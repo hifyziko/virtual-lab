@@ -1,34 +1,40 @@
 /* D-T products and mobile neighbouring nuclei. Units: keV, fm, keV/c, fm/c.
    Pairwise electrostatic interaction; secondary nuclear reactions are not inferred. */
 (function(root){'use strict';
-const Q=17589.3,masses={alpha:3727379.4066,neutron:939565.4205},C=1439.96448;
+const M=root.CoulombModel||(typeof require==='function'?require('./model.js'):null);
+const Q=1875612.94257+2808921.13298-3727379.4066-939565.4205,masses={alpha:3727379.4066,neutron:939565.4205},C=1439.96448;
 const nuclearMass={1:938272.08816,2:1875612.94257,3:2808921.13298,4:masses.alpha};
-function kinetic(b){const momentum=Math.hypot(b.px,b.py);return momentum*momentum/(Math.hypot(b.mass,momentum)+b.mass);}
-function velocity(b){const e=Math.hypot(b.mass,b.px,b.py);return [b.px/e,b.py/e];}
+function kinetic(b){const momentum=Math.hypot(b.px,b.py);return momentum?momentum*momentum/(Math.hypot(b.mass,momentum)+b.mass):0;}
+function velocity(b){const e=Math.hypot(b.mass,b.px,b.py);return e?[b.px/e,b.py/e]:[0,0];}
 function potential(b,sources){return sources.reduce((sum,t)=>t===b?sum:sum+C*b.Z*t.Z/Math.max(1e-9,Math.hypot(b.x-t.x,b.y-t.y)),0);}
 function force(b,sources){let fx=0,fy=0;for(const t of sources){if(t===b||!b.Z||!t.Z)continue;const dx=b.x-t.x,dy=b.y-t.y,r=Math.max(1e-9,Math.hypot(dx,dy)),f=C*b.Z*t.Z/r**3;fx+=f*dx;fy+=f*dy;}return [fx,fy];}
 function bodies(state){return [...state.products,...state.sources];}
-function totalEnergy(state){const all=bodies(state);let value=all.reduce((sum,b)=>sum+kinetic(b),0);for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)value+=potential(all[i],[all[j]]);return value;}
+function totalEnergy(state){const all=bodies(state);let value=all.reduce((sum,b)=>sum+kinetic(b)+M.cellField(state.cell,b.x,b.y,b.Z).U,0);for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++)value+=potential(all[i],[all[j]])+M.surfaceField(all[i],all[j],Math.hypot(all[i].x-all[j].x,all[i].y-all[j].y)).U;return value;}
 function totalMomentum(state){return bodies(state).reduce((sum,b)=>[sum[0]+b.px,sum[1]+b.py],[0,0]);}
-function create({x,y,energy=0,angle=0,sources=[]}){
+function create({x,y,energy=0,angle=0,sources=[],cell=null,boost=[0,0]}){
  const ma=masses.alpha,mn=masses.neutron,W=ma+mn+Q+Math.max(0,energy),momentum=Math.sqrt((W*W-(ma+mn)**2)*(W*W-(ma-mn)**2))/(2*W),px=momentum*Math.cos(angle),py=momentum*Math.sin(angle);
  const products=[{id:'alpha',A:4,Z:2,mass:ma,x,y,px:-px,py:-py},{id:'neutron',A:1,Z:0,mass:mn,x,y,px,py}];
- const state={products,sources:sources.map(t=>({...t,mass:t.mass||nuclearMass[t.A]||t.A*931494.10242,px:t.px||0,py:t.py||0})),time:0,energy:Q+Math.max(0,energy),collision:null};state.initialEnergy=totalEnergy(state);state.initialMomentum=totalMomentum(state);return state;
+ const beta2=boost[0]**2+boost[1]**2;
+ if(beta2>0&&beta2<1){const gamma=1/Math.sqrt(1-beta2);for(const b of products){const energy=Math.hypot(b.mass,b.px,b.py),dot=b.px*boost[0]+b.py*boost[1],factor=(gamma-1)*dot/beta2+gamma*energy;b.px+=factor*boost[0];b.py+=factor*boost[1];}}
+ const state={cell,products,sources:sources.map(t=>({...t,mass:t.mass||nuclearMass[t.A]||t.A*931494.10242,px:t.px||0,py:t.py||0})),time:0,energy:Q+Math.max(0,energy),collision:null};state.initialEnergy=totalEnergy(state);state.initialMomentum=totalMomentum(state);return state;
 }
-function pairForces(all){const forces=all.map(()=>[0,0]);for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){if(!all[i].Z||!all[j].Z)continue;const dx=all[i].x-all[j].x,dy=all[i].y-all[j].y,r=Math.max(1e-9,Math.hypot(dx,dy)),coefficient=C*all[i].Z*all[j].Z/r**3,fx=coefficient*dx,fy=coefficient*dy;forces[i][0]+=fx;forces[i][1]+=fy;forces[j][0]-=fx;forces[j][1]-=fy;}return forces;}
+function pairForces(all,cell){const forces=all.map(b=>{const w=M.cellField(cell,b.x,b.y,b.Z);return [w.fx,w.fy];});for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){if(!all[i].Z||!all[j].Z)continue;const dx=all[i].x-all[j].x,dy=all[i].y-all[j].y,r=Math.max(1e-9,Math.hypot(dx,dy)),coefficient=C*all[i].Z*all[j].Z/r**3+M.surfaceField(all[i],all[j],r).F/r,fx=coefficient*dx,fy=coefficient*dy;forces[i][0]+=fx;forces[i][1]+=fy;forces[j][0]-=fx;forces[j][1]-=fy;}return forces;}
 function advance(state,dt){
  if(state.collision)return;const all=bodies(state),maxSpeed=Math.max(...all.map(b=>Math.hypot(...velocity(b))));let clearance=Infinity,closest=null;
  for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){
   // Alpha and neutron are the already resolved exit channel, born at one point.
-  if(i===0&&j===1)continue;
-  const b=all[i],t=all[j],R=1.4*(Math.cbrt(b.A)+Math.cbrt(t.A)),gap=Math.hypot(b.x-t.x,b.y-t.y)-R;
+  if(!state.generic&&i===0&&j===1)continue;
+  if(!all[i].A||!all[j].A)continue;
+  const b=all[i],t=all[j],R=1.4*(Math.cbrt(b.A)+Math.cbrt(t.A)),core=b.Z&&t.Z&&!(b.surfaceGroup&&b.surfaceGroup===t.surfaceGroup)?(b.core||0)+(t.core||0):0,gap=Math.hypot(b.x-t.x,b.y-t.y)-Math.max(R,core);
   if(gap<clearance){clearance=gap;closest={product:b.id,target:t.id};}
  }
  if(clearance<=1e-6){state.collision=closest;return;}
- const h=Math.min(dt,.03*clearance/Math.max(2*maxSpeed,1e-8));if(h<1e-9){state.collision=closest;return;}
- const before=pairForces(all);all.forEach((b,i)=>{b.px+=before[i][0]*h/2;b.py+=before[i][1]*h/2;});
+ const before=pairForces(all,state.cell),maxAcceleration=Math.max(1e-30,...all.map((b,i)=>b.mass?Math.hypot(...before[i])/b.mass:0));
+ const wallGap=Math.min(...all.map(b=>M.cellField(state.cell,b.x,b.y,b.Z).gap));
+ const h=Math.min(dt,.02*Math.sqrt(Math.max(1e-9,Math.min(clearance,wallGap))/maxAcceleration),.03*clearance/Math.max(2*maxSpeed,1e-8),.02*Math.max(1e-9,wallGap)/Math.max(maxSpeed,1e-8));if(h<1e-9){state.collision=closest;return;}
+ all.forEach((b,i)=>{b.px+=before[i][0]*h/2;b.py+=before[i][1]*h/2;});
  for(const b of all){const v=velocity(b);b.x+=v[0]*h;b.y+=v[1]*h;}
- const after=pairForces(all);all.forEach((b,i)=>{b.px+=after[i][0]*h/2;b.py+=after[i][1]*h/2;});state.time+=h;return h;
+ const after=pairForces(all,state.cell);all.forEach((b,i)=>{b.px+=after[i][0]*h/2;b.py+=after[i][1]*h/2;});state.time+=h;return h;
 }
 // Select a demonstrative grazing orientation; never change forces or outcome probabilities.
 function planEncounter(options,side=1){

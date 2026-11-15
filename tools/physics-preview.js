@@ -4,9 +4,9 @@
   const areas = [
     {id:'electricity', title:'Elektřina a magnetismus', intro:'Od základních zákonů k elektrickému a magnetickému poli.', groups:['electromagnetism','materials'], topics:'Elektromagnetická indukce · silové účinky · materiály'},
     {id:'machines', title:'Elektrické stroje', intro:'Využití elektromagnetických principů ve strojích a pohonech.', groups:['transformer','common','induction','sync','dc','drive'], topics:'Transformátory · vinutí · motory · generátory · pohony'},
-    {id:'plasma', title:'Plazma a fúze', intro:'Nový prostor pro fyziku nabitých částic a energii hvězd.', groups:[], topics:'Částice v poli · magnetické udržení · tokamak'}
+    {id:'plasma', title:'Plazma a fúze', intro:'Prozkoumejte jádra a atomy, Coulombovu bariéru a názorné ukázky fúzních reakcí.', groups:['fusion'], topics:'Jádra a atomy · Coulombova bariéra · fúzní reakce'}
   ];
-  const groupTitles = {electromagnetism:'Základní elektromagnetické principy',materials:'Materiály',transformer:'Transformátory',common:'Vinutí',induction:'Asynchronní stroje',sync:'Synchronní stroje',dc:'Stejnosměrné stroje',drive:'Elektrické pohony vozidel'};
+  const groupTitles = {electromagnetism:'Základní elektromagnetické principy',materials:'Materiály',transformer:'Transformátory',common:'Vinutí',induction:'Asynchronní stroje',sync:'Synchronní stroje',dc:'Stejnosměrné stroje',drive:'Elektrické pohony vozidel',fusion:'Jádra, atomy a fúzní reakce'};
   const areaForGroup = group => areas.find(a => a.groups.includes(group)) || areas[0];
   const esc = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function context() {
@@ -17,8 +17,7 @@
     return {module,group,area};
   }
   function navigation({module,group,area}) {
-    const up = module && group ? '#group-' + group : group && area ? '#group-area-' + area.id : '#';
-    return `<nav class="physics-navigation" aria-label="Navigace laboratoře"><div class="physics-breadcrumb"><a href="#">Laboratoř</a>${area ? `<span aria-hidden="true">/</span><a href="#group-area-${area.id}" ${!group?'aria-current="page"':''}>${area.title}</a>` : ''}${group ? `<span aria-hidden="true">/</span><a href="#group-${esc(group)}" ${!module?'aria-current="page"':''}>${esc(groupTitles[group] || group)}</a>` : ''}${module ? `<span aria-hidden="true">/</span><span aria-current="page">${esc(module.title)}</span>` : ''}</div><div class="physics-shortcuts">${area ? `<a class="physics-up" href="${up}">↑ O úroveň výš</a>` : ''}<span class="physics-switch-label">Přejít do oblasti:</span>${areas.map(a => `<a href="#group-area-${a.id}" ${a===area?'aria-current="true"':''}>${a.title}</a>`).join('')}</div></nav>`;
+    return `<nav class="physics-navigation" aria-label="Navigace laboratoře"><div class="physics-breadcrumb"><a href="#">Laboratoř</a>${area ? `<span aria-hidden="true">/</span><a href="#group-area-${area.id}" ${!group?'aria-current="page"':''}>${area.title}</a>` : ''}${group ? `<span aria-hidden="true">/</span><a href="#group-${esc(group)}" ${!module?'aria-current="page"':''}>${esc(groupTitles[group] || group)}</a>` : ''}${module ? `<span aria-hidden="true">/</span><span aria-current="page">${esc(module.title)}</span>` : ''}</div><div class="physics-shortcuts"><span class="physics-switch-label">Přejít do oblasti:</span>${areas.map(a => `<a href="#group-area-${a.id}" ${a===area?'aria-current="true"':''}>${a.title}</a>`).join('')}</div></nav>`;
   }
   Lab.home = function () {
     const template = document.createElement('template');
@@ -41,9 +40,13 @@
     const nav = document.createElement('nav');
     nav.className = 'physics-areas';
     nav.setAttribute('aria-label', 'Oblasti fyziky');
-    nav.innerHTML = areas.map((area,i) => `<a class="physics-area-link area-${area.id}" href="#group-area-${area.id}"><span class="eyebrow">${i===2?'Námět nové oblasti':'Dostupné moduly'}</span><h2>${area.title}</h2><p>${area.topics}</p><strong>${i===2?'Prohlédnout návrh':'Prozkoumat oblast'} →</strong></a>`).join('');
+    nav.innerHTML = areas.map(area => `<a class="physics-area-link area-${area.id}" href="#group-area-${area.id}"><span class="eyebrow">Dostupné moduly</span><h2>${area.title}</h2><p>${area.topics}</p><strong>Prozkoumat oblast →</strong></a>`).join('');
     home.querySelector('.hero').after(nav);
     nav.hidden = !!current.area;
+    if (current.area) {
+      const up = current.group ? '#group-area-' + current.area.id : '#';
+      home.querySelector('.hero').insertAdjacentHTML('afterend', `<nav class="physics-level-navigation" aria-label="Návrat do nadřazeného tématu"><a class="physics-up physics-up-primary" href="${up}"><span aria-hidden="true">↑</span> O úroveň výš</a></nav>`);
+    }
     home.querySelector('.sectionline h2').textContent = 'Témata a moduly';
     const groups = [...home.querySelectorAll('.topic-group')];
     const footer = home.querySelector('.homefooter');
@@ -65,7 +68,7 @@
       if (area.id === 'plasma') section.insertAdjacentHTML('beforeend', '<div class="physics-proposals">' + [
         ['Částice v elektrickém a magnetickém poli','Pohyb nabitých částic jako základ pro pochopení plazmatu.'],
         ['Magnetické udržení plazmatu','Od pohybu podél siločar k principu tokamaku.'],
-        ['Jaderná fúze','Slučování lehkých jader a podmínky pro uvolňování energie.']
+        ['Fúzní elektrárny','Od jaderných reakcí k výrobě elektrické energie.']
       ].map(([title,text]) => `<article class="physics-proposal"><span class="badge">Námět k doplnění</span><h3>${title}</h3><p>${text}</p></article>`).join('') + '</div><p>Zatím návrh obsahu této oblasti. Interaktivní moduly zde ještě nejsou.</p>');
       footer.before(section);
     }
@@ -74,11 +77,7 @@
     home.querySelector('.discovery-search span').textContent = current.area ? 'Najít téma v oblasti' : 'Najít modul ve všech oblastech';
     // Remove other areas' groups from scoped search, keeping the root search global.
     if (current.area) for (const section of home.querySelectorAll('.physics-area')) if (section.hidden) section.remove();
-    if (!current.area || current.area.id === 'plasma') home.querySelector('.discovery-actions').hidden = true;
-    if (current.area?.id === 'plasma') {
-      home.querySelector('.discovery-toolbar').hidden = true;
-      home.querySelector('.sectionline').hidden = true;
-    }
+    if (!current.area) home.querySelector('.discovery-actions').hidden = true;
     return template.innerHTML;
   };
   const route = Lab.route;

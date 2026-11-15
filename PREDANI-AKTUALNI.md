@@ -2,6 +2,95 @@
 
 ## GitHub a přenos — 15. listopadu 2026
 
+### Předání na další počítač a schválený push
+
+Uživatel po dokončení přehledové galerie výslovně požádal o soukromý
+předávací ZIP a push posledního stavu. Tím nahradil předchozí zastavení
+pushe. Předává se celý aktuální vývoj včetně souběžných úprav fúzních reakcí,
+vlnového balíčku, společné galerie a navigace. Označení aplikace zůstává 1.0;
+konkrétní stav určuje commit a `_handoff/state.json` v soukromém ZIPu.
+ZIP obsahuje literaturu, malé zdrojové modely, aktuální web a Git/LFS historii.
+Na dalším počítači rozbalit do nové složky, spustit
+`node tools/project/restore.cjs` a přečíst pravidla. Další běžný postup je
+Pull → úpravy → Commit → Push; další push opět pouze na výslovný pokyn.
+Historické poznámky „bez pushe“ níže se vztahují k tehdejším dílčím úpravám.
+
+### Fúze a galerie v projektu — místní změna 15. listopadu 2026
+
+Oprava černého pole a ostrosti: původní zamýšlené čištění canvasu se kvůli
+neúspěšné textové náhradě nepropsalo. Nyní se před každým snímkem vypne
+scissor a celý buffer vyčistí světlou barvou pozadí; test kontroluje pořadí
+i barvu. Limit 480 tisíc pixelů / 1024 px nahrazuje 6 milionů pixelů / 4096 px,
+s podporou devicePixelRatio do 2 a adaptací podle výkonu. Ochrana fronty GPU
+i uvolnění kontextu zůstávají aktivní. Test vyžaduje na velkém okně skutečně
+vyšší rozlišení. Bez pushe.
+
+Aktuální přání: menší modely a všechny současně. Výchozí volba „Vše“ ukazuje
+13 různých modelů (9 částic/jader a 4 atomy), po pěti sloupcích na širokém
+displeji. Filtry skupin zůstávají dostupné. Celý canvas se před vykreslením
+vyčistí barvou pozadí, takže neobsazená pole nejsou černá. Push je po pokynu
+„stop“ stále odvolaný; tato další změna se neodesílá.
+
+Na další přání uživatele galerie znovu zobrazuje celou vybranou skupinu
+současně: 5 částic, 5 jader nebo 4 atomy v přehledové mřížce. Na úzkém
+displeji má dvě kolony. Zachovává jediný grafický kontext, společný omezený
+kreslicí buffer a ochranu před hromaděním snímků na GPU.
+
+Poslední oprava po snímku obrazovky: prázdnou galerii způsobilo chybné
+zařazení jejího vnějšího rámu do nativního škálování `module-window-fit.js`.
+To přidávalo `uniform-module-layout`, přepsalo výšku hostitele na `auto`
+a iframe se zhroutil na výchozích 150 px. Obal má nyní správné označení
+`imported-workspace`, takže si oba vložené fúzní moduly zachovávají
+responzivní výšku. Regresní test se skutečným společným škálováním před
+opravou selhal a po opravě prochází; pokrývá i staré odkazy galerie.
+Navíc byl opraven pevný limit vzdálenosti 20 v ray marchingu: při automatickém
+oddálení v nízkém okně skrýval model. Počet kroků i hranice modelu zůstávají
+omezené, test pokrývá vzdálenější kameru pro částice, jádra a atomy.
+
+V katalogu jsou dva vstupy: experiment `#fu01-reakce` a na další žádost
+uživatele sjednocená galerie `#fu02-galerie`. Galerie přepíná částice (5),
+jádra (5) a atomy (4), vždy s celou skupinou zobrazenou současně.
+Původní odkazy `#fu02-jadra`, `#fu03-atomy` a `#fu04-castice` zůstávají
+funkční jako vstupy do příslušné skupiny této jediné galerie. Také původní
+přímé HTML adresy jsou zachované. Skupina `#group-fusion` patří do Plazma a fúze.
+
+Společná hlavička, návrat a barevnost jsou ve
+`versions/vyvoj/m_files/fusion/navigation/`, ve webu v `shared/fusion/`.
+`build-progressive-web.cjs` připravuje dva balíčky `lazy/fusion-*.js` s HTML,
+skripty, CSS i fonty. Vkládají se až při otevření přes `srcdoc`; galerie a její
+staré odkazy sdílejí jeden balíček. Celkem je 40 odložených souborů.
+Samostatné sestavení galerie obnovuje i tyto balíčky a manifest.
+
+Po předchozí změně načítání uživatel dál hlásil nefunkční galerii a následně
+„This page crashed“. Přesná příčina pádu prohlížeče nebyla potvrzena.
+Galerie má kreslicí buffer nejvýše 480 000 pixelů / 1024 pixelů na delší
+straně a nejvýše 30 snímků/s. Galerie i fúzní renderer neřadí další snímek
+za vytíženou GPU. Souběžné úpravy fúzního experimentu vrátily jeho vlastní
+rozlišení a snímkování; omezení galerie se na něj již nevztahují.
+Galerie přepíná skupiny v jednom grafickém kontextu; odchod výslovně ruší
+animaci a uvolňuje grafické prostředky. Vzhled povrchů a fyzikální modely
+se nemění. Zdroj fúzních reakcí se dál upravuje souběžně v jiném chatu.
+
+Kontroly v `tools/test-fusion-render-lifecycle.cjs` pokrývají přepínání,
+počet kontextů, velká okna, omezení fronty snímků a opakovaný úklid;
+grafické příkazy jsou zde simulované. Navigační test ověřuje sdílení balíčku,
+staré odkazy, uvolnění dítěte a veřejné závislosti. DOM kontroly používají
+skutečný KaTeX. Skutečné vykreslení WebGL ani odstranění pádu v uživatelově
+prohlížeči nelze těmito testy potvrdit; nástroj pro vizuální kontrolu dříve
+odmítl místní file:// adresu. Změny jsou pouze místní, v obou dodávkách aktualni.
+**Bez pushe.**
+
+### Návrat do nadřazeného tématu — místní změna 15. listopadu 2026
+
+Na žádost uživatele je tlačítko „↑ O úroveň výš“ přesunuté z horních zkratek
+přímo pod banner oblasti, před podtémata. Má výrazné pozadí v barvě oblasti,
+minimální výšku 48 px a na úzké obrazovce plnou šířku. Z oblasti vede na hlavní
+rozcestník, z podtématu do jeho oblasti; v hlavním rozcestníku se nezobrazuje.
+Zdroje: `tools/physics-preview.js` a `tools/physics-preview.css`.
+Obě dodávky aktualni jsou sestavené; prošla kontrola `tools/project/check.cjs`
+a DOM kontrola umístění a cílů odkazů pro všechny oblasti a podtémata.
+Prohlížeč nebyl otevřen. **Změna tlačítka zatím nebyla pushnutá.**
+
 ### Postupné načítání — místní změna 15. listopadu 2026
 
 Úvodní HTML bylo zmenšeno z 100 942 297 na 2 432 242 bajtů (o 97,6 %).
@@ -24,6 +113,12 @@ DOM test používá náhrady canvasu; prohlížeč se neotevíral a vzhled nebyl
 vizuálně ověřen. Uživatel 15. listopadu 2026 výslovně schválil push tohoto
 zrychlení pro vyzkoušení. Skutečné nasazení potvrzuje úspěšný běh Pages;
 rozpracované změny fúzního modulu se tímto pushem nezveřejňují.
+
+Push zrychlení byl dokončen commitem `11b8cd2`. GitHub Pages běh
+`43727926261` úspěšně sestavil a nasadil web. Z veřejné adresy bylo staženo
+a pomocí SHA-256 ověřeno úvodní HTML (2 432 238 bajtů) i tři samostatné
+balíčky lekcí/dat proti přesně odeslanému sestavení. Rozpracovaná fúze
+zůstává místně; v tomto pushi nebyla zahrnuta.
 
 Níže uvedené počty a monolitické HTML popisují původní stav propojení.
 
@@ -98,3 +193,162 @@ Historické poznámky zůstávají v `versions/vyvoj/PREDANI_PROJEKTU.md`.
 Literatura a referenční podklady jsou přibalené; Chapmanův PDF soubor je
 Instructor’s Manual, nikoli plný text učebnice. Balíček je určen k předání
 projektu, nikoli k veřejnému zveřejnění přiložené literatury.
+
+
+### Coulombova bariéra — rozpracovaná lokální změna 15. 11. 2026
+Pohyblivé cíle při výstřelu, zamknuté při ručním ovládání a míření. Shift + tažení rozmísťuje jádra. Afinní projekce a společný integrátor predikce/letu; viditelná měkká vnější stěna pouze pro nabité částice. Bez automatického zoomu. Detaily a omezení v docs/fuze/COULOMB-MODEL.md, test tools/test-coulomb-mobile.cjs. Kreslené značky jsou zvětšené a mohou se při blízkých setkáních překrývat; dále ladit podle uživatelské vizuální kontroly. Git pull v této relaci selhal na zápisu .git/FETCH_HEAD (omezená oprávnění); změna není tímto krokem publikovaná.
+
+Ověřeno po úpravě: úplné sestavení aktualni, testy navigace a modelů z project/check, nový test mobilních jader, lokální DOM test ovládání/fúze a audit veřejného seznamu (436 souborů). Audit bylo nutné spustit mimo omezený proces kvůli EPERM při spuštění Gitu; prošel. Prohlížeč neotevřen, vizuální vzhled neověřen.
+
+Doplnění: libovolné jádro lze kliknutím/uchopením vybrat jako projektil. Každé těleso zachovává vlastní druh, A a Z i po výměně rolí. Shift pouze přesouvá. Testy výběru, letu, smíšených druhů a navazující D–T prošly; automatická vizuální kontrola nadále neprovedena.
+
+Opraveno ruční přiblížení: opět dosahuje energetické hladiny U=E, odstup zvětšené kresby řeší pouze ruční grafická značka středu. Predikce děla je dávkovaná, aby náměr neblokoval UI. Test 80 změn úhlu a tří teplot prošel; viz docs/fuze/COULOMB-MODEL.md.
+
+Aktuálně obnovován a ověřen řetězec výstřel–tunel–D–T: aktivace deuteronu před volbou cíle, dokončení náhledu před výstřelem bez opětovného přezbrojení. Přidán uživatelem zvolený samostatný detail a větší oblast doletu; odsouvání kresby projektilu odstraněno.
+
+Poslední pokyn: detail odstranit. Panel odstraněn, těsné průlety řeší pouze zmenšení kreslených značek (včetně jejich popisků) bez změny skutečných poloh nebo trajektorie. Fyzikální kontakt se nadále posuzuje podle R v modelu.
+
+Nejnovější pokyn: střelba pouze deuteronem, jiné konfigurace bez D mají dělo neaktivní. Velikosti jader pevné; místo zmenšování se didakticky rozestupují kresby a mezera klesá s teplotou. Stejný převod pro náhled i let; fyzikální integrátor a graf nezměněné.
+
+Po dokončené fúzi se při dalším uchopení scény obnovují vstupní jádra (bez převzetí produktů). Teplotní ovladač nyní 10–500 MK.
+
+### Fúze všech nabízených dvojic a 10 MK — místní změna 15. listopadu 2026
+Doplněn registr reactions.js a produkty všech nabízených dvojic, včetně volitelných větví D–D a p–p. Neutron–triton je pružný rozptyl bez tunelování. Dělo vybírá projektil podle dvojice. Kinematika zachovává energii a hybnost; tříčásticové výstupy ukazují zvolenou přípustnou konfiguraci, nikoli fyzikální rozdělení pravděpodobnosti.
+Opraveno ovládání při 10 MK, normalizace pole nezávislá na teplotě, záběr po ochlazení, příprava směru a adaptivní časový krok pomalých produktů. Neutrální jaderný kontakt má numerickou toleranci 0,001 fm, aby integrátor nezastavoval těsně před kontaktem. Podrobnosti a zdroje: docs/fuze/COULOMB-MODEL.md.
+Prohlížeč nebyl otevřen; ovládání je testované v DOM s náhradním canvasem, nejde o vizuální kontrolu. Změny nejsou publikované ani pushnuté.
+Ověření: úplné sestavení dokončeno; modelové a integrační testy z tools/project/check.cjs prošly, jeho závěrečný audit Gitu byl kvůli sandboxu spuštěn samostatně a prošel (442 souborů). DOM průběhy všech devíti kanálů dokončeny při 10 a 500 MK se třemi cíli; neutronová větev ověřena bez tunelování. Samostatně prošlo opakované tažení a míření při 10 MK. Zdroje a obě aktuální dodávky mají shodné soubory modulu.
+
+### Viditelné volby p–p — 15. listopadu 2026
+Pro p–p nahrazují skrytou volbu větve dvě tlačítka přímo v ovládání: „Tunelování bez β⁺ rozpadu“ a „Tunelování s β⁺ rozpadem“. Kliknutí připraví vybraný průběh, zvýrazní tlačítko; Vystřelit spustí děj. Volba vynutí navázání správnými produkty dané větve, obecné zaškrtávátko a původní tlačítko přípravy jsou pro p–p skryté. Ostatní dvojice zachovávají své ovládání. Aktualizovány obě dodávky pomocí build-particle-library.cjs.
+
+### Míření a počet cílů — místní změna 15. listopadu 2026
+Náhled ukazuje pouze směr a první odklon u nehybných cílů, po výstřelu zmizí. Odstraněno nelineární obcházení zvětšených značek v náhledu. Volba cílových jader rozšířena na 1–5 (výchozí 3). Neúspěšné hledání přípustné připravené reakce je nyní výslovně hlášeno; běžný výstřel zůstává dostupný. Obě aktuální dodávky aktualizovány. Kontrola lokálního náhledu při 10/100/500 MK a 1/3/5 cílech prošla; testy sil a mobilních jader zůstávají úspěšné. Prohlížeč nebyl otevřen.
+
+### Upřesnění délky mířidla — 15. listopadu 2026
+Náhled nově pokračuje přes první bod nejbližšího přiblížení a krátce za něj, aby byl vidět odklon (do 1,2násobku vzdálenosti v bodě obratu, nejvýše 0,65 této vzdálenosti po dráze za obratem). Končí také při přechodu k dalšímu nejbližšímu cíli. Cíle v náhledu stojí; pod zvětšenými značkami se čára přerušuje, ale její tvar se neohýbá kvůli obrysům. Nahrazuje předchozí limit 15° / 85 % vzdálenosti, který končil příliš brzy. Ověřeno zachování poloh cílů a viditelný odchozí úsek při 10/100/500 MK, včetně čelního směru. Obě aktuální dodávky sestaveny, DOM test ovládání při 10 MK prošel.
+
+### Viditelnost produktů a schválený pozitron — 15. listopadu 2026
+Pozitron nově používá stejnou geometrii/povrch jako elektron, sytě fialovou barvu a e⁺; uživatel schválil shodný tvar s jinou barvou a e⁺. Definice je ve společném particles/style.js, dostupná také v katalogu částic. Renderer nastavuje barvu leptonu samostatně pro každou instanci. Popisky produktů se odvozují z druhu, nikoli z pořadí alfa/neutron. Foton a neutrino mají alespoň vlastní symbol, ne chybějící výstup. Společná rychlost přehrávání je omezena nejrychlejším odletem z aktuální polohy tak, aby byl za přímočarého odletu viditelný nejméně 3,4 s; fyzikální rychlosti ani jejich poměry se nemění. Po opuštění záběru zůstává označení mimo záběr.
+Ověřeno DOM zachycením skutečných instancí rendereru: neutron viditelný 227 snímků, pozitron 540 snímků. Nejde o vizuální test WebGL v prohlížeči. Obě aktuální dodávky aktualizovány.
+
+### Neutrino a uvolněná energie — 15. listopadu 2026
+Schválená podoba elektronového neutrina: světlá částice s tmavým obrysem a νₑ. Přidána do společné definice, sdíleného shaderu, katalogu a fúzní scény; popisek je tmavý. Geometrický obrys je řízen pohledovým úhlem povrchu, nikoli rastrovou texturou. Opraveny druhově závislé energetické popisky všech produktů.
+Při emisi produktů se objeví klidné zlaté podbarvení místa reakce a trvalá karta Uvolněná energie +Q MeV, odvozená z registru reakčních klidových hmotností. Pružné kanály ukazují nulové uvolnění bez zlaté záře. Karta se při resetu skryje; nejde o dodatečnou energii v integrátoru. DOM kontrola D–T a p–p β⁺ ověřila Q, reset karty a vykreslování neutrina (383 viditelných snímků). Modelové testy všech kanálů a sdílené knihovny prošly. Aktualizovány obě dodávky; vizuální ověření v prohlížeči neproběhlo.
+
+### Oprava obcházení neutrina — 15. listopadu 2026
+Odstraněno odsouvání nabitých kreseb před neutrálními částicemi v schematicItems. Výpočet sil byl správně bez Coulombovy síly neutrina, ale zobrazovací transformace vytvářela falešnou objížďku a návrat. Neutrální částice nyní nevytěsňují žádné jiné značky; platí shodně pro živé kresby, pole i stopy. Silné srážky neutronů zůstávají věcí fyzikálního modelu, slabé interakce neutrin zde nejsou simulovány. Ověřeno průletem neutrina, gama a neutronu kolem dvou protonů: jejich kreslené polohy se proti stavu bez neutrální částice nemění. Odsazení dvojice nabitých jader zachováno.
+Energetické podbarvení zesíleno na krátký měkký zlatý impuls s maximem po 0,22 s, širší plochou a postupným útlumem. Bez tlakové vlny, fyzikální energie nezměněna. Obě aktuální dodávky aktualizované, regresní test sil a test dodávky prošly.
+
+### Souhrnný audit fúzního modulu — 15. listopadu 2026
+Zkontrolovány všechny reakční větve: devět kanálů při 100 MK, jejich energetické popisky a reset prvním gestem, devět kanálů se třemi cíli při 10 MK a 500 MK. Všechny tyto průběhy dokončeny. Ovládání (zoom, opakované uchopení, uvolnění a příprava náměru) prošlo maticí 1/3/5 cílů × 10/100/500 MK. Testovací náhrada WheelEvent potřebuje explicitní clientX/clientY; její původní NaN nebylo chybou aplikace.
+Nový trvalý tools/test-fusion-visual-contract.cjs zahrnut do tools/project/check.cjs: žádná odchylka nabitých značek kvůli neutrálnímu průletu; žádná elektrická síla ani fiktivní jaderný kontakt neutrina/gama; náhled první zatáčky; shodné Q D–T v obou modelech. Sjednoceno dříve zaokrouhlené Q v fusion.js s klidovými hmotnostmi z registru. Energetické, hybnostní a částicové testy všech kanálů prošly.
+Neutrino má jasnější perleťový střed a lépe vymezený tmavý okraj. Nejde o světelné záření neutrina; přímá viditelnost je jen ilustrace. Zdroj: https://neutrinos.fnal.gov/faq/how-do-we-detect-neutrinos/ (světlo detektoru pochází z nabitých sekundárních částic). Neutrinová hmotnost je v kinematice pro tyto energie zanedbána; slabé interakce při odletu nejsou simulovány.
+Úplné sestavení dokončeno, modelové a integrační kontroly projektu prošly. Závěrečný read-only audit byl kvůli sandboxovému spawnSync git EPERM spuštěn samostatně a prošel (446 souborů). Prohlížeč nebyl otevřen a skutečný WebGL vzhled nebyl vizuálně ověřen; DOM testy používají náhradu canvasu. Nejde o tvrzení absolutní bezchybnosti ani o ověření fyzikálních aproximací jako přesného modelu plazmatu.
+
+Následné výtvarné upřesnění uživatele: neutrino nesmí působit jako nakreslené kolečko. Plochá světlá výplň a výrazná kontura nahrazeny standardním prostorovým nasvícením sdíleného členitého povrchu, s perleťovým základním materiálem a pouze jemným ztmavením na okraji. νₑ zůstává tmavé a stabilní. Obě dodávky aktualizovány, test sdílené knihovny i regresní test neutrálních průletů prošel. Fyzikální výpočty se nezměnily.
+
+### Sjednocení scén a zamítnutý automatický zoom — 15. listopadu 2026
+Odstraněno dodatečné odsouvání jednotlivých nabitých kreseb. Společné automatické zvětšování vyzkoušeno jako ochrana proti překrytí, ale uživatel jej výslovně odmítl; bylo vypnuto. Pohled je opět klidný a částice se výtvarně neodsouvají. Otázka nepřekrývání zvětšených značek je nyní otevřená: uživatel vybírá mezi názornou konzervativní silou před viditelným povrchem a zmenšením značek při těsném průletu. Dokud neodpoví, fyzikální síly se nemění; nezaručujeme nepřekrytí.
+Zůstává sjednocené počáteční rozmístění a oblast při stejné teplotě a počtu cílů pro všechny reakce, i společné pravidlo odletového času (bez normalizace podle nejrychlejšího produktu nebo zvláštního DT směru). Doba zobrazení produktů 18 s. Tyto změny jsou nezávislé na nedořešeném způsobu zobrazení těsného průletu.
+
+### Schválená varianta: měkký povrch jen pro dělo — 15. listopadu 2026
+Uživatel po odmítnutí zoomu i zmenšování schválil názorné měkké odpuzování při střelbě, s původním ručním přibližováním. Zavedena volitelná konzervativní přídavná energie U = K(2R/r − 1)^4 pro r < 2R, jinak nula. R je součet viditelných poloměrů převedených do scénových souřadnic při přípravě výstřelu. Síla je přesná záporná derivace tohoto potenciálu a působí na dvojici opačně. Není to další skutečná jaderná síla. Základní Coulombův potenciál a ruční dragTowards/multiAdvance jsou beze změny; graf dál ukazuje fyzikální bariéru, nikoli tento výtvarně motivovaný člen.
+Přídavná síla je pouze v mobileAdvance (výstřel), v krátkém náhledu děla a v propagaci nabitých produktů. Neutrino, foton ani neutron ji nemají. Člen je zahrnut do vyhodnocení lokální energie při přípravě tunelu. Odletové produkty stejné právě vznikající reakce jsou do prvního vzájemného oddělení výjimkou z tohoto modelu povrchu; Coulombova interakce mezi nimi zůstává. Ostatní zdroje se nevrací výtvarnou korekcí. Výstřel z už překrytých nabitých značek je odmítnut s pokynem částici oddálit.
+Zachován společný rozsah počátečního rozmístění pro všechny reakce, pevné značky a klidná kamera. Udržovací buňka má nadále explicitně názorný charakter. Přídavný člen znamená, že celá střelecká scéna již není přesnou Rutherfordovou simulací ve fm; tato odlišnost je uvedena v nastavení.
+Trvalý test kontroluje gradient přídavného potenciálu, nulovou sílu pro neutrální částici, nepřekrytí při dvoučásticovém průletu, energii i hybnost a trvalý zpětný ráz místo návratu kresby. Původní test ručního energetického limitu a ovládání při 10 MK prošel. Všech devět kanálů při 100 MK dokončeno, D–T s pěti cíli také.
+Dodatečné ověření: D–T a p–p β⁺ při odletu kontrolují nepřekrytí nabitých značek vůči okolním jádrům; výjimkou je vlastní vznik společných produktů reakce před jejich prvním oddělením. Oba průběhy prošly. Helium-3 + helium-3 při 10 MK ve zkoušeném rozmístění nyní nemá nalezený dostatečně čelní připravený průchod: příprava jej výslovně odmítá, běžná střelba zůstává dostupná. Není potají vynuceno tunelování; test odmítnutí prošel. Všechny větve při 100 MK, zpětný ráz a zachování energie/hybnosti přídavného povrchu prošly. Obě aktuální dodávky aktualizované.
+
+### Uchopení automaticky ručně a srozumitelné tempo — 15. listopadu 2026
+Uchopení libovolného jádra i Shift + uchopení přepne interaction na drag a synchronizuje viditelnou volbu režimu. Tažení mimo jádra ponechá míření děla. Dotyk do probíhající nebo dokončené reakce obnoví vstupní jádra a přepne na ruční režim; gesto se spotřebuje, produkty se nestávají projektily.
+Tempo předreakčního letu sníženo z 0,9 na 0,25 společného referenčního faktoru; odletové tempo zvýšeno z 0,18 na 0,6. Jde o dvě deklarovaná časová měřítka animace, nikoli fyzikální zpomalení produktů. V energetické kartě je výslovně uvedeno, že odlet je zvlášť zpomalený záběr a vizuální rychlost nelze porovnávat s výstřelem. Poměry fyzikálních rychlostí mezi současnými produkty zachovány. Odstraněno zastavení výstřelu podle délky bufferu stopy (při pomalejším přehrávání by ukončovalo let předčasně), nahrazeno vzdálenostní hranicí scény.
+Prošel DOM test uchopení a Shift-uchopení vs. míření mimo částice i regresní test konzervativního povrchu. Obě aktuální dodávky aktualizovány.
+
+### Plynulost webové animace — 15. listopadu 2026
+Profilace pěti jader helia-3 s polem a siločárami odhalila hlavní zátěž v fieldLayer: přibližně 69 ms, celkový snímek 79 ms (Happy DOM/náhrada canvasu, bez skutečného GPU). Výpočet skalární mapy i obou stylů siločar přesunut do standardního Web Workeru vytvořeného z Blobu. Částice na výsledek nečekají; nejvýše jeden výpočet běží současně, aktuální polohy se odesílají nejvýše 25× za sekundu, nehybné pole se znovu nepočítá. Pole má rastr 192 px na šířku místo 144, s hladkým zvětšením; hustota zdrojových siločar zůstává. Pracovník se ukončuje při opuštění stránky, ne při uložení do bfcache.
+Odstraněno samostatné omezení rendereru na 30 fps a limit 1024 px / 480000 pixelů, který na velkém okně snižoval rozlišení pod CSS rozměr. Zůstává DPR nejvýše 1,5 a GPU fence proti hromadění příkazů. Obnovená kvalita nezmenšuje geometrickou jemnost částic ani fyzikální časový krok.
+Po úpravě naměřeno přibližně 8,1 ms průměrného hlavního snímku ve stejném scénáři. Test skutečného asynchronního workeru (Node worker_threads jako most browser API) ověřil 34 přijatých a vykreslených výsledků; oba styly mají konečné souřadnice, neutrální částice nepřidává elektrické pole. Trvalý tools/test-fusion-field-worker.cjs je součástí check.cjs a hlídá také plné rozlišení a vykreslení po 16 ms při připraveném GPU. D–T, p–p β⁺, automatické ruční uchopení a fyzikální regrese prošly.
+Jde o běžné browser API, bez serverového výpočtu nebo dodatečného doplňku. Pokus o kontrolu již otevřené file:// stránky byl zablokován zásadou Browser Use URL policy; skutečný FPS/GPU a vizuální vzhled v prohlížeči nejsou tímto měřením ověřeny. Nejde o záruku 60 fps na každém zařízení.
+
+### Oprava p–p bez β⁺ — 15. listopadu 2026
+Příčina dojmu nerozpadlého útvaru: odletová dvojice s Q=0 začínala na malé fyzikální vzdálenosti, takže zvětšené protonové kresby a jejich popisky zůstávaly překryté. Závěr přechodné fáze nyní výslovně rozpojí dva protony ve směru vybraného odletu. Parametr minimumExitRadius v reakcích dovoluje této větvi navázat na viditelně oddělené výstupní polohy; ostatní větve zachovávají dosavadní výchozí hodnotu. Jde o ilustrační návaznost přechodného útvaru na konečný výstup, nikoli o nové uvolnění energie. Kinematika znovu řeší hybnosti při dané výstupní vzdálenosti včetně vzájemné Coulombovy energie.
+Prošel DOM test přes skutečné tlačítko Tunelování bez β⁺ při 10/100/500 MK: přechodná fáze, dva od prvního výstupního snímku oddělené protony, odstraněné popisky přechodného útvaru, Q=0, dokončení animace. Trvalý modelový test hlídá energii a hybnost při zvětšené výstupní vzdálenosti. Obě aktuální dodávky aktualizovány, test workeru i rendererového kontraktu prošel. Skutečné WebGL vykreslení nebylo vizuálně ověřeno.
+
+### Viditelný odlet p–p bez β⁺ — 15. listopadu 2026
+Následná oprava řeší skutečný pohyb, nejen oddělené startovní kresby. Pružné větve (p–p bez β⁺ a n–T) nově používají jednotné časové měřítko stanovené podle relativní rychlosti produktů, s cílovým oddělováním 14 % kratšího rozměru scény za sekundu při výchozím zoomu. Oba produkty i ostatní jádra mají stejný časový faktor; hybnosti, energie a síly nejsou přenásobeny. Nejde o dodatečné Q. Běžné fúzní větve se nemění, karta pružné větve výslovně upozorňuje na upravený čas odletu.
+DOM test nyní měří skutečný posun po jedné sekundě: při 10 MK 54/64 px a nárůst rozestupu 87 px; při 100 MK 41/47 px a nárůst 62 px; při 500 MK 41/46 px a nárůst 61 px (konkrétní kontrolní rozmístění). Všechny tři průběhy dokončeny, Q=0 a čisté popisky ověřeny. Modelové kontroly energie/hybnosti zachovány. Obě aktuální dodávky aktualizovány.
+
+### 15. 11. 2026 — společná hranice ručního přibližování jader
+Opravena regrese ručního přibližování u p–p i D–T: dragTowards dostává vzdálenost viditelných povrchů pro konkrétní dvojici (stejné geometrické rozměry jako dělo, mezera 8 px při základním zoomu). Energetické omezení zůstává, ke kontaktu kresby se rychlost plynule snižuje; analytická kontrola celého posunu brání přeskočení jádra rychlým pohybem kurzoru. Nejde o přidanou jadernou sílu. Ústup z mezní polohy funguje i u neutrálního projektilu. Velikost značek ani průběh fúze se touto opravou nemění.
+Ověření: rozšířen tools/test-coulomb-multi.cjs o všech sedm dvojic při 10/100/500 MK; HappyDOM test skutečných pointer událostí pro 21 kombinací (tmp/fusion-gallery/test-manual-clearance.cjs). Prošly také modelové testy pohyblivých jader, vizuálního kontraktu a produktů reakcí. HappyDOM používá náhradní canvas, není to vizuální kontrola skutečného GPU.
+
+### 15. 11. 2026 — ruční marker U=E a intenzita pole
+Nahrazuje předchozí vizuální doraz v manualApproach: ruční výpočet používá opět pouze fyzikální jadernou hranici a energetický limit. Malá vzdálenost se zvětšuje jen při vykreslení aktivní částice; ostatní cíle stojí, velikost kreseb se nemění. Graf stále používá fyzikální x/y a dojde k průsečíku U=E. Při přechodu na dělo se viditelná poloha materializuje jako nový počáteční stav výstřelu (bez skoku kresby), tato schematičnost je vysvětlena v metodice.
+Barevná mapa nyní počítá velikost vektorového součtu elektrických intenzit ve zobrazené geometrii (relativní škála, nikoli V/m). Worker i fallback používají stejný výpočet a rastr 192 px; zvýšena sytost podbarvení, odstraněny přidané oranžové záře, které zakrývaly rušení pole. Legenda i metodika změněny z potenciálu na intenzitu.
+Ověření: 21 kombinací skutečných pointer událostí v HappyDOM při 10/100/500 MK, U/E > 0,995, viditelné oddělení a ústup; p-p a D-T přechod na dělo bez posunu. Trvalý regresní test v test-fusion-visual-contract.cjs spouští skutečný manualApproach a kontroluje U=E, oddělení kreseb a zachování polohy při přepnutí. Test workeru ověřuje nulové pole uprostřed dvou stejných nábojů a invariantní barvy při zoomu. Testy p-p produktů a ovládání prošly. Skutečné GPU vykreslení nebylo vizuálně kontrolováno; prohlížeč nebyl automaticky spuštěn.
+
+### 15. 11. 2026 — délka tunelu v grafu
+Grafický tunel nově spojuje dva kořeny U(q)=E jedné souvislé zakázané oblasti sousedící s jadernou jámou; jeho začátek se neodvozuje od vzdálenosti vizuálního kontaktu a konec není natvrdo r=R. Marker nejprve během úvodní pětiny animace dojde po křivce k vnějšímu průsečíku; teprve pak se kreslí tunel a průchod. U více hrbolů nepřemosťuje další klasicky dovolenou oblast. Není-li bariéra, tunel se nevykreslí. Při startu průchodu se uloží geometrie a energie grafu, takže následný odlet produktů nemění délku tunelu. Jde o ilustraci průchodu, nikoli o výpočet doby kvantového tunelování.
+Regresní test v tools/test-fusion-visual-contract.cjs ověřuje oba kořeny, U>E mezi nimi, žádný tunel bez bariéry a oddělení sousedních bariér. Aktualizovány obě aktivní webové dodávky.
+
+### 15. 11. 2026 — společné časové měřítko a vstup do tunelu
+Výstřel i odlet produktů používají playbackRate; přechod z jednotek vstupního nerelativistického solveru do fm/c produktového solveru používá faktor sqrt(931494.10242). Odstraněno zvláštní zpomalení fúzních produktů i umělá minimální rychlost p-p/n-T. Nevyčerpaný integrační čas produktů se přenáší do dalšího snímku. Energetická karta a metodika nyní uvádějí společný čas výstřelu/odletu; tunelový a složený stav jsou nadále názorné efekty.
+Příspěvek okolních nábojů v grafu nebyl nulový: nově je výraznější vyplněná plocha mezi potenciálem izolované dvojice a součtem, modrý úsek u markeru, legenda plochy a U_okolí se třemi desetinnými místy. Nepřibyla samostatná křivka. Výpočet sdílí graphSurroundingEnergy; p-p test kontroluje součet všech okolních protonů.
+Začátek blikání ve scéně je synchronizován s příchodem markeru na vnější kořen U=E. barrierProfile sdílí graf a výpočet vstupní vzdálenosti; tato vzdálenost se ve scéně zobrazí stejným zvětšením malých vzdáleností jako při ručním přiblížení. První pětina efektu pouze přibližuje jádro; blikání, skoky a zvuk startují až potom. Testy kontrolují U=E včetně okolí a nepřítomnost skoků před dosažením vstupu.
+Programové kontroly projektu prošly; závěrečný pouze čtecí audit spuštěn zvlášť kvůli sandboxovému spawnSync git EPERM a také prošel. HappyDOM ověřil p-p odlet při 10/100/500 MK se společným hodinovým převodem (bez dřívějších umělých prahů rychlosti). Skutečné GPU vykreslení není vizuálně ověřené.
+
+### 15. 11. 2026 — volitelná rychlost společného přehrávání
+Kvůli příliš rychlému odletu je výchozí společná rychlost pohybu 0,1× (desetinová oproti předchozímu stavu). V hlavních ovladačích je volba 0,02× / 0,1× / 0,25× / 1×. Používá stejný násobek pro přílet i všechny produkty, nikoli změnu fyzikálních rychlostí, energie či sil. Volbu lze změnit během letu bez resetu. Limit délky odletu je měřen ve škálovaném čase, takže pomalé přehrávání neukončí dráhu předčasně. Ruční tažení, tunelový efekt a promíchání nejsou zpomalovány touto volbou.
+Ověření: regresní test společného hodinového převodu nyní zkouší všechny čtyři rychlosti. HappyDOM test D-T ověřil výchozí 0,1× a změnu během odletu na 0,02×: neutron urazí za stejný čas přesně pětinu vzdálenosti, bez resetování poloh. Kontrola shody obou dodávek se zdroji prošla. Prohlížeč nebyl spuštěn.
+
+15. 11. 2026: Nabídka rychlosti nahrazena posuvníkem 0,02×–1,00× s krokem 0,01 a výchozí hodnotou 0,10×. Událost input průběžně aktualizuje rychlost, viditelný údaj i aria-valuetext. Ověřena změna rychlosti během odletu bez resetu a shoda obou dodávek se zdroji.
+
+### 15. 11. 2026 — široký obousměrný ovladač přehrávání
+Posuvník je pod celou laboratoří přes její šířku. Rozsah -1 až +1, krok 0,001, střed zastaví děj, vlevo se přehrává uložený průběh zpět, vpravo vpřed; vzdálenost od středu určuje rychlost. Výchozí +0,1×. Záznam začíná výstřelem, zahrnuje přílet, tunelování, složený stav i produkty. Při dosažení konce dosavadního záznamu lze plynule pokračovat v živém výpočtu. Nové nastavení či pokus záznam maže. Zpětný chod neintegruje fyziku obráceně ani znovu nelosuje výsledek. Ve zpětném přehrávání není přehráván zvuk.
+Ukládají se kompaktní stavy bez kopií dlouhých trajektorií; při více než 12000 vzorcích se snižuje hustota záznamu se zachováním začátku i konce. Mezi vzorky stejné fáze se interpolují polohy, hybnosti a čas efektu, přes změnu druhu produktů se neinterpoluje. Kamera se při přehrávání nepřestavuje. Pomalu přehrávaný přílet nyní integruje i zbytek kroku v každém snímku, takže nečeká několik snímků na celý pevný krok. Čas tunelového a složeného efektu nyní respektuje ovladač přehrávání (při +0,1× zachovává dosavadní délku).
+Ověření: trvalý VM test obousměrného přehrávání (interpolace, zastavení, přesný návrat na konec, omezení na začátku), HappyDOM test skutečného D-T pokusu od produktů zpět přes compound/tunnel/flight a vpřed do identických poloh, včetně změn rychlosti a resetu. Projektové testy prošly; pouze čtecí audit spuštěný zvlášť kvůli omezení sandboxu prošel. Skutečný GPU obraz nebyl vizuálně kontrolován.
+
+### 15. 11. 2026 — ruční zásah obnovuje částice i rychlost
+Opraven konflikt záporné rychlosti přehrávání s ručním tažením: bez aktivního záznamu zpětný ovladač neblokuje ruční integraci. Ruční uchopení (také Shift), ruční šipky a přepnutí do ručního režimu vracejí posuvník na +0,1×. První zásah do scény po fúzi (kliknutí, kolečko, šipky), případně úprava parametrů v ovládacím panelu, obnoví původní jádra i rychlost; posuvník přehrávání a pauza nadále slouží k prohlížení záznamu. Obnovení funguje už během odletu produktů i po přetočení záznamu zpět před reakci. Záznam se při obnově zahodí.
+Ověření HappyDOM: ruční uchopení z rychlostí -1, 0, 0,02 a 1 vždy obnoví +0,1× a částice se dá táhnout; první klik během odletu D-T při nulové rychlosti obnoví deuteron/triton, vymaže záznam a nastaví +0,1×. Test obousměrného přehrávání stále prochází, obě dodávky odpovídají zdrojům.
+
+15. 11. 2026 — Oprava zoomu: kolečko již nevolá resetAfterFusion. Mění pouze pohled a při připraveném děle aktualizuje náhled; při letu, fúzi a přehrávání náhled nepřepočítává. HappyDOM test zoomu dovnitř/ven během produktů potvrzuje zachování částic, fáze, záznamu a rychlosti. Nahrazuje předchozí pravidlo restartu kolečkem.
+
+15. 11. 2026: Odstraněno tlačítko Pozastavit i jeho JS obsluha; zastavení zajišťuje nulová poloha obousměrného posuvníku. Test přehrávání včetně zastavení a test zoomu bez resetu prošly.
+
+### 15. 11. 2026 — tlačítko referenční animace tunelování
+Vedle Nastavení je Animace tunelování. Otevře modální přehrávač uživatelova MP4 „Trik, který využívá Slunce_ Kvantové tunelování…“; původní soubor beze změny zkopírován do fusion/barrier/tunnel-reference.mp4 (2 601 572 B), zařazen mezi zdrojové a webové soubory. Video se načítá až po otevření dialogu, ne při načtení laboratoře. Při otevření se pozastaví simulace a zvuk, při zavření se video zastaví a obnoví předchozí stav simulace. Nativní ovládání videa umožňuje přehrávání a posun času. Zavření funguje tlačítkem i Escape.
+Build progresivní dodávky přepisuje data-video-src pro srcdoc vložený do hlavního rozcestníku; samostatná stránka používá relativní cestu. Video zůstává externí soubor, není vloženo do startovacího JS. Test navigace kontroluje cestu a hash videa v obou dodávkách. HappyDOM test ověřil lazy otevření, pozastavení laboratoře a zastavení videa/obnovu po zavření; skutečné dekódování videa nebylo v prohlížeči ověřeno.
+
+15. 11. 2026: Podle dalšího upřesnění ruční uchopení/přepnutí a obnova po fúzi nastavují +1×. Při každém emitProducts se živé přehrávání automaticky nastaví na +0,1× (včetně p-p); posuvník a údaj se aktualizují. Zpětné přehrávání existujícího záznamu tento přechod znovu nevynucuje. Karta energie uvádí automatické zpomalení. HappyDOM ověřil reset ruční rychlosti, automatické zpomalení při emisi a zachování stavu při zoomu.
+
+### 15. 11. 2026 — plynulý nájezd do průsečíku a viditelný marker
+Nájezd před tunelováním už není pevná pětina 0,9s efektu (při 1× šlo o cca 18 ms). Jeho délka vychází ze zbývající zobrazené dráhy a příletové rychlosti, s minimem 1,8 interních jednotek času; rychlost přehrávání ji dál škáluje. Graf i scéna používají stejný hladký průběh nájezdu. Vlastní kvantové skoky a zvuk začínají až při dosažení vstupního průsečíku.
+Vodorovný rozsah grafu nově zahrnuje šestinásobek startovní vzdálenosti pokusu místo pevného q<=6, které při nízkých teplotách drželo marker na pravém okraji. Rozsah se během ručního pohybu nemění a ukládá se do snímku bariéry při tunelování. Přidána jemná svislá projekce markeru na osu vzdálenosti a odpovídající popisy dalších dekád.
+HappyDOM ověřil pomalý nájezd mnoha souvislými snímky bez skoku a dosažení vstupního bodu; u p-p a D-T při 10/100/500 MK ověřil, že marker začíná uvnitř grafu, při ručním přibližování se viditelně posouvá a polohy osových popisků zůstávají pevné. Test zpětného přehrávání a regresní vizuální/modelové testy prošly; obě dodávky odpovídají zdrojům. GPU obraz nebyl ručně kontrolován.
+
+### 15. 11. 2026 — konečný dojezd ručního přiblížení na U=E
+Původní odpor úměrný (1-U/E) nechával částici asymptoticky dojíždět k hranici, i když kurzor stál hluboko za ní. Odpor ovládání nyní používá odmocninový náběh; přesný omezovač úseku stále zastaví částici na U=E a nedovolí průnik. Měkké zpomalování zůstává, ale hranice je dosažena v konečném čase. Modelový regresní test pro p-p, D-T, D-He3 a He3-He3 při 10/100/500 MK potvrzuje dosažení přesné hranice do 0,5 s z 1,2násobku bodu obratu, stabilní zastavení a okamžitou možnost ústupu. Existující energetické a vizuální testy prošly, stejně jako HappyDOM pohyb markeru při ručním tažení.
+
+### 15. 11. 2026 — kvazistatický ruční tah, nikoli fyzické dodávání práce
+Ruční ovládání již nepoužívá časové dojíždění dragTowards. manualResistancePoint počítá polohu přímo z počátku uchopení a polohy kurzoru: délka tahu = dráha jádra + poddajnost × nárůst potenciální energie. Derivace tohoto vztahu dává odpor závislý na složce Coulombovy síly podél tahu. Je to výuková vazba myši, nikoli nová fyzikální síla; poddajnost je názorná. První překročení U=E se ořízne přesným řešením hranice, další držení myši nic neposouvá. Graf i fyzické souřadnice zůstávají konzistentní, zvětšení malé vzdálenosti je pouze vykreslení.
+Vysvětlení ručního režimu výslovně říká, že tah vybírá polohy dostupné při zvolené energii a další práci nepřidává. Skutečné mechanické tlačení by energii dodávalo a U=E by nebyla univerzální zeď. Model volného pohybu představuje dělo. Testy kontrolují rostoucí odpor, přesný energetický doraz a nulové dojíždění při nehybném kurzoru (HappyDOM včetně rychlostí zpět/0/pomalu/rychle); modelové a vizuální regresní testy prošly.
+
+15. 11. 2026 — Oprava okamžiku automatického zpomalení: +0,1× se nastavuje již při beginFusion, nikoli až při emitProducts. Platí i při dopředném přehrávání přes začátek reakce v uloženém záznamu; zpětný chod se nepřepíná. Posuvník a jeho údaj se mění stejnou funkcí. HappyDOM test potvrdil +0,1× již ve složeném stavu před emisí; obousměrné přehrávání a shoda dodávek prošly.
+
+### 15. 11. 2026 — otáčitelná 3D ukázka tunelování a pevný 2D graf
+Tlačítko Animace tunelování nyní otevírá skutečně vykreslovanou scénu místo MP4. Nové wave-packet.js a wave-preview.js jsou v obou dodávkách i progresivních srcdoc modulech. Zdrojová inspirace a parametry: uživatelův D:/HI!Fyziko/SHORTS/tunelovani/quantum_tunneling_3D_render_v2.m. Přesné stacionární rozptylové stavy obdélníkové bariéry jsou přepsány analyticky (ekvivalent okrajového systému v MATLABu); hbar=m=1, V0=21, a=0,35, k0=5,4, sigmaX=2, x0=-7,8, Nk=420. Pro web 360 prostorových vzorků a 601 časových snímků na t=0…3,15, zobrazených standardně za 18 s. Výpočet běží v Blob Workeru; cache cca 1,7 MB komplexních snímků, bez průběžné normalizace amplitudy. Prostorový interval -12…12 stejně jako v MATLABu ořezává vzdálené Gaussovy ocasy; záměrně se nezakrývá přenormalizováním.
+3D perspektivní vektorové vykreslení na canvas: průhledný amplitudový obal |psi|, jasná komplexní křivka (x, S Re psi, S Im psi), průhledná bariéra. Tažení otáčí pouze horní 3D pohled, kolečko mění jeho přiblížení. Spodní hustota |psi|² má pevné osy a globální měřítko. Ovladače přehrát/pozastavit, časový posuvník a výchozí pohled; parametry bariéry nejsou nastavitelné. Dialog pozastaví hlavní laboratoř a zavření obnoví její stav. Původní MP4 zůstává zachované v dodávce jako referenční podklad, tlačítko jej už nepřehrává.
+Nový tools/test-tunneling-wave.cjs ověřuje R+T=1 (max chyba cca 8,9e-16), konečné amplitudy a globální rozsah, výpočet ve workeru, změnu 3D projekce při rotaci bez jakékoli změny operací 2D grafu, časový posuvník a ukončení renderovací smyčky. Test zařazen do project/check. Projektové testy prošly; závěrečný audit souborů prošel samostatně po obejití sandboxového spawnSync git EPERM. Canvas ověřen programově, skutečný obraz v prohlížeči zatím nebyl vizuálně zkontrolován.
+
+15. 11. 2026 — Automatické zpomalení a směr rotace: test všech devíti kanálů potvrdil původní přepnutí na +0,1× ve složeném stavu a při emisi. Přepnutí nyní nastává už při startTunnel, takže i nájezd a tunelový efekt všech nabitých dvojic jsou zpomalené; dopředné přehrávání záznamu přepíná rovněž při vstupu do tunelu. Neutronový kanál přepíná při blízkém setkání bez tunelu. Ověřeno skutečnými ovladači v HappyDOM pro všechny větve včetně p-p/β+, D-D obou větví, D-He3, He3-He3 a p-T. WavePreview má obrácený vodorovný i svislý směr otáčení na přání uživatele; test ověřuje směry a neměnnost pevného 2D grafu. Regresní testy přehrávání, navigace, fyziky i shoda dodávek prošly.
+
+15. 11. 2026 — Vyšší rozlišení ukázky tunelování: výpočet 820 prostorových vzorků (stejně jako MATLAB, dosud 360), obal 24 místo 12 obvodových segmentů, canvas až 2× rozlišení pro HiDPI místo 1,5×. Hustota podélných polygonů se přizpůsobuje šířce scény a přiblížení (180–420 prstenců), vlna a 2D graf používají všech 820 bodů. Cache 601 snímků cca 3,77 MiB; měřený výpočet v Node cca 481 ms, v aplikaci běží ve workeru. Test fyziky, rotace/pevného grafu, 2× canvas rozlišení a navigace prošel. Reálné FPS prohlížeče nebylo měřeno.
+
+15. 11. 2026 — Ruční nastavení rychlosti má přednost před automatikou. Automatické zpomalení na 0,1× proběhne nejvýše jednou během pokusu; pohyb posuvníku převezme řízení a další fáze tunelu, fúze, emise ani dopředný návrat záznamem rychlost nepřepisují. Zachovává se také ručně zvolené zastavení a zpětný chod i volba před výstřelem. Nové ruční nastavení pokusu nebo home obnoví automatiku; pouhé spuštění záznamu uživatelskou volbu nemaže. Regresní test a HappyDOM scénář ověřily tunel, složený stav, emisi, pauzu, zpětné i dopředné přehrání a reset. Obě aktuální dodávky přestavěny; shoda se zdroji a test navigace prošly.
+
+15. 11. 2026 — Čitelný rozlet lehkých produktů a odstranění neutron–triton. Na žádost uživatele jsou všechny kanály s výstupním protonem, neutronem, pozitronem, neutrinem či fotonem při odletu navíc 10× zpomaleny. Společný časový faktor platí pro všechny produkty i okolní jádra; fyzikální energie, poměry rychlostí a síly se nemění. Posuvník se nepřepisuje a zůstává násobitelem přehrávání. Faktor je popsán v kartě energie a metodice. Limit doby odletu používá stejný faktor, aby zpomalení předčasně neukončilo děj. Neutron–triton odstraněn z nabídky i registru reakcí a metodiky; neutron zůstává jako produkt ostatních reakcí. Testy všech zbývajících kanálů zachování energie/hybnosti, vizuálního kontraktu a navigace prošly. HappyDOM ověřil skutečný 10× pomalejší fyzikální čas obou větví p–p a zachování ruční rychlosti. Obě aktuální dodávky přestavěny. Reálná vizuální kontrola v prohlížeči neprovedena.
+
+15. 11. 2026 — Oprava podle upřesnění uživatele: odstraněn skrytý faktor 0,1 pro produkty. Při emisi se skutečná rychlost i poloha posuvníku přepnou na 0,01×, pokud uživatel již neposunul ovladač. Tunel zůstává automaticky na 0,1×; oba automatické kroky respektují uživatelské převzetí řízení. Ruční reset/new setup obnoví příznaky. Posuvník má symetrickou kvadratickou mapu rychlost = sign(u) × u², takže u středu lze jemně měnit pomalý chod vpřed i zpět. Údaj a aria-valuetext uvádějí skutečný násobitel, bez dalšího faktoru v pohybovém solveru. Modelové regresní testy mapování, automatických přechodů a uživatelské priority i navigace prošly; obě dodávky přestavěny.
+
+15. 11. 2026 — Doplněny okamžité rychlosti produktů pod jejich energetické popisky, v km/s s oddělenými tisíci. Používají přímo relativistickou rychlost z hybnosti solveru (v/c × 299792,458 km/s), nezávislou na posuvníku přehrávání. Foton a nehmotná aproximace neutrina mají také označení c; vysvětlení vztažné soustavy a aproximace je v titulku popisku. Údaje zůstávají i u označení mimo záběr a při přehrávání záznamu. Ověřena numerická konverze a skutečné vykreslení dvouřádkového zápisu KaTeXem pro klidovou, hmotnou a nehmotnou částici; navigace prošla, obě dodávky aktualizovány.
+15. 11. 2026 — Okamžitá rychlost v km/s doplněna také k vystřelenému jádru během letu (i při přehrávání záznamu). Vychází z vx/vy vstupního solveru s převodem jeho jednotek, nezávisí na časovém posuvníku. Při tunelové ilustraci a ručním tahu se skryje; při fúzi ji nahradí údaje produktů. Popisek zůstává u okraje i mimo záběr. Převod jednotek a regresní testy prošly, obě dodávky přestavěny.

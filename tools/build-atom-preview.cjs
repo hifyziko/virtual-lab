@@ -1,12 +1,13 @@
 const fs=require('fs'),path=require('path');
 const dir=path.resolve(__dirname,'../versions/vyvoj/m_files/fusion/particle-list');
-let html=fs.readFileSync(path.join(dir,'index.html'),'utf8');
-html=html.replace('<body>','<body data-mode="atoms">').replace('<title>HiFyziko · Galerie částic</title>','<title>HiFyziko · Atomy</title>');
-html=html.replace('HiFyziko / Galerie částic a jader','HiFyziko / Atomy');
-html=html.replace('Červený proton · šedý neutron · modrý elektron','Oběh a měkká dráha jsou názorné schéma, nikoli skutečná trajektorie.').replace('Ilustrativní povrchy a měřítko · 1.0','Obal a modré body znázorňují tytéž elektrony · 1.0');
-html=html.replace('</head>','<style>.views{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.view,.view:nth-child(n+4){grid-column:span 1}.electron-label{color:#126bc3;text-shadow:0 1px 3px white}footer{font-size:var(--ui-font)}footer span{max-width:60%}@media(max-width:700px){.views{grid-template-columns:1fr;grid-template-rows:repeat(4,1fr)}.view:last-child{grid-column:span 1}}</style></head>');
-fs.writeFileSync(path.join(dir,'atomy.html'),html);
-let nuclei=fs.readFileSync(path.join(dir,'index.html'),'utf8');
-nuclei=nuclei.replace('<body>','<body data-mode="nuclei">').replace('<title>HiFyziko · Galerie částic</title>','<title>HiFyziko · Samotná jádra</title>').replace('HiFyziko / Galerie částic a jader','HiFyziko / Samotná jádra').replace('Červený proton · šedý neutron · modrý elektron','Červený proton · šedý neutron · bez elektronového obalu');
-nuclei=nuclei.replace('</head>','<style>.views{grid-template-columns:repeat(6,1fr)}.view{grid-column:span 2}.view:nth-child(n+4){grid-column:span 3}@media(max-width:700px){.views{grid-template-columns:1fr;grid-template-rows:repeat(5,1fr)}.view,.view:nth-child(n+4){grid-column:span 1}.gallery{height:1600px}}</style></head>');
-fs.writeFileSync(path.join(dir,'jadra.html'),nuclei);
+const template=fs.readFileSync(path.join(dir,'index.html'),'utf8');
+for(const [file,mode,id,title,legend,note] of [
+ ['atomy.html','atoms','fu03-atomy','Galerie atomů','Oběh a měkká dráha jsou názorné schéma, nikoli skutečná trajektorie.','Obal a modré body znázorňují tytéž elektrony · 1.0'],
+ ['jadra.html','nuclei','fu02-jadra','Galerie jader','Červený proton · šedý neutron · bez elektronového obalu','Ilustrativní povrchy a měřítko · 1.0']
+]){
+ const html=template.replace('data-fusion-page="fu02-galerie"','data-fusion-page="'+id+'"').replace('data-gallery-initial="all"','data-gallery-initial="'+mode+'"')
+  .replace('<title>Částice a jádra · Virtuální laboratoř</title>','<title>'+title+' · Virtuální laboratoř</title>')
+  .replace('<h1>Částice a jádra</h1>','<h1>'+title+'</h1>')
+  .replace(/<span data-gallery-legend>.*?<\/span>/,'<span data-gallery-legend>'+legend+'</span>').replace(/<span data-gallery-note>.*?<\/span>/,'<span data-gallery-note>'+note+'</span>');
+ fs.writeFileSync(path.join(dir,file),html);
+}

@@ -1,0 +1,83 @@
+/* Project framing only; scientific colours and renderers remain shared. */
+#app.fusion-module-host{width:100%;max-width:none;margin:0;padding:0}
+.fusion-module-shell{position:relative;box-sizing:border-box;width:100%;height:calc(100dvh - var(--project-credit-space,30px));min-height:360px;margin:0 auto;background:#f7f3fa}
+.fusion-module-frame{display:block;border:0;width:100%;height:100%;visibility:hidden}
+.fusion-module-frame.is-ready{visibility:visible}
+.fusion-module-loading{position:absolute;inset:24px 0 auto;z-index:1}
+.fusion-topic .group-banner{background:linear-gradient(110deg,#f2eafa,#faf7fd);color:#49355c}
+.fusion-topic .badge{color:#60477e;background:#eee7f5}
+.fusion-future{margin:24px 0;color:#69597b}
+.fusion-future>summary{cursor:pointer;font-weight:600;padding:12px 0}
+body[data-fusion-page]{--fusion-accent:#725198;--fusion-ink:#49355c;--fusion-line:#ded2e8;background:#f7f3fa;color:#233f49;font-family:'Segoe UI',Arial,sans-serif}
+body[data-fusion-page] main{box-sizing:border-box;margin:0 auto}
+body[data-fusion-page] .modulehead{display:flex;align-items:center;flex-wrap:wrap;gap:10px 18px;flex:none;padding:8px 0 12px;border-bottom:1px solid var(--fusion-line)}
+body[data-fusion-page] .modulehead h1{flex:1;min-width:180px;margin:0;font-size:clamp(18px,1.65vw,25px);font-weight:650;line-height:1.3;color:#233f49;letter-spacing:-.4px}
+body[data-fusion-page] .modulehead .back{display:inline-flex;align-items:center;min-height:42px;padding:8px 14px;border:1px solid var(--fusion-line);border-radius:10px;background:#fff;color:var(--fusion-ink);font-size:15px;font-weight:650;text-decoration:none;white-space:nowrap}
+body[data-fusion-page] .modulehead button,body[data-fusion-page] .modulehead summary{min-height:42px;border-color:var(--fusion-line);color:var(--fusion-ink)}
+body[data-fusion-page] a:focus-visible,body[data-fusion-page] button:focus-visible,body[data-fusion-page] select:focus-visible{outline:3px solid var(--fusion-accent);outline-offset:3px}
+body[data-fusion-page] .fusion-tabs{display:flex;flex-wrap:wrap;gap:7px;flex:none;align-items:center}
+body[data-fusion-page] .fusion-tabs a{display:inline-flex;align-items:center;min-height:40px;padding:8px 14px;border:1px solid var(--fusion-line);border-radius:9px;background:#fff;color:var(--fusion-ink);font-size:14px;font-weight:600;line-height:1.25;text-decoration:none}
+body[data-fusion-page] .fusion-tabs a[aria-current=page],body[data-fusion-page] .fusion-tabs button[aria-pressed=true]{background:var(--fusion-accent);border-color:var(--fusion-accent);color:#fff}
+body[data-fusion-page] .fusion-tabs a:hover,body[data-fusion-page] .back:hover{box-shadow:0 3px 10px #72519818}
+body[data-fusion-page] footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 20px;flex:none;color:#6c6174;font-size:12px;line-height:1.4}
+body[data-fusion-page] .fusion-footer-links{display:flex;flex-wrap:wrap;gap:8px 16px}
+body[data-fusion-page] .fusion-footer-links a{color:var(--fusion-ink);text-underline-offset:3px}
+body.fusion-gallery{margin:0;font-size:17px;line-height:1.4}
+.fusion-gallery *{box-sizing:border-box}
+.fusion-gallery main{width:calc(100% - 40px);max-width:1600px;height:100dvh;min-height:360px;padding:12px 0;display:flex;flex-direction:column;gap:12px}
+.fusion-gallery button,.fusion-gallery select{font:inherit;padding:9px 14px;border:1px solid var(--fusion-line);border-radius:9px;background:#fff;color:var(--fusion-ink);cursor:pointer}
+.fusion-gallery .gallery{position:relative;flex:1;min-height:0;background:var(--scene-background,#f9faf6);border:1px solid var(--fusion-line);border-radius:16px;overflow:hidden}
+.fusion-gallery .gallery,.fusion-gallery .gallery *{user-select:none;-webkit-user-select:none}
+.fusion-gallery canvas{position:absolute;inset:0;width:100%;height:100%}
+.fusion-gallery .views{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--gallery-columns,4),minmax(0,1fr));grid-template-rows:repeat(var(--gallery-rows,2),minmax(0,1fr));gap:0}
+.fusion-gallery .view{grid-column:span 1;position:relative;min-width:0;min-height:0;touch-action:none;border:1px solid #ded2e899;cursor:grab}
+.fusion-gallery .view:active{cursor:grabbing}
+.fusion-gallery .view h2{position:absolute;left:18px;right:14px;top:14px;margin:0;font-size:clamp(14px,1.2vw,18px);font-weight:600;color:#233f49;pointer-events:none}
+.fusion-gallery .composition{position:absolute;bottom:14px;left:0;width:100%;text-align:center;color:#52635e;pointer-events:none;font-size:17px}
+.fusion-gallery .mark{position:absolute;transform:translate(-50%,-50%);font-size:var(--particle-font,50px);color:#fff;text-shadow:0 1px 4px #10262c,0 0 3px #10262c;pointer-events:none}
+.fusion-gallery .electron-label{color:#126bc3;text-shadow:0 1px 3px white}
+.fusion-gallery .katex{font-size:1em}
+.fusion-gallery .error{position:absolute;inset:20%;background:#fff7e9;padding:24px;z-index:4}
+.fusion-gallery[data-mode=nuclei] .views{grid-template-columns:repeat(6,minmax(0,1fr))}
+.fusion-gallery[data-mode=nuclei] .view{grid-column:span 2}
+.fusion-gallery[data-mode=nuclei] .view:nth-child(n+4){grid-column:span 3}
+.fusion-gallery[data-mode=atoms] .views{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.fusion-gallery[data-mode=atoms] .view,.fusion-gallery[data-mode=atoms] .view:nth-child(n+4){grid-column:span 1}
+.fusion-gallery .gallery-pager{display:flex;align-items:center;gap:8px;flex:none}
+.fusion-gallery .gallery-pager label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;font-size:14px}
+.fusion-gallery .gallery-pager select{min-width:0;width:100%;flex:1}
+.fusion-gallery [hidden]{display:none!important}
+.fusion-gallery .views,.fusion-gallery[data-mode] .views{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+.fusion-gallery .view,.fusion-gallery[data-mode] .view,.fusion-gallery[data-mode] .view:nth-child(n+4){display:block;grid-column:span 2;width:auto;height:auto;border:1px solid #ded2e899}
+.fusion-gallery .view:nth-child(n+4),.fusion-gallery[data-mode=nuclei] .view:nth-child(n+4){grid-column:span 3}
+.fusion-gallery[data-mode=atoms] .views{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fusion-gallery[data-mode=atoms] .view,.fusion-gallery[data-mode=atoms] .view:nth-child(n+4){grid-column:span 1}
+.fusion-gallery .view.is-selected{box-shadow:inset 0 0 0 2px #72519870}
+@media(max-width:700px),(max-height:650px) and (max-width:1100px){
+ .fusion-gallery main{width:calc(100% - 20px);padding:8px 0;gap:8px}
+ .fusion-gallery .gallery-pager{display:flex}
+ .fusion-gallery .views,.fusion-gallery[data-mode] .views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr))}
+ .fusion-gallery .view,.fusion-gallery[data-mode] .view,.fusion-gallery .view:nth-child(n+4),.fusion-gallery[data-mode] .view:nth-child(n+4){display:block;grid-column:span 1;width:auto;height:auto}
+ .fusion-gallery .view:last-child{grid-column:span 2}
+ .fusion-gallery[data-mode=atoms] .views{grid-template-rows:repeat(2,minmax(0,1fr))}
+ .fusion-gallery[data-mode=atoms] .view:last-child{grid-column:span 1}
+ .fusion-gallery .view h2{font-size:18px}
+ .fusion-gallery .modulehead h1{order:3;flex-basis:100%}
+ .fusion-gallery .modulehead .back{margin-right:auto}
+ .fusion-gallery .fusion-tabs{gap:5px}
+ .fusion-gallery .fusion-tabs a{padding:7px 9px;font-size:13px;flex:1;justify-content:center}
+ .fusion-gallery .gallery-pager label>span{display:none}
+ .fusion-gallery .gallery-pager button{padding:8px 10px}
+}
+@media(max-height:650px){.fusion-gallery footer{font-size:11px}.fusion-gallery .modulehead{padding:3px 0 8px}.fusion-gallery .modulehead h1{order:initial;flex-basis:auto}}
+/* Combined catalog: compact equal tiles, with the canvas cleared between draws. */
+.fusion-gallery[data-mode=all] .views{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr))}
+.fusion-gallery[data-mode=all] .view,.fusion-gallery[data-mode=all] .view:nth-child(n){grid-column:span 1}
+.fusion-gallery[data-mode=all] .view h2{font-size:14px;top:8px;left:10px;right:8px}
+.fusion-gallery[data-mode=all] .composition{font-size:13px;bottom:8px}
+@media(max-width:1000px){
+ .fusion-gallery[data-mode=all] .views{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:600px){
+ .fusion-gallery[data-mode=all] .views{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr))}
+}

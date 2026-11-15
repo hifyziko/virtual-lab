@@ -1,110 +1,211 @@
 (()=>{'use strict';
+const R=FusionReactions;
 const $=id=>document.getElementById(id),M=CoulombModel,S=HiFyzikoParticleStyle,c=$('scene'),g=$('graph'),ctx=c.getContext('2d'),gc=g.getContext('2d');
 const fmt=n=>n.toFixed(1).replace('.', '{,}'),tex=(el,s)=>{if(el.dataset.texValue!==s){el.innerHTML=katex.renderToString(s,{throwOnError:true});el.dataset.texValue=s;}};
-for(const id of ['target','projectile'])for(const [key,n]of Object.entries(M.nuclei)){if(id==='target'&&key==='neutron')continue;const o=document.createElement('option');o.value=key;o.textContent=n.name;$(id).append(o);}
+for(const id of ['target','projectile'])for(const [key,n]of Object.entries(M.nuclei)){const o=document.createElement('option');o.value=key;o.textContent=n.name;$(id).append(o);}
 let painter;try{painter=new HiFyzikoNucleusView($('nuclei'));}catch(e){$('renderError').hidden=false;$('renderError').textContent=e.message;}
+let waveWasPaused=false,wavePreview=null;
+$('tunnelVideoOpen').onclick=()=>{waveWasPaused=paused;paused=true;stopSound();$('tunnelVideoDialog').showModal();if(!wavePreview)wavePreview=new HiFyzikoWavePreview();wavePreview.open();};
+$('tunnelVideoClose').onclick=()=>$('tunnelVideoDialog').close();
+$('tunnelVideoDialog').addEventListener('close',()=>{wavePreview?.close();paused=waveWasPaused;$('tunnelVideoOpen').focus();});
+window.addEventListener('pagehide',()=>wavePreview?.dispose());
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 let p,shot,x=24,y=0,vx=0,vy=0,drag=null,aiming=false,mode='ready',energy=12.926,temperature=100,angle=0,paused=false,renderTime=0,old=0,W=0,H=0,scale=1,ox=0,oy=0,extent=36,preview=[],trail=[],probability=0,attempted=false,chosenOutcome=null,tunnelTime=0,tunnelFrom=null,attempts=0,passes=0,classical=0,batchNote='',zoom=1,panX=0,panY=0,activePointer=null,lastPointer=null,grabOffset=[0,0],aimAnchor=null,panning=false,centers=[],targetIndex=0,tunnelTo=null,recoil=null,tried=new Set(),layoutSeed=1,gunOrigin=[24,0],gunHeading=Math.PI,previewLimit=0,releaseBounds=null,aimTarget=0;
-let fitPending=true,fusion=null,dtLocalEnergy=0,fusionExampleCount=0;
+let lastShotSetup=null;
+let previewJob=null,launchPending=false,tunnelGlyphs=null;
+let cell=null,layoutPoints=[],layoutDrag=null,gripMoved=false,flightAccumulator=0;
+let dtBoost=[0,0];
+let fitPending=true,fusion=null,dtLocalEnergy=0,fusionExampleCount=0;let collisionZoom=1,collisionFocus=null;
 let rareEncounter=null,demoActive=false,demoPending=false,tunnelDisplayFrom=null,anticipated=new Map();
-function clearEncounter(){if(fusion){$('labels').replaceChildren();lastPair='';}fusion=null;tunnelDisplayFrom=null;anticipated.clear();rareEncounter=null;demoActive=false;demoPending=false;batchNote='';updateRareButton();}
+
+let playbackFrames=[],playbackHead=0,playbackCursor=null,recording=false,playbackHasProducts=false;
+const copyPlayback=value=>JSON.parse(JSON.stringify(value));
+function clearPlayback(){playbackFrames=[];playbackHead=0;playbackCursor=null;recording=false;playbackHasProducts=false;}
+function playbackSnapshot(){
+ const f=fusion?{...fusion,trail:[],sourceTrails:{}}:null;
+ return copyPlayback({x,y,vx,vy,centers,p,shot,cell,mode,targetIndex,renderTime,fusion:f,tunnelTime,tunnelFrom,tunnelTo,tunnelDisplayFrom,tunnelApproachFrom,tunnelGraph,tunnelGlyphs,tunnelSoundStarted,dtLocalEnergy,dtBoost,probability,attempts,passes,classical,chosenOutcome,demoActive,demoPending,rareEncounter,flightAccumulator,tried:[...tried],anticipated:[...anticipated],status:$('status').textContent});
+}
+function beginRecording(){playbackAutoSlowed=false,playbackProductsSlowed=false;clearPlayback();recording=true;playbackFrames.push({time:0,state:playbackSnapshot()});}
+function recordPlayback(dt){
+ if(!recording)return;if(fusion?.products)playbackHasProducts=true;playbackHead+=dt*Math.max(0,playbackSpeed);playbackFrames.push({time:playbackHead,state:playbackSnapshot()});
+ // Keep the complete history, reducing old sampling density rather than
+ // cutting off its beginning. Positions are interpolated during replay.
+ if(playbackFrames.length>12000)playbackFrames=playbackFrames.filter((_,i,a)=>i%2===0||i===a.length-1);
+ if(['productsDone','done','nuclear'].includes(mode))recording=false;
+}
+function restorePlayback(time){
+ let lo=0,hi=playbackFrames.length-1;while(lo+1<hi){const mid=(lo+hi)>>1;if(playbackFrames[mid].time<=time)lo=mid;else hi=mid;}
+ if(time>=playbackFrames[hi].time)lo=hi;
+ const a=playbackFrames[lo],b=playbackFrames[Math.min(lo+1,playbackFrames.length-1)],q=b.time>a.time?Math.max(0,Math.min(1,(time-a.time)/(b.time-a.time))):0,state=copyPlayback(a.state);
+ const mix=(u,v,keys)=>{for(const k of keys)if(Number.isFinite(u?.[k])&&Number.isFinite(v?.[k]))u[k]+=(v[k]-u[k])*q;};
+ if(state.mode===b.state.mode){mix(state,b.state,['x','y','vx','vy','renderTime','tunnelTime']);state.centers.forEach((t,i)=>mix(t,b.state.centers[i],['x','y','vx','vy']));if(state.fusion&&b.state.fusion){mix(state.fusion,b.state.fusion,['time','flightTime','playbackElapsed']);if(state.fusion.products&&b.state.fusion.products)for(const group of ['products','sources'])state.fusion.products[group].forEach((t,i)=>mix(t,b.state.fusion.products[group][i],['x','y','px','py']));}}
+ const changed=mode!==state.mode||!!fusion!==!!state.fusion,enteringFusion=playbackSpeed>0&&((!fusion&&!!state.fusion)||(mode!=='tunnel'&&state.mode==='tunnel'));
+ ({x,y,vx,vy,centers,p,shot,cell,mode,targetIndex,renderTime,fusion,tunnelTime,tunnelFrom,tunnelTo,tunnelDisplayFrom,tunnelApproachFrom,tunnelGraph,tunnelGlyphs,tunnelSoundStarted,dtLocalEnergy,dtBoost,probability,attempts,passes,classical,chosenOutcome,demoActive,demoPending,rareEncounter,flightAccumulator}=state);
+ tried=new Set(state.tried);anticipated=new Map(state.anticipated);manualDisplay=false;
+ const recent=playbackFrames.slice(Math.max(0,lo-150),lo+1).map(f=>f.state);
+ trail=recent.filter(t=>t.mode==='flight').map(t=>[t.x,t.y]);
+ if(fusion)fusion.trail=(fusion.products?.products||[]).map((_,i)=>recent.filter(t=>t.fusion?.products?.products[i]).map(t=>{const b=t.fusion.products.products[i];return [b.x,b.y];}));
+ if(changed){$('labels').replaceChildren();lastPair='';if(fusion?.products)showReactionEnergy();else $('reactionEnergy').hidden=true;}
+ if(enteringFusion)slowFusionPlayback();status(state.status);fieldKey='';
+}
+function replayPlayback(dt){
+ if(playbackSpeed<0&&playbackFrames.length){if(playbackCursor===null){playbackCursor=playbackHead;stopSound();}}
+ if(playbackCursor===null)return false;
+ if(!paused&&playbackSpeed!==0)playbackCursor=Math.max(0,Math.min(playbackHead,playbackCursor+dt*playbackSpeed));
+ restorePlayback(playbackCursor);
+ if(playbackSpeed>0&&playbackCursor>=playbackHead){playbackCursor=null;}
+ return true;
+}
+
+let tunnelGraph=null,tunnelApproachFrom=null,tunnelSoundStarted=false;
+function clearEncounter(){clearPlayback();tunnelGraph=null;tunnelApproachFrom=null;tunnelSoundStarted=false;collisionZoom=1;collisionFocus=null;$('reactionEnergy').hidden=true;tunnelGlyphs=null;previewJob=null;launchPending=false;if(fusion){$('labels').replaceChildren();lastPair='';}fusion=null;tunnelDisplayFrom=null;anticipated.clear();rareEncounter=null;demoActive=false;demoPending=false;batchNote='';updateRareButton();}
+function preferredProjectile(){return $('pairPreset').value.split('|')[1];}
+function hasProjectile(){const kind=preferredProjectile();return $('projectile').value===kind||centers.some(t=>targetKind(t)===kind);}
+function activeReaction(){return R.find($('projectile').value,centers[targetIndex]?targetKind(centers[targetIndex]):$('target').value,$('reactionBranch').value);}
+function configureBranches(){const preset=$('pairPreset').value,select=$('reactionBranch');select.replaceChildren();const options=preset==='proton|proton'?[['pp','Bez slabé přeměny — dva protony'],['ppbeta','Se slabou přeměnou — deuteron a záření']]:preset==='deuteron|deuteron'?[['ddp','Triton + proton'],['ddn','Helium-3 + neutron']]:[];for(const [value,text]of options){const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option);}$('branchControl').hidden=!options.length||preset==='proton|proton';}
+$('reactionBranch').onchange=()=>{clearEncounter();if($('interaction').value==='gun')armGun(true);};
 function isDT(){return p&&p.a.Z===1&&p.b.Z===1&&p.a.A+p.b.A===5&&p.a.A!==p.b.A;}
-function updateRareButton(){const dt=isDT();$('fusionControl').hidden=!dt;$('temperature').disabled=!!fusion;$('fusionEnabled').disabled=!!fusion;const unavailable=!p||!p.C||!$('quantum').checked; $('showRare').disabled=unavailable||mode==='tunnel'||mode==='flight'||mode==='recoil'||!!fusion;$('launch').disabled=mode==='recoil'||!!fusion;$('showRare').textContent=demoPending?'Zrušit ukázku':isDT()&&$('fusionEnabled').checked?'Připravit fúzi D–T':'Připravit tunelování';$('showRare').setAttribute('aria-pressed',String(demoPending));$('showRare').title=unavailable?'Ukázka vyžaduje nabitou dvojici a zapnuté tunelování.':'Nastaví směr z aktuální polohy. Celou ukázku spustí tlačítko Vystřelit.';}
+function updateRareButton(){const reaction=activeReaction(),busy=!!fusion&&fusion.phase!=='done',pp=$('pairPreset').value==='proton|proton';$('ppActions').hidden=!pp;$('showRare').hidden=pp;$('fusionControl').hidden=pp||!reaction;$('temperature').disabled=busy;$('fusionEnabled').disabled=busy;$('reactionBranch').disabled=busy;
+ const unavailable=!p||(!p.C&&!reaction?.noBarrier)||!hasProjectile();$('showRare').disabled=unavailable||mode==='tunnel'||mode==='recoil'||busy;$('launch').disabled=mode==='recoil'||!!fusion||!hasProjectile();
+ const action=reaction?.elastic?'Připravit srážku':reaction&&$('fusionEnabled').checked?'Připravit reakci':'Připravit tunelování';$('showRare').textContent=fusion?.phase==='done'?'Připravit další pokus':demoPending?'Zrušit ukázku':action;$('showRare').setAttribute('aria-pressed',String(demoPending));for(const [id,branch] of [['ppWithoutBeta','pp'],['ppWithBeta','ppbeta']]){$(id).disabled=$('showRare').disabled;$(id).setAttribute('aria-pressed',String(demoPending&&$('reactionBranch').value===branch));}$('showRare').title='Připraví vybraný názorný výsledek z aktuální polohy. Spustí jej Vystřelit; nejde o četnost reakcí.';
+}
 function status(text){if($('status').textContent!==text)$('status').textContent=text;}
 function startTunnel(encounter,demo=false){
- unpause();unlockSound();stopSound();tunnelDisplayFrom=encounter.displayFrom||encounter.from;targetIndex=encounter.index;probability=encounter.probability;
- dtLocalEnergy=Math.max(0,energy-(M.multiPotential(p,centers,...encounter.from)-p.C/Math.hypot(encounter.from[0]-centers[encounter.index].x,encounter.from[1]-centers[encounter.index].y)));
- [x,y]=encounter.from;vx=vy=0;tunnelFrom=[...encounter.from];tunnelTo=[...encounter.to];tunnelTime=0;mode='tunnel';demoActive=demo;
+ slowFusionPlayback();
+ unpause();unlockSound();stopSound();tunnelGlyphs=currentGlyphs().map(item=>unproject(item.x,item.y));tunnelDisplayFrom=tunnelGlyphs[0];targetIndex=encounter.index;probability=encounter.probability;
+ const hit=centers[encounter.index],rvx=vx-(hit.vx||0),rvy=vy-(hit.vy||0),r=Math.hypot(encounter.from[0]-hit.x,encounter.from[1]-hit.y);
+ dtLocalEnergy=.5*p.mu*(rvx*rvx+rvy*rvy)+p.C/r+M.surfaceField({...shot,Z:p.b.Z},{...hit,Z:p.a.Z},r).U;
+ dtBoost=[(p.b.A*vx+p.a.A*(hit.vx||0))/(p.a.A+p.b.A)/Math.sqrt(931494.10242),(p.b.A*vy+p.a.A*(hit.vy||0))/(p.a.A+p.b.A)/Math.sqrt(931494.10242)];
+ [x,y]=encounter.from;vx=vy=0;tunnelFrom=[...encounter.from];tunnelTo=[...encounter.to];tunnelTime=0;mode='tunnel';demoActive=demo;tunnelGraph={pair:p,centers:centers.map(t=>({...t})),targetIndex,x,y,energy,graphRadius:shot.start*6};
+ const profile=barrierProfile(tunnelGraph),band=graphBarrierInterval(profile.total,energy/Math.max(1,p.C/p.R));tunnelApproachFrom=[...tunnelDisplayFrom];tunnelSoundStarted=false;
+ if(band){const radius=p.R*Math.exp(1.5*(band.outer-1)),target=centers[targetIndex],dx=x-target.x,dy=y-target.y,d=Math.max(1e-12,Math.hypot(dx,dy)),gap=glyphClearance($('projectile').value,targetKind(target)),shown=radius<2*gap?gap+radius*radius/(4*gap):radius;tunnelDisplayFrom=[target.x+dx/d*shown,target.y+dy/d*shown];tunnelGraph.entryRadius=radius;}
+ const span=Math.hypot(tunnelDisplayFrom[0]-tunnelApproachFrom[0],tunnelDisplayFrom[1]-tunnelApproachFrom[1]),incomingRate=shot.start*.025/Math.sqrt(2*M.thermalMean(100)/1.2),incomingSpeed=Math.max(.01,Math.hypot(shot.vx,shot.vy));tunnelGraph.approachDuration=Math.max(1.8,1.5*span/(incomingSpeed*incomingRate));
+
  batchNote=demo?'Ukázka vzácného průchodu dokončena. Pravděpodobnost ani statistika pokusů se nezměnily.':'';
- $('showRare').disabled=true;playTunnelSound();status(demo?'UKÁZKA VZÁCNÉHO PRŮCHODU · vybraný úspěšný případ, nikoli výsledek losování.':'Průchod bariérou: úspěšný pravděpodobnostní pokus.');
+ $('showRare').disabled=true;status(demo?'UKÁZKA VZÁCNÉHO PRŮCHODU · vybraný úspěšný případ, nikoli výsledek losování.':'Průchod bariérou: úspěšný pravděpodobnostní pokus.');
 }
 function beginFusion(){
- const target=centers[targetIndex],ratio=p.b.A/(p.a.A+p.b.A),origin={x:target.x+(x-target.x)*ratio,y:target.y+(y-target.y)*ratio},center=project(origin.x,origin.y),targetPoint=project(target.x,target.y),incoming=tunnelContactPoint(),rad=displayRadius();
+ const reaction=activeReaction();if(!reaction){mode='nuclear';status('Tato dvojice má zatím jen model přiblížení.');return;}
+ slowFusionPlayback();
+ const target=centers[targetIndex],ratio=p.b.A/(p.a.A+p.b.A),origin={x:target.x+(x-target.x)*ratio,y:target.y+(y-target.y)*ratio},center=project(origin.x,origin.y),targetPoint=targetScreen(target,targetIndex),incoming=tunnelContactPoint(),rad=displayRadius();
  const initial=[];for(const [id,point]of [[$('target').value,targetPoint],[$('projectile').value,incoming]])for(const atom of S.connected.atoms[id])initial.push([atom[0]+(point[0]-center[0])/rad,atom[1]-(point[1]-center[1])/rad,atom[2],atom[3]]);initial.sort((a,b)=>b[3]-a[3]);
- const neighbours=centers.map((t,i)=>({...t,id:i,A:p.a.A,Z:p.a.Z})).filter(t=>t.id!==targetIndex),guided=neighbours.length&&(fusionExampleCount++%2===0),plan=guided?HiFyzikoDT.planEncounter({...origin,energy:dtLocalEnergy,sources:neighbours},fusionExampleCount%4===1?1:-1):null,focus=plan?{x:(origin.x+plan.target.x)*.5,y:(origin.y+plan.target.y)*.5}:origin,focusScreen=project(focus.x,focus.y);
- fusion={phase:'compound',time:0,screenOrigin:[focusScreen[0]/W,focusScreen[1]/H],origin,focus,plan,duration:9,initial,angle:plan?plan.angle:Math.random()*Math.PI*2,products:null,trail:[[],[]],sourceTrails:{},flightTime:0};mode='compound';$('labels').replaceChildren();lastPair='';fieldKey='';status('D–T: přechodné jádro helia-5. Vnitřní pohyb je zpomalená ilustrace.');
+ const neighbours=centers.map((t,i)=>({...t,id:i,A:t.A,Z:t.Z,px:(t.vx||0)*t.A*Math.sqrt(931494.10242),py:(t.vy||0)*t.A*Math.sqrt(931494.10242)})).filter(t=>t.id!==targetIndex),guided=reaction.id==='dt'&&neighbours.length&&(fusionExampleCount++%2===0),plan=guided?HiFyzikoDT.planEncounter({...origin,energy:dtLocalEnergy,sources:neighbours,cell,boost:dtBoost},fusionExampleCount%4===1?1:-1):null,focus=plan?{x:(origin.x+plan.target.x)*.5,y:(origin.y+plan.target.y)*.5}:origin,focusScreen=project(focus.x,focus.y);
+ fusion={reaction,phase:'compound',time:0,screenOrigin:[focusScreen[0]/W,focusScreen[1]/H],origin,focus,plan,duration:18,initial,angle:plan?plan.angle:Math.random()*Math.PI*2,products:null,trail:[[],[]],sourceTrails:{},flightTime:0};mode='compound';$('labels').replaceChildren();lastPair='';fieldKey='';status(reaction.elastic?'Blízké setkání: jádro se trvale nesloučí.':'Přechodný útvar. Vnitřní pohyb je zpomalená ilustrace.');
 }
-function compoundAtoms(){
- const u=Math.min(1,fusion.time/.65),gather=Math.min(1,u/.24),blend=gather*gather*(3-2*gather),split=Math.max(0,(u-.74)/.26),e=split*split*(3-2*split),a=fusion.angle,dx=Math.cos(a),dy=-Math.sin(a);
- const atoms=fusion.initial.map((atom,i)=>{const angle=i*Math.PI*2/5+(reduced.matches?0:u*1.2),amp=reduced.matches?0:.16*Math.sin(Math.PI*u),ring=[.88*Math.cos(angle)+amp*Math.sin(23*u+i*2.7),.88*Math.sin(angle)+amp*Math.cos(29*u+i*1.9),(reduced.matches?0:.12*Math.sin(19*u+i*2)),atom[3]],end=i<4?[S.connected.atoms.alpha[i][0],S.connected.atoms.alpha[i][1],0,atom[3]]:[0,0,0,0];return [0,1,2].map(k=>(atom[k]*(1-blend)+ring[k]*blend)*(1-e)+end[k]*e).concat(atom[3]);});
- return atoms;
+function ppExitRadius(){return Math.max(20,(displayRadius()*visualBound('proton')+5*zoom)/Math.max(scale,1e-9));}
+function compoundAtoms(){const u=Math.min(1,fusion.time/.65),blend=Math.min(1,u/.28),e=blend*blend*(3-2*blend),count=fusion.initial.length;
+ if(fusion.reaction.id==='pp'){const split=Math.max(0,(u-.4)/.6),smooth=split*split*(3-2*split),reach=.65+(ppExitRadius()*scale/displayRadius()-.65)*smooth;return fusion.initial.map((atom,i)=>{const sign=i===0?-1:1,target=[sign*reach*Math.cos(fusion.angle),-sign*reach*Math.sin(fusion.angle),0];return target.map((v,k)=>atom[k]*(1-e)+v*e).concat(1);});}
+ return fusion.initial.map((atom,i)=>{const a=i*2*Math.PI/count+(reduced.matches?0:u*.9),amp=reduced.matches?0:.15*Math.sin(Math.PI*u),target=[.85*Math.cos(a)+amp*Math.sin(23*u+i),.85*Math.sin(a)+amp*Math.cos(29*u+i),.1*Math.sin(19*u+i)],charge=fusion.reaction.weak&&u>.7&&i===1?0:atom[3];return [0,1,2].map(k=>atom[k]*(1-e)+target[k]*e).concat(charge);});
+}
+// Incoming solver: fm * sqrt(u/keV); product solver: fm/c.
+// One physical playback clock, with only the unit conversion between solvers.
+let playbackSpeed=.1,playbackUserOverride=false,playbackAutoSlowed=false,playbackProductsSlowed=false;
+function sliderToSpeed(value){return Math.sign(value)*value*value;}
+function speedToSlider(value){return Math.sign(value)*Math.sqrt(Math.abs(value));}
+function setPlaybackSpeed(value){playbackSpeed=Number.isFinite(value)?Math.max(-1,Math.min(1,value)):0;if(Math.abs(playbackSpeed)<.000001)playbackSpeed=0;$('playbackSpeed').value=String(speedToSlider(playbackSpeed));const text=playbackSpeed===0?'Stojí':Math.abs(playbackSpeed).toFixed(Math.abs(playbackSpeed)<.001?6:Math.abs(playbackSpeed)<.01?4:3).replace('.', ',')+'× '+(playbackSpeed<0?'zpět':'vpřed');$('playbackSpeedValue').textContent=text;$('playbackSpeed').setAttribute('aria-valuetext',text);if(playbackSpeed<=0)stopSound();}
+$('playbackSpeed').oninput=$('playbackSpeed').onchange=()=>{playbackUserOverride=true;setPlaybackSpeed(sliderToSpeed(Number($('playbackSpeed').value)));};
+function slowFusionPlayback(value=.1){if(playbackUserOverride||(value===.01?playbackProductsSlowed:playbackAutoSlowed))return;if(value===.01)playbackProductsSlowed=true;else playbackAutoSlowed=true;setPlaybackSpeed(value);}
+function resetManualSpeed(){playbackUserOverride=false;playbackAutoSlowed=false,playbackProductsSlowed=false;setPlaybackSpeed(1);}
+function playbackRate(products=false){const rate=Math.abs(playbackSpeed)*shot.start*.25/Math.sqrt(2*M.thermalMean(100)/1.2);return rate*(products?Math.sqrt(931494.10242):1);}
+function showReactionEnergy(){
+ const Q=fusion.reaction.Q,positive=Q>0,box=$('reactionEnergy');box.hidden=false;box.classList.toggle('noRelease',!positive);
+ $('reactionEnergyTitle').textContent=positive?'Uvolněná energie':'Bez uvolnění fúzní energie';
+ tex($('reactionEnergyValue'),(positive?'+':'')+(Q/1000).toFixed(3).replace('.', '{,}')+String.raw`\,\mathrm{MeV}`);
+ $('reactionEnergyNote').textContent=(positive?'':'Q = 0 · ')+'Výchozí rychlost rozletu je 0,01×. Ruční nastavení má přednost.';
 }
 function emitProducts(){
- const sources=centers.map((t,i)=>({...t,id:i,A:p.a.A,Z:p.a.Z})).filter(t=>t.id!==targetIndex);
- fusion.products=HiFyzikoDT.create({...fusion.origin,energy:dtLocalEnergy,angle:fusion.angle,sources});fusion.phase='products';mode='products';playFusionSound();view();const neutron=fusion.products.products[1],v=HiFyzikoDT.velocity(neutron),speed=Math.hypot(...v),margin=displayRadius()*visualBound('alpha')+35,rx=Math.max(30,W/2-margin-20),ry=Math.max(25,(H-130)/2-margin),travel=.9*Math.min(rx/Math.max(.001,Math.abs(v[0]/speed)),ry/Math.max(.001,Math.abs(v[1]/speed)));fusion.timeScale=fusion.plan?fusion.plan.time*1.8/fusion.duration:travel/(scale*speed*3.4);fieldKey='';$('labels').replaceChildren();lastPair='';status(fusion.plan?'Vybraný směr: alfa částice míjí okolní iont. Odklon a zpětný ráz určuje výpočet.':'Fúze D–T: alfa částice a neutron. Prodloužené sledování produktů ve společném měřítku času.');
-}
-function detailPair(){if(!fusion?.detail||!fusion.products)return null;const all=[...fusion.products.products,...fusion.products.sources];return fusion.detail.ids.map(id=>all.find(b=>b.id===id));}
-function updateEncounterDetail(dt){
- if(!fusion.products)return false;
- if(fusion.detail){const d=fusion.detail,pair=detailPair();d.age+=dt;
-  if(d.stage==='enter'){if(d.age>=.28){d.stage='active';d.age=0;}return true;}
-  if(d.stage==='exit'){if(d.age>=.28){fusion.detail=null;}return true;}
-  const [a,b]=pair,r=Math.hypot(a.x-b.x,a.y-b.y),va=HiFyzikoDT.velocity(a),vb=HiFyzikoDT.velocity(b),radial=(a.x-b.x)*(va[0]-vb[0])+(a.y-b.y)*(va[1]-vb[1]);
-  if(radial>0&&r>d.R*8){d.stage='exit';d.age=0;d.from=[scale,ox,oy];return true;}
-  return false;
- }
- const all=[...fusion.products.products,...fusion.products.sources];let choice=null;
- for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){if(i===0&&j===1)continue;const a=all[i],b=all[j],r=Math.hypot(a.x-b.x,a.y-b.y),va=HiFyzikoDT.velocity(a),vb=HiFyzikoDT.velocity(b),approach=(a.x-b.x)*(va[0]-vb[0])+(a.y-b.y)*(va[1]-vb[1])<0,extent=displayRadius()*(visualBound(typeof a.id==='string'?a.id:$('target').value)+visualBound(typeof b.id==='string'?b.id:$('target').value));if(approach&&r*scale<extent*2.5&&(!choice||r/extent<choice.r/choice.extent))choice={a,b,r,extent};}
- if(choice){const {a,b}=choice;fusion.detail={ids:[a.id,b.id],R:1.4*(Math.cbrt(a.A)+Math.cbrt(b.A)),stage:'enter',age:0,from:[scale,ox,oy]};status('Detail setkání: zvětšené vzdálenosti, stejné fyzikální síly.');return true;}return false;
-}
-function encounterView(){
- if(!fusion?.detail)return;const d=fusion.detail,pair=detailPair();if(!pair?.[0]||!pair[1])return;const [a,b]=pair,r=Math.hypot(a.x-b.x,a.y-b.y),extent=displayRadius()*(visualBound(typeof a.id==='string'?a.id:$('target').value)+visualBound(typeof b.id==='string'?b.id:$('target').value)),desired=Math.max(scale,Math.min(extent/d.R,extent*2/Math.max(r,.001))),cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,goal=[desired,W/2-cx*desired,75+(H-130)/2-cy*desired];
- if(d.stage==='active'){[scale,ox,oy]=goal;return;}const u=Math.min(1,d.age/.28),ease=u*u*(3-2*u),end=d.stage==='exit'?[scale,ox,oy]:goal;[scale,ox,oy]=d.from.map((value,i)=>value+(end[i]-value)*ease);
+ slowFusionPlayback(.01);
+ const sources=centers.map((t,i)=>({...t,id:i,A:t.A,Z:t.Z,px:(t.vx||0)*t.A*Math.sqrt(931494.10242),py:(t.vy||0)*t.A*Math.sqrt(931494.10242)})).filter(t=>t.id!==targetIndex);
+ fusion.products=(fusion.reaction.id==='dt'?HiFyzikoDT.create:R.create)({channel:fusion.reaction,...fusion.origin,energy:dtLocalEnergy,angle:fusion.angle,sources,cell,boost:dtBoost,minimumExitRadius:fusion.reaction.id==='pp'?ppExitRadius():20});cell=fusion.products.cell;const strength=Math.max(energy+fusion.reaction.Q,energy)*16,unit=displayRadius()/Math.max(scale,1e-9);fusion.products.products.forEach(b=>{b.core=unit*visualBound(b.kind||b.id)+4*zoom/Math.max(scale,1e-9);b.surfaceStrength=strength;b.surfaceGroup='exit';});fusion.products.sources.forEach(b=>{b.core=unit*visualBound(targetKind(centers[b.id]))+4*zoom/Math.max(scale,1e-9);b.surfaceStrength=b.surfaceStrength||energy*16;});fusion.trail=fusion.products.products.map(()=>[]);fusion.phase='products';mode='products';showReactionEnergy();playFusionSound();view();fusion.timeScale=playbackRate(true);fieldKey='';$('labels').replaceChildren();lastPair='';status(fusion.reaction.id==='pp'?'Bez β⁺ přeměny: přechodný útvar se rozpadl zpět na dva protony. Energie fúze se neuvolnila.':fusion.reaction.elastic?'Pružný rozptyl: odlet vstupních částic, bez uvolnění energie fúze.':'Produkty reakce: zachování energie, náboje a hybnosti; směry jsou vybraný názorný případ.');
 }
 function advanceFusion(dt){
- if(fusion.phase==='compound'){fusion.time+=dt;if(fusion.time>=.65)emitProducts();return;}
- if(fusion.phase!=='products')return;
- if(updateEncounterDetail(dt))return;
- const pair=detailPair(),relativeSpeed=pair?Math.hypot(...HiFyzikoDT.velocity(pair[0]).map((v,i)=>v-HiFyzikoDT.velocity(pair[1])[i])):0,clockRate=pair?Math.min(fusion.timeScale,95/(scale*Math.max(relativeSpeed,1e-8))):fusion.timeScale;
- let remaining=dt*clockRate;for(let i=0;i<2000&&remaining>1e-8;i++){const h=HiFyzikoDT.advance(fusion.products,Math.min(remaining,1));if(!h)break;remaining-=h;}
- fusion.flightTime+=dt;fusion.products.products.forEach((b,i)=>{fusion.trail[i].push([b.x,b.y]);if(fusion.trail[i].length>1500)fusion.trail[i].shift();});
- for(const b of fusion.products.sources){const points=fusion.sourceTrails[b.id]||(fusion.sourceTrails[b.id]=[]);points.push([b.x,b.y]);if(points.length>1500)points.shift();}
- if(fusion.products.collision||fusion.products.time>=fusion.timeScale*fusion.duration){fusion.phase='done';mode='productsDone';status(fusion.products.collision?'Další jaderný střet: zde ukázka končí, následné reakce zatím nepočítáme.':'Zastavený náhled produktů. Nabitá jádra se vzájemně odpuzují; neutron se elektricky neodklání.');}
+ if(fusion.phase==='compound'){fusion.time+=dt*Math.max(0,playbackSpeed)/.1;if(fusion.time>=.65)emitProducts();return;}
+ if(fusion.phase!=='products')return;const outgoing=fusion.products.products;if(outgoing.every((a,i)=>outgoing.every((b,j)=>i===j||!a.Z||!b.Z||Math.hypot(a.x-b.x,a.y-b.y)>2*((a.core||0)+(b.core||0)))))outgoing.forEach(b=>{b.surfaceGroup=null;});
+ // Keep the camera fixed while the particles move.
+ fusion.timeScale=playbackRate(true);const clockRate=fusion.timeScale/Math.max(1,collisionZoom);
+ fusion.accumulator=(fusion.accumulator||0)+dt*clockRate;for(let i=0;i<2000&&fusion.accumulator>1e-8;i++){const h=HiFyzikoDT.advance(fusion.products,fusion.accumulator);if(!h)break;fusion.accumulator-=h;}
+ fusion.flightTime+=dt;fusion.playbackElapsed=(fusion.playbackElapsed||0)+dt*playbackSpeed;const productNodes=[...fusion.products.products,...fusion.products.sources].map(b=>({x:b.x,y:b.y,kind:b.kind||(typeof b.id==='string'?b.id:targetKind(centers[b.id]))}));fusion.products.products.forEach((b,i)=>{fusion.trail[i].push(tracePoint(productNodes,i));if(fusion.trail[i].length>1500)fusion.trail[i].shift();});
+ if(fusion.products.collision||fusion.playbackElapsed>=fusion.duration){fusion.phase='done';mode='productsDone';status(fusion.products.collision?'Další jaderný střet: zde ukázka končí, následné reakce zatím nepočítáme.':'Pokus dokončen. Nabité produkty reagují na okolní jádra; neutrální záření se elektricky neodklání.');}
+}
+function productSpeedTex(body){
+ const fraction=Math.min(1,Math.hypot(...HiFyzikoDT.velocity(body))),km=Math.round(fraction*299792.458).toString().replace(/\B(?=(\d{3})+(?!\d))/g,String.raw`\,`);
+ return String.raw`v\approx `+(body.mass===0?String.raw`c\approx`:'')+km+String.raw`\,\mathrm{km/s}`;
+}
+function incomingSpeedTex(vx,vy){
+ const km=Math.round(Math.hypot(vx,vy)/Math.sqrt(931494.10242)*299792.458).toString().replace(/\B(?=(\d{3})+(?!\d))/g,String.raw`\,`);
+ return String.raw`v\approx `+km+String.raw`\,\mathrm{km/s}`;
+}
+function incomingSpeedLabel(){
+ const visible=!fusion&&['flight','free','done'].includes(mode);
+ if(!visible){const oldLabel=$('labels').querySelector('[data-key="incomingSpeed"]');if(oldLabel)oldLabel.hidden=true;return;}
+ const point=projectilePoint(),radius=displayRadius(),outside=point[0]<15||point[0]>W-15||point[1]<75||point[1]>H-55;
+ const info=label($('labels'),'incomingSpeed',incomingSpeedTex(vx,vy)+(outside?String.raw`\;\text{mimo záběr}`:''),Math.max(130,Math.min(W-130,point[0])),Math.max(90,Math.min(H-55,point[1]+radius*2.6)));
+ info.hidden=false;info.title='Okamžitá rychlost vystřeleného jádra ve vztažné soustavě scény; nezávisí na rychlosti přehrávání.';
 }
 function fusionGraphics(){
- const items=[],radius=displayRadius();centers.forEach((fixed,i)=>{if(i===targetIndex)return;const t=fusion.products?fusion.products.sources.find(b=>b.id===i):fixed;const point=project(t.x,t.y);items.push({id:$('target').value,x:point[0],y:point[1],radius});nucleus($('target').value,...point,'a'+i+'-');});
- if(fusion.phase==='compound'){const point=project(fusion.origin.x,fusion.origin.y),atoms=compoundAtoms();items.push({atoms,x:point[0],y:point[1],radius,vibration:1.8});nucleus('alpha',...point,'compound-',atoms);label($('labels'),'reaction',String.raw`{}^{5}\mathrm{He}^{*}`,point[0],point[1]-radius*3.2);}
+ const items=[],radius=displayRadius();centers.forEach((fixed,i)=>{if(i===targetIndex)return;const t=fusion.products?fusion.products.sources.find(b=>b.id===i):fixed;const point=project(t.x,t.y);items.push({id:targetKind(fixed),x:point[0],y:point[1],radius,labelKey:'a'+i+'-'});nucleus(targetKind(fixed),...point,'a'+i+'-');});
+ if(fusion.phase==='compound'){const point=project(fusion.origin.x,fusion.origin.y),atoms=compoundAtoms();items.push({atoms,x:point[0],y:point[1],radius,vibration:1.8});nucleus('alpha',...point,'compound-',atoms);label($('labels'),'reaction',fusion.reaction.compound,point[0],point[1]-radius*3.2);}
  else {fusion.products.products.forEach((b,i)=>{const point=project(b.x,b.y),outside=point[0]<15||point[0]>W-15||point[1]<75||point[1]>H-55;
- if(!outside){items.push({id:b.id,x:point[0],y:point[1],radius});nucleus(b.id,...point,'product'+i+'-');}
+ const kind=b.kind||b.id;if(!outside&&S.connected.atoms[kind]){items.push({id:kind,x:point[0],y:point[1],radius,labelKey:'product'+i+'-'});nucleus(kind,...point,'product'+i+'-');}
+ if(!S.connected.atoms[kind]){const marker=label($('labels'),'product'+i+'-symbol',R.species[kind]?.tex||kind,point[0],point[1]);marker.style.fontSize='26px';}
  for(const el of $('labels').querySelectorAll('[data-key^="product'+i+'-"]'))el.hidden=outside;
- const energyMeV=HiFyzikoDT.kinetic(b)/1000,text=(i===0?String.raw`\alpha:\ `:String.raw`\mathrm n:\ `)+fmt(energyMeV)+String.raw`\,\mathrm{MeV}`+(outside?String.raw`\;\text{mimo záběr}`:'');
- label($('labels'),'energy'+i,text,outside?Math.max(115,Math.min(W-115,point[0])):point[0],outside?Math.max(90,Math.min(H-60,point[1])):point[1]+radius*2.6);
+ const energyMeV=HiFyzikoDT.kinetic(b)/1000,text=(R.species[kind]?.tex||kind)+String.raw`:\ `+(energyMeV<.1?fmt(energyMeV*1000)+String.raw`\,\mathrm{keV}`:fmt(energyMeV)+String.raw`\,\mathrm{MeV}`)+(outside?String.raw`\;\text{mimo záběr}`:'');
+ const info=String.raw`\begin{gathered}`+text+String.raw`\\`+productSpeedTex(b)+String.raw`\end{gathered}`;
+ const speedLabel=label($('labels'),'energy'+i,info,outside?Math.max(115,Math.min(W-115,point[0])):point[0],outside?Math.max(90,Math.min(H-60,point[1])):point[1]+radius*2.6+10);speedLabel.title='Okamžitá rychlost ve vztažné soustavě scény; nezávisí na rychlosti přehrávání. Neutrino je v modelu aproximováno jako nehmotné.';
  });}
 
  for(const el of $('labels').querySelectorAll('.nucleon')){const px=parseFloat(el.style.left),py=parseFloat(el.style.top);el.hidden=px<0||px>W||py<65||py>H-45;}
  return items;
 }
 function optimalHeading(index){
- const t=centers[index],base=Math.atan2(t.y-y,t.x-x),speed=Math.sqrt(2*Math.max(0,energy-M.multiPotential(p,centers,x,y))/p.mu);
- const score=heading=>{const state={x,y,vx:speed*Math.cos(heading),vy:speed*Math.sin(heading)};let best=Infinity;for(let i=0;i<14000;i++){M.multiAdvance(p,centers,state,shot.dt*2);const distance=Math.hypot(state.x-t.x,state.y-t.y);if(distance<best)best=distance;else if(i>5)break;if(distance<=p.R)break;}return best;};
- let angleBest=base,best=score(base),step=.04;
- for(let i=-12;i<=12;i++){const candidate=base+i*step,value=score(candidate);if(value<best){best=value;angleBest=candidate;}}
- for(let i=0;i<19;i++){const l=score(angleBest-step),r=score(angleBest+step);if(l<best&&l<=r){angleBest-=step;best=l;}else if(r<best){angleBest+=step;best=r;}step*=.5;}return angleBest;
+ const target=centers[index],base=Math.atan2(target.y-y,target.x-x),speed=Math.sqrt(2*Math.max(0,energy-M.multiPotential(p,centers,x,y))/p.mu);
+ const score=heading=>{const moving=centers.map(q=>({...q})),state={x,y,core:shot.core,surfaceStrength:shot.surfaceStrength,vx:speed*Math.cos(heading),vy:speed*Math.sin(heading)};let previous=Infinity;
+ for(let i=0;i<14000;i++){
+  M.mobileAdvance(p,moving,state,shot.dt,cell);const t=moving[index],rx=state.x-t.x,ry=state.y-t.y,r=Math.hypot(rx,ry);
+  if(state.collision)return p.C?1e8:0;if(state.integrationLimited)return 1e9;
+  if(r>previous&&i>5){if(M.nearest(moving,state.x,state.y).index!==index)return 1e8+r;const ux=state.vx-(t.vx||0),uy=state.vy-(t.vy||0),local=.5*p.mu*(ux*ux+uy*uy)+p.C/r+M.surfaceField({...state,Z:p.b.Z},{...t,Z:p.a.Z},r).U,L=p.mu*(rx*uy-ry*ux),B=L*L/(2*p.mu);
+   if(!p.C)return r;
+   const rmin=(p.C+Math.sqrt(p.C*p.C+4*local*B))/(2*local),P=M.penetration(p,{energy:local,B,rmin}),head=M.penetration(p,{energy:local,B:0,rmin:p.C/local});return -Math.log(Math.max(1e-300,P)/Math.max(1e-300,head))+r/Math.max(shot.start,1)*1e-4;
+  }previous=r;
+ }return 1e9;};
+ let bestAngle=base,best=score(base),step=Math.PI/24;for(let i=-12;i<=12;i++){const candidate=base+i*step,value=score(candidate);if(value<best){best=value;bestAngle=candidate;}}
+ for(let i=0;i<24;i++){const left=score(bestAngle-step),right=score(bestAngle+step);if(left<best&&left<=right){bestAngle-=step;best=left;}else if(right<best){bestAngle+=step;best=right;}step*=.5;}return {heading:bestAngle,score:best};
 }
 $('fusionEnabled').onchange=()=>{clearEncounter();updateRareButton();};
 $('showRare').onclick=()=>{
- if(!p.C||mode==='tunnel')return;
+ const repeat=fusion?.phase==='done';
+ if(repeat)resetAfterFusion();
+ if((!p.C&&!activeReaction()?.noBarrier)||mode==='tunnel'||!hasProjectile())return;
  if(demoPending){demoPending=false;status('Běžný výstřel: výsledek určí fyzikální pravděpodobnost.');return;}
- const index=M.nearest(centers,x,y).index;
  $('interaction').value='gun';$('quantum').checked=true;armGun(true);
+ let index=M.nearest(centers,x,y).index;
  if(!shot.canLaunch)return;
- aimTarget=index;gunHeading=optimalHeading(index);angle=0;$('angle').value=0;armGun(false);targetIndex=index;demoPending=true;
- status('UKÁZKA PŘIPRAVENA · směr je nastaven. Stiskni Vystřelit: uvidíš celý vybraný úspěšný střet.');
+ let solution=optimalHeading(index);if(solution.score>Math.log(10)){for(const candidate of centers.map((t,i)=>({i,d:Math.hypot(t.x-x,t.y-y)})).sort((a,b)=>a.d-b.d)){if(candidate.i===index)continue;const alternative=optimalHeading(candidate.i);if(alternative.score<solution.score){solution=alternative;index=candidate.i;}if(solution.score<=Math.log(10))break;}}
+ if(p.C&&solution.score>Math.log(10)){status('Z této polohy nebylo nalezeno dostatečně čelní přiblížení. Posuň projektil nebo uprav teplotu; běžný výstřel zůstává dostupný.');return;}aimTarget=index;gunHeading=visualHeading(solution.heading);angle=0;$('angle').value=0;armGun(false);targetIndex=index;demoPending=true;updateRareButton();
+ status(repeat?'Vstupní dvojice obnovena. Další pokus je připraven; stiskni Vystřelit.':'UKÁZKA PŘIPRAVENA · směr je nastaven. Stiskni Vystřelit: uvidíš celý vybraný úspěšný střet.');
 };
-function unpause(){paused=false;$('pause').textContent='Pozastavit';$('pause').setAttribute('aria-pressed','false');}
-function home(){fitPending=true;clearEncounter();unpause();updateMode();shot=M.multiShot(p,energy,angle,Math.max(1,Math.min(3,+$('targetCount').value||3)),layoutSeed);centers=shot.centers;targetIndex=0;aimTarget=0;tried=new Set();recoil=null;({x,y,vx,vy}=shot);vx=vy=0;gunOrigin=[x,y];gunHeading=Math.atan2(centers[0].y-y,centers[0].x-x);extent=shot.start*1.4;previewLimit=0;probability=centers.length>1?null:M.penetration(p,shot);preview=M.multiTrajectory(p,shot);shot.closest=Math.min(...preview.map(q=>M.nearest(centers,...q).distance));trail=[];drag=null;attempted=false;chosenOutcome=null;mode='ready';tunnelTime=0;tunnelFrom=null;tunnelTo=null;stopSound();updateRareButton();status($('interaction').value==='gun'?'Zamiř tažením ve scéně, potom vystřel.':'Uchop částici. Dostupná energie omezuje přiblížení.');}
+for(const [id,branch] of [['ppWithoutBeta','pp'],['ppWithBeta','ppbeta']])$(id).onclick=()=>{if($(id).disabled)return;resetAfterFusion();$('reactionBranch').value=branch;$('fusionEnabled').checked=true;clearEncounter();$('showRare').onclick();updateRareButton();};
+function unpause(){paused=false;}
+function home(){playbackUserOverride=false;playbackAutoSlowed=false,playbackProductsSlowed=false;manualAnchor=null;manualDisplay=false;fitPending=true;clearEncounter();unpause();updateMode();shot=M.multiShot(p,energy,angle,Math.max(1,Math.min(5,+$('targetCount').value||3)),layoutSeed);centers=shot.centers.map(t=>({...t,kind:$('target').value,A:p.a.A,Z:p.a.Z,vx:0,vy:0}));shot.centers=centers;cell=M.makeCell([...centers,{x:shot.x,y:shot.y}],shot.start);shot.cell=cell;layoutPoints=[...centers.map(t=>({x:t.x,y:t.y})),{x:shot.x,y:shot.y}];flightAccumulator=0;targetIndex=0;aimTarget=0;tried=new Set();recoil=null;({x,y,vx,vy}=shot);vx=vy=0;gunOrigin=[x,y];gunHeading=Math.atan2(centers[0].y-y,centers[0].x-x);extent=shot.start*1.4;previewLimit=0;probability=centers.length>1?null:M.penetration(p,shot);preview=M.aimPreview(p,centers,shot);trail=[];drag=null;attempted=false;chosenOutcome=null;mode='ready';tunnelTime=0;tunnelFrom=null;tunnelTo=null;stopSound();updateRareButton();status($('interaction').value==='gun'?'Zamiř tažením ve scéně, potom vystřel.':'Uchop částici. Dostupná energie omezuje přiblížení.');}
 function flightLimit(){if(!W||!H)return extent;const corners=[[0,0],[W,0],[0,H],[W,H]].map(([px,py])=>Math.hypot((px-ox)/scale,(py-oy)/scale));return Math.max(extent,Math.hypot(...gunOrigin)*1.15,...corners.map(r=>r*1.15));}
-function refreshPreview(){const limit=flightLimit();preview=M.multiTrajectory(p,shot,limit);shot.closest=Math.min(...preview.map(q=>M.nearest(centers,...q).distance));previewLimit=limit;}
-function armGun(capture=true){clearEncounter();unpause();stopSound();updateMode();if(capture){gunOrigin=[x,y];}x=gunOrigin[0];y=gunOrigin[1];vx=vy=0;drag=null;recoil=null;mode='ready';tunnelFrom=tunnelTo=null;tunnelTime=0;trail=[];tried=new Set();const potential=M.multiPotential(p,centers,x,y),kinetic=Math.max(0,energy-potential),speed=Math.sqrt(2*kinetic/p.mu),heading=gunHeading-angle;shot={...shot,x,y,vx:speed*Math.cos(heading),vy:speed*Math.sin(heading),angle,aimTarget,energy,canLaunch:kinetic>1e-8,centers};shot.L=p.mu*(shot.x*shot.vy-shot.y*shot.vx);shot.B=shot.L**2/(2*p.mu);shot.rmin=(p.C+Math.sqrt(p.C**2+4*energy*shot.B))/(2*energy);probability=centers.length===1?M.penetration(p,shot):null;syncView();if(shot.canLaunch)refreshPreview();else{preview=[[x,y]];shot.closest=M.nearest(centers,x,y).distance;}status(shot.canLaunch?'Dělo je v aktuální poloze částice. Zamiř a vystřel.':'V tomto místě nezbývá pohybová energie. Zvyš teplotu nebo částici oddal.');}
+function prepareSurface(){const unit=displayRadius()/Math.max(scale,1e-9);shot.core=unit*visualBound($('projectile').value)+4*zoom/Math.max(scale,1e-9);shot.surfaceStrength=energy*16;for(const t of centers){t.core=unit*visualBound(targetKind(t))+4*zoom/Math.max(scale,1e-9);t.surfaceStrength=energy*16;}if(p.b.Z&&centers.some(t=>t.Z&&Math.hypot(x-t.x,y-t.y)<=shot.core+t.core))shot.canLaunch=false;}
+function refreshPreview(){prepareSurface();preview=M.aimPreview(p,centers,shot);previewJob=null;previewLimit=flightLimit();}
+function advancePreview(){if(!previewJob)return;if(mode!=='ready'){previewJob=null;return;}const until=performance.now()+3;do{const next=previewJob.next();preview=next.value;shot.closest=preview.closest;if(next.done){previewJob=null;if(launchPending){launchPending=false;launch();}break;}}while(performance.now()<until);}
+function displayJacobian(){
+ const epsilon=Math.max(.001,shot.start*1e-5),at=(dx,dy)=>{const q=project(x+dx,y+dy),items=schematicItems([{id:$('projectile').value,x:q[0],y:q[1],radius:displayRadius()},...centers.map(t=>({id:targetKind(t),x:project(t.x,t.y)[0],y:project(t.x,t.y)[1],radius:displayRadius()}))]);return [items[0].x,items[0].y];},origin=at(0,0),a=at(epsilon,0),b=at(0,epsilon);return [(a[0]-origin[0])/epsilon,(b[0]-origin[0])/epsilon,(a[1]-origin[1])/epsilon,(b[1]-origin[1])/epsilon];
+}
+function physicalHeading(heading){const [a,b,c,d]=displayJacobian(),det=a*d-b*c;if(Math.abs(det)<1e-12)return heading;const ux=Math.cos(heading),uy=Math.sin(heading);return Math.atan2((a*uy-c*ux)/det,(d*ux-b*uy)/det);}
+function visualHeading(heading){const [a,b,c,d]=displayJacobian(),ux=Math.cos(heading),uy=Math.sin(heading);return Math.atan2(c*ux+d*uy,a*ux+b*uy);}
+function armGun(capture=true){materializeManual();if(!hasProjectile()){clearEncounter();mode='ready';shot.canLaunch=false;preview=[];vx=vy=0;updateMode();updateRareButton();status('Ve scéně chybí projektil zvolené reakce.');return;}if($('projectile').value!==preferredProjectile()){const index=centers.findIndex(t=>targetKind(t)===preferredProjectile());if(index>=0){selectNucleus(index);capture=true;}}syncActivePair();clearEncounter();unpause();stopSound();updateMode();if(capture){gunOrigin=[x,y];}x=gunOrigin[0];y=gunOrigin[1];vx=vy=0;drag=null;recoil=null;mode='ready';tunnelFrom=tunnelTo=null;tunnelTime=0;trail=[];tried=new Set();if(cell&&[...centers,{x,y}].some(t=>Math.abs(t.x-cell.x)>cell.rx||Math.abs(t.y-cell.y)>cell.ry))cell=M.makeCell([...centers,{x,y}],shot.start);const span=Math.max(shot.start,2*M.nearest(centers,x,y).distance);shot.start=span;shot.dt=.0015*span/Math.max(.1,Math.sqrt(2*energy/p.mu));const potential=M.multiPotential(p,centers,x,y),kinetic=Math.max(0,energy-potential),speed=Math.sqrt(2*kinetic/p.mu),heading=physicalHeading(gunHeading-angle);shot={...shot,x,y,vx:speed*Math.cos(heading),vy:speed*Math.sin(heading),angle,aimTarget,energy,referenceMu:p.mu,projectileKind:$('projectile').value,canLaunch:kinetic>1e-8,centers};shot.L=p.mu*(shot.x*shot.vy-shot.y*shot.vx);shot.B=shot.L**2/(2*p.mu);shot.rmin=(p.C+Math.sqrt(p.C**2+4*energy*shot.B))/(2*energy);probability=centers.length===1?M.penetration(p,shot):null;syncView();if(shot.canLaunch)refreshPreview();else{preview=[[x,y]];shot.closest=M.nearest(centers,x,y).distance;}status(shot.canLaunch?'Dělo je v aktuální poloze částice. Zamiř a vystřel.':'Pro výstřel částici oddal: chybí pohybová energie nebo se zvětšené značky překrývají.');}
 
 function syncChoices(){document.querySelectorAll('[name="interactionChoice"]').forEach(input=>input.checked=input.value===$('interaction').value);document.querySelectorAll('[name="countChoice"]').forEach(input=>input.checked=input.value===$('targetCount').value);}
 for(const input of document.querySelectorAll('[name="interactionChoice"]'))input.addEventListener('change',()=>{if(input.checked){$('interaction').value=input.value;$('interaction').onchange();}});
 for(const input of document.querySelectorAll('[name="countChoice"]'))input.addEventListener('change',()=>{if(input.checked){$('targetCount').value=input.value;$('targetCount').onchange();}});
-function updateMode(){syncChoices();const gun=$('interaction').value==='gun';document.querySelector('.sceneTitle h2').textContent=gun?'Zamiř. Vystřel. Sleduj odklon.':'Přibliž jádra proti odpudivé síle';document.querySelector('.sceneTitle p').textContent=gun?'Hlaveň míří přímo ke kurzoru. Rovně: výstřel · přerušovaně: dráha v poli.':'Uchop částici. Čím blíž k jádru, tím více zaostává za kurzorem. Kolečko mění zoom; tažením prázdného místa posuneš pohled.';$('launch').hidden=!gun;$('pause').hidden=!gun;$('angle').closest('label').hidden=!gun;}
+function updateMode(){syncChoices();const gun=$('interaction').value==='gun';document.querySelector('.sceneTitle h2').textContent=gun?'Zamiř. Vystřel. Sleduj odklon.':'Přibliž jádra proti odpudivé síle';document.querySelector('.sceneTitle p').textContent=gun?'Střelba: měkké odpuzování povrchů. Náhled končí za prvním vychýlením. Mimo jádra: míření.':'Uchop libovolné jádro a ovládej je. Ostatní stojí. Shift + tažení mění jen rozmístění.';$('launch').hidden=!gun;$('angle').closest('label').hidden=!gun;}
 function clearStats(){attempts=passes=classical=0;batchNote='';}
-function pair(){p=M.pair($('target').value,$('projectile').value);clearStats();home();}
+function pair(){configureBranches();p=M.pair($('target').value,$('projectile').value);clearStats();home();}
 function reset(){layoutSeed=(Math.random()*4294967296)>>>0;$('targetCount').value='3';$('pairPreset').value='triton|deuteron';$('target').value='triton';$('projectile').value='deuteron';$('temperature').value=100;$('lineStyle').value='source';$('angle').value=0;$('interaction').value='drag';zoom=1;panX=panY=0;$('quantum').checked=$('field').checked=$('arrows').checked=true;temperature=100;energy=1.5*M.kB*temperature;angle=0;pair();}
-function updateEnergy(){
+function updateEnergy(){manualAnchor=null;
  temperature=+$('temperature').value;energy=M.thermalMean(temperature);clearStats();clearEncounter();unpause();stopSound();
  if(mode==='nuclear'){shot.energy=energy;return;}
  const held=drag;vx=vy=0;trail=[];tried=new Set();tunnelFrom=tunnelTo=null;tunnelTime=0;recoil=null;
@@ -125,109 +226,128 @@ function updateEnergy(){
  fieldKey='';updateRareButton();
 }
 $('temperature').oninput=updateEnergy;
+document.querySelector('.controlRail').addEventListener('pointerdown',event=>{if(event.target.closest('button,input,select')&&!event.target.closest('#sound'))resetAfterFusion(true);},true);
 $('shuffle').onclick=()=>{layoutSeed=(Math.random()*4294967296)>>>0;zoom=1;panX=panY=0;home();};
 $('pairPreset').onchange=()=>{const [target,projectile]=$('pairPreset').value.split('|');$('target').value=target;$('projectile').value=projectile;pair();};
 function snapAngle(degrees){return Math.round((((degrees+180)%360+360)%360-180)*1000)/1000;}
 $('angle').oninput=()=>{angle=snapAngle(+$('angle').value)*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);};
-$('target').onchange=$('projectile').onchange=$('targetCount').onchange=pair;$('reset').onclick=reset;$('home').onclick=()=>{batchNote='';home();};$('interaction').onchange=()=>{if($('interaction').value==='gun')armGun(true);else{release();clearEncounter();vx=vy=0;mode='ready';updateMode();}};
+$('target').onchange=$('projectile').onchange=$('targetCount').onchange=pair;$('reset').onclick=reset;$('home').onclick=()=>{batchNote='';home();};$('interaction').onchange=()=>{resetAfterFusion(true);if($('interaction').value==='gun'){if($('projectile').value!==preferredProjectile()){const index=centers.findIndex(t=>targetKind(t)===preferredProjectile());if(index>=0)selectNucleus(index);}armGun(true);}else{resetManualSpeed();release();clearEncounter();vx=vy=0;centers.forEach(t=>{t.vx=t.vy=0;});mode='ready';updateMode();}};
 $('quantum').onchange=()=>{clearStats();if($('interaction').value==='gun')armGun(mode!=='ready');else home();};
-function launch(outcome=null){const demonstration=demoPending;unlockSound();armGun(true);if(!shot.canLaunch)return;demoActive=demonstration;if(demonstration){fitAllParticles();}chosenOutcome=outcome;({x,y,vx,vy}=shot);mode='flight';status(demoActive?'UKÁZKA VZÁCNÉHO STŘETU · přiblížení a zpomalení před vybraným průchodem.':'Běžný výstřel: částice letí, výsledek průchodu není zaručen.');}
+function launch(outcome=null){
+ if(!hasProjectile()){status('Vyber dvojici s dostupným projektilem.');return;}
+ if(($('projectile').value!==preferredProjectile()&&centers.some(t=>targetKind(t)===preferredProjectile()))||mode!=='ready')armGun(true);
+ if(!shot.canLaunch)return;if(previewJob){launchPending=true;status('Dokončuji předpověď dráhy; výstřel je připraven.');return;}
+ lastShotSetup={x:shot.x,y:shot.y,kind:$('projectile').value,heading:gunHeading,angle,centers:centers.map(t=>({...t})),cell:{...cell},shot:{...shot,centers:undefined}};unlockSound();unpause();demoActive=demoPending;demoPending=false;chosenOutcome=outcome;({x,y,vx,vy}=shot);flightAccumulator=0;trail=[];tried=new Set();mode='flight';beginRecording();status(demoActive?(activeReaction()?.noBarrier?'PŘIPRAVENÁ SRÁŽKA · neutron nemá Coulombovu bariéru.':'UKÁZKA VZÁCNÉHO STŘETU · přiblížení, tunelování a zvolená reakce.'):'Běžný výstřel: částice sleduje vypočtenou dráhu.');
+}
 $('launch').onclick=()=>{batchNote='';launch();};
-$('pause').onclick=()=>{paused=!paused;if(paused)stopSound();$('pause').textContent=paused?'Pokračovat':'Pozastavit';$('pause').setAttribute('aria-pressed',String(paused));};
 $('full').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{});};
 function syncView(){const rect=c.getBoundingClientRect();W=rect.width;H=rect.height;view();}
-function baseView(){const points=[...centers,{x:shot.start,y:0}],minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x)),minY=Math.min(...points.map(p=>p.y)),maxY=Math.max(...points.map(p=>p.y)),padding=Math.max(35,Math.min(W,H)*.22),width=Math.max(1,W-padding*2),height=Math.max(1,H-110-padding*2),base=Math.min(width/Math.max(shot.start*.5,maxX-minX),height/Math.max(shot.start*.55,maxY-minY));scale=Math.max(.00001,base)*zoom;ox=W/2-(minX+maxX)/2*scale+panX*W;oy=65+padding+height/2-(minY+maxY)/2*scale+panY*H;}
+function baseView(){const points=layoutPoints.length?layoutPoints:[...centers,{x:shot.start,y:0}],minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x)),minY=Math.min(...points.map(p=>p.y)),maxY=Math.max(...points.map(p=>p.y)),padding=Math.max(35,Math.min(W,H)*.22),width=Math.max(1,W-padding*2),height=Math.max(1,H-110-padding*2),base=Math.min(width/Math.max(shot.start*.5,maxX-minX),height/Math.max(shot.start*.55,maxY-minY));scale=Math.max(.00001,base)*zoom;ox=W/2-(minX+maxX)/2*scale+panX*W;oy=65+padding+height/2-(minY+maxY)/2*scale+panY*H;}
 function fitAllParticles(){
  const rect=c.getBoundingClientRect();W=rect.width;H=rect.height;if(W<1||H<120)return;
  zoom=1;panX=panY=0;view();
- const bounds=()=>{const items=[...centers.map(t=>({x:t.x,y:t.y,id:$('target').value})),{x,y,id:$('projectile').value}],edges=items.map(t=>{const q=project(t.x,t.y),radius=displayRadius()*visualBound(t.id)+10;return {left:q[0]-radius,right:q[0]+radius,top:q[1]-radius,bottom:q[1]+radius};});return {left:Math.min(...edges.map(e=>e.left)),right:Math.max(...edges.map(e=>e.right)),top:Math.min(...edges.map(e=>e.top)),bottom:Math.max(...edges.map(e=>e.bottom))};};
+ const bounds=()=>{const items=currentGlyphs(),edges=items.map(t=>{const radius=t.radius*visualBound(t.id)+10;return {left:t.x-radius,right:t.x+radius,top:t.y-radius,bottom:t.y+radius};});return {left:Math.min(...edges.map(e=>e.left)),right:Math.max(...edges.map(e=>e.right)),top:Math.min(...edges.map(e=>e.top)),bottom:Math.max(...edges.map(e=>e.bottom))};};
  const left=20,right=W-20,top=76,bottom=H-55;
  for(let i=0;i<3;i++){let b=bounds();zoom*=Math.min(1,(right-left)/Math.max(1,b.right-b.left),(bottom-top)/Math.max(1,b.bottom-b.top))*.98;view();b=bounds();panX+=((left+right-b.left-b.right)/2)/W;panY+=((top+bottom-b.top-b.bottom)/2)/H;view();}
  fitPending=false;fieldKey='';
 }
 function fusionWarp(){if(!fusion)return 1;if(fusion.phase!=='compound')return 0;const u=Math.min(1,fusion.time/.65);return 1-u*u*(3-2*u);}
-function view(){baseView();if(fusion){const u=1-fusionWarp(),start=fusion.screenOrigin,desired=[start[0]*W*(1-u)+W*.5*u,start[1]*H*(1-u)+(75+(H-130)/2)*u],point=project((fusion.focus||fusion.origin).x,(fusion.focus||fusion.origin).y);ox+=desired[0]-point[0];oy+=desired[1]-point[1];encounterView();}}
+function view(){baseView();collisionZoom=1;collisionFocus=null;if($('cameraScale'))$('cameraScale').hidden=true;}
 $('viewReset').onclick=fitAllParticles;
-c.closest('.scene').addEventListener('wheel',e=>{e.preventDefault();syncView();if(!W||!H)return;const rect=c.getBoundingClientRect(),px=e.clientX-rect.left,py=e.clientY-rect.top,[wx,wy]=unproject(px,py),delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?H:1);zoom=Math.max(.08,Math.min(40,zoom*Math.exp(-delta*.0015)));view();const anchor=project(wx,wy);panX+=(px-anchor[0])/W;panY+=(py-anchor[1])/H;view();if(drag&&lastPointer){const q=position(lastPointer);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}fieldKey='';if($('interaction').value==='gun'&&shot.canLaunch!==false)refreshPreview();},{passive:false});
+c.closest('.scene').addEventListener('wheel',e=>{e.preventDefault();syncView();if(!W||!H)return;const rect=c.getBoundingClientRect(),px=e.clientX-rect.left,py=e.clientY-rect.top,[wx,wy]=unproject(px,py),delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?H:1);zoom=Math.max(.08,Math.min(40,zoom*Math.exp(-delta*.0015)));view();const anchor=project(wx,wy);panX+=(px-anchor[0])/W;panY+=(py-anchor[1])/H;view();if(drag&&lastPointer){const q=position(lastPointer);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}fieldKey='';if($('interaction').value==='gun'&&mode==='ready'&&!fusion&&playbackCursor===null&&shot.canLaunch!==false)refreshPreview();},{passive:false});
 function position(e){syncView();const r=c.getBoundingClientRect();return unproject(e.clientX-r.left,e.clientY-r.top);}
-function aimAtPointer(e){syncView();const rect=c.getBoundingClientRect(),origin=project(...gunOrigin),dx=e.clientX-rect.left-origin[0],dy=e.clientY-rect.top-origin[1];if(Math.hypot(dx,dy)<16)return;const heading=Math.atan2(dy,dx);angle=snapAngle((gunHeading-heading)*180/Math.PI)*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);}
-function visualBound(id){const bound=Math.max(...S.connected.atoms[id].map(a=>Math.hypot(...a.slice(0,3))+1.16));return 13.76*bound/Math.sqrt(13.76**2-bound**2);}
+function aimAtPointer(e){syncView();const rect=c.getBoundingClientRect(),origin=[currentGlyphs()[0].x,currentGlyphs()[0].y],dx=e.clientX-rect.left-origin[0],dy=e.clientY-rect.top-origin[1];if(Math.hypot(dx,dy)<16)return;const heading=Math.atan2(dy,dx);angle=snapAngle((gunHeading-heading)*180/Math.PI)*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);}
+function visualBound(id){if(!S.connected.atoms[id])return .35;const bound=Math.max(...S.connected.atoms[id].map(a=>Math.hypot(...a.slice(0,3))+1.16));return 13.76*bound/Math.sqrt(13.76**2-bound**2);}
 function baseRadius(){return Math.min(W,H)*.028*zoom;}
 function contactRadius(){return (displayRadius()*(visualBound($('target').value)+visualBound($('projectile').value))*1.08+8*zoom)/Math.max(scale,.00001);}
 function displayRadius(){return baseRadius();}
-// Smooth, invertible schematic enlargement around every fixed nucleus.
-// Its Jacobian is positive definite; physical coordinates and energies are untouched.
-function project(wx,wy){
- if(fusion&&fusion.phase!=='compound')return [ox+wx*scale,oy+wy*scale];
- const u=wx*scale,v=wy*scale,A=displayRadius()*(visualBound($('target').value)+visualBound($('projectile').value))*1.55*fusionWarp(),soft=Math.max(.001,(p.C?p.C/M.thermalMean(200):p.R)*scale*.1);let X=ox+u,Y=oy+v;
- for(const t of centers){const dx=u-t.x*scale,dy=v-t.y*scale,r=Math.hypot(dx,dy,soft);X+=A*dx/r;Y+=A*dy/r;}return [X,Y];
+function glyphClearance(a,b){return (displayRadius()*(visualBound(a)+visualBound(b))+8*zoom)/Math.max(scale,1e-9);}
+let manualDisplay=false,manualAnchor=null;
+function manualDisplayPosition(){
+ // A local, smooth magnification of small separations. Physical coordinates,
+ // energy and the barrier marker are never changed by this drawing transform.
+ let point={x,y};if(!manualDisplay||fusion||!centers.length)return point;
+ const near=M.nearest(centers,x,y).target,dx=x-near.x,dy=y-near.y,r=Math.hypot(dx,dy),gap=glyphClearance($('projectile').value,targetKind(near));
+ if(r<2*gap){const shown=gap+r*r/(4*gap);point={x:near.x+(r?dx/r:1)*shown,y:near.y+(r?dy/r:0)*shown};}
+ // Other fixed targets may be close after a user rearranges them.
+ for(let pass=0;pass<16;pass++){let moved=false;for(const t of centers){const dx=point.x-t.x,dy=point.y-t.y,d=Math.hypot(dx,dy),limit=glyphClearance($('projectile').value,targetKind(t));if(d<limit){point={x:t.x+(d?dx/d:1)*limit,y:t.y+(d?dy/d:0)*limit};moved=true;}}if(!moved)break;}
+ return point;
 }
-function unproject(X,Y){
- if(fusion&&fusion.phase!=='compound')return [(X-ox)/scale,(Y-oy)/scale];
- let u=(X-ox)/scale,v=(Y-oy)/scale;
- const A=displayRadius()*(visualBound($('target').value)+visualBound($('projectile').value))*1.55*fusionWarp(),soft=Math.max(.001,(p.C?p.C/M.thermalMean(200):p.R)*scale*.1);
- for(let k=0;k<35;k++){const q=project(u,v),ex=q[0]-X,ey=q[1]-Y;if(Math.hypot(ex,ey)<1e-6)break;let xx=1,yy=1,xy=0;for(const t of centers){const dx=(u-t.x)*scale,dy=(v-t.y)*scale,r=Math.hypot(dx,dy,soft),h=A/(r*r*r);xx+=h*(dy*dy+soft*soft);yy+=h*(dx*dx+soft*soft);xy-=h*dx*dy;}const det=xx*yy-xy*xy,du=(yy*ex-xy*ey)/det/scale,dv=(xx*ey-xy*ex)/det/scale;let step=1;const error=Math.hypot(ex,ey);for(let j=0;j<20;j++){const next=project(u-du*step,v-dv*step);if(Math.hypot(next[0]-X,next[1]-Y)<error)break;step*=.5;}u-=du*step;v-=dv*step;}return [u,v];
-}
+function materializeManual(){if(!manualDisplay)return;const point=manualDisplayPosition();x=point.x;y=point.y;gunOrigin=[x,y];manualDisplay=false;}
+function manualApproach(dt){manualDisplay=true;if(!manualAnchor)manualAnchor={x,y};return M.manualResistancePoint(p,centers,manualAnchor,drag,energy);}
+// Nuclear glyphs are enlarged; positions and paths share one affine projection.
+function project(wx,wy){return [ox+wx*scale,oy+wy*scale];}
+function unproject(X,Y){return [(X-ox)/scale,(Y-oy)/scale];}
 
-function hitParticle(q){const pointer=project(...q),center=project(x,y);return Math.hypot(pointer[0]-center[0],pointer[1]-center[1])<=displayRadius()*visualBound($('projectile').value)+8;}
-c.onpointerdown=e=>{if(mode==='recoil'||fusion)return;if(![0,1,2].includes(e.button)||e.isPrimary===false)return;if(activePointer!==null)release();unlockSound();const q=position(e);activePointer=e.pointerId;lastPointer={clientX:e.clientX,clientY:e.clientY};aimAnchor={clientX:e.clientX,clientY:e.clientY,angle,panX,panY};
-if(e.button!==0){panning=true;}
+function targetKind(t){return t.kind||$('target').value;}
+function syncActivePair(index=M.nearest(centers,x,y).index){
+ targetIndex=index;const kind=targetKind(centers[index]);$('target').value=kind;p=M.pair(kind,$('projectile').value);
+}
+function pickNucleus(q){
+ const displayed=currentGlyphs(),point=project(...q),choices=[{index:-1,x,y,kind:$('projectile').value},...centers.map((t,index)=>({...t,index,kind:targetKind(t)}))];
+ return choices.map(t=>({...t,distance:Math.hypot(...[displayed[t.index+1].x,displayed[t.index+1].y].map((v,i)=>v-point[i]))})).filter(t=>t.distance<displayRadius()*visualBound(t.kind)+10).sort((a,b)=>a.distance-b.distance)[0];
+}
+function selectNucleus(index){manualAnchor=null;if(index>=0)materializeManual();
+ clearEncounter();stopSound();recoil=null;trail=[];preview=[];tunnelFrom=tunnelTo=null;tried=new Set();vx=vy=0;
+ if(index>=0){const selected=centers[index],kind=targetKind(selected),previous={x,y,kind:$('projectile').value,...M.nuclei[$('projectile').value],vx:0,vy:0};x=selected.x;y=selected.y;centers[index]=previous;$('projectile').value=kind;}
+ centers.forEach(t=>{t.vx=t.vy=0;});syncActivePair();gunOrigin=[x,y];aimTarget=targetIndex;gunHeading=Math.atan2(centers[targetIndex].y-y,centers[targetIndex].x-x);angle=0;$('angle').value=0;
+ shot={...shot,x,y,centers,energy};mode='ready';$('labels').replaceChildren();lastPair='';fieldKey='';flightAccumulator=0;clearStats();updateMode();updateRareButton();
+}
+function hitParticle(q){const pointer=project(...q),center=projectilePoint();return Math.hypot(pointer[0]-center[0],pointer[1]-center[1])<=displayRadius()*visualBound($('projectile').value)+8;}
+function resetAfterFusion(force=false){
+ if((!fusion&&!playbackHasProducts)||(!force&&fusion?.phase!=='done')||!lastShotSetup)return false;
+ const saved=lastShotSetup;clearEncounter();resetManualSpeed();centers=saved.centers.map(t=>({...t,vx:0,vy:0}));x=saved.x;y=saved.y;vx=vy=0;$('projectile').value=saved.kind;cell={...saved.cell};shot={...saved.shot,centers};gunOrigin=[x,y];gunHeading=saved.heading??gunHeading;angle=saved.angle??0;$('angle').value=angle*180/Math.PI;
+ trail=[];preview=[];drag=null;layoutDrag=null;recoil=null;activePointer=null;lastPointer=null;panning=aiming=false;aimAnchor=null;releaseBounds=null;tunnelFrom=tunnelTo=null;tunnelTime=0;flightAccumulator=0;mode='ready';syncActivePair();unpause();stopSound();fieldKey='';updateMode();
+ if($('interaction').value==='gun')armGun(true);else updateRareButton();status('Původní jádra obnovena. Můžeš připravit další pokus.');return true;
+}
+c.onpointerdown=e=>{if(resetAfterFusion(true)){$('interaction').value='drag';updateMode();e.preventDefault();return;}if(mode==='recoil'||fusion)return;if(![0,1,2].includes(e.button)||e.isPrimary===false)return;if(activePointer!==null)release();unlockSound();const q=position(e);gripMoved=false;activePointer=e.pointerId;lastPointer={clientX:e.clientX,clientY:e.clientY};aimAnchor={clientX:e.clientX,clientY:e.clientY,angle,panX,panY};
+if(e.shiftKey&&e.button===0){
+ const picked=pickNucleus(q);
+ if(picked){resetManualSpeed();materializeManual();$('interaction').value='drag';updateMode();layoutDrag=picked.index;grabOffset=[q[0]-picked.x,q[1]-picked.y];drag=null;vx=vy=0;mode='ready';centers.forEach(t=>{t.vx=t.vy=0;});clearEncounter();}else panning=true;
+}
+else if(e.button!==0){panning=true;}
+else if(pickNucleus(q)){resetManualSpeed();$('interaction').value='drag';selectNucleus(pickNucleus(q).index);updateMode();releaseBounds=null;grabOffset=[q[0]-x,q[1]-y];manualAnchor={x,y};drag=[x,y];mode='drag';unpause();}
 else if($('interaction').value==='gun'){if(mode!=='ready')armGun(true);aiming=true;aimAtPointer(e);}
-else if(hitParticle(q)){releaseBounds=null;recoil=null;grabOffset=[q[0]-x,q[1]-y];drag=[x,y];mode='drag';vx=vy=0;unpause();}
 else panning=true;
 e.preventDefault();c.focus({preventScroll:true});c.setPointerCapture(e.pointerId);};
 c.onpointermove=e=>{if(activePointer===null||(e.pointerId!==undefined&&e.pointerId!==activePointer))return;lastPointer={clientX:e.clientX,clientY:e.clientY};
-if(panning){syncView();panX=aimAnchor.panX+(e.clientX-aimAnchor.clientX)/W;panY=aimAnchor.panY+(e.clientY-aimAnchor.clientY)/H;view();fieldKey='';}
+if(layoutDrag!==null){
+ const q=position(e),next={x:q[0]-grabOffset[0],y:q[1]-grabOffset[1]},id=layoutDrag<0?$('projectile').value:targetKind(centers[layoutDrag]),others=centers.filter((_,i)=>i!==layoutDrag).map(t=>({...t,id:targetKind(t)}));if(layoutDrag>=0)others.push({x,y,id:$('projectile').value});
+ const body=layoutDrag<0?{x,y}:centers[layoutDrag],safe=M.limitSeparation(others,body,next,t=>glyphClearance(id,t.id));
+ if(layoutDrag<0){x=safe.x;y=safe.y;gunOrigin=[x,y];}else Object.assign(centers[layoutDrag],safe);fieldKey='';preview=[];
+}
+else if(panning){syncView();panX=aimAnchor.panX+(e.clientX-aimAnchor.clientX)/W;panY=aimAnchor.panY+(e.clientY-aimAnchor.clientY)/H;view();fieldKey='';}
 else if(aiming){aimAtPointer(e);}
-else if(drag){const q=position(e);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}};
-function release(e){if(e&&e.pointerId!==undefined&&activePointer!==null&&e.pointerId!==activePointer)return;const held=drag!==null;activePointer=null;lastPointer=null;panning=false;aiming=false;aimAnchor=null;stopHum();if(!held)return;drag=null;vx=vy=0;recoil=null;syncView();const margin=Math.min(W*.25,H*.2,Math.max(28,displayRadius()*visualBound($('projectile').value)+12));releaseBounds={left:(margin-ox)/scale,right:(W-margin-ox)/scale,top:(65+margin-oy)/scale,bottom:(H-45-margin-oy)/scale};mode='free';status('Po puštění částici dál odpuzuje společné elektrické pole.');}
+else if(drag){if(Math.hypot(e.clientX-aimAnchor.clientX,e.clientY-aimAnchor.clientY)>3)gripMoved=true;const q=position(e);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}};
+function release(e){manualAnchor=null;if(e&&e.pointerId!==undefined&&activePointer!==null&&e.pointerId!==activePointer)return;if(layoutDrag!==null){layoutDrag=null;cell=M.makeCell([...centers,{x,y}],shot.start);shot.cell=cell;gunOrigin=[x,y];if($('interaction').value==='gun')armGun(true);else{mode='ready';status('Rozmístění upraveno. Okolní jádra jsou při ručním přibližování zamknutá.');}fieldKey='';}
+ const held=drag!==null;activePointer=null;lastPointer=null;panning=false;aiming=false;aimAnchor=null;stopHum();if(!held)return;drag=null;vx=vy=0;recoil=null;if($('interaction').value==='gun'){armGun(true);return;}if(!gripMoved){mode='ready';gunOrigin=[x,y];status('Jádro vybráno. Můžeš je uchopit nebo přepnout na dělo a vystřelit.');return;}syncView();const margin=Math.min(W*.25,H*.2,Math.max(28,displayRadius()*visualBound($('projectile').value)+12));releaseBounds={left:(margin-ox)/scale,right:(W-margin-ox)/scale,top:(65+margin-oy)/scale,bottom:(H-45-margin-oy)/scale};mode='free';status('Po puštění částici dál odpuzuje společné elektrické pole.');}
 c.onpointerup=release;c.onpointercancel=release;c.onlostpointercapture=e=>{if(activePointer!==null&&(!c.hasPointerCapture||!c.hasPointerCapture(activePointer)))release(e);};
 window.addEventListener('pointerup',release);window.addEventListener('pointercancel',release);window.addEventListener('blur',()=>release());
 c.addEventListener('contextmenu',e=>e.preventDefault());
-c.onkeydown=e=>{if(mode==='recoil')return;if(!e.key.startsWith('Arrow'))return;unlockSound();e.preventDefault();if($('interaction').value==='gun'){angle=snapAngle(angle*180/Math.PI+(e.key==='ArrowUp'||e.key==='ArrowLeft'?-1:1)*(e.shiftKey?.001:.01))*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);}else{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];drag=[x+extent*.04*d[0],y+extent*.04*d[1]];mode='drag';}};c.onkeyup=release;
-function predictCloseEncounter(index){
- const state={x,y,vx,vy},t=centers[index];let radial=(x-t.x)*vx+(y-t.y)*vy;
- for(let i=0;i<14000;i++){
- M.multiAdvance(p,centers,state,shot.dt*2);const near=M.nearest(centers,state.x,state.y),next=(state.x-t.x)*state.vx+(state.y-t.y)*state.vy;
- if(near.distance<=p.R)return null;
- if(radial<0&&next>=0){if(near.index!==index)return null;const localEnergy=Math.max(.001,energy-(M.multiPotential(p,centers,state.x,state.y)-p.C/near.distance)),L=p.mu*((state.x-t.x)*state.vy-(state.y-t.y)*state.vx),B=L*L/(2*p.mu),rmin=(p.C+Math.sqrt(p.C*p.C+4*localEnergy*B))/(2*localEnergy),prob=M.penetration(p,{energy:localEnergy,B,rmin}),head=M.penetration(p,{energy:localEnergy,B:0,rmin:p.C/localEnergy});
- if(!(prob>0&&prob>=.1*head))return null;
- return {index,probability:prob,from:[state.x,state.y],to:[t.x+(state.x-t.x)*p.R/near.distance,t.y+(state.y-t.y)*p.R/near.distance],displayFrom:[x,y]};}
- if(near.index!==index)return null;radial=next;
- }return null;
-}
+c.onkeydown=e=>{if(e.key.startsWith('Arrow')&&resetAfterFusion(true)){e.preventDefault();return;}if(mode==='recoil')return;if(!e.key.startsWith('Arrow'))return;unlockSound();e.preventDefault();if($('interaction').value==='gun'){angle=snapAngle(angle*180/Math.PI+(e.key==='ArrowUp'||e.key==='ArrowLeft'?-1:1)*(e.shiftKey?.001:.01))*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);}else{resetManualSpeed();const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];manualAnchor={x,y};drag=[x+extent*.04*d[0],y+extent*.04*d[1]];mode='drag';}};c.onkeyup=release;
 function step(dt){
  if(!['flight','free'].includes(mode))return;
- const before=centers.map(t=>(x-t.x)*vx+(y-t.y)*vy),state={x,y,vx,vy};M.multiAdvance(p,centers,state,dt);({x,y,vx,vy}=state);
- if(mode==='free'&&releaseBounds){const b=releaseBounds,screen=project(x,y),left=ox+b.left*scale,right=ox+b.right*scale,top=oy+b.top*scale,bottom=oy+b.bottom*scale;if(screen[0]<left||screen[0]>right||screen[1]<top||screen[1]>bottom){[x,y]=unproject(Math.max(left,Math.min(right,screen[0])),Math.max(top,Math.min(bottom,screen[1])));vx=vy=0;mode='ready';status('Částice je u okraje pracovní plochy. Můžeš ji znovu uchopit.');return;}}
- const near=M.nearest(centers,x,y);targetIndex=near.index;
- // A tiny visual lead-in to the actual turning point, independent of zoom and icon size.
- if(mode==='flight'&&demoActive&&!reduced.matches&&before[near.index]<0){
- if(!anticipated.has(near.index))anticipated.set(near.index,predictCloseEncounter(near.index));
- const predicted=anticipated.get(near.index);
- if(predicted){const turningDistance=Math.hypot(predicted.from[0]-near.target.x,predicted.from[1]-near.target.y);
- if(near.distance<=turningDistance*1.03){aimTarget=near.index;startTunnel({...predicted,displayFrom:[x,y]},true);return;}}
- }
-
+ const before=centers.map(t=>(x-t.x)*(vx-(t.vx||0))+(y-t.y)*(vy-(t.vy||0))),state={x,y,vx,vy,core:shot.core,surfaceStrength:shot.surfaceStrength};
+ if(mode==='flight')M.mobileAdvance(p,centers,state,dt,cell);else M.multiAdvance(p,centers,state,dt);
+ ({x,y,vx,vy}=state);if(state.integrationLimited){mode='done';status('Výpočet zastaven při příliš těsném přiblížení. Částici můžeš znovu uchopit.');return;}if(state.collision&&activeReaction()?.noBarrier&&$('fusionEnabled').checked){const hitIndex=state.collision.includes(0)?state.collision.find(i=>i!==0)-1:-1;if(hitIndex>=0){syncActivePair(hitIndex);const t=centers[hitIndex],rvx=vx-(t.vx||0),rvy=vy-(t.vy||0);dtLocalEnergy=.5*p.mu*(rvx*rvx+rvy*rvy);dtBoost=[(p.b.A*vx+p.a.A*(t.vx||0))/(p.a.A+p.b.A)/Math.sqrt(931494.10242),(p.b.A*vy+p.a.A*(t.vy||0))/(p.a.A+p.b.A)/Math.sqrt(931494.10242)];beginFusion();return;}}if(state.collision){mode='nuclear';status('Dosažena jaderná oblast; další jaderný střet zde nepočítáme.');return;}
+ if(mode==='free'&&releaseBounds){const b=releaseBounds,screen=projectilePoint(),left=ox+b.left*scale,right=ox+b.right*scale,top=oy+b.top*scale,bottom=oy+b.bottom*scale;if(screen[0]<left||screen[0]>right||screen[1]<top||screen[1]>bottom){[x,y]=unproject(Math.max(left,Math.min(right,screen[0])),Math.max(top,Math.min(bottom,screen[1])));vx=vy=0;mode='ready';status('Částice je u okraje pracovní plochy. Můžeš ji znovu uchopit.');return;}}
+ const near=M.nearest(centers,x,y);syncActivePair(near.index);
  if(near.distance<=p.R){const demonstration=demoActive;clearEncounter();if(!demonstration){attempts++;classical++;}mode='nuclear';vx=vy=0;status('Dosažena jaderná oblast. Výsledek reakce zatím nepočítáme.');return;}
- if(mode==='flight'){const t=near.target,radial=(x-t.x)*vx+(y-t.y)*vy;if(!tried.has(near.index)&&before[near.index]<0&&radial>=0&&(near.distance<shot.start*.7||demoActive)){tried.add(near.index);if(!demoActive)attempts++;
- const localEnergy=Math.max(.001,energy-(M.multiPotential(p,centers,x,y)-M.potential(p,near.distance))),L=p.mu*((x-t.x)*vy-(y-t.y)*vx),B=L*L/(2*p.mu),rmin=(p.C+Math.sqrt(p.C*p.C+4*localEnergy*B))/(2*localEnergy);probability=M.penetration(p,{energy:localEnergy,B,rmin});
+ if(mode==='flight'){const t=near.target,rvx=vx-(t.vx||0),rvy=vy-(t.vy||0),radial=(x-t.x)*rvx+(y-t.y)*rvy;if(!tried.has(near.index)&&before[near.index]<0&&radial>=0&&(near.distance<shot.start*.7||demoActive)){tried.add(near.index);if(!demoActive)attempts++;
+ const localEnergy=Math.max(.001,.5*p.mu*(rvx*rvx+rvy*rvy)+p.C/near.distance+M.surfaceField({...shot,Z:p.b.Z},{...t,Z:p.a.Z},near.distance).U),L=p.mu*((x-t.x)*rvy-(y-t.y)*rvx),B=L*L/(2*p.mu),rmin=(p.C+Math.sqrt(p.C*p.C+4*localEnergy*B))/(2*localEnergy);probability=M.penetration(p,{energy:localEnergy,B,rmin});
  // Eligibility is a presentation rule, not a new physical tunnelling threshold.
  // Never force a long sideways jump: prefer a near-head-on, genuinely accessible encounter.
  const headOnProbability=M.penetration(p,{energy:localEnergy,B:0,rmin:p.C/localEnergy}),credible=probability>0&&probability>=.1*headOnProbability;
- const success=$('quantum').checked&&(demoActive?credible:Math.random()<probability);
+ const success=p.C>0&&$('quantum').checked&&(demoActive?credible:Math.random()<probability);
  const encounter={index:near.index,probability,from:[x,y],to:[t.x+(x-t.x)*p.R/near.distance,t.y+(y-t.y)*p.R/near.distance]};
  if(success){if(!demoActive)passes++;else aimTarget=near.index;rareEncounter=null;startTunnel(encounter,demoActive);}else{
- rareEncounter=$('quantum').checked&&p.C>0&&probability>0?encounter:null;$('showRare').disabled=!rareEncounter;
+ rareEncounter=$('quantum').checked&&p.C>0&&probability>0?encounter:null;updateRareButton();
  status(demoActive?'Toto přiblížení je příliš tečné pro připravenou ukázku. Dráha pokračuje bez vynuceného tunelu.':!$('quantum').checked?'Tunelování je vypnuté: klasický odraz.':probability<1e-6?'Průchod je při této energii a geometrii mimořádně vzácný. Částice se odráží.':'Průchod tentokrát nenastal. Částice se odklání.');
  }
  }}
  if(mode==='flight'&&demoActive&&Math.hypot(x-gunOrigin[0],y-gunOrigin[1])>shot.start*6){mode='done';vx=vy=0;status('Ukázka nenašla vhodné přiblížení. Připrav ji znovu; vzdálený tunel se nevynucuje.');}
- if(mode==='flight'&&!demoActive){
- const margin=Math.min(W*.25,H*.2,Math.max(28,displayRadius()*visualBound($('projectile').value)+12)),bounds={left:(margin-ox)/scale,right:(W-margin-ox)/scale,top:(65+margin-oy)/scale,bottom:(H-45-margin-oy)/scale};
- // A display boundary, not a force or a reflecting physical wall. Follow current zoom.
- const screen=project(x,y);if(screen[0]<margin||screen[0]>W-margin||screen[1]<65+margin||screen[1]>H-45-margin){[x,y]=unproject(Math.max(margin,Math.min(W-margin,screen[0])),Math.max(65+margin,Math.min(H-45-margin,screen[1])));mode='done';vx=vy=0;status('Dolet ukončen u okraje scény. Částice zůstává k dispozici pro další výstřel.');}
- }
+ if(mode==='flight'&&Math.hypot(x-gunOrigin[0],y-gunOrigin[1])>shot.start*6){mode='done';status('Ukázka zastavena u hranice scény. Jádra můžeš znovu rozmístit nebo vystřelit.');}
+
 }
 
 // Audio starts only after the user interacts; no audio files or network requests.
@@ -255,16 +375,19 @@ function playFusionSound(){if(!soundEnabled||!audio||audio.state!=='running')ret
 $('sound').onclick=()=>{soundEnabled=!soundEnabled;$('sound').textContent=soundEnabled?'Zvuk zapnutý':'Zvuk vypnutý';$('sound').setAttribute('aria-pressed',String(soundEnabled));if(soundEnabled)unlockSound();else stopSound();};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopSound();});window.addEventListener('pagehide',stopSound);
 const tunnelDuration=.9;
+function tunnelApproachLength(){return tunnelGraph?.approachDuration??tunnelDuration*.2;}
 function tunnelBlend(){
- const t=Math.min(1,tunnelTime/tunnelDuration),smooth=t*t*(3-2*t),hopEnd=.64,snapEnd=.73,phase=Math.min(1,t/hopEnd)*5,cycle=phase-Math.floor(phase);
+ const t=Math.max(0,Math.min(1,(tunnelTime-tunnelApproachLength())/(tunnelDuration*.8))),smooth=t*t*(3-2*t),hopEnd=.64,snapEnd=.73,phase=Math.min(1,t/hopEnd)*5,cycle=phase-Math.floor(phase);
  let travel=smooth;
  if(!reduced.matches){if(t<hopEnd){const v=cycle<.5?cycle*2:(1-cycle)*2,e=v*v*(3-2*v);travel=.17*e-.025*Math.sin(Math.PI*cycle);}else{const q=Math.min(1,(t-hopEnd)/(snapEnd-hopEnd));travel=q*q*(3-2*q);}}
  const glitch=!reduced.matches&&t<hopEnd&&(cycle>.32&&cycle<.64),breakup=reduced.matches?0:Math.sin(Math.PI*t),shimmer=glitch?.52:1;
  return {t,smooth,travel,shimmer,breakup,glitch};
 }
-function tunnelContactPoint(){const target=centers[targetIndex],center=project(target.x,target.y),start=project(...(tunnelDisplayFrom||tunnelFrom||[x,y])),dx=start[0]-center[0],dy=start[1]-center[1],n=Math.max(.001,Math.hypot(dx,dy)),offset=displayRadius()*(visualBound($('target').value)+visualBound($('projectile').value))*.42;return [center[0]+dx/n*offset,center[1]+dy/n*offset];}
-function projectilePoint(){return mode==='nuclear'&&tunnelTo?tunnelContactPoint():project(x,y);}
+function targetScreen(t,i){return tunnelGlyphs&&['tunnel','nuclear','compound'].includes(mode)?project(...tunnelGlyphs[i+1]):project(t.x,t.y);}
+function tunnelContactPoint(){const target=centers[targetIndex],center=targetScreen(target,targetIndex),start=project(...(tunnelDisplayFrom||tunnelFrom||[x,y])),dx=start[0]-center[0],dy=start[1]-center[1],n=Math.max(.001,Math.hypot(dx,dy)),offset=displayRadius()*(visualBound($('target').value)+visualBound($('projectile').value))*.42;return [center[0]+dx/n*offset,center[1]+dy/n*offset];}
+function projectilePoint(){if(mode==='tunnel'){const f=tunnelBlend();return tunnelVisualPoint(f.travel,f.t);}if(mode==='nuclear'&&tunnelTo)return tunnelContactPoint();const q=manualDisplayPosition();return project(q.x,q.y);}
 function tunnelVisualPoint(travel,t){
+ if(tunnelApproachFrom&&tunnelTime<tunnelApproachLength()){const u=Math.max(0,tunnelTime/tunnelApproachLength()),ease=u*u*(3-2*u),a=project(...tunnelApproachFrom),b=project(...tunnelDisplayFrom);return [a[0]+(b[0]-a[0])*ease,a[1]+(b[1]-a[1])*ease];}
  const start=project(...(tunnelDisplayFrom||tunnelFrom)),end=tunnelContactPoint();
  return [start[0]+(end[0]-start[0])*travel,start[1]+(end[1]-start[1])*travel];
 }
@@ -286,29 +409,50 @@ function resize(canvas,context){const r=canvas.getBoundingClientRect(),d=Math.mi
 function line(context,a,b,color,width=1){context.strokeStyle=color;context.lineWidth=width;context.beginPath();context.moveTo(...a);context.lineTo(...b);context.stroke();}
 function arrow(a,b,color){line(ctx,a,b,color,2);const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(...b);ctx.lineTo(b[0]-6*Math.cos(ang-.5),b[1]-6*Math.sin(ang-.5));ctx.lineTo(b[0]-6*Math.cos(ang+.5),b[1]-6*Math.sin(ang+.5));ctx.fill();}
 function label(host,key,s,left,top,cls=''){let el=host.querySelector('[data-key="'+key+'"]');if(!el){el=document.createElement('span');el.dataset.key=key;el.className='mathlabel '+cls;host.append(el);}tex(el,s);el.style.left=left+'px';el.style.top=top+'px';return el;}
-function nucleus(id,X,Y,key,customAtoms){const atoms=customAtoms||S.connected.atoms[id],rad=displayRadius(),cz=13.76;atoms.forEach((a,i)=>{const len=Math.hypot(a[0],a[1],cz-a[2]),depth=cz-a[2]-(cz-a[2])/len,px=X+rad*cz*(a[0]-a[0]/len)/depth,py=Y-rad*cz*(a[1]-a[1]/len)/depth;const el=label($('labels'),key+i,S.labels[a[3]===1?'p':'n'],px,py,'nucleon');el.style.fontSize=S.particleLabels.fontSize*2*rad/S.particleLabels.referenceDiameter+'px';});}
+function nucleus(id,X,Y,key,customAtoms,rad=displayRadius()){const atoms=customAtoms||S.connected.atoms[id],cz=13.76;atoms.forEach((a,i)=>{const len=Math.hypot(a[0],a[1],cz-a[2]),depth=cz-a[2]-(cz-a[2])/len,px=X+rad*cz*(a[0]-a[0]/len)/depth,py=Y-rad*cz*(a[1]-a[1]/len)/depth;const el=label($('labels'),key+i,S.labels[id==='neutrino'?'neutrino':id==='positron'?'positron':a[3]<0?'e':a[3]===1?'p':'n'],px,py,'nucleon');if(id==='neutrino'){el.style.color='#294a53';el.style.textShadow='none';}el.style.fontSize=S.particleLabels.fontSize*2*rad/S.particleLabels.referenceDiameter+'px';});}
 
 const potentialCanvas=document.createElement('canvas'),potentialContext=potentialCanvas.getContext('2d');
 const fieldCanvas=document.createElement('canvas'),fc=fieldCanvas.getContext('2d');let fieldKey='',lastPair='',gridKey='',worldGrid=[];
+
+// Pure numeric field work runs outside the animation/UI thread.
+function fieldWorkerMain(){
+ self.onmessage=({data:d})=>{
+ const {W,H,ox,oy,scale,sources,R,reference,arrows,style,viewKey}=d,width=192,height=Math.max(1,Math.round(width*H/W)),pixels=new Uint8ClampedArray(width*height*4),palette=[[42,91,184],[30,172,195],[83,190,158],[179,206,90],[240,172,57],[222,91,63]],charged=sources.filter(s=>s[2]);
+ for(let iy=0;iy<height;iy++)for(let ix=0;ix<width;ix++){const px=(ix+.5)*W/width,py=(iy+.5)*H/height;let ex=0,ey=0;for(const [sx,sy,z]of charged){const dx=px-sx,dy=py-sy,r=Math.max(d.radius*.7,Math.hypot(dx,dy));ex+=z*dx/r**3;ey+=z*dy/r**3;}const strength=Math.hypot(ex,ey)*(d.radius*4)**2,part=Math.min(1,Math.log1p(strength)/Math.log(17))*5,index=Math.min(4,Math.floor(part)),t=part-index,k=(iy*width+ix)*4;for(let j=0;j<3;j++)pixels[k+j]=Math.round(palette[index][j]+(palette[index+1][j]-palette[index][j])*t);pixels[k+3]=255;}
+ const lines=[],heads=[],F=(x,y)=>{let fx=0,fy=0;for(const [sx,sy,z]of charged){const dx=x-sx,dy=y-sy,r=Math.hypot(dx,dy);if(r>1){const f=z/(r*r*r);fx+=dx*f;fy+=dy*f;}}const n=Math.hypot(fx,fy);return n>1e-12?[fx/n,fy/n]:null;};
+ if(arrows&&style==='source'){for(const [sx,sy,z]of charged)for(let j=0;j<24*z;j++){const a=j*Math.PI*2/(24*z);let x=sx+10*Math.cos(a),y=sy+10*Math.sin(a);const points=[x,y];for(let k=0;k<450;k++){const f=F(x,y);if(!f)break;const mid=F(x+1.5*f[0],y+1.5*f[1]);if(!mid)break;x+=3*mid[0];y+=3*mid[1];if(k%3===0)points.push(x,y);if(j%2===0&&k%50===25)heads.push([x,y,Math.atan2(mid[1],mid[0])]);if(x<0||x>W||y<62||y>H-40)break;}lines.push({points,light:!!(j%2)});}}
+ else if(arrows){const occupied=new Set(),cell=(x,y)=>Math.floor(x/16)+','+Math.floor(y/16);const trace=(sx,sy,sign)=>{let x=sx,y=sy;const points=[];for(let i=0;i<650;i++){const f=F(x,y);if(!f)break;const mid=F(x+sign*1.5*f[0],y+sign*1.5*f[1]);if(!mid)break;x+=sign*3*mid[0];y+=sign*3*mid[1];if(x<0||x>W||y<62||y>H-40||occupied.has(cell(x,y))||charged.some(s=>Math.hypot(x-s[0],y-s[1])<d.radius*1.4))break;points.push([x,y]);}return points;};for(let y=70;y<H-40;y+=38)for(let x=18;x<W;x+=38){if(occupied.has(cell(x,y)))continue;const points=[...trace(x,y,-1).reverse(),[x,y],...trace(x,y,1)];if(points.length<10)continue;points.forEach(q=>occupied.add(cell(...q)));const sampled=points.filter((_,i)=>i%3===0);lines.push({points:sampled.flat(),light:false});for(let i=28;i<points.length-2;i+=100){const q=points[i],f=F(...q);if(f)heads.push([...q,Math.atan2(f[1],f[0])]);}}}
+ self.postMessage({width,height,pixels,lines,heads,sources:charged,W,H,viewKey,radius:d.radius},[pixels.buffer]);
+ };
+}
+let fieldWorker=null,fieldWorkerBusy=false,fieldWorkerView='',fieldWorkerReady=false,fieldRequestAt=-Infinity,fieldSourceKey='';
+try{if(typeof Worker==='function'){const url=URL.createObjectURL(new Blob(['('+fieldWorkerMain.toString()+')()'],{type:'text/javascript'}));fieldWorker=new Worker(url);URL.revokeObjectURL(url);fieldWorker.onerror=()=>{fieldWorker.terminate();fieldWorker=null;fieldKey='';};fieldWorker.onmessage=({data:d})=>{fieldWorkerBusy=false;if(d.viewKey!==fieldWorkerView)return;fieldCanvas.width=Math.round(d.W);fieldCanvas.height=Math.round(d.H);potentialCanvas.width=d.width;potentialCanvas.height=d.height;potentialContext.putImageData(new ImageData(d.pixels,d.width,d.height),0,0);fc.save();fc.globalAlpha=.58;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,d.W,d.H);fc.restore();fc.save();fc.beginPath();fc.rect(0,62,d.W,Math.max(1,d.H-102));fc.clip();for(const light of [true,false]){fc.beginPath();for(const line of d.lines){if(line.light!==light)continue;for(let i=0;i<line.points.length;i+=2){if(i)fc.lineTo(line.points[i],line.points[i+1]);else fc.moveTo(line.points[i],line.points[i+1]);}}fc.strokeStyle=light?'rgba(24,112,117,.24)':'rgba(24,112,117,.46)';fc.lineWidth=light?.8:1.1;fc.stroke();}fc.beginPath();for(const [x,y,a]of d.heads){fc.moveTo(x+3*Math.cos(a),y+3*Math.sin(a));fc.lineTo(x-3*Math.cos(a-.55),y-3*Math.sin(a-.55));fc.lineTo(x-3*Math.cos(a+.55),y-3*Math.sin(a+.55));fc.closePath();}fc.fillStyle='rgba(24,105,111,.58)';fc.fill();fc.restore();fc.save();fc.globalCompositeOperation='destination-in';const fade=fc.createLinearGradient(0,0,0,d.H);fade.addColorStop(0,'rgba(0,0,0,0)');fade.addColorStop(.12,'rgba(0,0,0,1)');fade.addColorStop(.87,'rgba(0,0,0,1)');fade.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=fade;fc.fillRect(0,0,d.W,d.H);fc.restore();fieldWorkerReady=true;};window.addEventListener('pagehide',event=>{if(!event.persisted)fieldWorker?.terminate();});}}
+catch(e){fieldWorker=null;}
+function threadedFieldLayer(){
+ const sources=fusion?(fusion.products?[...fusion.products.sources,...fusion.products.products].map(b=>[...project(b.x,b.y),b.Z]):[...centers.filter((_,i)=>i!==targetIndex).map(t=>[...project(t.x,t.y),t.Z??p.a.Z]),[...project(fusion.origin.x,fusion.origin.y),fusion.reaction.input.reduce((z,k)=>z+R.species[k].Z,0)]]):[...centers.map(t=>[...project(t.x,t.y),t.Z??p.a.Z]),[...projectilePoint(),p.b.Z]],viewKey=[W,H,ox,oy,scale,$('arrows').checked,$('lineStyle').value].join('/'),now=performance.now();
+ if(viewKey!==fieldWorkerView){fieldWorkerView=viewKey;fieldWorkerReady=false;fieldRequestAt=-Infinity;fieldSourceKey='';}
+ const sourceKey=viewKey+'/'+p.R+'/'+sources.map(s=>[Math.round(s[0]/2),Math.round(s[1]/2),s[2]].join(',')).join(';');if(!fieldWorkerBusy&&sourceKey!==fieldSourceKey&&now-fieldRequestAt>=40){fieldWorkerBusy=true;fieldRequestAt=now;fieldSourceKey=sourceKey;fieldWorker.postMessage({W,H,ox,oy,scale,sources,R:p.R,reference:M.thermalMean(100),arrows:$('arrows').checked,style:$('lineStyle').value,viewKey,radius:displayRadius()});}
+ if(fieldWorkerReady)ctx.drawImage(fieldCanvas,0,0);
+}
+
 function fieldLayer(X,Y){
- const key=[Math.round(W),Math.round(H),Math.round(ox),Math.round(oy),zoom,Math.round(X/2),Math.round(Y/2),layoutSeed,centers.length,shot.start,energy,scale,fusion?fusion.phase+'-'+Math.round(fusion.flightTime*30)+'-'+Math.round(fusionWarp()*50)+'-'+(fusion.detail?fusion.detail.stage+Math.round(fusion.detail.age*60):''):'',p.a.Z,p.b.Z,$('arrows').checked,$('lineStyle').value].join('/');
+ if(fieldWorker){threadedFieldLayer();return;}
+ const key=[Math.round(W),Math.round(H),Math.round(ox),Math.round(oy),zoom,Math.round(X/2),Math.round(Y/2),Math.round(x*scale),Math.round(y*scale),layoutSeed,centers.map(t=>Math.round(t.x*scale)+','+Math.round(t.y*scale)).join(';'),centers.length,shot.start,energy,scale,fusion?fusion.phase+'-'+Math.round(fusion.flightTime*30)+'-'+Math.round(fusionWarp()*50)+'-'+(fusion.detail?fusion.detail.stage+Math.round(fusion.detail.age*60):''):'',p.a.Z,p.b.Z,$('arrows').checked,$('lineStyle').value].join('/');
  if(key!==fieldKey){fieldKey=key;fieldCanvas.width=Math.round(W);fieldCanvas.height=Math.round(H);fc.clearRect(0,0,W,H);
- const physicalSources=fusion?[...(fusion.products?fusion.products.sources.map(b=>[b.x,b.y,b.Z]):centers.filter((t,i)=>i!==targetIndex).map(t=>[t.x,t.y,p.a.Z])),...(fusion.products?fusion.products.products.map(b=>[b.x,b.y,b.Z]):[[fusion.origin.x,fusion.origin.y,2]])]:[...centers.map(t=>[t.x,t.y,p.a.Z]),[x,y,p.b.Z]];const sources=physicalSources.map(([wx,wy,z])=>[...project(wx,wy),z]);
- // Smooth FEM-style scalar potential map; fixed normalization for the current pair/energy.
- const mapWidth=fusion&&fusion.phase==='compound'?80:144,mapHeight=Math.max(1,Math.round(mapWidth*H/W));potentialCanvas.width=mapWidth;potentialCanvas.height=mapHeight;
+ const physicalSources=fusion?[...(fusion.products?fusion.products.sources.map(b=>[b.x,b.y,b.Z]):centers.filter((t,i)=>i!==targetIndex).map(t=>[t.x,t.y,t.Z??p.a.Z])),...(fusion.products?fusion.products.products.map(b=>[b.x,b.y,b.Z]):[[fusion.origin.x,fusion.origin.y,fusion.reaction.input.reduce((z,k)=>z+R.species[k].Z,0)]])]:[...centers.map(t=>[t.x,t.y,t.Z??p.a.Z]),[x,y,p.b.Z]];const sourceKinds=fusion?(fusion.products?[...fusion.products.sources.map(b=>targetKind(centers[b.id])),...fusion.products.products.map(b=>b.kind||b.id)]:[...centers.filter((_,i)=>i!==targetIndex).map(targetKind),'alpha']):[...centers.map(targetKind),$('projectile').value],displayedSources=schematicItems(physicalSources.map(([wx,wy],i)=>({id:sourceKinds[i],x:project(wx,wy)[0],y:project(wx,wy)[1],radius:displayRadius()}))),sources=displayedSources.map((q,i)=>!fusion&&i===physicalSources.length-1?[...projectilePoint(),physicalSources[i][2]]:[q.x,q.y,physicalSources[i][2]]),mapSources=sources.map(([sx,sy,z])=>[...unproject(sx,sy),z]);
+ // Magnitude of the vector sum of electric fields, in schematic scene geometry.
+ const mapWidth=192,mapHeight=Math.max(1,Math.round(mapWidth*H/W));potentialCanvas.width=mapWidth;potentialCanvas.height=mapHeight;
  const currentGridKey=[W,H,ox,oy,scale,zoom,layoutSeed,centers.length,p.C,p.R,fusionWarp()].join('/');
  if(gridKey!==currentGridKey){gridKey=currentGridKey;worldGrid=[];for(let iy=0;iy<mapHeight;iy++)for(let ix=0;ix<mapWidth;ix++)worldGrid.push(unproject((ix+.5)/mapWidth*W,(iy+.5)/mapHeight*H));}
 
- const palette=[[42,91,184],[30,172,195],[83,190,158],[179,206,90],[240,172,57],[222,91,63]],reference=Math.max(.001,energy/Math.max(1,p.b.Z));
+ const palette=[[42,91,184],[30,172,195],[83,190,158],[179,206,90],[240,172,57],[222,91,63]],reference=M.thermalMean(100);
  for(let iy=0;iy<mapHeight;iy++)for(let ix=0;ix<mapWidth;ix++){
- const [px,py]=worldGrid[iy*mapWidth+ix];let potential=0;
- for(const [sx,sy,z]of physicalSources){const r=Math.max(p.R*.45,Math.hypot(px-sx,py-sy));potential+=1439.96448*z/r;}
- const value=1-Math.exp(-.6*Math.log1p(potential/reference)),part=value*(palette.length-1),index=Math.min(palette.length-2,Math.floor(part)),t=part-index,col=palette[index].map((c,j)=>Math.round(c+(palette[index+1][j]-c)*t));
+ const px=(ix+.5)*W/mapWidth,py=(iy+.5)*H/mapHeight;let ex=0,ey=0;
+ for(const [sx,sy,z]of sources){const dx=px-sx,dy=py-sy,r=Math.max(displayRadius()*.7,Math.hypot(dx,dy));ex+=z*dx/r**3;ey+=z*dy/r**3;}
+ const strength=Math.hypot(ex,ey)*(displayRadius()*4)**2,value=Math.min(1,Math.log1p(strength)/Math.log(17)),part=value*(palette.length-1),index=Math.min(palette.length-2,Math.floor(part)),t=part-index,col=palette[index].map((c,j)=>Math.round(c+(palette[index+1][j]-c)*t));
  potentialContext.fillStyle='rgb('+col.join(',')+')';potentialContext.fillRect(ix,iy,1,1);
  }
- fc.save();fc.globalAlpha=.28;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,W,H);fc.restore();
- // Concentrated, layered halos keep the source positions legible without washing the whole field.
- for(const [sx,sy,z]of sources){if(!z)continue;const radius=Math.max(32,displayRadius()*5),glow=fc.createRadialGradient(sx,sy,radius*.12,sx,sy,radius);glow.addColorStop(0,'rgba(255,144,42,.22)');glow.addColorStop(.3,'rgba(255,174,65,.12)');glow.addColorStop(.65,'rgba(255,201,96,.04)');glow.addColorStop(1,'rgba(255,192,77,0)');fc.fillStyle=glow;fc.fillRect(sx-radius,sy-radius,radius*2,radius*2);}
+ fc.save();fc.globalAlpha=.58;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,W,H);fc.restore();
  if($('arrows').checked&&$('lineStyle').value==='spread'){
   fc.save();fc.beginPath();fc.rect(0,0,W,H);fc.clip();
   // Spaced streamlines, inspired by force-core; direction comes from the electric field.
@@ -317,7 +461,7 @@ function fieldLayer(X,Y){
    const key=Math.floor(px/5)+','+Math.floor(py/5);if(directions.has(key))return directions.get(key);
    const gx=Math.max(0,Math.min(mapWidth-1,px/W*mapWidth-.5)),gy=Math.max(0,Math.min(mapHeight-1,py/H*mapHeight-.5)),ix=Math.floor(gx),iy=Math.floor(gy),jx=Math.min(mapWidth-1,ix+1),jy=Math.min(mapHeight-1,iy+1),tx=gx-ix,ty=gy-iy;
    const q=[0,1].map(k=>(worldGrid[iy*mapWidth+ix][k]*(1-tx)+worldGrid[iy*mapWidth+jx][k]*tx)*(1-ty)+(worldGrid[jy*mapWidth+ix][k]*(1-tx)+worldGrid[jy*mapWidth+jx][k]*tx)*ty);
-   let fx=0,fy=0;for(const [sx,sy,z]of physicalSources){const dx=q[0]-sx,dy=q[1]-sy,r=Math.max(p.R*.3,Math.hypot(dx,dy));fx+=z*dx/r**3;fy+=z*dy/r**3;}
+   let fx=0,fy=0;for(const [sx,sy,z]of mapSources){const dx=q[0]-sx,dy=q[1]-sy,r=Math.max(p.R*.3,Math.hypot(dx,dy));fx+=z*dx/r**3;fy+=z*dy/r**3;}
    const n=Math.hypot(fx,fy);let result=null;if(n>1e-15){const start=project(...q),end=project(q[0]+fx/n*.2/scale,q[1]+fy/n*.2/scale),dx=end[0]-start[0],dy=end[1]-start[1],length=Math.hypot(dx,dy);if(length>1e-9)result=[dx/length,dy/length];}directions.set(key,result);return result;
   };
   const trace=(seed,sign)=>{let point=seed;const points=[];for(let i=0;i<650;i++){const d=F(...point);if(!d)break;const mid=F(point[0]+sign*1.5*d[0],point[1]+sign*1.5*d[1]);if(!mid)break;point=[point[0]+sign*3*mid[0],point[1]+sign*3*mid[1]];if(point[0]<0||point[0]>W||point[1]<0||point[1]>H||occupied.has(cell(...point))||sources.some(([sx,sy,z])=>z&&Math.hypot(point[0]-sx,point[1]-sy)<displayRadius()*1.4))break;points.push(point);}return points;};
@@ -337,18 +481,35 @@ function fieldLayer(X,Y){
  }
  ctx.drawImage(fieldCanvas,0,0);
 }
-function path(points,color,dashed=false){if(points.length<2)return;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.setLineDash(dashed?[10,6]:[]);ctx.beginPath();points.forEach((q,i)=>{const [X,Y]=project(q[0],q[1]);if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y);});if(dashed){ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=6;ctx.stroke();}ctx.strokeStyle=color;ctx.lineWidth=dashed?3:2.4;ctx.stroke();ctx.restore();}
+function tracePoint(nodes,index=0){const q=[nodes[index].x,nodes[index].y];q.nodes=nodes;q.nodeIndex=index;return q;}
+const traceCache=new WeakMap();
+function tracePosition(q){if(!q.nodes)return project(q[0],q[1]);const key=[scale,ox,oy,zoom,temperature,W,H].join('/'),cached=traceCache.get(q);if(cached?.key===key)return cached.point;const items=schematicItems(q.nodes.map(t=>({id:t.kind||$('target').value,x:project(t.x,t.y)[0],y:project(t.x,t.y)[1],radius:displayRadius()}))),item=items[q.nodeIndex||0],point=[item.x,item.y];traceCache.set(q,{key,point});return point;}
+function drawAimPreview(){
+ if(preview.length<2)return;const glyphs=currentGlyphs(),origin=glyphs[0],[a,b,c,d]=displayJacobian(),start=preview[0],points=[];let interrupted=false;
+ // One fixed linear map preserves the initial heading; no per-point collision-avoidance warp.
+ for(const q of preview){const dx=q[0]-start[0],dy=q[1]-start[1],px=origin.x+a*dx+b*dy,py=origin.y+c*dx+d*dy;
+ if(glyphs.slice(1).some(t=>Math.hypot(px-t.x,py-t.y)<t.radius*visualBound(t.id)+3)){interrupted=true;continue;}
+ const point=unproject(px,py);point.move=interrupted;interrupted=false;points.push(point);
+ }path(points,'#753bb3',true);
+}
+function path(points,color,dashed=false){if(points.length<2)return;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.setLineDash(dashed?[10,6]:[]);ctx.beginPath();points.forEach((q,i)=>{const [X,Y]=tracePosition(q);if(i&&!q.move)ctx.lineTo(X,Y);else ctx.moveTo(X,Y);});if(dashed){ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=6;ctx.stroke();}ctx.strokeStyle=color;ctx.lineWidth=dashed?3:2.4;ctx.stroke();ctx.restore();}
+function drawCell(){
+ if(!cell||!(['flight','products','productsDone'].includes(mode)))return;const a=project(cell.x-cell.rx,cell.y-cell.ry),b=project(cell.x+cell.rx,cell.y+cell.ry),w=cell.width*scale;
+ ctx.save();ctx.fillStyle='rgba(137,108,171,.045)';ctx.fillRect(a[0]-w,a[1]-w,b[0]-a[0]+2*w,w);ctx.fillRect(a[0]-w,b[1],b[0]-a[0]+2*w,w);ctx.fillRect(a[0]-w,a[1],w,b[1]-a[1]);ctx.fillRect(b[0],a[1],w,b[1]-a[1]);ctx.strokeStyle='#9d8cb466';ctx.lineWidth=1.2;ctx.setLineDash([5,7]);ctx.strokeRect(a[0],a[1],b[0]-a[0],b[1]-a[1]);ctx.setLineDash([]);ctx.strokeStyle='#9d8cb433';ctx.strokeRect(a[0]-w,a[1]-w,b[0]-a[0]+2*w,b[1]-a[1]+2*w);ctx.restore();
+}
 function scene(){
  document.querySelector('.fieldLegend').hidden=!$('field').checked;
- [W,H]=resize(c,ctx);view();if(fitPending)fitAllParticles();if(demoActive&&mode==='flight'){const margin=70,[px,py]=project(x,y);panX+=(Math.max(margin,Math.min(W-margin,px))-px)/W;panY+=(Math.max(margin,Math.min(H-margin,py))-py)/H;view();}ctx.clearRect(0,0,W,H);const [X,Y]=projectilePoint();
- if($('field').checked)fieldLayer(X,Y);if(fusion&&fusion.phase==='compound'){const point=project(fusion.origin.x,fusion.origin.y),pulse=displayRadius()*(2.4+.3*Math.sin(fusion.time*19));const glow=ctx.createRadialGradient(...point,0,...point,pulse*1.7);glow.addColorStop(0,'rgba(255,184,81,.2)');glow.addColorStop(1,'rgba(255,184,81,0)');ctx.fillStyle=glow;ctx.fillRect(point[0]-pulse*1.7,point[1]-pulse*1.7,pulse*3.4,pulse*3.4);}
+ [W,H]=resize(c,ctx);view();if(fitPending)fitAllParticles();ctx.clearRect(0,0,W,H);const [X,Y]=projectilePoint();
+ if($('field').checked)fieldLayer(X,Y);drawCell();
+ if(fusion&&fusion.phase!=='compound'&&fusion.reaction.Q>0){const point=project(fusion.origin.x,fusion.origin.y),radius=Math.min(W,H)*(.32+.045*Math.min(1,fusion.flightTime/.7)),alpha=.16+.5*Math.exp(-Math.pow((fusion.flightTime-.22)/.48,2)),wash=ctx.createRadialGradient(...point,0,...point,radius);wash.addColorStop(0,'rgba(243,183,62,'+alpha+')');wash.addColorStop(.22,'rgba(255,211,91,'+(alpha*.82)+')');wash.addColorStop(.6,'rgba(243,166,34,'+(alpha*.48)+')');wash.addColorStop(1,'rgba(243,183,62,0)');ctx.fillStyle=wash;ctx.fillRect(point[0]-radius,point[1]-radius,radius*2,radius*2);}
+if(fusion&&fusion.phase==='compound'){const point=project(fusion.origin.x,fusion.origin.y),pulse=displayRadius()*(2.4+.3*Math.sin(fusion.time*19));const glow=ctx.createRadialGradient(...point,0,...point,pulse*1.7);glow.addColorStop(0,'rgba(255,184,81,.2)');glow.addColorStop(1,'rgba(255,184,81,0)');ctx.fillStyle=glow;ctx.fillRect(point[0]-pulse*1.7,point[1]-pulse*1.7,pulse*3.4,pulse*3.4);}
  if(!fusion){const heat=Math.max(0,Math.min(1,(temperature-10)/490)),haloRadius=displayRadius()*(3.3+heat),halo=ctx.createRadialGradient(X,Y,displayRadius(),X,Y,haloRadius);
  halo.addColorStop(0,'rgba(231,134,40,'+(.04+.17*heat)+')');halo.addColorStop(1,'rgba(231,134,40,0)');ctx.fillStyle=halo;ctx.fillRect(X-haloRadius,Y-haloRadius,haloRadius*2,haloRadius*2);}
  ctx.save();ctx.beginPath();ctx.rect(0,65,W,Math.max(1,H-110));ctx.clip();
- if(fusion&&fusion.phase!=='compound'){fusion.trail.forEach((points,i)=>path(points,i===0?'#bd5b12':'#506b87'));Object.values(fusion.sourceTrails).forEach(points=>path(points,'#188c7b'));const origin=project(fusion.origin.x,fusion.origin.y);ctx.beginPath();ctx.arc(...origin,4,0,Math.PI*2);ctx.strokeStyle='#7b8382';ctx.lineWidth=1.3;ctx.stroke();}
+ if(fusion&&fusion.phase!=='compound'){fusion.trail.forEach((points,i)=>path(points,i===0?'#bd5b12':'#506b87'));const origin=project(fusion.origin.x,fusion.origin.y);ctx.beginPath();ctx.arc(...origin,4,0,Math.PI*2);ctx.strokeStyle='#7b8382';ctx.lineWidth=1.3;ctx.stroke();}
  if(!fusion&&$('interaction').value==='gun'){
- path(preview,'#753bb3',true);path(trail,'#087f79');
- const [gx,gy]=project(...gunOrigin);ctx.save();ctx.translate(gx,gy);ctx.rotate(gunHeading-angle);ctx.scale(zoom,zoom);ctx.fillStyle='#244f55';ctx.strokeStyle='#dce9e6';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(-21,-11,46,22,5);ctx.fill();ctx.stroke();ctx.fillStyle='#79b9aa';ctx.fillRect(20,-7,8,14);ctx.restore();
+ if(mode==='ready'&&$('interaction').value==='gun'){drawAimPreview();}path(trail,'#087f79');
+ const gunGlyph=mode==='ready'?currentGlyphs()[0]:null,[gx,gy]=gunGlyph?[gunGlyph.x,gunGlyph.y]:project(...gunOrigin);ctx.save();ctx.translate(gx,gy);ctx.rotate(gunHeading-angle);ctx.scale(zoom,zoom);ctx.fillStyle='#244f55';ctx.strokeStyle='#dce9e6';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(-21,-11,46,22,5);ctx.fill();ctx.stroke();ctx.fillStyle='#79b9aa';ctx.fillRect(20,-7,8,14);ctx.restore();
  const heading=gunHeading-angle,guideLength=aiming&&lastPointer?Math.hypot(lastPointer.clientX-c.getBoundingClientRect().left-gx,lastPointer.clientY-c.getBoundingClientRect().top-gy):Math.min(W,H)*.38;arrow([gx+Math.cos(heading)*30*zoom,gy+Math.sin(heading)*30*zoom],[gx+Math.cos(heading)*Math.max(guideLength,50*zoom),gy+Math.sin(heading)*Math.max(guideLength,50*zoom)],'#b37a32');
  }
  if(!fusion){ctx.strokeStyle='#b58bb666';ctx.setLineDash([3,5]);ctx.beginPath();ctx.arc(...project(centers[targetIndex].x,centers[targetIndex].y),Math.min(W,H)*.13*zoom,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
@@ -356,10 +517,10 @@ function scene(){
 ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(X,Y);for(let i=1;i<=40;i++){const t=i/40,wiggle=Math.sin(t*Math.PI*12)*Math.sin(t*Math.PI)*Math.min(6,len*.08);ctx.lineTo(X+dx*t-dy/Math.max(1,len)*wiggle,Y+dy*t+dx/Math.max(1,len)*wiggle);}ctx.stroke();ctx.beginPath();ctx.arc(tx,ty,8,0,Math.PI*2);ctx.stroke();
 if(p.C){arrow([X,Y+Math.min(W,H)*.13*zoom],[X+(x-centers[targetIndex].x)/r*(20+65*resistance),Y+Math.min(W,H)*.13*zoom+(y-centers[targetIndex].y)/r*(20+65*resistance)],color);ctx.setLineDash([3,7]);ctx.strokeStyle='#bd725b66';ctx.beginPath();for(let i=0;i<=96;i++){const angle=i*Math.PI/48,point=project(centers[targetIndex].x+limit*Math.cos(angle),centers[targetIndex].y+limit*Math.sin(angle));if(i)ctx.lineTo(...point);else ctx.moveTo(...point);}ctx.stroke();ctx.setLineDash([]);}
 status(!p.C?'Neutron nemá Coulombův odpor.':resistance>.995?'Bariéra: dál tě dostupná energie nepustí.':resistance>.35?'Odpor výrazně roste. Pružná spojnice ukazuje tah myši.':'Táhni blíž k jádru. Odpor při přibližování poroste.');}
- if(mode==='tunnel'){const f=tunnelBlend(),dest=tunnelContactPoint();tunnelRibbon(ctx,tunnelVisualPoint(0,f.t),dest,Math.min(W,H)*.11*zoom,f.t);for(const [xx,yy,weight]of [[X,Y,1-f.smooth],[...dest,f.smooth]]){const rad=Math.min(W,H)*.14*zoom,gr=ctx.createRadialGradient(xx,yy,0,xx,yy,rad);gr.addColorStop(0,'rgba(145,130,204,'+(.27*weight*f.shimmer)+')');gr.addColorStop(1,'rgba(145,130,204,0)');ctx.fillStyle=gr;ctx.fillRect(xx-rad,yy-rad,rad*2,rad*2);}}
+ if(mode==='tunnel'&&tunnelTime>=tunnelApproachLength()){const f=tunnelBlend(),dest=tunnelContactPoint();tunnelRibbon(ctx,tunnelVisualPoint(0,f.t),dest,Math.min(W,H)*.11*zoom,f.t);for(const [xx,yy,weight]of [[X,Y,1-f.smooth],[...dest,f.smooth]]){const rad=Math.min(W,H)*.14*zoom,gr=ctx.createRadialGradient(xx,yy,0,xx,yy,rad);gr.addColorStop(0,'rgba(145,130,204,'+(.27*weight*f.shimmer)+')');gr.addColorStop(1,'rgba(145,130,204,0)');ctx.fillStyle=gr;ctx.fillRect(xx-rad,yy-rad,rad*2,rad*2);}}
  ctx.restore();
- const pk=$('target').value+$('projectile').value+centers.length;if(pk!==lastPair){$('labels').replaceChildren();lastPair=pk;}
- if(!fusion)centers.forEach((t,i)=>nucleus($('target').value,...project(t.x,t.y),'a'+i+'-'));if(!fusion)nucleus($('projectile').value,X,Y,'b');
+ const pk=centers.map(targetKind).join(',')+$('projectile').value;if(pk!==lastPair){$('labels').replaceChildren();lastPair=pk;}
+ if(!fusion)centers.forEach((t,i)=>nucleus(targetKind(t),...targetScreen(t,i),'a'+i+'-'));if(!fusion)nucleus($('projectile').value,X,Y,'b');if(!fusion)for(const el of $('labels').querySelectorAll('.nucleon'))el.hidden=false;
  for(const el of $('labels').children)if(el.dataset.key.startsWith('b'))el.style.opacity=mode==='tunnel'?0:1;
 }
 function excavatedTunnel(context,from,to){
@@ -369,32 +530,50 @@ function excavatedTunnel(context,from,to){
  for(let i=2;i<steps;i+=4){const u=i/steps,px=from[0]+dx*u;for(const side of [-1,1])line(context,[px,from[1]+edge(u,side)],[px+2,from[1]+side*3],'rgba(134,103,173,.32)',.8);}
  context.setLineDash([2,5]);line(context,from,to,'rgba(119,82,160,.38)',.8);context.restore();
 }
+// Connected classically forbidden interval adjacent to the nuclear well.
+// The two ends solve the same U(q)=E that is drawn in the graph.
+function barrierProfile(snapshot){
+ const gp=snapshot.pair,targets=snapshot.centers,index=snapshot.targetIndex,target=targets[index],distance=Math.hypot(snapshot.x-target.x,snapshot.y-target.y),norm=Math.max(1e-12,distance),nx=distance?(snapshot.x-target.x)/norm:1,ny=distance?(snapshot.y-target.y)/norm:0;
+ const qOf=r=>1+Math.log(Math.max(.01,r/gp.R))/1.5,nuclear=q=>gp.C?-20/(1+Math.exp((q-1)/.04)):0,repulsion=q=>gp.C?Math.exp(-1.5*(q-1)):0;
+ const background=q=>{const r=gp.R*Math.exp(1.5*(q-1));return graphSurroundingEnergy(gp,targets,index,target.x+nx*r,target.y+ny*r)/Math.max(1,gp.C/gp.R);},total=q=>repulsion(q)+nuclear(q)+background(q);
+ return {target,distance,qOf,nuclear,repulsion,background,total};
+}
+function graphSurroundingEnergy(pair,targets,selected,x,y){return targets.reduce((sum,t,i)=>i===selected?sum:sum+1439.96448*pair.b.Z*(t.Z??pair.a.Z)/Math.max(pair.R*.3,Math.hypot(x-t.x,y-t.y)),0);}
+function graphBarrierInterval(total,energy){
+ const root=(a,b)=>{const sign=total(a)>energy;for(let i=0;i<45;i++){const m=(a+b)/2;if((total(m)>energy)===sign)a=m;else b=m;}return (a+b)/2;};
+ let inner=null,previous=.3,above=total(previous)>energy;
+ for(let i=1;i<=2400;i++){const q=.3+i*.005,next=total(q)>energy;if(!above&&next&&inner===null)inner=root(previous,q);if(above&&!next&&inner!==null)return {inner,outer:root(previous,q)};previous=q;above=next;}
+ return null;
+}
 function graph(){
+ const snapshot=tunnelGraph||{pair:p,centers,targetIndex,x,y,energy,graphRadius:shot.start*6},gp=snapshot.pair,graphCenters=snapshot.centers,graphTarget=snapshot.targetIndex,graphEnergy=snapshot.energy;
+
  const [w,h]=resize(g,gc),left=60,right=w-25,top=38,bottom=h-75,zero=top+(bottom-top)*.72;
  if(h<100||w<150)return;gc.clearRect(0,0,w,h);
- // Quantified logarithmic radius and linear model energy; the deep nuclear well is clipped.
- const sx=q=>left+q/6*(right-left),sy=u=>zero-u*(zero-top)/yMax,nuclear=q=>-20/(1+Math.exp((q-1)/.04)),repulsion=q=>p.C?Math.exp(-1.5*(q-1)):0,total=q=>repulsion(q)+nuclear(q)+background(q);
- const target=centers[targetIndex],distance=Math.hypot(x-target.x,y-target.y),qOf=r=>1+Math.log(Math.max(.01,r/p.R))/1.5;
- const norm=Math.max(.001,distance),nx=distance?(x-target.x)/norm:1,ny=distance?(y-target.y)/norm:0;
- const background=q=>{const r=p.R*Math.exp(1.5*(q-1)),px=target.x+nx*r,py=target.y+ny*r;return centers.reduce((sum,t,i)=>i===targetIndex?sum:sum+p.C/Math.max(p.R*.3,Math.hypot(px-t.x,py-t.y)),0)/Math.max(1,p.C/p.R);};
- const energyUnit=Math.max(1,p.C/p.R),tickText=v=>Math.abs(v)>=100?Math.round(v).toString():fmt(v);let peak=.01;for(let i=0;i<=500;i++)peak=Math.max(peak,repulsion(.3+5.7*i/500)+nuclear(.3+5.7*i/500));const yMax=Math.max(peak,p.C?M.thermalMean(200)/energyUnit:0)*1.12;
+ // Quantified logarithmic radius and linear model graphEnergy; the deep nuclear well is clipped.
+ const qMax=Math.max(6,1+Math.log(Math.max(1,snapshot.graphRadius/gp.R))/1.5),sx=q=>left+q/qMax*(right-left),sy=u=>zero-u*(zero-top)/yMax;
+ const {target,distance,qOf,nuclear,repulsion,background,total}=barrierProfile(snapshot);
+ const energyUnit=Math.max(1,gp.C/gp.R),tickText=v=>Math.abs(v)>=100?Math.round(v).toString():fmt(v);let peak=.01;for(let i=0;i<=500;i++)peak=Math.max(peak,repulsion(.3+(qMax-.3)*i/500)+nuclear(.3+(qMax-.3)*i/500));const yMax=Math.max(peak,M.thermalMean(Number($('temperature').max))/energyUnit)*1.12;
  for(let i=0;i<=2;i++){const value=yMax*i/2,yy=sy(value);label($('graphLabels'),'ytick'+i,tickText(value*energyUnit),left-30,yy);line(gc,[left-4,yy],[left,yy],'#718280');if(i){gc.setLineDash([2,5]);line(gc,[left,yy],[right,yy],'#dce6e4',.7);gc.setLineDash([]);}}
  const negative=-yMax*(bottom-zero)/(zero-top);label($('graphLabels'),'yneg',tickText(negative*energyUnit),left-30,bottom);
- for(let exponent=0;exponent<=4;exponent++){const r=10**exponent,q=qOf(r),tick=label($('graphLabels'),'xtick'+exponent,String(r),sx(q),bottom+16);tick.hidden=q<0||q>6;if(!tick.hidden)line(gc,[sx(q),bottom],[sx(q),bottom+4],'#718280');}
+ for(let exponent=0;exponent<=8;exponent++){const r=10**exponent,q=qOf(r),tick=label($('graphLabels'),'xtick'+exponent,String(r),sx(q),bottom+16);tick.hidden=q<0||q>qMax;if(!tick.hidden)line(gc,[sx(q),bottom],[sx(q),bottom+4],'#718280');}
  line(gc,[left,bottom],[right,bottom],'#b8c7c2');
  label($('graphLabels'),'title',fusion?String.raw`\text{Bariéra před reakcí}`:String.raw`\text{Společný potenciál}`,w/2,12);
  label($('graphLabels'),'axisU',String.raw`U/\mathrm{keV}`,left+8,top-16);label($('graphLabels'),'axisR',String.raw`r/\mathrm{fm}`,right-24,bottom+35);
  line(gc,[left,top],[left,bottom],'#718280');line(gc,[left,zero],[right,zero],'#718280');
  gc.save();gc.beginPath();gc.rect(left,top,right-left,bottom-top);gc.clip();gc.fillStyle='#e0eef155';gc.fillRect(left,top,sx(1.4)-left,bottom-top);
- const curve=(fn,color,dash)=>{gc.beginPath();for(let i=0;i<=500;i++){const q=.3+5.7*i/500;if(i)gc.lineTo(sx(q),sy(fn(q)));else gc.moveTo(sx(q),sy(fn(q)));}gc.strokeStyle=color;gc.lineWidth=2;gc.setLineDash(dash);gc.stroke();gc.setLineDash([]);};
- if(centers.length>1){gc.beginPath();for(let i=0;i<=400;i++){const q=.3+5.7*i/400;if(i)gc.lineTo(sx(q),sy(total(q)));else gc.moveTo(sx(q),sy(total(q)));}for(let i=400;i>=0;i--){const q=.3+5.7*i/400;gc.lineTo(sx(q),sy(repulsion(q)+nuclear(q)));}gc.closePath();gc.fillStyle='#487eb521';gc.fill();}
+ const curve=(fn,color,dash)=>{gc.beginPath();for(let i=0;i<=500;i++){const q=.3+(qMax-.3)*i/500;if(i)gc.lineTo(sx(q),sy(fn(q)));else gc.moveTo(sx(q),sy(fn(q)));}gc.strokeStyle=color;gc.lineWidth=2;gc.setLineDash(dash);gc.stroke();gc.setLineDash([]);};
+ if(graphCenters.length>1){gc.beginPath();for(let i=0;i<=400;i++){const q=.3+(qMax-.3)*i/400;if(i)gc.lineTo(sx(q),sy(total(q)));else gc.moveTo(sx(q),sy(total(q)));}for(let i=400;i>=0;i--){const q=.3+(qMax-.3)*i/400;gc.lineTo(sx(q),sy(repulsion(q)+nuclear(q)));}gc.closePath();gc.fillStyle='#487eb570';gc.fill();}
  curve(q=>repulsion(q)+nuclear(q),'#a7aaa5',[5,4]);curve(total,'#146e70',[]);
- let overflowStart=null,overflow=false;for(let i=0;i<=501;i++){const q=.3+5.7*Math.min(i,500)/500,above=i<=500&&total(q)>yMax;if(above&&overflowStart===null)overflowStart=q;if(!above&&overflowStart!==null){const px=sx((overflowStart+q)/2);line(gc,[px-4,top+7],[px,top+2],'#146e70',1.7);line(gc,[px,top+2],[px+4,top+7],'#146e70',1.7);overflowStart=null;overflow=true;}}
+ let overflowStart=null,overflow=false;for(let i=0;i<=501;i++){const q=.3+(qMax-.3)*Math.min(i,500)/500,above=i<=500&&total(q)>yMax;if(above&&overflowStart===null)overflowStart=q;if(!above&&overflowStart!==null){const px=sx((overflowStart+q)/2);line(gc,[px-4,top+7],[px,top+2],'#146e70',1.7);line(gc,[px,top+2],[px+4,top+7],'#146e70',1.7);overflowStart=null;overflow=true;}}
  const graphNote=document.querySelector('.graphNote'),note=overflow?'Pevná osa pro dvojici · vyšší hrbol okolí přesahuje graf ↑':'Pevná osa pro dvojici · vzdálenost logaritmicky';if(graphNote.textContent!==note)graphNote.textContent=note;
 
- const tunneled=tunnelFrom&&(mode==='tunnel'||mode==='nuclear'||!!fusion),entry=tunneled?Math.hypot(tunnelFrom[0]-target.x,tunnelFrom[1]-target.y):Math.max(p.R,M.turning(p,energy)),entryQ=qOf(entry),energyRatio=p.C?energy/(p.C/p.R):0,energyY=sy(energyRatio);let innerLo=.8,innerHi=1.3;for(let i=0;i<40;i++){const mid=(innerLo+innerHi)/2;if(total(mid)<energyRatio)innerLo=mid;else innerHi=mid;}const exitQ=qOf(p.R);
+ const energyRatio=gp.C?graphEnergy/(gp.C/gp.R):0,energyY=sy(energyRatio),band=gp.C?graphBarrierInterval(total,energyRatio):null;
+ const active=tunnelFrom&&(mode==='tunnel'||mode==='nuclear'||!!fusion),phase=active?Math.max(0,Math.min(1,(tunnelTime-tunnelApproachLength())/(tunnelDuration*.8))):0,tunneled=!!(active&&band&&tunnelTime>=tunnelApproachLength()),entryQ=band?band.outer:qOf(distance),exitQ=band?band.inner:entryQ;
+ const radiusOf=q=>gp.R*Math.exp(1.5*(q-1)),entry=radiusOf(entryQ),exit=radiusOf(exitQ);
  gc.setLineDash([6,4]);line(gc,[left,energyY],[right,energyY],'#af7830',1.5);gc.setLineDash([]);
- const progress=tunneled?Math.min(1,tunnelTime/tunnelDuration):0,q=tunneled?entryQ+(exitQ-entryQ)*progress:qOf(distance),mx=sx(q),my=tunneled?energyY:sy(total(q));
+ const progress=tunneled?phase:0,approachLinear=active&&band?Math.min(1,tunnelTime/tunnelApproachLength()):0,approach=approachLinear*approachLinear*(3-2*approachLinear),q=tunneled?entryQ+(exitQ-entryQ)*progress:qOf(distance)+(entryQ-qOf(distance))*approach,mx=sx(q),my=tunneled?energyY:sy(total(q));
+ if(!tunneled&&graphCenters.length>1){const baseY=sy(repulsion(q)+nuclear(q));line(gc,[mx,baseY],[mx,my],'#376daf',3);line(gc,[mx-4,baseY],[mx+4,baseY],'#376daf',1.5);}
  if(tunneled){
   const startX=sx(entryQ),endX=sx(exitQ);
   gc.beginPath();gc.moveTo(endX,energyY);for(let i=0;i<=160;i++){const q=exitQ+(entryQ-exitQ)*i/160;gc.lineTo(sx(q),Math.min(energyY,sy(total(q))));}gc.lineTo(startX,energyY);gc.closePath();gc.fillStyle='rgba(123,91,170,.10)';gc.fill();
@@ -403,36 +582,50 @@ function graph(){
   line(gc,[endX+7,energyY-4],[endX,energyY],'#8054a6',2);line(gc,[endX+7,energyY+4],[endX,energyY],'#8054a6',2);
   tunnelRibbon(gc,[startX,energyY],[endX,energyY],14,progress,mode==='nuclear'||!!fusion);
  }
- const tunnelLabel=label($('graphLabels'),'tunnelSpan',tunneled?String.raw`\Delta r=`+fmt(Math.max(0,entry-p.R))+String.raw`\,\mathrm{fm}`:'',Math.max(left+60,Math.min(right-60,(sx(entryQ)+sx(exitQ))/2)),energyY+29);tunnelLabel.hidden=!tunneled;
+ const tunnelLabel=label($('graphLabels'),'tunnelSpan',tunneled?String.raw`\Delta r=`+fmt(Math.max(0,entry-exit))+String.raw`\,\mathrm{fm}`:'',Math.max(left+60,Math.min(right-60,(sx(entryQ)+sx(exitQ))/2)),energyY+29);tunnelLabel.hidden=!tunneled;
 
+ gc.save();gc.setLineDash([3,5]);line(gc,[mx,bottom],[mx,my],'rgba(190,128,34,.65)',1.1);gc.setLineDash([]);line(gc,[mx,bottom-5],[mx,bottom+1],'#b57825',2);gc.restore();
  gc.beginPath();gc.arc(Math.max(left+6,Math.min(right-6,mx)),Math.max(top+6,Math.min(bottom-6,my)),6,0,Math.PI*2);gc.fillStyle='#efaa3e';gc.fill();gc.strokeStyle='#603e18';gc.stroke();gc.restore();
  label($('graphLabels'),'sum',String.raw`\text{Součet}`,sx(4.7),top+18);
- label($('graphLabels'),'others',String.raw`\text{Okolní jádra: }`+fmt(background(qOf(distance))*Math.max(1,p.C/p.R))+'\\,\\mathrm{keV}',w/2,h-15);
- label($('graphLabels'),'well',String.raw`\text{Jaderná jáma pokračuje dolů}`,sx(3.8),zero+(bottom-zero)*.6);
- label($('graphLabels'),'readout',p.C?'E/U_C(R)='+fmt(100*energy/(p.C/p.R))+'\\,\\%':String.raw`\text{Neutron nemá Coulombovu bariéru}`,w/2,h-38);
+ const others=label($('graphLabels'),'others',String.raw`U_{\mathrm{okolí}}=`+(background(q)*energyUnit).toFixed(3).replace('.', '{,}')+String.raw`\,\mathrm{keV}`,w/2,h-15);others.style.color='#285c9a';others.title='Příspěvek ostatních cílových jader k potenciální energii v poloze markeru; je zahrnut v celkové křivce.';
+ label($('graphLabels'),'well',String.raw`\text{Jaderná jáma pokračuje dolů}`,sx(3.8),zero+(bottom-zero)*.6).hidden=!gp.C;
+ label($('graphLabels'),'readout',gp.C?'E/U_C(R)='+fmt(100*graphEnergy/(gp.C/gp.R))+'\\,\\%':String.raw`\text{Neutron nemá Coulombovu bariéru}`,w/2,h-38);
 }
 
 function scientific(n){if(n===0)return p.C?String.raw`\text{pod rozlišením výpočtu}`:'0';if(n>=.001)return fmt(n*100)+'\\,\\%';const e=Math.floor(Math.log10(n));return fmt(n/10**e)+'\\cdot10^{'+e+'}';}
 function ui(){
  updateRareButton();
- $('lesson').textContent=fusion?(fusion.plan?'Názorně vybraný směr k okolnímu iontu; nejde o náhodný vzorek úhlů fúze. Síly a zpětný ráz jsou vypočtené.':'Ukázka D–T fúze po průchodu, nikoli výpočet četnosti reakcí. Po emisi se nabitá jádra vzájemně odpuzují včetně zpětného rázu; vnitřní pohyb je ilustrativní.'):demoActive?'Vybraný úspěšný případ. Pohyb a délka efektu nejsou skutečnou dráhou ani dobou tunelování.':'Nižší energie znamená širší bariéru a vzácnější průchod, nikoli ostrý práh. Prostupnost není pravděpodobnost fúze.';tex($('temperatureValue'),'T='+fmt(temperature)+'\\,\\mathrm{MK}');tex($('angleValue'),(angle*180/Math.PI).toFixed(3).replace('.', '{,}')+'^{\\circ}');const pair=detailPair(),r=pair?Math.hypot(pair[0].x-pair[1].x,pair[0].y-pair[1].y):M.nearest(centers,x,y).distance;tex($('distance'),(pair?'r_{\\mathrm{detail}}=':'r=')+fmt(r)+'\\,\\mathrm{fm}');tex($('values'),'\\langle E\\rangle=\\tfrac32 k_B T='+fmt(M.thermalMean(temperature))+'\\,\\mathrm{keV}');tex($('turning'),'r_{\\min,\\,klas.}='+fmt(Math.max(p.R,shot.closest))+'\\,\\mathrm{fm}');tex($('probability'),centers.length>1?(probability===null?String.raw`\text{Odhad průchodu po přiblížení}`:String.raw`\text{Lokální WKB odhad: }`+scientific(probability)):shot.rmin<=p.R?'\\text{Klasický přístup bez tunelování}':'P_{\\mathrm{WKB}}\\approx '+scientific(probability));tex($('statistics'),'N='+attempts+'\\quad N_{\\mathrm{tunel}}='+passes+'\\quad N_{\\mathrm{klas.}}='+classical);if(fusion){tex($('values'),String.raw`\mathrm D+\mathrm T\to{}^{5}\mathrm{He}^{*}\to\alpha+\mathrm n`);tex($('probability'),String.raw`Q=17{,}59\,\mathrm{MeV}`);if(fusion.products){const speeds=fusion.products.products.map(b=>Math.hypot(...HiFyzikoDT.velocity(b))*299792.458);tex($('turning'),String.raw`\begin{aligned}v_\alpha&=`+Math.round(speeds[0])+String.raw`\,\mathrm{km/s}\\v_{\mathrm n}&=`+Math.round(speeds[1])+String.raw`\,\mathrm{km/s}\end{aligned}`);}else tex($('turning'),String.raw`\text{Přechodné jádro: }2\,\mathrm p+3\,\mathrm n`);}graph();}
+ $('lesson').textContent=fusion?(fusion.plan?'Vybraný směr odletu; nejde o náhodný vzorek úhlů reakce.':'Vybraný výstupní kanál, nikoli výpočet četnosti reakcí. Směry a rozdělení energie tří produktů jsou názorný příklad se zachováním energie a hybnosti.'):demoActive?'Vybraný úspěšný případ. Pohyb a délka efektu nejsou skutečnou dráhou ani dobou tunelování.':$('interaction').value==='drag'?'Ruční tah vybírá polohy dostupné při zvolené energii; další energii nepřidává. Volný pohyb ukazuje dělo.':'Nižší energie znamená širší bariéru a vzácnější průchod, nikoli ostrý práh. Prostupnost není pravděpodobnost fúze.';tex($('temperatureValue'),'T='+fmt(temperature)+'\\,\\mathrm{MK}');tex($('angleValue'),(angle*180/Math.PI).toFixed(3).replace('.', '{,}')+'^{\\circ}');const pair=null,r=M.nearest(centers,x,y).distance;tex($('distance'),(pair?'r_{\\mathrm{detail}}=':'r=')+fmt(r)+'\\,\\mathrm{fm}');tex($('values'),'\\langle E\\rangle=\\tfrac32 k_B T='+fmt(M.thermalMean(temperature))+'\\,\\mathrm{keV}');tex($('turning'),'r_{\\min,\\,klas.}='+fmt(Math.max(p.R,shot.closest))+'\\,\\mathrm{fm}');tex($('probability'),centers.length>1?(probability===null?String.raw`\text{Odhad průchodu po přiblížení}`:String.raw`\text{Lokální WKB odhad: }`+scientific(probability)):shot.rmin<=p.R?'\\text{Klasický přístup bez tunelování}':'P_{\\mathrm{WKB}}\\approx '+scientific(probability));tex($('statistics'),'N='+attempts+'\\quad N_{\\mathrm{tunel}}='+passes+'\\quad N_{\\mathrm{klas.}}='+classical);if(fusion){tex($('values'),fusion.reaction.tex);tex($('probability'),'Q='+fmt(fusion.reaction.Q/1000)+String.raw`\,\mathrm{MeV}`);tex($('turning'),fusion.reaction.elastic?String.raw`\text{Pružný rozptyl; bez trvalého sloučení}`:fusion.reaction.weak?String.raw`\text{Vybraná vzácná slabá přeměna}`:String.raw`\text{Vybraný výstupní kanál reakce}`);} graph();}
+
+
+function schematicItems(items){return items.map((item,layoutIndex)=>({...item,layoutIndex}));}
+function currentGlyphs(){return schematicItems([{id:$('projectile').value,x:projectilePoint()[0],y:projectilePoint()[1],radius:displayRadius()},...centers.map(t=>({id:targetKind(t),x:project(t.x,t.y)[0],y:project(t.x,t.y)[1],radius:displayRadius()}))]);}
+function legibleMainGlyphs(items){
+ if(mode==='tunnel'||fusion?.phase==='compound')return items;
+ const result=schematicItems(items);
+ result.forEach(item=>{if(item.labelKey){nucleus(item.id,item.x,item.y,item.labelKey,null,item.radius);for(const el of $('labels').querySelectorAll('[data-key^="'+item.labelKey+'"]'))el.hidden=false;}
+ if(item.labelKey==='b'){ctx.save();ctx.strokeStyle='#8050b8';ctx.lineWidth=1.5;ctx.setLineDash([3,5]);ctx.beginPath();ctx.arc(item.x,item.y,item.radius*visualBound(item.id)+3,0,Math.PI*2);ctx.stroke();ctx.restore();}});return result;
+}
 let uiSince=0;
 function frame(t){const dt=old?Math.min(.05,(t-old)/1000):0;old=t;if(document.hidden){requestAnimationFrame(frame);return;}
- if(!paused){if(!reduced.matches)renderTime+=dt;if(fusion){advanceFusion(dt);}else if(mode==='tunnel'){tunnelTime+=dt;if(tunnelTime>=tunnelDuration){x=tunnelTo[0];y=tunnelTo[1];vx=vy=0;mode='nuclear';if(isDT()&&$('fusionEnabled').checked)beginFusion();else status($('pairPreset').value==='proton|proton'?'Průchod bariérou p–p. Slabou přeměnu potřebnou pro fúzi tento model nepočítá.':batchNote||'Průchod do jaderné oblasti. Fúzi a její produkty přidáme v dalším kroku.');}}
- else if(mode==='recoil'&&recoil){recoil.time+=dt;const f=Math.min(1,recoil.time/.55),ease=1-(1-f)**3,points=recoil.points,index=ease*(points.length-1),i=Math.min(points.length-2,Math.floor(index));if(i>=0){const t=index-i;x=points[i][0]+(points[i+1][0]-points[i][0])*t;y=points[i][1]+(points[i+1][1]-points[i][1])*t;}if(f===1){recoil=null;mode=drag?'drag':'ready';if($('interaction').value==='gun')armGun(true);else status('Nová hranice přiblížení odpovídá zvolené teplotě.');}}
+ const replaying=replayPlayback(dt);
+ if(!paused&&!replaying&&(playbackSpeed>0||mode==='drag'||mode==='recoil'||mode==='free')){if(!reduced.matches)renderTime+=dt*Math.abs(playbackSpeed)/.1;if(fusion){advanceFusion(dt);}else if(mode==='tunnel'){tunnelTime+=dt*Math.max(0,playbackSpeed)/.1;if(tunnelTime>=tunnelApproachLength()&&!tunnelSoundStarted){tunnelSoundStarted=true;playTunnelSound();}if(tunnelTime>=tunnelApproachLength()+tunnelDuration*.8){x=tunnelTo[0];y=tunnelTo[1];vx=vy=0;mode='nuclear';if(activeReaction()&&$('fusionEnabled').checked)beginFusion();else status($('pairPreset').value==='proton|proton'?'Průchod bariérou p–p. Slabou přeměnu potřebnou pro fúzi tento model nepočítá.':batchNote||'Průchod do jaderné oblasti. Fúzi a její produkty přidáme v dalším kroku.');}}
+ else if(mode==='recoil'&&recoil){recoil.time+=dt;const f=Math.min(1,recoil.time/.55),ease=1-(1-f)**3,points=recoil.points,index=ease*(points.length-1),i=Math.min(points.length-2,Math.floor(index));if(i>=0){const t=index-i;x=points[i][0]+(points[i+1][0]-points[i][0])*t;y=points[i][1]+(points[i+1][1]-points[i][1])*t;}if(f===1){recoil=null;mode=drag?'drag':'ready';const point=currentGlyphs()[0];if(point.x<35||point.x>W-35||point.y<100||point.y>H-70)fitAllParticles();if($('interaction').value==='gun')armGun(true);else status('Nová hranice přiblížení odpovídá zvolené teplotě.');}}
 
- else if(mode==='drag'&&drag){const next=M.dragTowards(p,centers,{x,y},drag,energy,dt,p.R);x=next.x;y=next.y;targetIndex=M.nearest(centers,x,y).index;updateHum();}
- else if(['flight','free'].includes(mode)){const speed=Math.sqrt(2*energy/p.mu),duration=dt*shot.start/Math.max(speed,.1)*.9*Math.sqrt(temperature/100),count=Math.max(1,Math.ceil(duration/shot.dt));for(let i=0;i<count;i++)step(duration/count);if(mode==='flight'||mode==='done'){trail.push([x,y]);if(trail.length>1200)trail.shift();}}
+ else if(mode==='drag'&&drag){syncActivePair();const next=manualApproach(dt);x=next.x;y=next.y;targetIndex=M.nearest(centers,x,y).index;updateHum();}
+ else if(['flight','free'].includes(mode)){const rate=mode==='free'?shot.start*.025/Math.sqrt(2*M.thermalMean(100)/1.2):playbackRate(),duration=dt*rate/Math.max(1,collisionZoom);flightAccumulator+=duration;let ticks=0;while(flightAccumulator>1e-10&&ticks++<2000&&['flight','free'].includes(mode)){const h=Math.min(shot.dt,flightAccumulator);step(h);flightAccumulator-=h;}if(mode==='flight'||mode==='done'){trail.push(tracePoint([{x,y,kind:$('projectile').value},...centers.map(t=>({x:t.x,y:t.y,kind:targetKind(t)}))]));if(trail.length>1200)trail.shift();}}
  }
- if(!paused&&['flight','free'].includes(mode))updateHum();else if(mode!=='drag')stopHum();
- scene();if(fusion&&painter){painter.draw(W,H,renderTime,fusionGraphics());}else if(painter){const radius=displayRadius(),items=centers.map(t=>({id:$('target').value,x:project(t.x,t.y)[0],y:project(t.x,t.y)[1],radius}));if(mode==='tunnel'){const f=tunnelBlend(),point=tunnelVisualPoint(f.travel,f.t),smear=!reduced.matches&&f.t>.04&&f.t<.75;
+ if(!paused&&!replaying&&playbackSpeed>0)recordPlayback(dt);
+ if(!paused&&!replaying&&(playbackSpeed>0||mode==='free')&&['flight','free'].includes(mode))updateHum();else if(mode!=='drag')stopHum();
+ view();advancePreview();scene();if(fusion&&painter){painter.draw(W,H,renderTime,legibleMainGlyphs(fusionGraphics()));}else if(painter){const radius=displayRadius(),items=centers.map((t,i)=>({id:targetKind(t),x:targetScreen(t,i)[0],y:targetScreen(t,i)[1],radius,labelKey:'a'+i+'-'}));if(mode==='tunnel'){const f=tunnelBlend(),point=tunnelVisualPoint(f.travel,f.t),smear=!reduced.matches&&f.t>.04&&f.t<.75;
  if(smear)for(let i=5;i>=1;i--){const ghost=tunnelVisualPoint(Math.max(0,f.travel-i*.06),f.t),spread=Math.sin(i*2.4+f.t*19)*radius*.10;items.push({id:$('projectile').value,x:ghost[0]+spread,y:ghost[1]+Math.cos(i*3.1)*radius*.08,radius,opacity:.17*(1-i/6)});}
  if(f.glitch){for(let i=0;i<10;i++)items.push({id:$('projectile').value,x:point[0]+Math.sin(i*17+Math.floor(f.t*70))*radius*.34,y:point[1],radius,opacity:.65+.25*(i%2),clipY:[i/10,(i+1)/10]});}
  else items.push({id:$('projectile').value,x:point[0],y:point[1],radius,opacity:reduced.matches?1:smear?.62:.96});
- }else items.push({id:$('projectile').value,x:projectilePoint()[0],y:projectilePoint()[1],radius});painter.draw(W,H,renderTime,items);}
+ }else items.push({id:$('projectile').value,x:projectilePoint()[0],y:projectilePoint()[1],radius,labelKey:'b'});painter.draw(W,H,renderTime,legibleMainGlyphs(items));}
+ incomingSpeedLabel();
  if(mode==='tunnel'||t-uiSince>70){ui();uiSince=t;}requestAnimationFrame(frame);
 }
-window.coulombProjectilePoint=projectilePoint;window.coulombTunnelContact=tunnelContactPoint;window.coulombProject=project;window.coulombUnproject=unproject;
-window.coulombState=()=>({fusion,x,y,vx,vy,mode,energy,temperature,angle,paused,zoom,scale,ox,oy,pair:p,shot,demoActive,demoPending,probability,attempts,passes,classical,tunnelTime,tunnelFrom,tunnelDisplayFrom,tunnelTo,centers,targetIndex,activePointer,layoutSeed,gunOrigin,gunHeading,aimTarget,previewLimit,releaseBounds,flightLimit:flightLimit(),displayRadius:displayRadius(),contactRadius:contactRadius(),targetBound:visualBound($('target').value),projectileBound:visualBound($('projectile').value)});
+window.coulombGlyphs=currentGlyphs;window.coulombProjectilePoint=projectilePoint;window.coulombTunnelContact=tunnelContactPoint;window.coulombProject=project;window.coulombUnproject=unproject;
+window.coulombState=()=>({playbackSpeed,playbackUserOverride,playbackAutoSlowed,playbackHasProducts,playbackCursor,playbackHead,playbackFrameCount:playbackFrames.length,manualDisplay,tunnelGraph,tunnelApproachFrom,tunnelSoundStarted,collisionZoom,cell,preview,layoutDrag,fusion,x,y,vx,vy,mode,energy,temperature,angle,paused,zoom,scale,ox,oy,pair:p,shot,demoActive,demoPending,probability,attempts,passes,classical,tunnelTime,tunnelFrom,tunnelDisplayFrom,tunnelTo,centers,targetIndex,activePointer,layoutSeed,gunOrigin,gunHeading,aimTarget,previewLimit,releaseBounds,flightLimit:flightLimit(),displayRadius:displayRadius(),contactRadius:contactRadius(),targetBound:visualBound($('target').value),projectileBound:visualBound($('projectile').value)});
 reset();requestAnimationFrame(frame);
 })();

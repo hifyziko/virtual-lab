@@ -5,7 +5,7 @@
   function applyAreaPalette(){
     const id=location.hash.slice(1),group=Lab.catalog.find(m=>m.id===id)?.group||(id.startsWith('group-')?id.slice(6):'');
     const machines=['transformer','common','induction','sync','dc','drive'];
-    const area=id==='group-area-machines'||machines.includes(group)?'machines':id==='group-area-plasma'?'plasma':'electricity';
+    const area=id==='group-area-machines'||machines.includes(group)?'machines':id==='group-area-plasma'||group==='fusion'?'plasma':'electricity';
     const palettes={electricity:['#176659','#e9f3ed','#f5f7f2','#173f3a','#cbded4'],machines:['#285da2','#eaf1fb','#f1f4fa','#203b60','#cdd9eb'],plasma:['#725198','#f1ebf8','#f7f3fa','#49355c','#ded2e8']};
     const root=document.documentElement;if(id)root.dataset.tone='area';else delete root.dataset.tone;root.dataset.physicsArea=area;
     ['accent','wash','paper','ink','line'].forEach((key,i)=>root.style.setProperty('--tone-'+key,palettes[area][i]));
@@ -77,7 +77,7 @@
       // Unique IDs prevent gradient collisions between the hero and cards.
       visual.innerHTML = art(id).replaceAll('wow-field-glow','wow-card-field-glow').replaceAll('wow-plasma-glow','wow-card-plasma-glow');
       card.prepend(visual);
-      card.querySelector('strong').innerHTML = (id==='plasma'?'Nahlédnout do připravované oblasti':'Vstoupit do oblasti') + ' <span aria-hidden="true">↗</span>';
+      card.querySelector('strong').innerHTML = 'Vstoupit do oblasti <span aria-hidden="true">↗</span>';
     }
     const comparison = document.createElement('p');
     comparison.className = 'wow-comparison';

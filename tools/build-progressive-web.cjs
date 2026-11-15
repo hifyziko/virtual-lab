@@ -72,14 +72,57 @@ function transform(original){
  for(const script of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g))new vm.Script(script[1]);
  return {html,chunks,assets,dependencies,preserved,originalBytes:Buffer.byteLength(original)};
 }
+// Package runtime assets in an on-demand document, like the imported machine
+// lessons, without depending on navigation to another file:// page in a frame.
+function addFusionPages(output,web){
+ const navigation=fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8');
+ const pages=[...navigation.matchAll(/id:'(fu\d+-[a-z]+)'[^\n]+?page:'([^']+)'/g)];
+ if(pages.length!==2)throw Error('Expected the fusion experiment and unified gallery');
+ const published=new Set(require('./project/common.cjs').policy().webFiles);
+ output.preserved=output.preserved.filter(item=>!item.key.startsWith('fusion-'));
+ for(const key of Object.keys(output.assets))if(key.startsWith('fusion-'))delete output.assets[key];
+ for(const id of Object.keys(output.dependencies))if(id.startsWith('fu'))delete output.dependencies[id];
+ for(const [,id,page] of pages){
+  const read=ref=>{
+   const url=new URL(ref,'https://bundle.invalid/'+page),rel=url.pathname.slice(1);
+   if(url.origin!=='https://bundle.invalid'||url.search||url.hash||!published.has(rel))throw Error('Unexpected fusion runtime asset: '+ref);
+   return {rel,text:fs.readFileSync(path.join(web,rel),'utf8')};
+  };
+  let html=read('../'+page).text;
+  html=html.replace(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g,(_,ref)=>{
+   const {rel,text}=read(ref);
+   if(/@import|url\((?!["']?data:)/i.test(text)||/<\/style/i.test(text))throw Error('Stylesheet is not self-contained: '+rel);
+   return '<style data-fusion-source="'+rel+'">'+text+'</style>';
+  });
+  // Media stays lazy and external; srcdoc inherits the hub base URL.
+  html=html.replace(/data-video-src="([^"]+)"/g,(_,ref)=>{const url=new URL(ref,'https://bundle.invalid/'+page),rel=url.pathname.slice(1);if(url.origin!=='https://bundle.invalid'||!published.has(rel))throw Error('Unexpected fusion video: '+ref);return 'data-video-src="'+rel+'"';});
+  const scripts=[];
+  html=html.replace(/<script\b[^>]*src="([^"]+)"[^>]*>\s*<\/script>/g,(_,ref)=>{
+   const {rel,text}=read(ref);new vm.Script(text);
+   scripts.push('<script data-fusion-source="'+rel+'">'+text.replace(/<\/script/gi,'<\\/script')+'</script>');return '';
+  });
+  // Deferred scripts originally run after parsing the body; preserve that order.
+  html=html.replace('</body>',()=>scripts.join('\n')+'\n</body>');
+  html=html.replaceAll('href="../index.html#','href="index.html#');
+  const key='fusion-'+id,code='LabProgress.accept('+encode(key)+','+encode(html)+');\n';
+  new vm.Script(code);const bytes=Buffer.from(code),hash=sha(bytes),rel='lazy/'+key+'-'+hash.slice(0,16)+'.js';
+  output.assets[key]={path:rel,bytes:bytes.length,sha256:hash};output.chunks.set(rel,bytes);output.dependencies[id]=[key];
+  output.preserved.push({key,kind:'html',sha256:sha(Buffer.from(html))});
+ }
+ const aliases=JSON.parse(navigation.match(/const aliases=(\{[^\n]+\});/)[1]);
+ for(const id of Object.keys(aliases))output.dependencies[id]=['fusion-fu02-galerie'];
+ const install='<script id="progressive-web-install">LabProgress.install('+encode(output.assets)+','+encode(output.dependencies)+');</script>';
+ output.html=output.html.replace(/<script id="progressive-web-install">[\s\S]*?<\/script>/,()=>install);
+}
 function build(directory){
  const web=path.resolve(directory),index=path.join(web,'index.html'),manifestPath=path.join(web,'../manifest.json');
  const original=fs.readFileSync(index,'utf8'),manifest=JSON.parse(fs.readFileSync(manifestPath,'utf8'));
+ let output;
  if(original.includes('id="progressive-web-install"')){
   for(const rel of manifest.progressiveFiles||[]){const expected=manifest.files.find(f=>f.path===rel);if(!expected||sha(fs.readFileSync(path.join(web,rel)))!==expected.sha256)throw Error('Lazy asset mismatch: '+rel);}
-  console.log('Progressive web already current: '+web);return;
- }
- const output=transform(original),shell=Buffer.from(output.html);
+  const p=manifest.progressive;output={html:original,chunks:new Map(),assets:{...p.assets},dependencies:{...p.dependencies},preserved:[...p.preserved],originalBytes:p.originalBytes};
+ }else output=transform(original);
+ addFusionPages(output,web);const shell=Buffer.from(output.html);
  for(const [rel,bytes] of output.chunks){
   const dest=path.join(web,rel);fs.mkdirSync(path.dirname(dest),{recursive:true});
   if(fs.existsSync(dest)){if(sha(fs.readFileSync(dest))!==sha(bytes))throw Error('Existing lazy asset differs: '+rel);}else fs.writeFileSync(dest,bytes,{flag:'wx'});
@@ -87,10 +130,10 @@ function build(directory){
  manifest.files=manifest.files.filter(f=>f.path!=='index.html'&&!f.path.startsWith('lazy/'));
  manifest.files.push({path:'index.html',bytes:shell.length,sha256:sha(shell)},...Object.values(output.assets));
  manifest.files.sort((a,b)=>a.path.localeCompare(b.path));manifest.bytes=manifest.files.reduce((n,f)=>n+f.bytes,0);
- manifest.progressiveFiles=[...output.chunks.keys()].sort();
+ manifest.progressiveFiles=Object.values(output.assets).map(asset=>asset.path).sort();
  manifest.progressive={schema:1,originalBytes:output.originalBytes,shellBytes:shell.length,assets:output.assets,dependencies:output.dependencies,preserved:output.preserved};
  fs.writeFileSync(index,shell);fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\n');
- console.log(JSON.stringify({web,originalBytes:output.originalBytes,shellBytes:shell.length,deferredFiles:output.chunks.size,reductionPercent:+(100*(1-shell.length/output.originalBytes)).toFixed(1)}));
+ console.log(JSON.stringify({web,originalBytes:output.originalBytes,shellBytes:shell.length,deferredFiles:manifest.progressiveFiles.length,reductionPercent:+(100*(1-shell.length/output.originalBytes)).toFixed(1)}));
  return output;
 }
 if(require.main===module){

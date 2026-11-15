@@ -16,6 +16,6 @@ for(const base of ['versions/aktualni/web','versions/vyvoj/versions/aktualni/web
  const file=path.resolve(__dirname,'..',base,'fuze-bariera/index.html'),html=fs.readFileSync(file,'utf8');
  for(const [,ref]of html.matchAll(/(?:src|href)="([^"#]+)"/g))assert.ok(fs.existsSync(path.resolve(path.dirname(file),ref)),ref);
  const manifest=JSON.parse(fs.readFileSync(path.resolve(__dirname,'..',base,'../manifest.json')));
- for(const name of ['index.html','style.css','app.js','model.js','fusion.js'])assert.ok(manifest.files.some(f=>f.path==='fuze-bariera/'+name),'Missing runtime file in delivery manifest: '+name);
+ for(const name of ['index.html','style.css','app.js','model.js','fusion.js','reactions.js'])assert.ok(manifest.files.some(f=>f.path==='fuze-bariera/'+name),'Missing runtime file in delivery manifest: '+name);
 }
 console.log('Coulomb: gradient, isotope/charge comparisons, neutron, energy, turning point and delivery links passed.');
