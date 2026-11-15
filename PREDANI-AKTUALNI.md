@@ -2,6 +2,11 @@
 
 ## GitHub a přenos — 15. listopadu 2026
 
+Nejnovější pokyn uživatele: práce na fúzním modulu stále probíhá. **Další push
+pouze na výslovné požádání.** Neposílat automaticky ani změny pravidel či tagy.
+Přenosový balíček může nést dosud neodeslané místní commity. První schválený
+projektový commit na GitHubu je b30b5f1; další rozpracované změny zachovat.
+
 Schváleno: veřejný Git obsahuje minimum upravitelných zdrojů, pravidla a
 sestavovací nástroje; Pages pouze prezentační soubory. Literatura se přenáší
 v soukromém balíčku. Nepotřebné surové FEM výsledky se po ověření odstraňují;

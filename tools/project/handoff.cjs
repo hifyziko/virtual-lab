@@ -9,7 +9,7 @@ const files=new Set(C.repositoryFiles());
 // Private literature and small reproducible model inputs travel only in this archive.
 for(const p of fs.readdirSync(root))if(p.endsWith('.pdf'))files.add(p);
 for(const dir of ['TEs knizka','versions/vyvoj/m_files/reference','docs/fuze'])for(const p of C.walk(path.join(root,dir)))files.add(C.relative(p));
-for(const dir of ['versions/vyvoj/m_files','tools','versions/vyvoj/tools'])for(const p of C.walk(path.join(root,dir))){const rel=C.relative(p);if(/\/(__pycache__|mpl-cache|review|nahled-usporna-vyuka)\/|\.aedtresults\//.test(rel))continue;if(/\.(py|ps1|cjs|m|aedt|vbs|cfg|md)$/.test(p))files.add(rel);if(/machines-fem\/.*\/(?:dc-model|bldc-model|sources)\.json$/.test(rel))files.add(rel);}
+for(const dir of ['versions/vyvoj/m_files','tools','versions/vyvoj/tools'])for(const p of C.walk(path.join(root,dir))){const rel=C.relative(p);if(/\/(__pycache__|mpl-cache|review|nahled-usporna-vyuka|startup-live)\/|\.aedtresults\//.test(rel))continue;if(/\.(py|ps1|cjs|mjs|js|css|html|json|svg|png|jpe?g|woff2?|ttf|m|aedt|vbs|cfg|md|txt)$/.test(p))files.add(rel);}
 for(const rel of ['tmp/sync-tests/linkedom.mjs'])if(fs.existsSync(C.inside(root,rel)))files.add(rel);
 for(const p of C.walk(path.join(root,'versions/vyvoj/m_files/machines-fem/dc-bldc/recompute-inputs')))files.add(C.relative(p));
 for(const rel of [...files].sort())C.copy(C.inside(root,rel),C.inside(folder,rel));

@@ -32,7 +32,8 @@ Nikdy nerozbalujte balíček přes jinou rozpracovanou kopii.
 5. Sestavte `node tools/build-release.cjs`, ověřte `node tools/project/check.cjs`.
 6. Nové veřejné soubory registrujte pomocí `node tools/project/files.cjs add cesta`.
 7. Spusťte `node tools/project/files.cjs stage`, zkontrolujte `git diff --cached`
-   a vytvořte commit. Potom `git push`. Výstupy sestavení se necommitují.
+   a vytvořte místní commit. `git push` až na výslovný pokyn uživatele.
+   Výstupy sestavení se necommitují. Automatický push není součástí práce.
 
 Push do main spouští sestavení a zveřejnění vybrané dodávky. Pro nedokončenou
 práci použijte pracovní větev; například `git switch -c prace/nazev` a při
@@ -41,7 +42,8 @@ prvním pushi `git push -u origin HEAD`. Před zveřejněním změny slučte do 
 ### Pokyn „přesouváme se na jiný počítač“
 
 Aktualizujte PREDANI-AKTUALNI.md: co je hotové, co zbývá, výsledky kontrol,
-omezení a další krok. Ověřte sestavení, commitněte a pushněte připravený stav.
+omezení a další krok. Ověřte sestavení a vytvořte místní commit připraveného stavu.
+Push proveďte pouze na výslovný pokyn; samotné předání není souhlas s pushem.
 Pokud není práce hotová, použijte pracovní větev. Pak spusťte:
 
 `node tools/project/handoff.cjs`

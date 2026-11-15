@@ -22,7 +22,7 @@ node tools/project/check.cjs
 ```
 
 Otevřete `versions/aktualni/web/index.html`. Běžná práce: Pull → úpravy zdrojů
-→ sestavení a kontrola → Commit → Push. GitHub Actions publikuje pouze
+→ sestavení a kontrola → místní Commit → **Push až na výslovný pokyn**. GitHub Actions publikuje pouze
 vybraný hotový web při pushi do `main`. Pracovní větve se nepublikují.
 
 Repozitář obsahuje upravitelné zdroje a minimální potřebná data. Literatura,
