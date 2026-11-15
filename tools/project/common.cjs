@@ -10,6 +10,11 @@ function writeJSON(p,data){fs.mkdirSync(path.dirname(p),{recursive:true});fs.wri
 function copy(from,to){fs.mkdirSync(path.dirname(to),{recursive:true});fs.copyFileSync(from,to,fs.constants.COPYFILE_EXCL);}
 function git(args,opts={}){return cp.execFileSync('git',args,{cwd:root,encoding:'utf8',...opts}).trim();}
 function policy(){return json(path.join(root,'config/project-files.json'));}
+function webFiles(manifest=json(path.join(root,'versions/aktualni/manifest.json'))){
+ const generated=manifest.progressiveFiles||[];
+ for(const rel of generated)if(!/^lazy\/[a-z0-9-]+-[a-f0-9]{16}\.js$/.test(rel))throw Error('Unexpected generated web asset: '+rel);
+ return [...new Set([...policy().webFiles,...generated])].sort();
+}
 function repositoryFiles(){const p=policy();return [...new Set([...p.sourceFiles,...walk(path.join(root,'tools/project')).map(relative),...walk(path.join(root,'.github/workflows')).map(relative),'config/project-files.json','.gitignore','.gitattributes'])].sort();}
 function assertPublic(rel){inside(root,rel);if(/(^|\/)(\.env(?:\..*)?|\.git|\.ssh|\.aws|\.codex|\.browser|node_modules|tmp|archiv|TEs knizka)(\/|$)|\.(pdf|zip|npz|aedt|aedtplt|fld|pem|key|pfx|p12|pyc)$/i.test(rel)||rel.startsWith('docs/fuze/podklady/')||rel.startsWith('versions/1.'))throw Error('Private/generated file cannot enter public repository: '+rel);}
-module.exports={fs,path,cp,root,relative,inside,walk,sha,json,writeJSON,copy,git,policy,repositoryFiles,assertPublic};
+module.exports={fs,path,cp,root,relative,inside,walk,sha,json,writeJSON,copy,git,policy,webFiles,repositoryFiles,assertPublic};

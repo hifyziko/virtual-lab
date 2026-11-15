@@ -7,7 +7,7 @@ const base=path.join(root,'versions/aktualni/web');
 const manifest=C.json(path.join(root,'versions/aktualni/manifest.json'));
 const known=new Map(manifest.files.map(f=>[f.path,f]));
 const report=[];
-for(const rel of C.policy().webFiles){
+for(const rel of C.webFiles(manifest)){
  if(/\.(pdf|zip|npz|dat|tif)$/i.test(rel)||/TEs knizka|CTETE|README/.test(rel))throw Error('Non-presentation file in web list: '+rel);
  const from=C.inside(base,rel),b=fs.readFileSync(from),expected=known.get(rel);
  if(!expected||expected.bytes!==b.length||expected.sha256!==C.sha(b))throw Error('Delivery manifest mismatch: '+rel);

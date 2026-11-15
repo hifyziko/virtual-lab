@@ -2,6 +2,31 @@
 
 ## GitHub a přenos — 15. listopadu 2026
 
+### Postupné načítání — místní změna 15. listopadu 2026
+
+Úvodní HTML bylo zmenšeno z 100 942 297 na 2 432 242 bajtů (o 97,6 %).
+Třicet dva vložených lekcí a šest skupin numerických dat se sestavují
+do 38 souborů `web/lazy/`. Stahují se až při otevření příslušného modulu,
+s viditelným průběhem, návratem během načítání a opakováním při chybě.
+Zdrojové HTML, matematické modely a původní renderery se zachovávají;
+shoda všech přesunutých lekcí a dat je kontrolována SHA-256.
+
+Změna je součástí `node tools/build-release.cjs`, publikace i soukromého ZIPu.
+Obě dodávky aktualni jsou aktualizované. Veřejný výběr má nyní 192 souborů
+(154 původních a 38 načítaných podle potřeby), celkem přibližně 177 MiB.
+Celkový obsah zůstává zachovaný; zmenšil se objem potřebný při vstupu.
+
+Prošlo úplné sestavení, `tools/project/check.cjs`, audit 440 veřejných zdrojů,
+příprava publikačního výstupu, kontrola shody obou dodávek a místní DOM test
+všech rozcestníků i odložených modulů. Testy zahrnují přímé odkazy, cache,
+odchod během stahování, retry, odmítnutí poškozených dat a režim file://.
+DOM test používá náhrady canvasu; prohlížeč se neotevíral a vzhled nebyl
+vizuálně ověřen. Uživatel 15. listopadu 2026 výslovně schválil push tohoto
+zrychlení pro vyzkoušení. Skutečné nasazení potvrzuje úspěšný běh Pages;
+rozpracované změny fúzního modulu se tímto pushem nezveřejňují.
+
+Níže uvedené počty a monolitické HTML popisují původní stav propojení.
+
 Nejnovější pokyn uživatele: práce na fúzním modulu stále probíhá. **Další push
 pouze na výslovné požádání.** Neposílat automaticky ani změny pravidel či tagy.
 Přenosový balíček může nést dosud neodeslané místní commity. První schválený

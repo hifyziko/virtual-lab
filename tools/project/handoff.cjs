@@ -2,6 +2,7 @@
 const C=require('./common.cjs'),ZIP=require('./zip.cjs'),{fs,path,root}=C;
 if(C.git(['status','--porcelain']).length)throw Error('Commit the selected public changes before handoff. Never discard pending work.');
 const commit=C.git(['rev-parse','HEAD']),branch=C.git(['branch','--show-current']);if(!branch)throw Error('Switch to a named branch before handoff.');
+for(const f of JSON.parse(C.git(['lfs','ls-files','--json'])).files){const b=fs.readFileSync(C.inside(root,f.name));if(b.length!==f.size||C.sha(b)!==f.oid)throw Error('LFS content is not fully available; run git lfs pull before handoff: '+f.name);}
 const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z');
 const folder=path.join(root,'handoffs','virtual-lab-'+stamp+'-'+commit.slice(0,8));
 if(fs.existsSync(folder))throw Error('Handoff already exists');fs.mkdirSync(folder,{recursive:true});
@@ -13,8 +14,9 @@ for(const dir of ['versions/vyvoj/m_files','tools','versions/vyvoj/tools'])for(c
 for(const rel of ['tmp/sync-tests/linkedom.mjs'])if(fs.existsSync(C.inside(root,rel)))files.add(rel);
 for(const p of C.walk(path.join(root,'versions/vyvoj/m_files/machines-fem/dc-bldc/recompute-inputs')))files.add(C.relative(p));
 for(const rel of [...files].sort())C.copy(C.inside(root,rel),C.inside(folder,rel));
-const release=[];for(const rel of C.policy().webFiles){const r='versions/aktualni/web/'+rel,p=C.inside(root,r),b=fs.readFileSync(p);C.copy(p,C.inside(folder,r));release.push({path:rel,bytes:b.length,sha256:C.sha(b)});}
-C.writeJSON(path.join(folder,'versions/aktualni/manifest.json'),{version:'1.0',channel:'aktualni',entry:'web/index.html',bytes:release.reduce((s,f)=>s+f.bytes,0),files:release});
+const currentRelease=C.json(path.join(root,'versions/aktualni/manifest.json'));
+const release=[];for(const rel of C.webFiles(currentRelease)){const r='versions/aktualni/web/'+rel,p=C.inside(root,r),b=fs.readFileSync(p);C.copy(p,C.inside(folder,r));release.push({path:rel,bytes:b.length,sha256:C.sha(b)});}
+C.writeJSON(path.join(folder,'versions/aktualni/manifest.json'),{version:'1.0',channel:'aktualni',entry:'web/index.html',bytes:release.reduce((s,f)=>s+f.bytes,0),files:release,progressiveFiles:currentRelease.progressiveFiles||[],...(currentRelease.progressive?{progressive:currentRelease.progressive}:{})});
 fs.mkdirSync(path.join(folder,'_handoff'),{recursive:true});
 C.git(['bundle','create',path.join(folder,'_handoff/history.bundle'),'--all']);
 C.git(['bundle','verify',path.join(folder,'_handoff/history.bundle')]);

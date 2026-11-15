@@ -4,6 +4,9 @@ fs.mkdirSync(path.join(root,'tmp'),{recursive:true});
 const dir=fs.mkdtempSync(path.join(root,'tmp/project-tools-test-'));
 assert.throws(()=>C.inside(dir,'../private'));assert.throws(()=>C.inside(dir,'/absolute'));
 for(const p of ['literatura.pdf','tmp/test.txt','versions/archiv/data.js','.env','key.pem'])assert.throws(()=>C.assertPublic(p));
+assert.throws(()=>C.webFiles({progressiveFiles:['../literatura.pdf']}));
+assert.throws(()=>C.webFiles({progressiveFiles:['lazy/secrets.txt']}));
+assert(C.webFiles({progressiveFiles:['lazy/lesson-test-0123456789abcdef.js']}).includes('lazy/lesson-test-0123456789abcdef.js'));
 const samples=[['příliš žluťoučký.txt',Buffer.from('Přenos pravidel\r\n')],['data/model.bin',Buffer.from(Array.from({length:3000},(_,i)=>i%256))],['empty.txt',Buffer.alloc(0)]];
 const manifest=[];for(const [rel,b] of samples){const p=C.inside(dir,rel);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,b);manifest.push({path:rel,bytes:b.length,sha256:C.sha(b)});}
 ZIP.create(dir,path.join(dir,'test.zip'),manifest.map(f=>f.path));ZIP.verify(path.join(dir,'test.zip'),manifest);

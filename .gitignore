@@ -16,12 +16,15 @@
 !/tools/build-atom-preview.cjs
 !/tools/build-particle-library.cjs
 !/tools/build-physics-preview.cjs
+!/tools/build-progressive-web.cjs
 !/tools/build-release.cjs
 !/tools/particle-library-navigation.js
 !/tools/physics-preview.css
 !/tools/physics-preview.js
 !/tools/physics-visual.css
 !/tools/physics-visual.js
+!/tools/progressive-loader.css
+!/tools/progressive-loader.js
 !/tools/project/check.cjs
 !/tools/project/common.cjs
 !/tools/project/files.cjs
@@ -35,6 +38,7 @@
 !/tools/test-coulomb.cjs
 !/tools/test-fusion-dt.cjs
 !/tools/test-particle-library.cjs
+!/tools/test-progressive.cjs
 !/tools/update-version-index.cjs
 !/versions/AGENTS.md
 !/versions/PRAVIDLA_LADENI_MODULU.md

@@ -11,6 +11,7 @@ if(fs.existsSync(path.join(activeSource,'m_files','Web','mmf-module.js'))){
  fs.cpSync(path.join(activeSource,'versions',version),dest,{recursive:true});
  if(working)execFileSync(process.execPath,['tools/build-physics-preview.cjs','--visual','--activate'],{cwd:root,stdio:'inherit'});
  if(working)execFileSync(process.execPath,['tools/build-particle-library.cjs'],{cwd:root,stdio:'inherit'});
+ if(working)execFileSync(process.execPath,['tools/build-progressive-web.cjs'],{cwd:root,stdio:'inherit'});
  require('./update-version-index.cjs');
  console.log('Updated stable application: '+path.join(web,'index.html'));
  process.exit(0);

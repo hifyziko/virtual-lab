@@ -70,6 +70,16 @@ kopii v nové složce `dist/pages`; existující složku nepřepíše.
 Při nové verzi modulu doplňte také nové runtime soubory do seznamu `webFiles`.
 CI ze zdrojů sestaví web, otestuje jej a publikuje jen tento výběr.
 
+Úvodní stránka se sestavuje jako lehký rozcestník. Závěrečný krok
+`tools/build-progressive-web.cjs` oddělí vložené lekce a numerické báze
+do `web/lazy/`; původní zdroje, data a cesty modulů zůstávají zachované.
+Moduly se načítají až po otevření, s průběhem, opakováním při chybě a cache
+v otevřené stránce. Funguje také místní otevření přes `file://`.
+Generované soubory uvádí `progressiveFiles` v manifestu; publikační nástroj
+i předávací ZIP je přidávají automaticky. Nekopírujte samotný index.html.
+Při přidání další velké datové závislosti upravte mapování v tomto sestavení
+a spusťte `tools/test-progressive.cjs` nebo celé `tools/project/check.cjs`.
+
 ### Historické informace o výchozím podkladu
 
 Následující poznámky popisují základ z 14. 11. 2026. Novější stav určuje Git
