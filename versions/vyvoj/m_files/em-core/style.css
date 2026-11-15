@@ -1,0 +1,108 @@
+/* Shared readable PowerLab layout for the two induction lessons. */
+.layout{gap:0;border:1px solid #dbe4e1;border-radius:12px;overflow:hidden;background:#fff;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,.95fr)}
+.card{border:0;border-right:1px solid #e1e9e5;border-radius:0;box-shadow:none;min-height:0;padding:16px}.card:last-child{border-right:0}
+.sceneBox,.graphic{background:#fff;border:0;border-radius:0}.sceneBox{overflow:visible}.chartBox{border:0}.carddesc{margin-top:18px}
+.control label,.tab,.legend,.phasebox,.viewControls,.note{font-size:14px}.ticks,.sub,.readout small,.tag,.modelnote,.foot{font-size:12px;color:#536f77}.card h2{font-size:16px}.statTitle,.lawpart b{font-size:14px}
+.formula.smaller{font-size:17px}.formula,.formula.big{font-size:20px}.lawparts{grid-template-columns:1fr}.lawpart .katex{font-size:1.18em}.lawpart.muted{opacity:.55}
+.viewControls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}.viewControls label{display:flex;align-items:center;gap:5px}.viewControls select{font:inherit;color:#244650;background:#fff;border:1px solid #ccddd7;border-radius:7px;padding:7px}.viewControls input{accent-color:#007e6c}
+.presets{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.presets button{font:600 13px system-ui;color:#345861;background:#f8fbfa;border:1px solid #d2e2db;border-radius:7px;padding:7px 10px;cursor:pointer}
+.referenceInfo{font-size:13px;color:#3f606b;margin:9px 0;line-height:1.6}.phasebox input{min-width:0}.formula,.katex-display{max-width:100%;overflow-x:auto;overflow-y:hidden}.control label{flex-wrap:wrap}.readout strong{font-size:17px}
+@media(max-width:1150px){.layout{grid-template-columns:1.2fr 1fr}.card:last-child{grid-column:1/-1;border-top:1px solid #e1e9e5}.card{min-height:0}.controls{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.layout{grid-template-columns:1fr}.card{border-right:0;border-bottom:1px solid #e1e9e5}.card:last-child{grid-column:auto}.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.top .sub{display:none}.formula.smaller{font-size:16px}.phasebox{flex-wrap:wrap}}
+
+.amplitudeReadout{font-size:19px;font-weight:750;color:#b74532;margin:4px 0 10px}.scaleControls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:13px}.scaleControls label{display:flex;align-items:center;gap:5px}.scaleControls input{accent-color:#007e6c}.scaleControls button{font:inherit;padding:7px 9px;border:1px solid #cbded6;border-radius:7px;color:#244650;background:#fff;cursor:pointer}.scaleWarning{font-size:12px;line-height:1.5;color:#536f77;min-height:36px;margin:8px 0}.scaleWarning.outside{color:#a13e22;font-weight:700;background:#fff4e8;padding:6px;border-radius:5px}
+
+.currentPreviewBox{border-top:1px solid #dbe5e0;margin-top:12px;padding-top:10px}.currentPreviewBox h3{font-size:15px;margin:0 0 5px}.currentPreviewBox svg{display:block;width:100%}.currentPreviewBox p{font-size:12px;color:#526e77;margin:3px 0;line-height:1.5}
+/* Give the induction scene more width while retaining readable equations. */
+@media(min-width:1151px){body.em-lesson .layout{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr) minmax(270px,.68fr)}body.em-lesson .layout>.card:last-child{padding:13px 12px}body.em-lesson .layout>.card:last-child .readouts{gap:6px}body.em-lesson .layout>.card:last-child .readout{padding:8px 6px}body.em-lesson .layout>.card:last-child .readout strong .katex{font-size:1em}}
+/* Keep all three induction windows inside the teaching screen. */
+@media(min-width:900px){
+body.em-lesson:not(.rod-view-active) main>.layout{height:var(--em-layout-height,440px);min-height:0;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr) minmax(250px,.68fr);align-items:stretch}
+body.em-lesson:not(.rod-view-active) .layout>.card{min-height:0;max-height:100%;overflow:auto;padding:10px;box-sizing:border-box}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child{grid-column:auto;border-top:0}
+body.em-lesson:not(.rod-view-active) .layout>.card:first-child{overflow:hidden}
+body.em-lesson:not(.rod-view-active) .sceneBox{flex:1;min-height:0;overflow:hidden}
+body.em-lesson:not(.rod-view-active) #scene{height:100%;width:100%;object-fit:contain}
+body.em-lesson:not(.rod-view-active) .layout>.card:first-child .legend{flex:none;margin:5px 0;font-size:12px;gap:5px 10px}
+body.em-lesson:not(.rod-view-active) .carddesc{flex:none;margin-top:6px;font-size:13px;line-height:1.4}
+body.em-lesson:not(.rod-view-active) .viewControls{margin:4px 0}
+body.em-lesson:not(.rod-view-active) .layout>.card:nth-child(2)>*{flex-shrink:0}
+body.em-lesson:not(.rod-view-active) .presets{margin:5px 0;gap:5px}
+body.em-lesson:not(.rod-view-active) .presets button{padding:4px 7px}
+body.em-lesson:not(.rod-view-active) .amplitudeReadout{font-size:16px;margin:3px 0 5px}
+body.em-lesson:not(.rod-view-active) .scaleWarning{min-height:30px;margin:4px 0;font-size:11px}
+body.em-lesson:not(.rod-view-active) #chart{height:160px;width:100%}
+body.em-lesson:not(.rod-view-active) #currentPreview{height:95px;width:100%}
+body.em-lesson:not(.rod-view-active) .currentPreviewBox{margin-top:6px;padding-top:6px}
+body.em-lesson:not(.rod-view-active) main>.foot{display:none}
+body.em-lesson:not(.rod-view-active) .toolbar{padding:8px;margin-bottom:8px}
+body.em-lesson:not(.rod-view-active) .controls{gap:10px}
+body.em-lesson:not(.rod-view-active) .formula{margin-top:6px;margin-bottom:6px}
+}
+#scene foreignObject .katex{font-size:1em}#scene foreignObject{overflow:visible}.layout>.card:first-child .legend .katex{font-size:1em}
+/* Prioritize the two plots; remove repeated explanatory text. */
+@media(min-width:900px){
+body.em-lesson:not(.rod-view-active) .layout>.card:nth-child(2){overflow:hidden;gap:4px}
+body.em-lesson:not(.rod-view-active) .layout>.card:nth-child(2)>.sub,body.em-lesson:not(.rod-view-active) #voltageAmplitude,body.em-lesson:not(.rod-view-active) #scaleWarning,body.em-lesson:not(.rod-view-active) #referenceInfo,body.em-lesson:not(.rod-view-active) .layout>.card:nth-child(2)>.legend,body.em-lesson:not(.rod-view-active) .layout>.card:nth-child(2)>.note,body.em-lesson:not(.rod-view-active) .currentPreviewBox>p{display:none}
+body.em-lesson:not(.rod-view-active) .em-graph-tools{display:flex;justify-content:space-between;align-items:center;gap:5px;flex-wrap:wrap}
+body.em-lesson:not(.rod-view-active) .em-graph-tools .presets{margin:0;gap:3px}
+body.em-lesson:not(.rod-view-active) .em-graph-tools button{font-size:11px;padding:4px 5px}
+body.em-lesson:not(.rod-view-active) .layout>.card:nth-child(2)>.chartBox{flex:1 1 140px;min-height:120px;max-height:none}
+body.em-lesson:not(.rod-view-active) #chart{height:100%;width:100%}
+body.em-lesson:not(.rod-view-active) #currentPreview{height:65px}
+body.em-lesson:not(.rod-view-active) .currentPreviewBox{margin-top:0;padding-top:4px}
+body.em-lesson:not(.rod-view-active) .currentPreviewBox h3{font-size:13px;margin:0}
+body.em-lesson:not(.rod-view-active) .phasebox{margin:0;gap:6px;font-size:12px}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child>.sub{display:none}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child .formula{font-size:15px;margin:3px 0}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child .formula.big{font-size:17px}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child .katex-display{margin:.3em 0}
+body.em-lesson:not(.rod-view-active) .statTitle{margin:6px 0 2px;font-size:12px}
+body.em-lesson:not(.rod-view-active) .lawparts{gap:5px;margin:5px 0}
+body.em-lesson:not(.rod-view-active) .lawpart{padding:5px 7px}
+body.em-lesson:not(.rod-view-active) .lawpart b{font-size:12px}
+body.em-lesson:not(.rod-view-active) .lawpart .katex{font-size:1em}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child .modelnote{display:none}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child .callout{font-size:12px;line-height:1.4;padding:6px;margin-top:4px}
+}
+#scene [data-flux-sign] .flux-sign-badge{box-sizing:border-box;display:block;background:#fff;border:1px solid #b9cdcf;border-radius:5px;padding:3px 7px;box-shadow:0 1px 3px #24465012}
+#chart foreignObject,#currentPreview foreignObject{overflow:visible}#chart foreignObject .katex,#currentPreview foreignObject .katex{font-size:1em}
+/* Larger excitation plot and mathematical typography. */
+@media(min-width:900px){
+body.em-lesson:not(.rod-view-active) #currentPreview{height:clamp(100px,14vh,145px)}
+body.em-lesson:not(.rod-view-active) .currentPreviewBox h3{font-size:15px;margin-bottom:2px}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child .formula{font-size:18px}
+body.em-lesson:not(.rod-view-active) .layout>.card:last-child .formula.big{font-size:21px}
+body.em-lesson:not(.rod-view-active) .lawpart{font-size:16px}
+body.em-lesson:not(.rod-view-active) .lawpart .katex{font-size:1em}
+}
+@media(min-width:900px){body.em-lesson:not(.rod-view-active) .layout>.card:last-child>*{flex-shrink:0}body.em-lesson:not(.rod-view-active) .layout>.card:last-child .formula{overflow:visible}body.em-lesson:not(.rod-view-active) .layout>.card:last-child .katex-display{overflow:visible;padding:3px 0}}
+@media(min-width:900px){body.em-lesson:not(.rod-view-active) .lawpart{font-size:20px;padding:9px 8px}body.em-lesson:not(.rod-view-active) .lawpart b{display:block;font-size:15px;margin-bottom:5px}body.em-lesson:not(.rod-view-active) .lawpart .katex{font-size:1em}body.em-lesson:not(.rod-view-active) .lawpart>div{padding:4px 0}}
+
+@media(min-width:900px){body.em-inductance .controls{grid-template-columns:repeat(4,minmax(0,1fr)) 160px}body.em-inductance .controls .note{font-size:11px;line-height:1.3;margin:3px 0}body.em-inductance .layout>.card:nth-child(2) .chartBox{flex:1 1 auto;min-height:180px}body.em-inductance .layout>.card:nth-child(2) .presets{margin:5px 0}body.em-inductance .layout>.card:nth-child(2) .note{font-size:13px;line-height:1.4;margin:6px 0}body.em-inductance .layout>.card:nth-child(2) #referenceInfo{display:block;font-size:12px;line-height:1.4;margin:5px 0}body.em-inductance .layout>.card:nth-child(2)>.legend{display:flex;font-size:13px;gap:7px;margin:4px 0}body.em-inductance .layout>.card:last-child .formula.smaller{font-size:16px}}
+/* Reserve graph and readout rows before the first interaction. */
+@media(min-width:900px){body.em-inductance .layout>.card:nth-child(2){display:grid;grid-template-rows:24px 34px minmax(180px,1fr) 40px 24px;gap:4px;align-content:stretch}body.em-inductance .layout>.card:nth-child(2)>h2{grid-row:1;margin:0}body.em-inductance .layout>.card:nth-child(2)>.presets{grid-row:2;margin:0;align-items:center}body.em-inductance .layout>.card:nth-child(2)>.chartBox{grid-row:3;min-height:0;height:100%;overflow:hidden}body.em-inductance .layout>.card:nth-child(2) #referenceInfo{grid-row:4;margin:0;line-height:1.5;height:40px;overflow:hidden}body.em-inductance .layout>.card:nth-child(2)>.legend{grid-row:5;margin:0;align-items:center}body.em-inductance .layout>.card:nth-child(2)>.sub,body.em-inductance .layout>.card:nth-child(2)>.note{display:none}}
+
+main.uniform-module-layout{--module-flexible-height:1}
+
+/* Induction cards participate in the host fit; never create nested viewports. */
+@media(min-width:900px){
+body.em-lesson:not(.em-inductance):not(.rod-view-active) main>.layout{height:auto;min-height:var(--em-layout-height,440px)}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) .layout>.card{min-width:0;min-height:min-content;max-height:none;overflow:visible}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) .lawpart{font-size:17px;padding:6px 8px}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) .lawpart b{font-size:13px;margin-bottom:3px}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) .lawpart>div{padding:2px 0}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) .layout>.card:last-child .formula.big{font-size:19px}
+}
+
+/* One host-sized canvas for every induction view, including both motion tabs. */
+body.em-lesson:not(.em-inductance) main.uniform-module-layout{height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column}
+body.em-lesson:not(.em-inductance) main.uniform-module-layout> :not(.layout):not(.motional-rod-panel){flex-shrink:0}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) main.uniform-module-layout>.layout{flex:1 1 0;height:0;min-height:0;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,.85fr)}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) main.uniform-module-layout .layout>.card{min-height:0;max-height:none}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) main.uniform-module-layout .layout>.card:last-child .formula{font-size:17px;margin:3px 0}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) main.uniform-module-layout .lawpart{font-size:16px;padding:5px 7px}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) main.uniform-module-layout .readout{padding:5px 6px}
+body.em-lesson:not(.em-inductance):not(.rod-view-active) main.uniform-module-layout .statTitle{margin:4px 0 2px}
+body.rod-view-active main.uniform-module-layout>.motional-rod-panel{flex:1 1 0;height:0;min-height:0;overflow:visible;grid-template-rows:auto auto minmax(0,1fr) minmax(68px,max-content)}
+body.rod-view-active main.uniform-module-layout .rod-details{min-height:0}

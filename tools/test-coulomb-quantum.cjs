@@ -1,0 +1,7 @@
+
+const assert=require('node:assert/strict'),M=require('../versions/vyvoj/m_files/fusion/barrier/model.js'),p=M.pair('deuteron','triton');
+let seed=42;const rng=()=>{seed=(1664525*seed+1013904223)>>>0;return (seed+.5)/4294967296;};let total=0;for(let i=0;i<60000;i++)total+=M.sampleEnergy(100,rng);assert.ok(Math.abs(total/60000-M.thermalMean(100))/M.thermalMean(100)<.015);
+for(const E of [1,10,30,100]){const s=M.shot(p,E),P=M.penetration(p,s),z=p.R/s.rmin,action=Math.sqrt(2*p.mu*931494.10242*E)/197326.9804*s.rmin*(Math.acos(Math.sqrt(z))-Math.sqrt(z*(1-z)));assert.ok(Math.abs(Math.log(P)+2*action)<.06);const oblique=M.shot(p,E,.1);assert.ok(oblique.rmin>s.rmin);assert.ok(M.penetration(p,oblique)<P);}
+assert.ok(M.penetration(p,M.shot(p,30))>M.penetration(p,M.shot(p,10)));assert.equal(M.penetration(p,M.shot(p,1000)),1);
+for(const angle of [0,.1,-.1]){const s=M.shot(p,20,angle),E=s.energy,L=s.L;let closest=Infinity;for(let i=0;i<6000;i++){M.advance(p,s,s.dt);const r=Math.hypot(s.x,s.y);closest=Math.min(closest,r);assert.ok(Math.abs(p.mu*(s.vx*s.vx+s.vy*s.vy)/2+M.potential(p,r)-E)<.002);assert.ok(Math.abs(p.mu*(s.x*s.vy-s.y*s.vx)-L)<1e-7);if(r>s.start*1.35)break;}assert.ok(Math.abs(closest/s.rmin-1)<.0001);}
+console.log('PASS: thermal mean, finite-radius WKB against analytic integral, angular-momentum suppression, above-barrier access, energy/angular-momentum conservation and closest approach.');

@@ -1,0 +1,44 @@
+/* Reserve widths for changing values so Reset never wraps during a run. */
+body:has(.gridplots.induction-faithful) .controls #speedReadout{display:block;flex:0 0 110px;min-width:110px;width:110px;box-sizing:border-box;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums;font:12px ui-monospace,monospace}
+body:has(.gridplots.induction-faithful) .controls #play{flex:0 0 120px;width:120px;min-width:120px;white-space:nowrap}
+body:has(.gridplots.induction-faithful) .controls .control.time{min-width:260px;flex:1 1 300px}
+body:has(.gridplots.induction-faithful) .controls #timeValue{flex:0 0 76px;min-width:76px;width:76px;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
+body:has(.gridplots.induction-faithful) .controls #reset{flex:0 0 66px;min-width:66px;width:66px;white-space:nowrap}
+@media(min-width:900px){
+body:has(.gridplots.induction-faithful) section.controls{display:flex;flex-direction:column;align-items:stretch;gap:9px;padding:9px 12px}
+body:has(.gridplots.induction-faithful) .motor-control-row{display:flex;align-items:center;gap:8px;width:100%;min-width:0;flex-wrap:nowrap}
+body:has(.gridplots.induction-faithful) .motor-primary>.control{display:flex;flex-direction:column;align-items:stretch;gap:3px;flex:1 1 0;min-width:0}
+body:has(.gridplots.induction-faithful) .motor-primary>.control label{font-size:11px;white-space:nowrap}
+body:has(.gridplots.induction-faithful) .motor-control-row input[type=number],body:has(.gridplots.induction-faithful) .motor-control-row select{width:100%;min-width:0;max-width:none;box-sizing:border-box;font-size:12px}
+body:has(.gridplots.induction-faithful) .motor-primary #play{flex:0 0 110px;min-width:110px;width:110px}
+body:has(.gridplots.induction-faithful) .motor-secondary>.control{min-width:0;flex:1 1 120px}
+body:has(.gridplots.induction-faithful) .motor-secondary>.control:has(#n){display:flex;flex-direction:column;gap:3px;align-items:stretch;flex:1 1 600px}
+body:has(.gridplots.induction-faithful) .motor-secondary #n{width:100%;min-width:0;max-width:none}
+body:has(.gridplots.induction-faithful) .motor-secondary #speedReadout{flex-basis:88px;min-width:88px;width:88px;font-size:11px}
+body:has(.gridplots.induction-faithful) .motor-secondary .control.time{display:flex;flex:2 1 220px;min-width:0}
+body:has(.gridplots.induction-faithful) .motor-secondary .control.time label{font-size:11px;white-space:nowrap}
+body:has(.gridplots.induction-faithful) .motor-secondary .control.time input{min-width:30px;width:100%}
+body:has(.gridplots.induction-faithful) .motor-secondary #timeValue{flex-basis:58px;min-width:58px;width:58px}
+body:has(.gridplots.induction-faithful) .motor-secondary>button{font-size:12px;padding:6px 8px;white-space:nowrap;flex-shrink:0}
+body:has(.gridplots.induction-faithful) .motor-secondary #reset{flex-basis:60px;min-width:60px;width:60px}
+}
+@media(max-width:899px){.motor-control-row{display:contents}}
+body:has(.gridplots.induction-faithful) .motor-number-slider{display:flex;align-items:center;gap:5px;min-width:0;width:100%}
+body:has(.gridplots.induction-faithful) .motor-number-slider input[type=range]{display:block;flex:1 1 50px;width:0;min-width:25px;accent-color:#007e6c;margin:0}
+body:has(.gridplots.induction-faithful) .motor-control-row .motor-number-slider input[type=number]{flex:0 0 48px;width:48px;min-width:0;padding:5px 3px;font-size:11px}
+body:has(.gridplots.induction-faithful) .metric-checks{align-items:center;gap:7px 12px}
+body:has(.gridplots.induction-faithful) .metric-checks #clearMetrics{margin-left:auto;flex:0 0 auto;font-size:12px;padding:5px 8px;white-space:nowrap}
+@media(min-width:1100px){body:has(.gridplots.induction-faithful) .metric-checks{flex-wrap:nowrap}body:has(.gridplots.induction-faithful) .metric-checks label{white-space:nowrap;font-size:11px}}
+
+/* Give the space released by the angle control to precise speed adjustment. */
+body:has(.gridplots.induction-faithful) .motor-secondary>.control:has(#tempo){flex:0 0 120px;width:120px}
+
+/* Put the label above the full-width tempo select instead of squeezing both inline. */
+body:has(.gridplots.induction-faithful) .motor-secondary>.control:has(#tempo){display:flex;flex-direction:column;align-items:stretch;gap:3px;flex:0 0 132px;width:132px;min-width:132px}
+body:has(.gridplots.induction-faithful) .motor-secondary label[for=tempo]{white-space:nowrap}
+body:has(.gridplots.induction-faithful) .motor-secondary #tempo{width:100%;min-width:0;max-width:none;white-space:nowrap;padding-right:24px}
+
+/* Use one small gap between the control panel, curve choices and plots. */
+#app>.workspace[data-module="10-asynchronni"]>.controls{margin-bottom:6px}
+#app>.workspace[data-module="10-asynchronni"]>.metric-picker{margin:0 0 6px}
+#app>.workspace[data-module="10-asynchronni"]>.gridplots{gap:8px}

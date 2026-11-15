@@ -1,0 +1,38 @@
+<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Samostatně pracující generátor</title><style>/*STYLE*/</style>/*KATEX*/</head><body><main>
+<header><h1>Samostatně pracující generátor</h1></header>
+<div class="layout">
+<aside class="panel settings"><h2>Hladký synchronní generátor</h2><p class="muted">Symetrická třífázová zátěž · ustálený stav</p>
+<h3>Zátěž</h3><div id="loadTypes" class="load-types" aria-label="Druh zátěže">
+<button data-load="R">R</button><button data-load="L">L</button><button data-load="C">C</button><button data-load="RL" aria-pressed="true">R–L</button><button data-load="RC">R–C</button></div>
+<label class="control"><span>Fázový posun <span data-math="\varphi"></span><output id="phiOut"></output></span><input id="phi" type="range" min="0" max="90" value="30" step="1"></label>
+<label class="control"><span>Zatížení <span data-math="|I_a|/I_k"></span><output id="loadOut"></output></span><input id="load" type="range" min="0" max="1" value=".5" step=".005"></label>
+<p class="small">Mění se velikost impedance při zvoleném účiníku. Levý kraj: naprázdno.</p>
+<div id="loadValues" class="load-values"></div><p id="status" class="status" aria-live="polite"></p>
+<h3>Buzení a otáčky</h3>
+<label class="control"><span>Buzení <span data-math="I_b/I_{bN}"></span><output id="eOut"></output></span><input id="e" type="range" min=".4" max="1.8" step=".01" value="1.15"></label>
+<label class="control"><span>Otáčky <span data-math="n/n_N"></span><output id="speedOut"></output></span><input id="speed" type="range" min=".7" max="1.3" step=".01" value="1"></label>
+<h3>Parametry stroje</h3>
+<label class="control"><span><span data-math="X_s\;(n=n_N)"></span><output id="xOut"></output></span><input id="x" type="range" min=".4" max="2" step=".01" value="1"></label>
+<label class="control"><span><span data-math="R_a"></span><output id="rOut"></output></span><input id="r" type="range" min="0" max=".4" step=".01" value="0"></label>
+<p class="small">Napětí, proudy a impedance v poměrných jednotkách. Otáčky udržuje pohon.</p>
+<button id="reset">Výchozí nastavení</button>
+</aside>
+<section class="panel graph-panel"><div class="heading"><h2>Vnější charakteristika</h2></div>
+<div id="metrics" class="metrics"></div>
+<div class="chart-shell"><svg id="plot" viewBox="0 0 600 600" role="img" aria-label="Svorkové napětí v závislosti na proudu dodávaném do zátěže"></svg></div>
+<div id="legend" class="legend"></div><p id="plotNote" class="plot-note"></p>
+
+</section>
+<aside class="panel pictures"><section><h2>Fázorový diagram</h2><button id="rescale">Přeškálovat fázory</button><svg id="phasor" viewBox="0 0 330 310" role="img" aria-label="Napětí a proud v generátorické konvenci"></svg><p class="small">Proud <span data-math="\overline I_a"></span> má kladný směr do stroje, stejně jako v ostatních modulech. Generátor dodává proud opačným směrem. Napětí a proud mají samostatná, pevná měřítka.</p></section>
+<section class="machine-box"><h2>Toky a proudy ve stroji</h2><svg id="machine" viewBox="25 10 510 510" role="img" aria-label="Hladký rotor, směry magnetických toků a okamžitých proudů"></svg>
+<div class="flux-legend"><span class="gold" data-math="\Phi_b"></span> buzení <span class="blue" data-math="\Phi_a"></span> reakce kotvy <span class="green" data-math="\Phi"></span> výsledný</div>
+<p id="reaction" class="small"></p><p class="small">⊙ proud k pozorovateli · ⊗ od pozorovatele<br>Plné šipky: toky. Čárkované: indukovaná napětí. Tečkovaná: proud kotvy. Veličiny mají samostatná měřítka.</p></section></aside>
+</div>
+<div class="equations"><div id="equation"></div><div id="powerEquation"></div><p class="small" data-math="u=U_a/U_{ib},\quad i=|I_a|/I_k,\quad I_k=U_{ib}/\sqrt{R_a^2+X_s^2}"></p></div>
+<details class="panel explanation"><summary>Jak číst charakteristiku a co model zahrnuje</summary>
+<p>Každá křivka platí při stálém buzení, otáčkách a účiníku. Fázový posun zátěže je kladný pro L a záporný pro C; vztahuje se k proudu dodávanému do zátěže, který má opačný směr než fázor proudu do stroje. Zatížení volí proud od nuly do proudu nakrátko; odpovídající impedance zátěže se dopočítá z napětí a proudu. R–L a R–C jsou sériové ekvivalenty. Pro samotné R, L a C je fázový posun pevný.</p>
+<p>Barevné oblasti odděluje odporová charakteristika, nikoli vodorovná čára napětí naprázdno. Čárkovaná vodorovná čára označuje napětí naprázdno. Kreslíme větev navazující na chod naprázdno v rozsahu do proudu nakrátko; srovnávací kapacitní charakteristiky zachycují i pokračování za tento rozsah.</p>
+<p>Lineární magnetický obvod, hladký rotor, konstantní synchronní reaktance při dané frekvenci. Nezahrnuje nasycení, přechodové jevy ani regulátory. Změna otáček mění frekvenci, indukované napětí i reaktanci. Při změně zátěže se otáčky nemění.</p>
+<p>V piktogramu používáme rozptylovou reaktanci <span data-math="X_{a\sigma}=0{,}15\,n/n_N"></span>. Budicí tok a reakce kotvy dávají výsledný hlavní tok. Piktogram ukazuje základní prostorovou harmonickou; nejde o výpočet místního rozložení indukce v zubech.</p>
+<p>Normalizovaný graf používá velikost proudu; fázor proudu má kladný směr do stroje.</p>
+</details></main>/*SCRIPTS*/</body></html>

@@ -1,0 +1,316 @@
+#group-dc,.group-nav a[data-group="dc"]{--section-wash:#edf7f3;--section-head:#d7eee5;--section-line:#aed2c4}
+.dc-workspace{color:#233f49}
+.dc-workspace .dc-intro{display:flex;align-items:center;justify-content:space-between;gap:20px;height:45px}
+.dc-workspace .learning-lead{font-size:18px;margin:0;max-width:none;color:#405f54}
+.dc-workspace .dc-stage{white-space:nowrap;color:#8a642e;font-size:13px}
+.dc-workspace .dc-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;height:48px}
+.dc-workspace .learning-tabs,.dc-workspace .dc-transport{display:flex;gap:8px;margin:0}
+.dc-workspace button{padding:7px 13px;font-size:14px;border:1px solid #c7d9cf;border-radius:7px;background:#fff;color:#284c3d;cursor:pointer}
+.dc-workspace button[aria-pressed=true]{background:#007e6c;color:#fff;border-color:#007e6c}
+.dc-workspace .dc-controls{display:flex;align-items:center;gap:24px;border:1px solid #d7e3dc;background:#f3f7f2;border-radius:10px;padding:10px 16px;margin:5px 0 12px;height:70px;box-sizing:border-box}
+.dc-workspace .dc-controls>label:not(.dc-field-control){display:grid;grid-template-columns:1fr auto;gap:3px 20px;width:330px;font-size:14px;font-weight:600}
+.dc-workspace .dc-controls input[type=range]{grid-column:1/-1;width:100%;margin:0;accent-color:#007e6c}
+.dc-workspace .dc-controls output{height:22px}.dc-workspace .dc-field-control{font-size:14px;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.dc-workspace .dc-controls-note{font-size:13px;color:#61766a;max-width:260px}
+.dc-workspace .dc-visual-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:12px;height:625px}
+.dc-workspace .learning-panel{padding:14px 16px;border-radius:12px;border:1px solid #d4e0d8;background:#fff;min-width:0}
+.dc-workspace .learning-panel h2{font-size:17px;font-weight:600;margin:0;line-height:24px}
+.dc-workspace .dc-scene-panel{display:flex;flex-direction:column;min-height:0}
+.dc-workspace #dc-scene{width:100%;height:0;flex:1;min-height:0;display:block}
+.dc-workspace .dc-charts{display:grid;grid-template-rows:1fr 1fr;gap:12px;min-height:0}
+.dc-workspace .dc-chart-panel{display:flex;flex-direction:column;min-height:0}
+.dc-workspace .dc-chart-panel svg{width:100%;height:0;flex:1;min-height:0}
+.dc-workspace .dc-chart-legend{display:flex;justify-content:center;gap:15px;align-items:center;height:25px;font-size:13px}
+.dc-workspace .dc-chart-legend>span{display:flex;gap:6px;align-items:center}
+.dc-workspace .dc-chart-legend i{width:17px;height:3px;display:inline-block;border-radius:2px}
+.dc-workspace .dc-insight{display:grid;grid-template-columns:220px minmax(0,1fr) 360px;align-items:center;gap:20px;height:88px;margin-top:12px;padding:8px 18px;background:#edf5ef;border:1px solid #d2e3d7;border-radius:10px;box-sizing:border-box}
+.dc-workspace .dc-insight strong{font-size:17px}.dc-workspace .dc-insight p{font-size:14px;line-height:1.55;margin:0}
+.dc-workspace #dc-formula{font-size:19px;text-align:center}
+.dc-workspace .dc-bottom{display:flex;justify-content:space-between;align-items:center;gap:20px;height:35px}
+.dc-workspace #dc-model-note{font-size:12px;color:#718178;margin:0}
+.dc-workspace .learning-explanation{margin:0;font-size:13px;white-space:nowrap}
+.dc-workspace .learning-explanation p{white-space:normal}
+.dc-workspace .learning-links{justify-content:space-between;margin:3px 0 0;font-size:13px;height:24px}
+.dc-workspace svg text{font-family:system-ui,"Segoe UI",sans-serif}
+.dc-workspace [hidden]{display:none!important}
+
+.dc-workspace .dc-layer-controls{display:grid;grid-template-columns:repeat(3,max-content);gap:8px 18px}
+.dc-workspace .dc-rotor-hit{cursor:grab;touch-action:none}
+.dc-workspace .dc-dragging,.dc-workspace .dc-dragging .dc-rotor-hit{cursor:grabbing}
+
+.dc-princip-workspace .dc-controls>label:not(.dc-field-control){width:225px;flex:1;min-width:120px}
+.dc-princip-workspace .dc-visual-grid{height:670px}
+
+.dc-princip-workspace .dc-controls{height:100px}
+.dc-princip-workspace .dc-visual-grid{height:640px}
+
+.dc-princip-workspace .dc-visual-grid{height:688px}
+
+.dc-princip-workspace .dc-insight{height:48px;padding:4px 14px;grid-template-columns:180px 1fr 240px;gap:12px}
+.dc-princip-workspace .dc-insight p{font-size:13px;line-height:1.25}
+.dc-princip-workspace .actions select{font:inherit;border:1px solid #c7d9cf;border-radius:7px;color:#284c3d;background:white}
+
+.dc-princip-workspace .dc-bottom,.dc-princip-workspace .learning-links{display:none}
+.dc-princip-workspace .modulehead .learning-explanation{font-size:12px;align-self:center}
+
+.dc-explore .dc-visual-grid{grid-template-columns:minmax(0,1fr)}
+.dc-explore .dc-charts{display:none}
+
+.dc-simple-workspace .dc-controls{height:90px;gap:22px}
+.dc-simple-workspace .dc-controls>label{flex:1;min-width:140px}
+.dc-simple-workspace .dc-layer-controls{grid-template-columns:repeat(2,max-content);font-size:14px}
+.dc-simple-workspace .dc-simple-panel{height:710px;padding:0;display:flex;align-items:center;justify-content:center}
+.dc-simple-workspace #simple-scene{width:100%;height:100%;display:block;touch-action:none}
+.dc-simple-workspace .dc-simple-caption{display:flex;justify-content:space-between;gap:24px;padding:8px 4px;font-size:12px;color:#718780}
+
+/* Fixed natural geometry inherits the application's centered automatic fit. */
+.dc-compose .compose-steps{display:flex;align-items:center;gap:10px;height:48px}
+.dc-compose .compose-steps span{font-size:13px;color:#607680;margin-left:auto}
+.dc-compose .compose-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0}
+.dc-compose .compose-controls>label{display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px;padding:9px 14px;border:1px solid color-mix(in srgb,var(--field-color) 35%,white);border-left:4px solid var(--field-color);background:color-mix(in srgb,var(--field-color) 7%,white);border-radius:7px;font-size:15px}
+.dc-compose input[type=range]{width:100%;grid-column:1/-1;accent-color:var(--field-color,#007e6c);margin:0}
+.dc-compose .compose-parameters{display:grid;grid-template-columns:1fr 1.2fr 1fr 1.2fr;gap:24px;padding:8px 12px;margin-bottom:10px;background:#f1f5f6;border:1px solid #d7e1e4;border-radius:8px}
+.dc-compose .compose-parameters>label{display:grid;grid-template-columns:1fr auto;gap:5px;font-size:14px;align-items:center}
+.dc-compose .compose-options{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px}
+.dc-compose .compose-panel{height:650px;padding:4px;display:flex}
+.dc-compose #compose-scene{width:100%;height:100%;display:block}
+.dc-compose .compose-explanation{display:grid;grid-template-columns:1fr 430px;gap:20px;align-items:center;background:#edf5f2;border:1px solid #cddfd6;border-radius:8px;padding:8px 14px;margin-top:10px;height:58px;box-sizing:border-box}
+.dc-compose .compose-explanation p{font-size:14px;margin:0;line-height:1.4}
+.dc-compose .compose-explanation>div{text-align:center;font-size:19px}
+.dc-compose .compose-note{font-size:12px;color:#657a80;margin:8px 0;line-height:1.4}
+
+.dc-armature-workspace .arm-controls{height:84px;gap:22px;margin:6px 0 8px}
+.dc-armature-workspace .arm-controls>label{flex:1;min-width:0;width:auto!important;font-size:13px!important;gap:4px 8px!important}
+.dc-armature-workspace .arm-options{display:grid;gap:7px;font-size:13px;white-space:nowrap}
+.dc-armature-workspace .arm-options label{display:flex;gap:6px;align-items:center}
+.dc-armature-workspace .arm-presets{display:flex;align-items:center;gap:8px;height:34px;margin-bottom:10px}
+.dc-armature-workspace .arm-presets button{font-size:13px;padding:5px 11px}
+.dc-armature-workspace .arm-presets span{margin-left:auto;font-size:13px;color:#657b79}
+.dc-armature-workspace .dc-visual-grid{height:650px;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr)}
+.dc-armature-workspace #arm-scene{width:100%;height:0;flex:1;min-height:0;display:block;touch-action:none}
+.dc-armature-workspace .arm-summary{display:grid;grid-template-columns:minmax(0,1fr) 210px 300px;align-items:center;gap:16px;margin-top:10px;height:58px;padding:8px 14px;border:1px solid #d2e3d7;border-radius:10px;background:#edf5ef;font-size:14px}
+.dc-armature-workspace .arm-summary>div:not(:first-child){text-align:center;font-size:19px}
+.dc-armature-workspace .arm-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;height:38px;font-size:12px;color:#657b79}
+.dc-armature-workspace .arm-foot button{font-size:12px;padding:4px 9px}
+.arm-explanation{width:min(900px,90vw);max-height:85vh;padding:24px;border:1px solid #c7d9cf;border-radius:12px;color:#233f49;background:#fff;font:16px/1.55 system-ui}
+.arm-explanation::backdrop{background:#19313b55}
+.arm-explanation>button{float:right}
+.arm-explanation>div{font-size:19px;margin:18px 0;text-align:center}
+
+/* Same 1600 × 1000 baseline and host fitting as the other machine windows. */
+#app>.workspace.dc-workspace{height:var(--native-viewport-height,1000px)!important;min-height:0!important;display:flex;flex-direction:column;box-sizing:border-box}
+#app>.workspace.dc-workspace>*{flex-shrink:0}
+#app>.workspace.dc-workspace>.dc-visual-grid,
+#app>.workspace.dc-workspace>.dc-simple-panel,
+#app>.workspace.dc-workspace>.compose-panel{flex:1 1 0;height:auto;min-height:0}
+.dc-compose .compose-toolbar{display:flex;align-items:center;gap:12px;min-height:66px;margin:4px 0}
+.dc-compose .compose-toolbar>label{display:grid;grid-template-columns:1fr auto;gap:5px 12px;width:330px;margin-right:auto;font-size:14px}
+.dc-compose .compose-toolbar button{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.dc-compose #compose-range-value{font-size:13px;min-width:150px;text-align:center}
+.dc-compose .compose-panel{position:relative}
+.dc-compose .compose-detail-panel{position:absolute;bottom:12px;left:12px;width:660px;padding:12px;border:1px solid #91aaa5;border-radius:10px;background:#fffffff5;box-shadow:0 5px 24px #233f492a;z-index:3}
+.dc-compose .compose-detail-panel>div{display:flex;justify-content:space-between;align-items:center;font-size:15px}
+.dc-compose .compose-detail-panel>svg{display:block;width:100%;height:286px}
+.dc-compose .compose-detail-panel>p{font-size:12px;margin:0;color:#536972;line-height:1.4}
+.dc-compose .compose-options{grid-template-columns:1fr 1fr;gap:3px 8px}
+.dc-compose .compose-controls>label{display:flex;align-items:center;min-height:42px;box-sizing:border-box}
+.dc-compose .compose-controls>label>span{display:flex;align-items:center;gap:8px}
+/* Current controls live with their winding switches; one shared series current. */
+.dc-compose .compose-integrated-controls{grid-template-columns:1fr 2fr 1.25fr;align-items:stretch;gap:12px;margin:5px 0 10px}
+.dc-compose .compose-current-card{display:grid;grid-template-columns:1fr;gap:5px;padding:8px 12px;border:1px solid #d6dfdf;border-left:4px solid var(--field-color,#346fc0);border-radius:8px;background:color-mix(in srgb,var(--field-color,#346fc0) 6%,white);min-width:0}
+.dc-compose .compose-winding-toggle{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--field-color,#233f49)}
+.dc-compose .compose-series-toggles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dc-compose .compose-current-slider{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:#536972}
+.dc-compose .compose-current-slider output{font-size:14px;color:#233f49;white-space:nowrap}
+.dc-compose .compose-integrated-controls>.compose-options{border:1px solid #d6dfdf;border-radius:8px;padding:8px 10px;background:#f3f6f5;align-content:center;font-size:13px}
+.dc-compose .compose-toolbar>label{width:240px;min-width:190px;margin-right:4px}
+.dc-compose .compose-toolbar{gap:10px;min-height:58px}
+.dc-compose .compose-toolbar #compose-detail{margin-left:auto}
+
+.dc-compose .compose-toolbar>label{width:190px;min-width:170px}
+.dc-compose .compose-toolbar>.compose-quantity-label{width:175px;min-width:175px;grid-template-columns:1fr}
+.dc-compose #compose-quantity{width:100%;font:inherit;color:#233f49;background:white;border:1px solid #bdcfc9;border-radius:6px;padding:5px}
+/* Reserve space for the complete signed brush angle; keep KaTeX on one line. */
+.dc-compose .compose-toolbar>label:has(#compose-brush){width:240px;min-width:240px;grid-template-columns:minmax(0,1fr) 78px;margin-left:10px}
+.dc-compose .compose-toolbar output{white-space:nowrap;min-width:max-content;text-align:right}
+.dc-compose .compose-toolbar output .katex{white-space:nowrap}
+.dc-compose .compose-detail-width{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin:8px 0 0;font-size:14px}
+.dc-compose .compose-detail-width input{grid-column:1/-1;width:100%}
+.dc-compose .compose-detail-width output{white-space:nowrap}
+.dc-compose #compose-fit{background:#dcefe9;border-color:#79b5a5;color:#006d5c;font-weight:600}
+.dc-compose #compose-fit:hover{background:#c9e7dd;border-color:#41967f}
+.dc-compose #compose-fit:focus-visible{outline:3px solid #008675;outline-offset:3px}
+/* Operating lessons reuse the synchronous circuit's quiet palette and component symbols. */
+.dc-operating .op-controls,.dc-bldc .bc-controls{display:flex;gap:18px;align-items:center;padding:12px 16px;background:#edf4f0;border:1px solid #ceded5;border-radius:10px;margin:8px 0 12px}
+.dc-operating .op-controls label,.dc-bldc .bc-controls label{display:grid;grid-template-columns:1fr auto;gap:6px 10px;flex:1;min-width:110px;font-size:14px}
+.dc-operating input[type=range],.dc-bldc input[type=range]{grid-column:1/-1;width:100%;accent-color:#007e6c}
+.dc-operating output,.dc-bldc output{white-space:nowrap}
+.dc-operating select{grid-column:1/-1;border:1px solid #c7d9cf;border-radius:6px;background:white;padding:7px;color:#233f49;font:inherit}
+.dc-operating .op-controls label:has(input:disabled){opacity:.45}
+.dc-operating .op-tabs{display:flex;gap:8px;margin:8px 0}
+.op-details-workspace .op-tabs{display:none}
+.dc-operating.op-details-workspace .op-reaction-controls{margin-top:0}
+.dc-operating .op-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0}
+.dc-operating .op-cards>div{background:white;border:1px solid #d6e3dc;border-left:4px solid var(--dc-accent);border-radius:8px;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.dc-operating .op-cards>div>span{font-size:13px;color:#60776b}.dc-operating .op-cards strong{font-size:20px;color:var(--dc-accent);font-weight:500;white-space:nowrap}
+.dc-operating #op-scheme{width:100%;height:365px;display:block}
+.dc-operating .op-schematic-label foreignObject>div{height:38px;display:flex;align-items:center;justify-content:center}
+.op-details-workspace .op-overview{display:grid;grid-template-columns:minmax(0,1fr) 260px;align-items:center;gap:20px}
+.op-details-workspace .op-overview #op-scheme{height:auto;aspect-ratio:1240/430;min-width:0}
+.op-details-workspace .op-overview .op-cards{grid-template-columns:minmax(0,1fr);gap:12px;margin:0}
+.op-details-workspace .op-overview .op-cards>div{display:grid;gap:8px;padding:12px 14px}
+.op-details-workspace .op-overview .op-cards strong{font-size:21px}
+.dc-operating .op-plots{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.dc-operating .op-plots svg{display:block;width:100%;height:235px}
+.dc-operating .op-plots h2,.dc-bldc h2{font-size:16px;margin:0 0 8px}
+.dc-workspace .op-insight{padding:12px 18px;background:#eaf4ef;border:1px solid #ceded5;border-radius:9px;font-size:15px;line-height:1.5;margin:10px 0 4px}
+.dc-workspace .op-note{font-size:12px;color:#718178;margin:6px 0}
+.dc-bldc .bc-sectors{display:flex;gap:8px;margin:8px 0}.dc-bldc .bc-sectors button{flex:1}
+.dc-bldc .bc-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dc-bldc #bc-bridge{display:block;width:100%;height:680px}
+.dc-bldc .bc-right{display:grid;grid-template-rows:280px 1fr;gap:12px}
+.dc-bldc #bc-machine,.dc-bldc #bc-diagram{width:100%;height:100%;display:block}
+.dc-bldc .bc-wave-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.dc-bldc #bc-wave{display:block;width:100%;height:auto;aspect-ratio:760/160}
+.dc-bldc .bc-wave-row .learning-panel{padding:12px 16px}
+.dc-bldc .bc-wave-row h2{font-size:15px;margin:0 0 4px}
+.dc-bldc .bc-wave-row .op-insight{margin:0;padding:12px 16px}
+.dc-bldc .bc-wave-row .op-insight p{margin:6px 0;font-size:13px}
+.dc-bldc .bc-controls button{white-space:nowrap}
+.dc-operating .op-reaction-controls{display:flex;align-items:center;gap:18px;padding:10px 16px;margin:8px 0;border:1px solid #e2d4b6;border-radius:9px;background:#fff9ec}
+.dc-operating .op-reaction-controls label{display:grid;grid-template-columns:1fr auto;gap:5px 12px;flex:1;font-size:14px}
+.dc-operating .op-reaction-controls button{white-space:nowrap}
+.dc-commutation .cm-controls{display:flex;align-items:center;gap:16px;padding:12px 16px;background:#edf4f0;border:1px solid #ceded5;border-radius:10px;margin:8px 0}
+.dc-commutation .cm-controls label{display:grid;grid-template-columns:1fr auto;gap:7px;flex:1;font-size:14px}
+.dc-commutation input[type=range]{grid-column:1/-1;width:100%;accent-color:#008372}
+.dc-commutation output{white-space:nowrap}.dc-commutation .cm-tabs{display:flex;gap:8px;margin:12px 0}
+.dc-commutation .cm-tabs button[aria-pressed=true]{background:#dcefe7;border-color:#72a990;color:#006653}
+.dc-commutation .cm-main,.dc-commutation .cm-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.dc-commutation h2{font-size:17px;margin:0 0 8px}.dc-commutation #cm-scene{display:block;width:100%;height:345px}
+.dc-commutation #cm-diagram{display:block;width:100%;height:275px}.dc-commutation .cm-bottom svg{display:block;width:100%;height:230px}
+.dc-commutation .cm-equations{display:flex;flex-direction:column;align-items:center;gap:9px;min-height:62px;padding:8px;font-size:18px}
+.dc-commutation .cm-values{display:flex;justify-content:space-around;padding:12px;background:#f2f7f4;font-size:19px}
+.dc-commutation .op-insight{min-height:92px}.dc-commutation .op-note{font-size:12px;color:#718178}
+
+.dc-winding .wc-toolbar{display:flex;align-items:center;gap:10px;margin:8px 0 12px}.dc-winding .wc-toolbar span{margin-left:auto;font-size:17px}.dc-winding .wc-controls{display:flex;align-items:center;gap:16px;background:#edf4f0;border:1px solid #ceded5;border-radius:10px;padding:12px 16px;margin-bottom:12px}.dc-winding .wc-controls label{display:grid;grid-template-columns:1fr auto;gap:6px;flex:1;font-size:14px}.dc-winding input[type=range]{grid-column:1/-1;width:100%;accent-color:#008372}.dc-winding select{grid-column:1/-1;padding:5px;border:1px solid #c7d9cf;border-radius:5px;background:white;color:inherit}.dc-winding button:disabled{opacity:.4;cursor:default}.dc-winding .wc-main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:12px;height:570px}.dc-winding h2{font-size:18px;margin:0 0 10px}.dc-winding #wc-scene{display:block;width:100%;height:465px}.dc-winding #wc-equation{text-align:center;padding:8px;font-size:19px}.dc-winding .wc-explain p{font-size:15px;line-height:1.55;margin:10px 0}.dc-winding #wc-facts{display:grid;gap:10px;background:#f2f7f4;padding:12px;font-size:18px}.dc-winding #wc-detail{display:block;width:100%;height:210px}.dc-winding #wc-caption{font-size:13px;color:#657b79}.dc-winding .op-insight{height:68px;box-sizing:border-box}.dc-winding output{white-space:nowrap}
+/* Use the shared fitted canvas; drawings fill the space left by fixed controls. */
+#app>.workspace.dc-winding>.wc-main{flex:1 1 0;height:auto;min-height:0}
+.dc-winding .wc-main>.learning-panel{display:flex;flex-direction:column;min-height:0}
+.dc-winding .wc-main>.learning-panel>:not(svg){flex-shrink:0}
+.dc-winding #wc-scene,.dc-winding #wc-detail{flex:1 1 0;height:0;min-height:0;width:100%}
+.dc-winding #wc-spatial{display:block;flex:1.15 1 0;height:0;min-height:0;width:100%}
+.dc-winding #wc-spatial-heading{font-size:16px;margin:8px 0 0}
+.dc-winding .wc-controls label{min-width:0}
+.dc-winding .wc-controls button{white-space:nowrap}
+/* Drive: primary controls above two equal charts; secondary tools overlay the canvas. */
+#app>.workspace.dc-drive{position:relative}
+.dc-drive .learning-panel{padding:10px 14px;min-width:0;box-sizing:border-box}
+.dc-drive .dd-control-panel{margin:6px 0 8px}
+.dc-drive .dd-methods,.dc-drive .dd-toolbar{display:flex;align-items:center;gap:8px}
+.dc-drive .dd-methods{margin-bottom:8px}
+.dc-drive #dd-details{margin-left:auto;background:#fff3d9;border-color:#dfc58e;color:#79551d}
+.dc-drive #dd-details:hover{background:#ffebc1}
+.dc-drive #dd-details:focus-visible{outline:2px solid #a76914;outline-offset:3px}
+.dc-drive .dd-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.dc-drive .dd-controls>label,.dc-drive .dd-advanced-controls>label{display:block;font-size:14px;min-width:0}
+.dc-drive .dd-advanced-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,.85fr) minmax(0,.65fr) auto;gap:18px;align-items:center;border-top:1px solid #dce5df;margin-top:8px;padding-top:8px}
+.dc-drive .dd-advanced-controls>label:has(select){display:grid;gap:4px}
+.dc-drive .dd-advanced-controls>label:has(input[type=checkbox]){display:flex;align-items:center;gap:7px;white-space:nowrap}
+.dc-drive label>span{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dc-drive output{white-space:nowrap;color:#007e6c}
+.dc-drive input[type=range]{width:100%;accent-color:#007e6c;margin:7px 0 0}
+.dc-drive select{font:inherit;color:#284c3d;border:1px solid #cadbd0;border-radius:5px;padding:5px;background:white}
+.dc-drive .dd-toolbar{margin-top:5px;font-size:13px}
+.dc-drive .dd-toolbar button{font-size:13px;padding:6px 10px}
+.dc-drive #dd-held{margin-left:auto;color:#617a6d;font-size:13px}
+.dc-drive #dd-brake{background:#fff0e8;border-color:#d3a08b;color:#994d31}
+.dc-drive #dd-brake[aria-pressed=true]{background:#b15a3b;color:white}
+#app>.workspace.dc-drive>.dd-layout{flex:1 1 0;min-height:0;height:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dc-drive .dd-envelope,.dc-drive .dd-chart-panel{display:grid;min-height:0;grid-template-rows:28px 24px minmax(0,1fr) 26px}
+.dc-drive .dd-chart-panel{grid-template-rows:28px 24px minmax(0,1fr) 26px}
+.dc-drive h2{font-size:17px;margin:0}
+.dc-drive #dd-envelope,.dc-drive #dd-plot{display:block;width:100%;height:100%;min-height:0}
+.dc-drive #dd-plot{touch-action:none;cursor:crosshair}
+.dc-drive .dd-envelope p{font-size:13px;line-height:1.4;color:#617a6d;margin:4px 0 0}
+.dc-drive .dd-legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;color:#617a6d}
+.dc-drive .dd-legend>span:before{content:'';display:inline-block;width:17px;height:3px;background:var(--c);vertical-align:middle;margin-right:6px}
+#app>.workspace.dc-drive>.dd-support{flex:0 0 92px;height:92px;min-height:0;margin-top:8px}
+.dc-drive .dd-feedback{height:92px;display:grid;grid-template-columns:1fr 1.5fr;grid-template-rows:49px 20px;gap:3px 14px;padding:8px 12px}
+.dc-drive .dd-status{align-self:center;border-left:3px solid #007e6c;background:#edf6f0;padding:8px 10px;margin:0;font-size:14px;line-height:1.4}
+.dc-drive .dd-readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:center}
+.dc-drive .dd-readouts>div{min-width:0;border-left:1px solid #dce5df;padding-left:10px}
+.dc-drive .dd-readouts>div>span{display:block;color:#6c8175;font-size:12px;margin-bottom:4px}
+.dc-drive .dd-readouts strong{display:block;font-size:16px;font-weight:500;color:#245945;white-space:nowrap}
+.dc-drive .dd-warning{grid-column:1/-1;margin:0;color:#a4662b;font-size:12px;line-height:1.4}
+.dc-drive .dd-theory{position:absolute;z-index:20;box-shadow:0 10px 45px #24463b40;border:1px solid #8daf9e;background:#fff;border-radius:9px}
+.dc-drive .dd-theory[hidden],.dc-drive .dd-controls>label[hidden]{display:none}
+.dc-drive .dd-theory h2{display:flex;justify-content:space-between;align-items:center;font-size:19px;margin-bottom:14px}
+.dc-drive .dd-theory{top:150px;left:3%;right:3%;padding:24px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px 28px;align-items:center}
+.dc-drive .dd-theory h2,.dc-drive .dd-theory-summary{grid-column:1/-1}
+.dc-drive .dd-theory-summary{display:grid;grid-template-columns:390px 250px minmax(0,1fr);align-items:center;gap:28px;background:#fffaf0;padding:12px 16px;border-radius:6px}
+.dc-drive #dd-compact-circuit{width:100%;height:164px;display:block}
+.dc-drive #dd-equation-values{font-size:20px;line-height:1.9;white-space:nowrap}
+.dc-drive #dd-control-note{font-size:16px;line-height:1.6;color:#526e60;margin:0}
+.dc-drive #dd-circuit{height:310px;width:100%;display:block}
+.dc-drive .dd-schematic-label foreignObject>div{height:38px;display:flex;align-items:center;justify-content:center}
+.dc-drive .dd-derive{display:flex;flex-direction:column;gap:18px;align-items:center;font-size:21px;min-width:0}
+.dc-drive .dd-derive>small{font-size:13px;color:#75897e}
+.dc-drive .dd-key-equation{width:100%;text-align:center;background:#fff4bd;border:1px solid #ebd686;padding:7px 2px;border-radius:5px;font-size:22px}
+.dc-drive .dd-model-note{grid-column:1/-1;font-size:14px;color:#617a6d;line-height:1.5;margin:0}
+
+/* An explicit display fraction and a tall SVG math box prevent clipping. */
+.dc-drive .dd-graph-equation{display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;height:100%;padding:8px 10px;background:#fffffff2;border:1px solid #d6e2d9;border-radius:8px;color:#293e47;font-size:23px;white-space:nowrap;pointer-events:none}
+.dc-drive #dd-active-equation{pointer-events:none}
+
+/* Guided commutation: one large contact scene and one selectable measurement. */
+.dc-commutation .cm-main{grid-template-columns:1.18fr 1fr;margin-top:10px}
+.dc-commutation #cm-scene{height:430px}
+.dc-commutation #cm-diagram{height:310px;margin-top:14px}
+.dc-commutation button[aria-pressed=true]{background:#dcefe7;border-color:#72a990;color:#006653}
+.dc-commutation .cm-story{height:94px;box-sizing:border-box;border-left:4px solid #008372;background:#eef6f2;padding:12px 18px;border-radius:6px}
+.dc-commutation .cm-story strong{font-size:21px;color:#244b42}
+.dc-commutation .cm-story p{font-size:17px;line-height:1.45;margin:5px 0}
+.dc-commutation .cm-graph-tabs{display:flex;gap:6px}
+.dc-commutation .cm-graph-tabs button{flex:1;font-size:14px;padding:9px 5px}
+.dc-commutation .cm-equations{min-height:50px;font-size:18px}
+.dc-commutation .op-insight{min-height:76px;font-size:16px;line-height:1.45;margin:12px 0 5px}
+.dc-commutation .cm-tabs{margin:8px 0}
+
+.dc-commutation .cm-amount-help{min-height:42px;margin:6px 0 10px;font-size:15px;line-height:1.4;color:#536c62}
+
+/* Keep the teaching controls in a compact strip; help floats over the scene. */
+.dc-commutation{position:relative}
+.dc-commutation .cm-controls{padding:7px 12px;gap:16px;margin:5px 0}
+.dc-commutation .cm-controls label{gap:2px;font-size:13px}
+.dc-commutation .cm-controls input[type=range]{margin:1px 0;height:16px}
+.dc-commutation .cm-controls button{padding:7px 12px;font-size:13px}
+.dc-commutation .cm-controls .cm-help{width:20px;height:20px;padding:0;border-radius:50%;font-size:12px;line-height:18px;vertical-align:middle}
+.dc-commutation .cm-tabs{gap:6px;margin:5px 0}
+.dc-commutation .cm-tabs button{padding:6px 12px;font-size:13px}
+.dc-commutation .cm-amount-help{position:absolute;z-index:20;right:20px;top:120px;width:460px;box-sizing:border-box;min-height:0;margin:0;padding:14px 18px;border:1px solid #b8cec2;border-radius:8px;background:#f6fbf8;box-shadow:0 6px 20px #234b4230;font-size:15px;line-height:1.45}
+.dc-commutation .cm-amount-help[hidden]{display:none}
+.dc-commutation .cm-story{height:80px;padding:8px 14px}
+.dc-commutation .cm-story strong{font-size:19px}
+.dc-commutation .cm-story p{font-size:16px;line-height:1.35;margin:3px 0}
+
+.dc-commutation .cm-cause{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:54px;font-size:13px;color:#536c62}.dc-commutation .cm-cause span{flex:1;text-align:center}.dc-commutation .cm-cause .active{background:#fcf1d9;border-radius:5px;padding:7px}.dc-commutation #cm-identity{min-height:28px;padding:5px}.dc-commutation .cm-amount-help{width:580px}
+
+/* Follow the DC drive's fill-height contract; all extra space belongs to drawings. */
+#app>.workspace.dc-commutation>.cm-main{flex:1 1 0;min-height:0;height:auto;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr)}
+.dc-commutation .cm-main>.learning-panel{display:flex;flex-direction:column;min-height:0;gap:8px}
+.dc-commutation .cm-main>.learning-panel>:not(svg){flex-shrink:0}
+.dc-commutation #cm-scene,.dc-commutation #cm-diagram{flex:1 1 0;min-height:0;height:0;width:100%;margin:0;display:block}
+.dc-commutation .cm-equations{min-height:0;padding:4px;gap:4px}
+.dc-commutation #cm-overlap{flex-direction:row;justify-content:space-evenly;font-size:17px}
+.dc-commutation .cm-values{padding:7px;font-size:18px}
+.dc-commutation .cm-cause{min-height:62px;gap:12px}
+.dc-commutation .cm-cause span{min-width:0;line-height:1.45}
+.dc-commutation .cm-story{height:88px}
+.dc-commutation .op-insight{min-height:66px;box-sizing:border-box;padding:9px 14px}
+
+.dc-commutation .cm-legend{display:flex;justify-content:center;gap:24px;min-height:24px;align-items:center;font-size:15px;color:#536c62}
+.dc-commutation .cm-legend span{display:flex;align-items:center;gap:8px}
+.dc-commutation .cm-legend i{width:24px;height:3px;display:inline-block}
+.dc-commutation .cm-cause{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:64px;border-top:1px solid #dce7e0;padding-top:5px;text-align:center;font-size:17px}
+.dc-commutation .cm-cause small,.dc-commutation .cm-values small{display:block;font-size:13px;color:#61766a;margin-bottom:4px}
+.dc-commutation .cm-values{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:10px;min-height:48px}

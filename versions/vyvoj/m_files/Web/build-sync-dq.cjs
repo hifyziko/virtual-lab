@@ -1,0 +1,12 @@
+const fs=require('fs'),path=require('path'),vm=require('vm');
+const dir=path.join(__dirname,'synchronous'),ref=fs.readFileSync(path.join(dir,'schema.html'),'utf8');
+const styles=[...ref.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m=>m[1]);
+const mathCss=styles.find(s=>s.includes('@font-face')&&s.includes('KaTeX'));
+const lib=[...ref.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].find(m=>m[1].trim().startsWith('!function')&&m[1].includes('ParseError'))?.[1];
+if(!mathCss||!lib)throw Error('Offline mathematical typesetting not found');
+let html=fs.readFileSync(path.join(dir,'dq-template.html'),'utf8').replace('<!--KATEX-->',()=>'<style>'+mathCss+'</style><script>'+lib+'</script>');
+for(const [tag,file] of [['STYLE','dq.css'],['PRINCIPLE','princip-model.js'],['ART','machine-art.js'],['CONTOURS','../magnetic-field/contours.js'],['MODEL','dq-model.js'],['UI','dq.js']])html=html.replace('/*'+tag+'*/',()=>{let source=fs.readFileSync(path.join(dir,file),'utf8');if(file==='machine-art.js')source=source.replaceAll('${salient}','${opts.salientPath||salient}').replace('for(const x of [-74,74])','for(const x of [-68,68])').replaceAll('${x-22}','${x-11}').replaceAll('width="44" height="23"','width="22" height="23"').replace('[-13,0,13]','[-6,0,6]');return source;});
+if(!fs.existsSync(path.join(dir,'dq-field-basis.js')))require('./synchronous/build-dq-fields.cjs');
+const context={window:{}};vm.runInNewContext(fs.readFileSync(path.join(dir,'dq-field-basis.js'),'utf8'),context);const basis=context.window.SyncDQFieldBasis;
+html=html.replace('/*BASIS*/',()=> 'window.SyncFieldBasis='+JSON.stringify(basis)+';');
+fs.writeFileSync(path.join(dir,'dq.html'),html);console.log('Built d–q teaching experiment:',Buffer.byteLength(html),'bytes');

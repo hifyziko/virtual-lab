@@ -1,0 +1,131 @@
+.sk-blocks{max-width:1500px;padding:12px 22px 20px}
+.sk-blocks .modulehead h1{font-size:26px}
+.sk-blocks>.learning-lead{font-size:15px;margin:6px 0 10px}
+.sk-blocks>.learning-presets{margin:8px 0;gap:7px}
+.sk-blocks>.learning-presets button{padding:7px 11px;font-size:13px}
+.sk-settings{font-size:13px;margin:5px 0 10px}.sk-settings summary{cursor:pointer;color:#4a646b;padding:4px 0}.sk-settings .learning-controls{margin:6px 0}
+.sk-blocks>.learning-grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:stretch}
+.sk-blocks .learning-panel{padding:16px;border-radius:14px}
+.sk-blocks .learning-panel h2{font-size:19px;margin:0 0 7px}
+.sk-blocks .learning-panel>p{font-size:14px;line-height:1.45;margin:6px 0 10px}
+.sk-blocks #sk-geometry{width:100%;height:auto;aspect-ratio:680/610}
+.sk-blocks .sk-cancel-inline{padding:8px;margin:8px 0}
+.sk-blocks .sk-cancel-tools{gap:7px}.sk-blocks .sk-cancel-tools button{font-size:13px;padding:8px}.sk-blocks .sk-cancel-tools label{font-size:13px}
+.sk-blocks .sk-cancel-bottom{margin:5px 0 8px;gap:6px}.sk-blocks .sk-cancel-bottom p{font-size:14px;min-height:40px;padding:8px 10px}
+.sk-blocks .sk-scene-note{font-size:12px!important;margin:5px 0!important}
+.sk-blocks .sk-phasor-panel{display:flex;flex-direction:column}
+.sk-blocks #sk-phasors{width:100%;height:auto;flex:1;min-height:300px;max-height:440px}
+.sk-blocks .learning-stats{gap:8px;margin:12px 0}.sk-blocks .learning-stat{padding:11px}.sk-blocks .learning-stat>span{font-size:13px}.sk-blocks .learning-stat>strong{font-size:23px}
+.sk-blocks .learning-note{padding:11px;font-size:14px}
+.sk-geometry-values{border-top:1px solid #dbe5df;margin-top:auto;padding-top:8px}
+.sk-blocks .learning-equation{font-size:16px;padding:10px}
+.sk-block-stack{display:contents}.sk-block-stack .sk-spectrum-panel{grid-column:auto}
+.sk-blocks #sk-wave{max-height:190px}
+.sk-blocks .learning-table{font-size:14px;margin-top:8px}.sk-blocks .learning-table td,.sk-blocks .learning-table th{padding:9px 6px}
+.sk-blocks .learning-legend{font-size:13px;gap:10px}.sk-blocks>.learning-explanation{margin-top:12px;font-size:14px}.sk-blocks>.learning-links{margin-top:10px;font-size:14px}
+@media(max-width:850px){.sk-blocks{padding:12px}.sk-blocks>.learning-grid{grid-template-columns:1fr}.sk-blocks #sk-phasors{flex:none;min-height:0;max-height:380px}.sk-blocks .learning-stat>strong{font-size:21px}.sk-blocks .learning-panel{padding:13px}}
+/* One desktop rectangle: mechanism left, vector sum and wave right. */
+.sk-blocks{max-width:1500px;padding:8px 20px 12px}
+.sk-blocks>.learning-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:12px}
+.sk-blocks>.learning-lead{margin:4px 0 6px}
+.sk-blocks>.learning-presets{align-items:center;margin:6px 0;gap:6px}
+.sk-live-pitch{display:grid;grid-template-columns:1fr auto;gap:2px 8px;flex:1;min-width:230px;font-size:13px;color:#23434a}
+.sk-live-pitch input{grid-column:1/-1;width:100%;margin:0;accent-color:#007c69}.sk-live-pitch output{font-weight:700}
+.sk-settings{margin:2px 0 5px}.sk-settings>.learning-stats{max-width:700px}
+.sk-blocks .learning-panel{padding:12px}
+.sk-blocks .learning-panel h2{font-size:17px;margin-bottom:4px}
+.sk-blocks .learning-panel>p{font-size:13px;margin:4px 0 7px}
+.sk-blocks #sk-geometry{height:clamp(320px,calc(var(--native-viewport-height,100dvh) - 385px),540px);aspect-ratio:auto;width:100%}
+.sk-blocks .sk-cancel-inline{margin:5px 0;padding:5px}.sk-blocks .sk-cancel-tools button{padding:6px;font-size:12px}.sk-blocks .sk-cancel-tools label{font-size:12px}
+.sk-blocks .sk-cancel-bottom p{min-height:0;padding:6px 8px;font-size:13px;margin:3px 0}.sk-blocks .sk-cancel-bottom{margin:3px 0;gap:3px}
+.sk-blocks .sk-scene-note{font-size:11px!important;line-height:1.4}
+.sk-blocks .sk-phasor-panel{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-content:start;gap:4px 10px}
+.sk-phasor-panel>h2,.sk-phasor-panel>p,.sk-phasor-panel>.sk-wave-panel,.sk-phasor-panel>.sk-spectrum-panel{grid-column:1/-1}
+.sk-blocks #sk-phasors{min-height:0;height:210px;max-height:none;align-self:center}
+.sk-vector-results .learning-stats{grid-template-columns:1fr;margin:0;gap:4px}
+.sk-vector-results .learning-stat{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px}
+.sk-vector-results .learning-stat>span{font-size:12px}.sk-vector-results .learning-stat>strong{font-size:19px;white-space:nowrap;margin:0}
+.sk-vector-results .learning-note{font-size:12px;line-height:1.4;padding:6px 8px;margin:6px 0 0}
+.sk-wave-panel{border-top:1px solid #dbe5df;padding-top:6px}
+.sk-blocks .sk-wave-panel h2{font-size:15px}.sk-blocks #sk-wave{height:100px;max-height:none}
+.sk-blocks .learning-legend{font-size:12px}
+.sk-blocks .sk-spectrum-panel{border:0;border-top:1px solid #dbe5df;border-radius:0;padding:6px 0 0;margin-top:4px}
+.sk-blocks .sk-spectrum-panel h2{font-size:15px}.sk-blocks .learning-table{font-size:12px;margin-top:4px}.sk-blocks .learning-table td,.sk-blocks .learning-table th{padding:4px 5px}.sk-blocks .sk-spectrum-panel>p{font-size:11px;margin:4px 0 0}
+.sk-blocks>.learning-explanation{margin-top:5px;font-size:12px}.sk-blocks>.learning-links{margin-top:4px;font-size:12px}
+@media(max-width:850px){.sk-blocks>.learning-grid{grid-template-columns:1fr}.sk-blocks #sk-geometry{height:auto}.sk-live-pitch{flex-basis:100%}}
+@media(max-width:420px){.sk-blocks .sk-phasor-panel{grid-template-columns:1fr}.sk-blocks #sk-phasors{height:220px}.sk-blocks .sk-vector-results{grid-column:1/-1}}
+@media(min-width:851px){.sk-blocks #sk-phasors{height:180px}.sk-blocks #sk-wave{height:80px}.sk-blocks .sk-spectrum-panel>p{line-height:1.25}.sk-blocks #sk-geometry text{font-size:17px}.sk-blocks #sk-geometry text.small{font-size:15px}}
+/* Grow meaningful plots with available height; captions stay in normal text flow. */
+.sk-blocks .sk-wave-caption{font-size:12px;line-height:1.4;text-align:center;margin:2px 0 6px;color:#49616b}
+.sk-blocks #sk-wave{margin:5px 0 0;width:100%;height:120px}
+.sk-blocks #sk-phasors text{font-size:19px}
+@media(min-width:851px){
+ .sk-blocks #sk-phasors{height:clamp(180px,calc(38dvh - 112px),350px)}
+ .sk-blocks #sk-wave{height:clamp(85px,calc(22dvh - 80px),220px)}
+ .sk-blocks .sk-phasor-panel{align-content:stretch;grid-template-rows:auto auto minmax(180px,1fr) auto auto}
+ .sk-vector-results{align-self:center}
+ .sk-blocks .learning-table td,.sk-blocks .learning-table th{padding:clamp(4px,calc(1dvh - 4px),9px) 5px}
+}
+/* Let the stator use the height already occupied by the right-hand results. */
+@media(min-width:851px){
+ .sk-blocks .sk-main-scene{display:flex;flex-direction:column}
+ .sk-blocks #sk-geometry{flex:1 0 auto;height:clamp(400px,calc(var(--native-viewport-height,100dvh) - 385px),820px);min-height:400px}
+ .sk-blocks .sk-main-scene .sk-scene-note{margin-top:7px!important}
+}
+/* Keep the vector sum close to its heading; give spare height to the wave. */
+.sk-blocks .sk-phasor-panel{align-content:start;grid-template-rows:auto auto auto minmax(0,1fr) auto}
+.sk-blocks .sk-wave-panel{display:flex;flex-direction:column;min-width:0}
+.sk-blocks .sk-wave-panel #sk-wave{flex:1;min-height:85px}
+.sk-blocks .sk-phasor-panel>h2{font-size:19px}
+.sk-blocks .sk-wave-panel h2,.sk-blocks .sk-spectrum-panel h2{font-size:17px}
+.sk-blocks .sk-vector-results{align-self:center}
+.sk-blocks .sk-vector-results .learning-stat>span{font-size:13px}
+.sk-blocks .sk-vector-results .learning-stat>strong{font-size:22px}
+.sk-blocks .sk-vector-results .learning-note{font-size:13px;line-height:1.45}
+.sk-blocks .sk-wave-caption{font-size:13px}
+.sk-blocks .sk-phasor-panel .learning-table{font-size:14px}
+.sk-blocks .sk-spectrum-panel>p{font-size:12px;line-height:1.4}
+@media(min-width:851px){
+ .sk-blocks #sk-phasors{height:clamp(180px,calc(34dvh - 80px),320px);align-self:start}
+ .sk-blocks .sk-wave-panel #sk-wave{height:clamp(85px,calc(22dvh - 80px),220px)}
+}
+@media(min-width:851px) and (min-height:950px){
+ .sk-blocks .sk-phasor-panel>p{font-size:15px}
+ .sk-blocks .sk-vector-results .learning-stat{padding:11px 10px}
+ .sk-blocks .sk-vector-results .learning-stat>span{font-size:14px}
+ .sk-blocks .sk-vector-results .learning-stat>strong{font-size:25px}
+ .sk-blocks .sk-vector-results .learning-note{font-size:14px;padding:10px}
+ .sk-blocks .sk-phasor-panel .learning-table{font-size:15px}
+ .sk-blocks .sk-phasor-panel .learning-legend{font-size:14px}
+ .sk-blocks .sk-wave-caption{font-size:14px}
+}
+@media(max-width:850px){.sk-blocks .sk-phasor-panel{grid-template-rows:none}}
+
+/* Compact pitch control and highlighted parameter access share the preset row. */
+.sk-blocks>.learning-presets>.sk-live-pitch{flex:1 1 280px;min-width:220px;margin-left:auto}
+.sk-blocks>.learning-presets>.sk-settings{flex:0 0 auto;margin:0}
+.sk-blocks .sk-settings>summary{list-style:none;cursor:pointer;padding:9px 13px;border:1px solid #006655;border-radius:7px;background:#007e6c;color:#fff;font-size:13px;font-weight:700;line-height:1.4}
+.sk-blocks .sk-settings>summary::-webkit-details-marker{display:none}
+.sk-blocks .sk-settings>summary:hover{background:#006655}
+.sk-blocks .sk-settings>summary:focus-visible{outline:3px solid #d9b854;outline-offset:3px}
+.sk-blocks .sk-settings[open]>summary{background:#007e6c;color:#fff}
+@media(max-width:550px){.sk-blocks>.learning-presets>.sk-live-pitch{margin-left:0;flex:1 1 220px}}
+
+/* Keep the explanatory footer compact and reserve flexible height for the image. */
+.sk-blocks .sk-main-scene>.sk-scene-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:4px 10px;flex:0 0 auto;margin-top:4px;align-items:start}
+.sk-blocks .sk-scene-footer>.sk-cancel-bottom{display:contents}
+.sk-blocks .sk-scene-footer .sk-cancel-bottom>label{grid-column:1/-1;margin:0;gap:8px;font-size:12px}
+.sk-blocks .sk-scene-footer .sk-cancel-bottom>p{margin:0;padding:5px 7px;min-height:0;font-size:12px;line-height:1.35}
+.sk-blocks .sk-main-scene .sk-scene-footer>.sk-scene-note{margin:0!important;padding:3px 0;font-size:12px!important;line-height:1.35}
+.sk-blocks .sk-scene-footer:has(>.sk-cancel-bottom[hidden])>.sk-scene-note{grid-column:1/-1}
+.sk-blocks .sk-main-scene>.sk-slice-legend{margin:4px 0;gap:5px 10px}
+@media(max-width:550px){.sk-blocks .sk-main-scene>.sk-scene-footer{grid-template-columns:minmax(0,1fr)}}
+
+/* Equations belong to the existing explanation overlay. */
+.sk-blocks .sk-theory{max-width:1000px;margin:0 auto;padding:10px 16px;font-size:16px;line-height:1.55}
+.sk-blocks .sk-theory h3{font-size:18px;margin:16px 0 6px;color:#23434a}
+.sk-blocks .sk-theory p{margin:8px 0}
+.sk-blocks .sk-theory #sk-formula{margin:10px 0;padding:12px;font-size:18px;text-align:center}
+
+/* Reserve four text lines for every result state, including a reversed phase. */
+.sk-blocks .sk-vector-results #sk-result{box-sizing:border-box;min-height:calc(5.8em + 16px);padding:8px;line-height:1.45}

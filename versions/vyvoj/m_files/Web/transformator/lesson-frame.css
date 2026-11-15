@@ -1,0 +1,282 @@
+/* Transformer lessons use the same unscaled 1600 × 1000 canvas.
+   Only the host fits that canvas to the monitor; diagrams retain their viewBox. */
+main.uniform-module-layout[data-transformer-lesson]{--module-flexible-height:1;height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;max-height:none!important;display:flex;flex-direction:column;gap:12px;position:relative}
+main[data-transformer-lesson]>*{flex-shrink:0;margin-top:0;margin-bottom:0;min-width:0}
+main[data-transformer-lesson] :is(.card,.panel){box-sizing:border-box;padding:12px;border:1px solid #d9e2e1!important;border-radius:12px!important;background:#fff;min-width:0}
+main[data-transformer-lesson] :is(.layout,.lab,.duo,.grid,.bottom,.footerrow){gap:12px!important}
+main[data-transformer-lesson] :is(h2,.paneltitle){font-size:16px!important;line-height:1.35;margin:0 0 6px}
+main[data-transformer-lesson] :is(button,select,input,label,.controlunit label){font-size:14px!important;line-height:1.35}
+main[data-transformer-lesson] :is(.small,.foot,.lead,.intro,.note-line,.link-detail,.insight){font-size:13px!important;line-height:1.4}
+main[data-transformer-lesson] :is(.controlpanel,.control-panel){padding:10px 12px;gap:12px}
+main[data-transformer-lesson] :is(.duo,.lab){flex:1 1 0;min-height:0;align-items:stretch}
+main[data-transformer-lesson] :is(.duo,.lab)>.panel,main[data-transformer-lesson] .lab>.card{display:flex;flex-direction:column;gap:8px;min-height:0}
+main[data-transformer-lesson] :is(.duo,.lab)>:is(.panel,.card)>*{flex-shrink:0}
+main[data-transformer-lesson] .duo{border:0;background:transparent;overflow:visible}
+main[data-transformer-lesson] .figurebox{flex:1 1 0!important;min-height:210px;display:flex;align-items:center}
+main[data-transformer-lesson] :is(#realTrafo,#schema){width:100%;height:100%!important;min-height:0;max-height:none!important;object-fit:contain}
+main[data-transformer-lesson] :is(.meters,.circuit-links){gap:8px;margin:0}
+main[data-transformer-lesson] .meter{padding:8px;min-width:0}
+main[data-transformer-lesson] .meter strong{font-size:20px;line-height:1.4}
+main[data-transformer-lesson] :is(.linked-equation,.mmf){margin:0;padding:6px;min-height:0}
+main[data-transformer-lesson] #fluxSplit{height:120px;width:100%;display:block}
+main[data-transformer-lesson] :is(.lead,.intro){min-height:2.8em}
+main[data-transformer-lesson] .controlunit small{display:block;font-size:13px;line-height:1.4;min-height:2.8em}
+main[data-transformer-lesson] #sceneSub{min-height:2.8em}
+main[data-transformer-lesson] .link-detail{display:block;min-height:2.8em}
+main[data-transformer-lesson] #magneticCause{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:8px!important;margin-top:0!important}
+main[data-transformer-lesson] #magneticCause>:is(h3,p){grid-column:1/-1;margin:0!important}
+main[data-transformer-lesson] #magneticCause>div{margin:0!important;min-width:0}
+main[data-transformer-lesson] #rmsOverview{margin:0!important;padding:6px!important;border:0!important}
+main[data-transformer-lesson] #modelReadouts{gap:6px 12px!important;margin-top:6px!important;padding-top:6px!important}
+/* TR04: drawings above, explanations and numerical results below. */
+html:has(main[data-transformer-lesson="tr04-pricna-vetev"]){scrollbar-gutter:auto}
+main[data-transformer-lesson="tr04-pricna-vetev"]>.controlpanel{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,.8fr) auto;gap:12px}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time input{width:100%;min-width:0;flex:1 1 100%;order:2}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time button{margin-left:auto;padding:6px 10px}
+main[data-transformer-lesson="tr04-pricna-vetev"]>.duo{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1fr) 270px}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-scene{grid-area:1/1;min-height:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-circuit{grid-area:1/2;min-height:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] :is(.tr04-scene,.tr04-circuit)>.figurebox{height:0;min-height:0;flex:1 1 0!important}
+main[data-transformer-lesson="tr04-pricna-vetev"] .figurebox svg{height:100%!important;min-height:0;max-height:100%!important}
+main[data-transformer-lesson="tr04-pricna-vetev"] #magneticCause.tr04-cause{grid-area:2/1;margin:0!important;border:1px solid #d9e2e1!important;padding:12px!important;align-content:start;min-height:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] #rmsOverview.tr04-results{grid-area:2/2;display:block;margin:0!important;padding:12px!important;border:1px solid #d9e2e1!important;width:100%;min-height:0;box-sizing:border-box}
+main[data-transformer-lesson="tr04-pricna-vetev"] #rmsOverview table{width:100%;table-layout:fixed}
+main[data-transformer-lesson="tr04-pricna-vetev"] #modelReadouts{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px!important}
+main[data-transformer-lesson="tr04-pricna-vetev"] #modelReadouts>div{min-width:0!important}
+main[data-transformer-lesson="tr04-pricna-vetev"] .paneltitle{flex-wrap:wrap;gap:3px 8px}
+main[data-transformer-lesson="tr04-pricna-vetev"] .controlunit label{align-items:center;min-height:32px;gap:12px}
+main[data-transformer-lesson="tr04-pricna-vetev"] #muValue{display:flex;align-items:center;justify-content:flex-end;min-width:110px;min-height:32px;font-size:18px!important;line-height:1.3;flex-shrink:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] #muValue .katex{font-size:1em!important}
+main[data-transformer-lesson="tr04-pricna-vetev"] :is(#phaseValue,#sceneSub,#sceneI,#sceneI2) .katex{font-size:1.08em}
+/* Reserve the closed summary; expanded explanations are handled by a dialog. */
+main[data-transformer-lesson]>details{flex:none;margin:0;padding:0;min-height:36px}
+main[data-transformer-lesson]>details>summary{box-sizing:border-box;padding:8px 12px;font-size:14px;line-height:20px;cursor:pointer}
+.transformer-explanation{box-sizing:border-box;width:min(1100px,92vw);max-height:88vh;border:1px solid #cbdcd6;border-radius:12px;padding:20px;background:#fff;color:#19313b;overflow:auto;font:14px/1.5 system-ui}
+.transformer-explanation::backdrop{background:#19313b55}
+.transformer-explanation .explanation-close{display:block;margin:0 0 12px auto;padding:6px 12px}
+.transformer-explanation details{display:block!important}.transformer-explanation summary{display:none}
+main[data-transformer-lesson="tr01-matematicky"]>.compact-lab{flex:1;min-height:0;grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr);grid-template-rows:150px minmax(0,1fr);align-items:stretch}
+main[data-transformer-lesson="tr01-matematicky"] .control-panel{grid-column:1/-1}
+main[data-transformer-lesson="tr01-matematicky"] .control-panel-grid{grid-template-columns:170px minmax(0,1fr) 260px!important;gap:12px;width:100%;min-width:0}
+main[data-transformer-lesson="tr01-matematicky"] .control-panel .controls{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+main[data-transformer-lesson="tr01-matematicky"] :is(.stage-panel,.plots-panel){display:flex;flex-direction:column;gap:8px;min-height:0}
+main[data-transformer-lesson="tr01-matematicky"] .stage{flex:1;min-height:0}
+main[data-transformer-lesson="tr01-matematicky"] .stage svg{height:100%!important;max-height:none!important;min-height:0!important;aspect-ratio:auto}
+main[data-transformer-lesson="tr01-matematicky"] .combined-plots{flex:1;min-height:0;display:grid;grid-template-rows:repeat(2,minmax(0,1fr));gap:12px}
+main[data-transformer-lesson="tr01-matematicky"] .plot{display:flex;flex-direction:column;min-height:0}
+main[data-transformer-lesson="tr01-matematicky"] .plot svg{flex:1;min-height:0!important;height:0!important}
+main[data-transformer-lesson="tr01-matematicky"] :is(.chapter,.mini-insight){min-height:4.2em;margin:0}
+main[data-transformer-lesson="tr01-matematicky"] :is(.control-panel-grid>*,.select-time,.select-params,.plot,.combined-plots){min-width:0;max-width:100%;box-sizing:border-box}
+main[data-transformer-lesson="tr01-matematicky"] .control-panel .actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+main[data-transformer-lesson="tr01-matematicky"] .control-panel .actions button{padding:6px 8px;white-space:nowrap}
+main[data-transformer-lesson="tr01-matematicky"] .tr01-plot-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;min-width:0}
+main[data-transformer-lesson="tr01-matematicky"] .tr01-plot-heading h2{margin:0}
+main[data-transformer-lesson="tr01-matematicky"] #autoScale{flex:none;margin:0;padding:6px 10px}
+main[data-transformer-lesson="tr01-matematicky"] .plots-panel{padding:12px!important;box-sizing:border-box;min-width:0}
+main[data-transformer-lesson="tr01-matematicky"] .combined-plots{width:100%;margin:0;padding:0}
+main[data-transformer-lesson="tr01-matematicky"] .plot{width:100%;margin:0;padding:8px;box-sizing:border-box}
+main[data-transformer-lesson="tr01-matematicky"] .plot svg{box-sizing:border-box;max-width:100%;width:100%}
+main[data-transformer-lesson="tr02-magnetizacni"]>.card{height:160px}
+main[data-transformer-lesson="tr02-magnetizacni"] .lab{grid-template-columns:minmax(0,1.85fr) minmax(360px,1fr)}
+main[data-transformer-lesson="tr02-magnetizacni"] .cross-plot{flex:1;min-height:0;display:flex}
+main[data-transformer-lesson="tr02-magnetizacni"] .cross-plot svg{width:100%;height:100%!important;min-height:0!important}
+main[data-transformer-lesson="tr02-magnetizacni"] .stage{flex:1;min-height:220px!important;display:flex}
+main[data-transformer-lesson="tr02-magnetizacni"] .stage svg{height:100%!important;min-height:0!important;max-height:none!important}
+main[data-transformer-lesson="tr03-schema"]>.controls{height:105px}
+main[data-transformer-lesson="tr03-schema"]>section.card:not(.controls){height:100%;min-height:0;display:flex;flex-direction:column}
+main[data-transformer-lesson="tr03-schema"] .diagram{flex:1;min-height:0;display:flex}
+main[data-transformer-lesson="tr03-schema"] #diagram{height:100%;width:100%;min-width:0!important}
+main[data-transformer-lesson="tr03-schema"]>.grid{flex:1;min-height:0;grid-template-columns:1fr 1fr}
+main[data-transformer-lesson="tr03-schema"] .grid .eq{font-size:18px;line-height:1.4;padding:3px 0;margin:4px 0}
+main[data-transformer-lesson="tr06-hodinove-cislo"] .toolbar{margin:0}
+main[data-transformer-lesson="tr06-hodinove-cislo"] .guide{padding:10px 12px;min-height:88px}
+main[data-transformer-lesson="tr06-hodinove-cislo"] .connection{display:grid;grid-template-rows:24px minmax(0,1fr) 24px minmax(0,1fr);flex:1;min-height:0;padding:0}
+main[data-transformer-lesson="tr06-hodinove-cislo"] .connection svg{height:100%;min-height:0}
+main[data-transformer-lesson="tr06-hodinove-cislo"] #phasors{flex:1;min-height:0;height:0;aspect-ratio:auto}
+main[data-transformer-lesson="tr06-hodinove-cislo"] :is(.panelhead,.pairbar,.phaselegend,.graphnote){padding:0;margin:0}
+main[data-transformer-lesson="tr06-hodinove-cislo"] :is(.formula,.result){margin:0;padding:8px;min-height:60px}
+
+
+
+
+
+
+
+
+
+
+
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .controlunit label{align-items:center;min-height:32px;gap:12px}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] :is(#muValue,#loadValue){display:flex;align-items:center;justify-content:flex-end;min-height:32px;font-size:18px!important;line-height:1.3;flex-shrink:0}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] :is(#muValue,#loadValue) .katex{font-size:1em!important}
+
+/* TR05: full-height physical transformer, circuit and results on the right. */
+html:has(main[data-transformer-lesson="tr05-rozptylova-reaktance"]){scrollbar-gutter:auto}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"]>.duo{grid-template-rows:minmax(0,1fr) 270px}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .duo>.panel:not(.tr05-results){min-height:0}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .figurebox{height:0;min-height:0;flex:1 1 0!important}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] #schema{height:100%!important;max-height:100%!important}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] #rmsOverview.tr05-results{grid-area:2/2;display:block;padding:12px!important;border:1px solid #d9e2e1!important;margin:0!important}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .tr05-results>h2{grid-column:1/-1}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] #modelReadouts{display:grid!important;grid-template-columns:1fr 1fr;align-content:center;margin:0!important;border:0!important}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] #modelReadouts>div{min-width:0!important}
+
+/* Stable geometry across open circuit / loaded circuit and finite permeability. */
+main[data-transformer-lesson="tr04-pricna-vetev"]>.controlpanel{height:140px;min-height:140px;align-items:start}
+main[data-transformer-lesson="tr04-pricna-vetev"] #loadValue{min-width:105px;text-align:right;white-space:nowrap}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-circuit>.circuit-links{height:144px;min-height:144px;grid-template-rows:minmax(0,1fr);margin:0!important;flex:none}
+main[data-transformer-lesson="tr04-pricna-vetev"] .circuit-link{display:grid;grid-template-rows:22px 48px minmax(0,1fr);gap:6px;box-sizing:border-box;min-width:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] .linked-equation{display:flex;align-items:center;justify-content:center;height:48px;margin:0!important;padding:0;min-width:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] .link-detail{margin:0;min-height:0;line-height:1.4}
+main[data-transformer-lesson="tr04-pricna-vetev"] #sceneInstantValues{height:88px;min-height:88px;box-sizing:border-box}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-scene>.mmf{height:48px;min-height:48px;box-sizing:border-box}
+main[data-transformer-lesson="tr04-pricna-vetev"] #rmsOverview tr{height:28px}
+
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .tr05-scene{grid-area:1/1/3/2}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .tr05-circuit{grid-area:1/2}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"]>.controlpanel{height:140px;min-height:140px}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .tr05-circuit>.circuit-links{height:144px;min-height:144px;grid-template-rows:minmax(0,1fr);margin:0!important;flex:none}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .circuit-link{display:grid;grid-template-rows:22px 48px minmax(0,1fr);gap:6px;box-sizing:border-box;min-width:0}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .linked-equation{display:flex;align-items:center;justify-content:center;height:48px;margin:0!important;padding:0}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .link-detail{min-height:0;margin:0}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] #modelReadouts{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px!important;padding-top:8px!important}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] #rmsOverview tr{height:28px}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .paneltitle{flex-wrap:wrap;gap:3px 8px}
+
+/* Keep the content inside the iframe's actual content box, including its gutter. */
+main.uniform-module-layout[data-transformer-lesson]{width:calc(100% - 24px)!important;min-width:0!important;max-width:none!important;margin:0 12px!important;padding-top:0!important}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.lead{min-height:0;margin:0;line-height:1.4;font-size:13px}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.controlpanel{height:112px;min-height:112px;padding:8px 12px;align-items:start}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.duo{grid-template-rows:minmax(0,1fr) 240px}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .duo>.panel>.figurebox{height:320px;min-height:320px;max-height:320px;flex:0 0 320px!important}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .duo>.panel>.circuit-links{height:90px;min-height:90px;gap:8px;margin:0!important}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .circuit-link{grid-template-rows:18px 32px minmax(0,1fr);padding:6px 8px!important;gap:2px}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .linked-equation{height:32px;margin:0!important}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .link-detail{font-size:12px!important;line-height:1.3}
+main[data-transformer-lesson="tr04-pricna-vetev"] #sceneInstantValues{height:72px;min-height:72px}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-scene>.mmf{height:40px;min-height:40px}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .timeunit #play{width:auto;min-width:120px;padding:5px 10px;margin-top:4px}
+
+/* Fractions need a full line box; never turn an equation into a scroll area. */
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .duo>.panel>.circuit-links{height:112px;min-height:112px}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .circuit-link{grid-template-rows:18px 44px minmax(0,1fr)}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .linked-equation{height:44px;min-height:44px!important;overflow:visible;padding:0!important}
+main[data-transformer-lesson] .linked-equation .katex-display{margin:0;overflow:visible}
+
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] #mmfValue{min-height:70px;font-size:18px;display:flex;align-items:center}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] #fluxSplit{height:150px}
+
+/* Equivalent-circuit chapter: one navigation heading and compact controls. */
+main[data-transformer-lesson="tr03-schema"] .card{margin:0;padding:12px}
+main[data-transformer-lesson="tr03-schema"]>.controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px}
+main[data-transformer-lesson="tr03-schema"]>.controls label{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:4px 8px}
+main[data-transformer-lesson="tr03-schema"]>.controls input{grid-column:1/-1;width:100%;min-width:0}
+main[data-transformer-lesson="tr03-schema"] .toolbar{margin:0;gap:6px}
+main[data-transformer-lesson="tr03-schema"] button{padding:6px 10px}
+main[data-transformer-lesson="tr03-schema"] .diagram{overflow:visible}
+main[data-transformer-lesson="tr03-schema"] #step{min-height:1.35em;margin:0}
+main[data-transformer-lesson="tr03-schema"] .steps{margin:0 0 6px}
+main[data-transformer-lesson="tr03-schema"] .grid>.card{min-width:0;padding:12px}
+main[data-transformer-lesson="tr03-schema"] .grid :is(td,th){padding:5px 8px;font-size:14px}
+main[data-transformer-lesson="tr03-schema"] .grid hr{margin:8px 0!important}
+main[data-transformer-lesson="tr03-schema"] .grid p{margin:4px 0}
+
+/* Reserve independent rows for the drawing, results and closed explanation. */
+main.uniform-module-layout[data-transformer-lesson="tr03-schema"]{display:grid;grid-template-rows:20px 76px minmax(340px,1fr) 156px 36px;gap:12px}
+main[data-transformer-lesson="tr03-schema"]>p.muted{margin:0;min-height:0}
+main[data-transformer-lesson="tr03-schema"]>.controls{height:76px;min-height:0}
+main[data-transformer-lesson="tr03-schema"]>.grid{height:100%;min-height:0;grid-template-columns:minmax(0,1fr) minmax(0,1.85fr);grid-template-rows:minmax(0,1fr)}
+main[data-transformer-lesson="tr03-schema"]>.grid>.card{height:100%;min-height:0}
+main[data-transformer-lesson="tr03-schema"]>details.card{display:block;height:36px;min-height:36px;padding:0;margin:0}
+main[data-transformer-lesson="tr03-schema"] .grid :is(.eq,div[data-tex]){overflow:visible;line-height:1.4;padding:3px 0;font-size:18px}
+main[data-transformer-lesson="tr03-schema"] .grid .katex-display{overflow:visible;margin:2px 0}
+main[data-transformer-lesson="tr03-schema"] .schema-reference{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;border-top:1px solid #e5ece9;margin-top:8px;padding-top:6px}
+main[data-transformer-lesson="tr03-schema"] .schema-reference>div{min-width:0}
+main[data-transformer-lesson="tr03-schema"] .schema-reference .eq{margin:2px 0;padding:1px 0;font-size:18px;line-height:1.35}
+main[data-transformer-lesson="tr03-schema"] .grid :is(td,th),main[data-transformer-lesson="tr03-schema"] #values td{padding:3px 8px;line-height:1.35}
+main[data-transformer-lesson="tr03-schema"] .grid .katex{font-size:1em}
+main[data-transformer-lesson="tr03-schema"] .schema-parameters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+main[data-transformer-lesson="tr03-schema"] .schema-parameters [data-tex]{font-size:16px;line-height:1.4}
+main[data-transformer-lesson="tr03-schema"] .schema-summary #change{font-size:21px;min-height:48px;display:flex;align-items:center;margin:4px 0 8px}
+main[data-transformer-lesson="tr03-schema"] .schema-summary table{table-layout:fixed;font-size:16px}
+main[data-transformer-lesson="tr03-schema"] .schema-summary :is(td,th),main[data-transformer-lesson="tr03-schema"] .schema-summary #values td{font-size:16px;padding:5px 6px;text-align:center;white-space:nowrap}
+main[data-transformer-lesson="tr03-schema"] .schema-summary tr>th:first-child{width:134px;text-align:left;font:500 14px/1.35 system-ui}
+main[data-transformer-lesson="tr03-schema"] .schema-summary tr:first-child th{font:500 14px/1.35 system-ui}
+main[data-transformer-lesson="tr03-schema"] .schema-summary tr:last-child>:is(td,th){border-bottom:0}
+
+/* Short circuit: plots retain the full left column; calculations sit beside them. */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Give the three explanatory equations priority over auxiliary definitions. */
+
+
+
+
+.short-circuit-reference{margin-top:20px}
+.short-circuit-reference>[data-tex]{display:block;font-size:20px;margin:14px 0}
+.short-circuit-reference>.card{margin-top:20px}
+
+
+
+
+
+
+
+
+
+
+/* Final short-circuit layout, compiled before first paint. */
+main.uniform-module-layout[data-transformer-lesson="tr08-zkratovy-proud"]{display:grid!important;grid-template-rows:auto minmax(0,1fr) 38px}
+main[data-transformer-lesson="tr08-zkratovy-proud"]>.layout{margin:0;min-height:0;grid-template-columns:minmax(0,1fr) 490px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .graph-card{display:grid;flex-direction:column;min-height:0;gap:6px;position:relative;grid-template-rows:32px 28px minmax(0,1.65fr) 20px minmax(0,1fr) 38px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] #currentPlot{flex:1 1 0;height:0!important;min-height:0!important}
+main[data-transformer-lesson="tr08-zkratovy-proud"] #voltagePlot{height:90px;min-height:90px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-content:start;gap:8px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side>:nth-child(n+4){grid-column:1/-1}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side .metric strong{font-size:19px!important}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .bottom{margin:0;min-height:0}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .bottom .equations{font-size:14px;gap:4px;padding:8px 12px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] :is(#currentPlot,#voltagePlot){width:100%;height:100%!important;min-height:0!important;max-height:none}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .legend{margin:0;align-items:center}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .transport{margin:0;padding-top:6px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] #play[hidden]{display:none!important}
+main[data-transformer-lesson="tr08-zkratovy-proud"] #clipWarning{position:absolute;top:72px;right:18px;max-width:75%;margin:0;padding:8px 12px;z-index:2;background:#fff3e4;border:1px solid #edc594;color:#91541f;box-shadow:0 2px 8px #9b632014;pointer-events:none}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side>.card{flex:initial;padding:8px 10px;grid-column:1/-1}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side .metric small{font-size:12px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side .metric .detail{font-size:11px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .schema-body{grid-template-columns:minmax(0,1fr) 165px;gap:8px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] #sc-approved-schema{height:145px!important;min-width:0!important}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .schema-parameters{font-size:13px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations{font-size:14px;line-height:1.3}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations [data-tex]{margin:10px 0;padding:2px 0;overflow:visible;display:block;white-space:nowrap}
+main[data-transformer-lesson="tr08-zkratovy-proud"] #phaseSummary :is(td,th){padding:3px 2px!important}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side>.equations{grid-column:1/-1;padding:12px 14px;font-size:19px;line-height:1.35}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations .katex{font-size:1em}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations [data-tex]:last-child{margin-bottom:4px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side>.metric[hidden]{display:none!important}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations>[data-tex]{margin:7px 0}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .equations>.envelope-results{margin-top:12px;padding:10px 0 0;border:0!important;border-top:1px solid #d9e2e1!important;border-radius:0!important}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .envelope-results #phaseSummary table{font:14px/1.4 system-ui!important}
+
+/* Share additional host height between the equivalent circuit and equations. */
+main[data-transformer-lesson="tr03-schema"]>section.card:not(.controls){height:100%;min-height:0}
+main[data-transformer-lesson="tr03-schema"] .diagram>#diagram{display:block;flex:1 1 0;height:100%!important;max-height:none!important;object-fit:contain}

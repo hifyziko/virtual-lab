@@ -1,0 +1,221 @@
+:root{--green:#007e6c;--ink:#19313b;--muted:#60747b;--line:#d9e2e1;--bg:#eef2f1}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,"Segoe UI",sans-serif}header{background:white;padding:10px 20px;display:flex;justify-content:space-between;align-items:center}header strong{font-size:20px}header b{background:var(--ink);color:#c8f18c;padding:4px 7px;border-radius:7px}header>span{font-size:11px;letter-spacing:1px;color:var(--green)}main{max-width:1450px;margin:auto;padding:12px 18px}h1{font-size:28px;margin:0}h2{font-size:16px;margin:0 0 10px}p{margin:7px 0}.hero p,.note{color:var(--muted)}.hero{margin-bottom:12px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}.controls,.rotor-controls{display:grid;grid-template-columns:1fr 1fr 1fr 1.2fr;gap:18px;align-items:center}.rotor-controls{margin-top:8px}.control{display:block;min-width:0}.control>span{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}output{color:var(--green);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}input[type=range]{display:block;width:100%;margin:9px 0 0;accent-color:var(--green)}input[type=checkbox]{accent-color:var(--green)}button,select{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:7px;background:#fff;padding:7px 9px}select{width:100%;margin-top:4px}button{cursor:pointer;font-weight:650}button:hover{background:#edf6f3}.buttons{display:flex;gap:7px;flex-wrap:wrap}.buttons button{font-size:12px}.check{font-size:12px}.harmonics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}.harm-controls{display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:center}.note{font-size:12px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:9px;margin-top:9px}.chart-card{display:flex;flex-direction:column}.chart-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.chart-head h2{margin:0}.legend{display:flex;flex-wrap:wrap;gap:18px;font-size:12px;margin:10px 0}.legend .total{color:var(--green)}.legend .base{color:#849391}#torquePlot{display:block;width:100%;height:370px;flex:1;min-height:370px}.cursor{padding-top:12px;border-top:1px solid var(--line);margin-top:10px}aside{display:flex;flex-direction:column;gap:9px}aside>.card{flex:1}.readings>div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #edf2f0;font-size:12px}.readings strong{font-size:24px;color:var(--green)}.readings b{font-size:14px;font-variant-numeric:tabular-nums}.bar-content{display:grid;grid-template-columns:100px 1fr;gap:12px;align-items:center}#barPlot{width:100%;height:180px}.bar-content p{font-size:12px}.bottom{display:grid;grid-template-columns:1.2fr 1fr;gap:9px;margin-top:9px}#schema{display:block;width:100%;height:220px}.equations [data-tex]{display:block;margin:12px 0;overflow-x:auto;overflow-y:hidden;padding:4px 0}.equations .katex{font-size:1.06em}.katex{font-size:1.05em}details{margin-top:10px;border:1px solid var(--line);border-radius:10px;background:white}summary{padding:12px;cursor:pointer;color:var(--green);font-weight:700}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:12px}.detail-grid p{font-size:13px;color:var(--muted)}.detail-grid [data-tex]{display:block;margin:12px 0;overflow-x:auto}.sources{font-size:12px;padding:0 12px 12px}a{color:var(--green)}[hidden]{display:none!important}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d2a43f;outline-offset:2px}@media(max-width:1050px){.controls,.rotor-controls{grid-template-columns:1fr 1fr}.layout{grid-template-columns:minmax(0,1fr) 250px}.harm-controls{grid-template-columns:130px 1fr}}@media(max-width:800px){.layout,.bottom{grid-template-columns:1fr}aside{display:grid;grid-template-columns:1fr 1fr}.harmonics{grid-template-columns:1fr}#torquePlot{height:340px;min-height:340px}.detail-grid{grid-template-columns:1fr}}@media(max-width:500px){main{padding:10px}h1{font-size:25px}.controls,.rotor-controls{gap:12px}.buttons{grid-column:1/-1}aside{grid-template-columns:1fr}.bar-content{grid-template-columns:100px 1fr}.chart-head{align-items:flex-start}.chart-head h2{font-size:15px}.control>span{flex-wrap:wrap}.harm-controls{gap:10px;grid-template-columns:120px 1fr}.equations{font-size:13px}.detail-grid{padding:10px}#schema{height:180px}}
+
+.schema-scroll{overflow-x:auto}#schema{min-width:500px}
+
+.harm-picks{display:flex;flex-wrap:wrap;gap:8px 14px}.harm-picks label{white-space:nowrap}.time-gain{margin-top:10px}#gainNotice{color:#a44a2f;min-height:17px}
+
+.harm-controls{grid-template-columns:minmax(0,1fr)}.harm-picks{display:flex;flex-wrap:nowrap;gap:8px 16px;overflow-x:auto;padding:3px 0}.harm-picks label{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;font-size:14px}.harm-picks input{margin:0}.legend,.chart-card .note{font-size:13px}@media(max-width:500px){.harm-picks{gap:8px 12px}}
+
+.chart-card .legend .total,.chart-card .legend .base{display:inline-flex;align-items:center;gap:7px}
+.chart-head .check{white-space:nowrap}
+.chart-card .legend .total::before,.chart-card .legend .base::before{content:"";width:20px;border-top:3px solid currentColor;border-radius:3px}
+.chart-card .legend .base::before{border-top-width:2px;border-top-style:dashed}
+#gainNotice:empty{display:none}
+.plot-math{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#425e68;font-size:14px;white-space:nowrap}
+.plot-math.y-tick{justify-content:flex-end}
+.plot-math.axis{color:#183d46;font-size:15px}
+.plot-math.harmonic-tick{color:#946519;font-size:12px}
+.plot-math.tag{border:1px solid #c4ded6;border-radius:6px;background:#fff;color:#186b62;font-size:13px}
+.plot-math.breakdown{border-color:#ecd6af;background:#fff9ee;color:#865818}
+.readings .marker-key{display:inline-flex;align-items:center;gap:7px}
+.marker-key::before{content:"";width:7px;height:7px;border-radius:50%;background:#186b62}
+.marker-key.breakdown::before{background:#9b641a}
+
+.controls,.rotor-controls{gap:10px 16px;padding-block:9px}
+.control input[type=range]{margin:4px 0 0;height:17px}
+.harmonics .card{padding:9px 12px}
+.harmonics h2{margin-bottom:5px}
+.harm-row{display:flex;align-items:center;gap:9px;min-width:0}
+.harm-row+.harm-row{margin-top:4px}
+.harm-label,.slot-ratio{flex:0 0 auto;color:var(--muted);font-size:12px}
+.harm-label small{font-size:inherit}
+.harm-picks{gap:6px}
+.harm-order{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;padding:2px 5px;border:1px solid #e1e9e7;border-radius:6px;background:#f7faf9}
+.harm-include{width:22px;height:22px;padding:0;line-height:1;color:#365d60}
+.harm-include[aria-pressed=true]{background:#007e6c;color:#fff;border-color:#007e6c}
+.harmonic-action{margin:4px 4px 0}
+.time-gain{margin-top:4px;max-width:310px}
+.curve-key{display:inline-flex;align-items:center;gap:5px;color:var(--curve-color)}
+.curve-key::before{content:"";width:16px;border-top:2px solid var(--curve-color)}
+.curve-key.dashed::before{border-top-style:dashed}
+.plot-math.start-tick{color:#865818}
+.cursor{padding-top:8px;margin-top:6px}
+.bar-pane #barPlot{display:block;height:auto;max-height:177px}
+.bar-pane .bar-math{font-size:11px}
+.bar-pane .note{margin:5px 0}
+.bar-equations{display:flex;align-items:center;flex-wrap:wrap;gap:3px 12px;padding:4px 0;font-size:12px}
+.detail-grid{grid-template-columns:1fr}
+.machine-controls{padding:9px 12px}
+.machine-controls .controls,.machine-controls .rotor-controls{padding:0;gap:6px 16px}
+.machine-controls .rotor-controls{margin-top:6px}
+.machine-controls select{font-size:13px;padding:4px 7px;margin-top:1px}
+.machine-controls .buttons{align-items:center;gap:6px}
+.machine-controls .buttons button{padding:3px 8px}
+.machine-controls .buttons .check{white-space:nowrap}
+.machine-controls #reset{font-size:20px;line-height:1;padding:3px 7px}
+.machine-controls .control>span{font-size:11px}
+@media(max-width:500px){
+ .machine-controls .controls,.machine-controls .rotor-controls{gap:6px 12px}
+ .machine-controls .buttons{grid-column:auto}
+ .machine-controls .buttons .check{font-size:11px}
+}
+.regime-legend{display:flex;align-items:center;flex-wrap:wrap;gap:5px 13px;margin:4px 0 1px;font-size:12px}
+.regime-caption{color:var(--muted)}
+.regime-key{display:inline-flex;align-items:center;gap:5px}
+.regime-key::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.regime-key.generator{color:#4f6b9c}.regime-key.motor{color:#257e68}.regime-key.brake{color:#94651e}
+#torquePlot{min-height:380px}
+@media(max-width:500px){.harm-label small{display:none}.harm-order{padding-inline:4px}.harm-row{gap:6px}}
+
+/* Keep the working diagram beside the characteristic. */
+.hero{margin-bottom:8px}.hero h1{font-size:24px}.hero p{display:none}
+header{padding-block:6px}main{padding-top:8px}
+.layout{align-items:start;grid-template-columns:minmax(0,1fr) 340px}
+.chart-card .legend{margin:5px 0;gap:14px}
+#normalization{margin:0;font-size:11px;color:var(--muted)}
+.chart-head h2{font-size:15px}
+#torquePlot{height:clamp(380px,40vh,440px);min-height:380px;flex:none}
+.plot-math.regime-label{font-size:12px;opacity:.65;pointer-events:none}
+.plot-math.regime-label.generator{color:#4f6b9c}
+.plot-math.regime-label.motor{color:#257e68}
+.plot-math.regime-label.brake{color:#94651e}
+aside>.card{flex:none;padding:9px 11px}
+aside h2{font-size:14px;margin-bottom:5px}
+.schema-pane #schema{min-width:0;height:125px}
+.schema-pane .note{font-size:11px;margin:2px 0}
+.readings>div{padding:3px 0}
+.readings strong{font-size:20px}
+.bar-pane #barPlot{max-height:125px}
+.bar-pane .note,.bar-equations{font-size:11px}
+.equation-content{padding:0 12px 8px}
+#axisNote{margin:3px 0 0;font-size:11px}
+@media(min-width:801px){
+ .layout{align-items:stretch}
+ .chart-card #torquePlot{flex:1;min-height:380px;height:380px}
+ .readings{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+ .readings h2,.readings>div:first-of-type{grid-column:1/-1}
+ .readings>div:not(:first-of-type){display:block;font-size:11px;line-height:1.4}
+ .readings>div:not(:first-of-type)>b{display:block;font-size:13px}
+}
+@media(min-width:1100px){
+ .harmonics{grid-template-columns:minmax(250px,.65fr) minmax(0,1.35fr)}
+ .harmonics .card{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:3px 12px}
+ .harmonics h2{font-size:13px;margin:0}
+ .harmonics .harm-row{margin:0}
+ .harmonics .harm-row+.harm-row{grid-column:2}
+ .harmonics .time-gain{grid-column:2;margin:0}
+}
+@media(max-width:1050px){.layout{grid-template-columns:minmax(0,1fr) 290px}}
+@media(max-width:800px){
+ .layout{grid-template-columns:1fr}
+ aside{display:grid;grid-template-columns:1fr 1fr}
+ .bar-pane{grid-column:1/-1}
+ #torquePlot{height:400px}
+}
+@media(max-width:500px){aside{grid-template-columns:1fr}.bar-pane{grid-column:auto}.hero h1{font-size:22px}}
+.schema-tabs{display:flex;gap:4px;margin:5px 0}.schema-tabs button{font-size:11px;padding:4px 7px}.schema-tabs button[aria-pressed=true]{background:#e3f2ed;border-color:#8bbcaf;color:#007e6c}.schema-pane:has([data-schema="space"][aria-pressed="true"]) #schema{height:160px}.schema-pane #schemaInfo>div{margin:4px 0}.schema-math{font-size:18px}.schema-caption{font-size:11px;line-height:1.4}
+/* Reserve all conditional controls and annotations to avoid layout shifts. */
+.harmonics .card{display:block;height:116px;overflow:hidden}
+.harmonics h2{font-size:13px;margin:0 0 5px}
+.harmonics .harm-row{height:31px;margin:0;align-items:center}
+.harmonics .time-gain{margin-top:5px}
+.harmonics .time-gain[hidden]{display:block!important;visibility:hidden;pointer-events:none}
+.harm-order .harm-include[hidden]{display:inline-flex!important;visibility:hidden;pointer-events:none}
+.harm-order .harm-include{align-items:center;justify-content:center}
+.space-gain{flex:1 1 130px;min-width:95px;max-width:180px}
+.harmonics .space-gain{margin:0 0 0 8px}
+.harmonic-action{height:18px;line-height:18px;margin:3px 4px 0}
+.harmonic-action[hidden]{display:block!important;visibility:hidden}
+#gainNotice,#gainNotice:empty{display:block;height:19px;min-height:19px;line-height:19px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#componentsLegend,#componentsLegend[hidden]{display:flex!important;flex-wrap:nowrap;height:25px;min-height:25px;margin:0;overflow-x:auto;overflow-y:hidden;align-items:center;white-space:nowrap}
+#componentsLegend[hidden]{visibility:hidden}
+#axisNote{height:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.schema-pane{height:326px;overflow:hidden}
+.schema-pane h2{height:20px;line-height:20px;white-space:nowrap;font-size:12px}
+.schema-pane #schema,.schema-pane:has([data-schema="space"][aria-pressed="true"]) #schema{height:160px}
+.schema-pane #schemaInfo{height:88px;overflow:hidden;font-size:11px}
+.schema-field path,.schema-field rect{stroke:currentColor}
+.schema-field .plot-math{color:inherit;font-weight:700}
+.schema-tabs [data-schema=time]{color:#b45c16}.schema-tabs [data-schema=space]{color:#7542bd}
+.schema-tabs [data-schema=time][aria-pressed=true]{background:#fff1e4;border-color:#d89c64;color:#a54f0e}
+.schema-tabs [data-schema=space][aria-pressed=true]{background:#f1eafb;border-color:#ac8bd6;color:#7542bd}
+.schema-pane[data-mode=time] #schemaInfo{color:#a54f0e}.schema-pane[data-mode=space] #schemaInfo{color:#7542bd}
+@media(max-width:1099px){.harmonics .card{height:134px}.harmonics .harm-row{height:35px}}
+@media(max-width:500px){.harmonics .card{height:144px}.space-gain{min-width:95px}.harm-order{gap:2px}.harm-picks{gap:4px}.schema-pane{height:326px}}
+.harm-row .harm-picks{min-width:0}.space-gain{flex-shrink:0}.buttons #fit[hidden]{display:inline-block!important;visibility:hidden}.schema-pane #schemaInfo .schema-caption{line-height:1.35}
+.schema-pane[data-mode=time] #schemaInfo,.schema-pane[data-mode=space] #schemaInfo{color:var(--muted)}.schema-field .plot-math{font-weight:400}
+.harmonic-action,.harmonic-action[hidden]{display:none!important}.layout{margin-top:9px}
+.harmonics .card{position:relative;height:140px}
+.harmonics .time-gain,.harmonics .space-gain{position:absolute;left:12px;bottom:9px;width:calc(100% - 24px);max-width:310px;min-width:0;margin:0}
+@media(max-width:500px){.harmonics .card{height:144px}}
+.harmonics .time-gain,.harmonics .space-gain{max-width:420px;display:flex;align-items:center;gap:9px}
+.time-gain .control{flex:1;min-width:0;max-width:310px}
+.sum-gain{flex:none;font-size:11px;padding:5px 7px;white-space:nowrap}
+.sum-gain[aria-pressed=true]{background:#e3f2ed;border-color:#007e6c;color:#007e6c}
+.schema-tabs [data-schema=space]{color:#0039a6}
+.schema-tabs [data-schema=space][aria-pressed=true]{background:#e6edff;border-color:#6689dc;color:#0039a6}
+.readings h2{font-size:16px}
+.readings strong{font-size:28px}
+.readings b{font-size:18px;font-weight:700}
+@media(min-width:801px){
+ .layout{height:840px;align-items:stretch}
+ .layout>.chart-card{height:100%;min-height:0;overflow:hidden}
+ .chart-card #torquePlot{min-height:300px;height:300px;flex:1}
+ .layout>aside{height:100%;min-height:0;display:grid;grid-template-rows:290px 260px minmax(0,1fr);gap:9px}
+ .layout>aside>.schema-pane{height:290px}
+ .layout>aside>.card{min-height:0;overflow:hidden}
+ .layout>aside>.readings{height:260px;align-content:start}
+ .readings>div{padding:5px 0}
+ .readings>div:not(:first-of-type){font-size:13px;line-height:1.4}
+ .readings>div:not(:first-of-type)>b{font-size:18px}
+ .layout>aside:has(>.wound:not([hidden])){grid-template-rows:290px 260px minmax(0,1fr)}
+}
+@media(max-width:800px){.readings>div{font-size:14px}.readings b{font-size:17px}}
+@media(min-width:801px){
+ .layout{height:880px}
+ .layout>aside,.layout>aside:has(>.wound:not([hidden])){grid-template-rows:290px 300px minmax(0,1fr)}
+ .layout>aside>.readings{height:300px}
+}
+@media(min-width:801px){
+ .layout{height:calc(100dvh - var(--panel-top,380px) - 12px);min-height:400px}
+ .chart-card #torquePlot{min-height:180px;height:280px}
+ .layout>aside{display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+ .layout>aside>.card{flex:none}
+ .chart-card{padding:10px 12px}
+ .chart-card .cursor{padding-top:5px;margin-top:3px}
+}
+/* Give the bar illustration its natural aspect ratio and readable labels. */
+.bar-pane #barPlot{display:block;width:100%;height:auto;max-height:none;aspect-ratio:255 / 165;overflow:visible;margin:6px 0 9px}
+.bar-pane .note{font-size:12px;line-height:1.5;overflow-wrap:normal}
+.bar-pane .bar-equations{display:flex;align-items:center;gap:8px 14px;font-size:13px;line-height:1.5;padding:6px 0}
+.bar-equations>[data-tex]{display:block;white-space:nowrap;padding:3px 0}
+.bar-pane #barMotor[hidden]{display:block!important;visibility:hidden}
+.layout>aside>.bar-pane{overflow:visible}
+@media(min-width:801px){
+ .layout{height:880px;min-height:0}
+ .chart-card #torquePlot{min-height:380px;height:380px;flex:1}
+ .layout>aside{height:880px}
+}
+/* Fit all three right-hand cards within the chart, without a scroll area. */
+@media(min-width:801px){
+ .layout>aside,.layout>aside:has(>.wound:not([hidden])){display:grid;grid-template-rows:300px 230px minmax(0,1fr);height:880px;overflow:visible}
+ .layout>aside>.schema-pane{height:300px}
+ .layout>aside>.readings{height:230px;align-content:start}
+ .readings h2{font-size:14px;margin-bottom:4px}
+ .readings strong{font-size:24px}
+ .readings>div{padding:3px 0}
+ .readings>div:not(:first-of-type){font-size:12px;line-height:1.3}
+ .readings>div:not(:first-of-type)>b{font-size:15px;line-height:1.4}
+ .bar-pane #barPlot{height:150px;aspect-ratio:auto;margin:4px 0 6px}
+ .bar-pane .note{font-size:11.5px;line-height:1.35;margin:4px 0}
+ .bar-pane .bar-equations{font-size:12px;gap:4px 10px;padding:3px 0}
+ .bar-equations>[data-tex]{padding:2px 0}
+ .layout>aside>.bar-pane{height:100%;overflow:visible}
+}
+@media(min-width:801px){.readings>div{padding:2px 0}.readings h2{margin-bottom:2px}.readings>div:not(:first-of-type){line-height:1.25}}
+.schema-pane #schemaInfo{height:auto;min-height:88px;overflow:visible}
+@media(min-width:801px){
+ .layout>aside,.layout>aside:has(>.wound:not([hidden])){grid-template-rows:326px 230px minmax(0,1fr)}
+ .layout>aside>.schema-pane{height:326px}
+ .bar-pane .note{margin:3px 0}
+}

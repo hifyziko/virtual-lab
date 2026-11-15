@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HiFyziko · Atomy</title>
+<link rel="stylesheet" href="../particles/vendor/katex.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eaf0eb;color:#183c38;font:18px/1.4 "Segoe UI",Arial,sans-serif}main{width:min(1500px,96vw);height:100dvh;margin:auto;display:flex;flex-direction:column;padding:18px 0;gap:12px}header,footer{display:flex;justify-content:space-between;align-items:center;gap:24px}h1{font:600 20px "Segoe UI",Arial;margin:0}header p,footer{font-size:16px;color:#58716b;margin:0}.gallery{position:relative;flex:1;min-height:0;background:#10262c;border-radius:16px;overflow:hidden}canvas{position:absolute;inset:0;width:100%;height:100%}.views{position:absolute;inset:0;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:1fr 1fr;gap:1px}.view{grid-column:span 4;position:relative;min-width:0;touch-action:none;border:1px solid #58757533;cursor:grab}.view:nth-child(n+4){grid-column:span 3}.view:active{cursor:grabbing}.view h2{position:absolute;left:18px;top:14px;margin:0;font-size:18px;font-weight:500;color:#edf3ee;pointer-events:none}.composition{position:absolute;bottom:14px;left:0;width:100%;text-align:center;color:#c8d6d1;pointer-events:none;font-size:18px}.mark{position:absolute;transform:translate(-50%,-50%);font-size:18px;color:#fff;text-shadow:0 1px 4px #10262c,0 0 3px #10262c;pointer-events:none}.katex{font-size:1em}.error{position:absolute;inset:20%;background:#fff7e9;padding:24px;z-index:4}[hidden]{display:none!important}@media(max-width:700px){main{height:auto;min-height:100dvh}header p{display:none}.gallery{flex:none;height:1250px}.views{grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr)}.view,.view:nth-child(n+4){grid-column:span 1}.view:last-child{grid-column:span 2}footer{font-size:14px}}
+</style>
+<style>
+:root{--ui-font:18px;--particle-font:50px;--scene-background:#f9faf6}
+body{background:#f0f3ee}
+.gallery{background:var(--scene-background)}
+.gallery,.gallery *{user-select:none;-webkit-user-select:none}
+.view{border-color:#d5dfd4}
+.view h2{color:#183c38}
+.composition{color:#3e5b53}
+h1,header p,footer,.view h2,.composition{font-size:var(--ui-font)}
+.mark{font-size:var(--particle-font)}
+footer{flex-wrap:wrap}
+.view h2{right:14px}
+header a{color:#285b53;font-size:var(--ui-font)}
+</style>
+<script defer src="../particles/vendor/katex.js"></script><script defer src="../particles/style.js"></script><script defer src="../particles/nuclear-shader.js"></script><script defer src="../particles/framing.js"></script><script defer src="list.js"></script><style>header nav{display:flex;gap:9px;flex-wrap:wrap}header nav a{padding:9px 16px;border:1px solid #b8cdbd;border-radius:7px;background:white;text-decoration:none;font-weight:600}header nav a[aria-current=page]{background:#007e6c;border-color:#007e6c;color:white}</style><style>.views{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}.view,.view:nth-child(n+4){grid-column:span 1}.electron-label{color:#126bc3;text-shadow:0 1px 3px white}footer{font-size:var(--ui-font)}footer span{max-width:60%}@media(max-width:700px){.views{grid-template-columns:1fr;grid-template-rows:repeat(4,1fr)}.view:last-child{grid-column:span 1}}</style></head>
+<body data-mode="atoms"><main><header><h1>HiFyziko / Atomy</h1><nav aria-label="Přehledy knihovny"><a href="index.html">Částice a jádra</a><a href="jadra.html">Samotná jádra</a><a href="atomy.html">Atomy</a></nav></header><section class="gallery"><canvas id="gl"></canvas><div class="views" id="views"></div><div class="error" id="error" hidden>Pro zobrazení je potřeba WebGL 2 s grafickou akcelerací.</div></section><footer><span>Oběh a měkká dráha jsou názorné schéma, nikoli skutečná trajektorie.</span><span>Obal a modré body znázorňují tytéž elektrony · 1.0</span></footer></main></body></html>

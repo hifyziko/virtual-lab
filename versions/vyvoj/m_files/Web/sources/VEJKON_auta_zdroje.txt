@@ -1,0 +1,52 @@
+VOZIDLA VE VEJKON V4 - ZDROJE A PREDPOKLADY (3. 11. 2026)
+
+Vozidlo                             m [kg]   Cd     A [m2]
+Tesla Model 3, puvodni priklad       1847     0.23   2.22
+Skoda Enyaq 85 (2025)                2141     0.26   2.59
+BMW i4 eDrive40 (2022)               2125     0.24   2.31
+VW ID.4 Pro 4MOTION (2022)           2221     0.28   2.62
+Hyundai IONIQ 6 Lite RWD (MY, 2024)   1850     0.21   2.39
+
+Vsechny predvolby maji cr=0.0075: spolecny vyukovy predpoklad, nikoli
+zmereny udaj pneumatik konkretniho auta. Hodnoty lze rucne menit.
+Nejde o porovnani homologovane spotreby. Model pocita mechanickou energii
+na kolech pri ustalene jizde, bez ztrat pohonu a pomocnych spotrebicu.
+Cd zavisi na kolech, vybave a konfiguraci; katalogove minimum nemusi
+platit pro kazdy prodany vuz. Plochy oznacene jako odhad nejsou mereni.
+
+TESLA
+Hodnoty zachovany z puvodniho skriptu; varianta a rok nebyly dolozeny.
+
+SKODA
+Hmotnost vcetne 75kg ridice: minimum technickeho listu 2141 kg.
+Cd=0.26 reprezentativni volba v rozmezi rady; A=2.59 m2 odhad.
+https://cdn.skoda-storyboard.com/2025/01/TD-Enyaq-en_1fba4bab.pdf
+
+BMW
+Technicke udaje i4 eDrive40: DIN/EU 2050/2125 kg; Cd x A = 0.24 x 2.31.
+Pouzita EU hmotnost s ridicem. Plocha neni odhad.
+https://www.press.bmwgroup.com/asia/article/attachment/T0334138EN/481305
+https://connect.bmwhk.com/sites/default/files/2022-09/BMW%20i4%20%28G26%29%20-%20Sales%20literature%20-%20Catalogue%20-%20090122.pdf
+https://newsroom.bmwgroup.com/americas/the-new-2022-bmw-i4-edrive40-and-i4-m50
+
+VOLKSWAGEN
+Specifikace ID.4 Pro 4MOTION: minimalni provozni hmotnost 2221 kg, Cd=0.28.
+A=2.62 m2 je hruby vyukovy odhad celni plochy SUV, nikoli udaj VW.
+Zdroj byl dostupny v indexovanem obsahu vyhledavace; prime otevreni pri
+kontrole vracelo 404 (odkaz muze byt po reorganizaci webu nefunkcni).
+https://www.volkswagen-newsroom.com/en/volkswagen-id4-pro-4motion-15130/specifications-of-the-id4-pro-4motion-15140
+
+HYUNDAI
+Malajsijska specifikace IONIQ 6 Lite RWD (53 kWh), brozura 2024:
+nejlehci curb weight 1775 kg, v modelu pridan 75kg ridic = 1850 kg.
+Cd=0.21 je uvedena hodnota rady (nejlepsi aerodynamicka konfigurace).
+A=2.39 m2 je odhad 0.85 * sirka 1.880 m * vyska 1.495 m.
+Nejde o presne zmerenou plochu, ani automaticky o ceskou vybavu.
+https://www.hyundai.com.my/downloads/e-brochure/request-from-kiosk/eBrochure-ioniq6.pdf
+https://www.hyundai.news/eu/models/electrified/ioniq-6/press-kit/hyundai-ioniq-6-delivers-a-new-electric-mobility-experience-march-2023.html
+
+OVLADANI
+Vyber auta zmeni m, cr, Cd a A. Rychlost, sklon a teplota zustanou.
+Rucni uprava parametru vozidla prepne na Vlastni parametry; teplota nikoli.
+Reset vraci puvodni priklad Tesla vcetne rychlosti, sklonu a teploty.
+Pro srovnani nastavte rovinu a 130 km/h, potom prepinejte vozidla.

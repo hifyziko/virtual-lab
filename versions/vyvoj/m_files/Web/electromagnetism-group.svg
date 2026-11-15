@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 120" role="img" aria-label="Střídavý proud v první cívce budí magnetické pole a ve druhé indukuje napětí">
+<g fill="none" stroke="#007c69" stroke-width="1.7"><path d="M38 57C15 57 14 18 53 18H126C165 18 166 57 142 57M38 57C14 57 15 86 53 86H126C165 86 166 57 142 57"/><path d="M38 57C24 57 24 29 54 29H125C153 29 157 57 142 57M38 57C25 57 25 75 54 75H125C155 75 157 57 142 57"/><path d="M36 51H144M36 62H144"/><path d="M91 18l-5-3m5 3-5 3M90 86l-5-3m5 3-5 3M91 51l5-3m-5 3 5 3"/></g>
+<g fill="none" stroke="#c45a2c" stroke-width="3.1"><ellipse cx="46" cy="56" rx="6" ry="23"/><ellipse cx="53" cy="56" rx="6" ry="23"/><ellipse cx="60" cy="56" rx="6" ry="23"/><ellipse cx="67" cy="56" rx="6" ry="23"/></g>
+<g fill="none" stroke="#426ed4" stroke-width="3.1"><ellipse cx="112" cy="56" rx="6" ry="23"/><ellipse cx="119" cy="56" rx="6" ry="23"/><ellipse cx="126" cy="56" rx="6" ry="23"/><ellipse cx="133" cy="56" rx="6" ry="23"/></g>
+<path d="M40 56H21V100H39M73 56H80V100H61" fill="none" stroke="#c45a2c" stroke-width="2"/><circle cx="50" cy="100" r="11" fill="#f4f5f0" stroke="#c45a2c" stroke-width="2"/><path d="M43 100q3-8 7 0t7 0" fill="none" stroke="#c45a2c" stroke-width="1.6"/>
+<path d="M106 56H99V100H117M139 56H159V100H139" fill="none" stroke="#426ed4" stroke-width="2"/><circle cx="128" cy="100" r="11" fill="#f4f5f0" stroke="#426ed4" stroke-width="2"/><path d="M122 95l6 10 6-10" fill="none" stroke="#426ed4" stroke-width="1.8" stroke-linejoin="round"/>
+</svg>

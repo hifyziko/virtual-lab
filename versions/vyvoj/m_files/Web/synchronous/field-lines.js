@@ -1,0 +1,4 @@
+(()=>{'use strict';const basis=window.SyncFieldBasis,N=basis.N,R=basis.R,h=2*R/(N-1);let cacheKey='',cached={paths:'',arrows:''};
+const contours=(a,color)=>window.MagneticContours(a,N,R,color);
+window.SyncFieldLines=function(s,source){if(source==='none'||(source==='rotor'&&!s.type.startsWith('ipm')&&(!s.excitation||s.excitationLevel===0)))return '';const beta=window.SyncPrinciple.polePairs(s)*(s.field-s.rotor),ex=s.type.startsWith('ipm')?1:s.excitation?s.excitationLevel:0,k=[s.type,source,Math.round(beta*180),ex].join(':');if(k!==cacheKey){const f=basis[s.type].fields,a=new Float32Array(N*N),st=source!=='rotor',rot=source!=='stator',c=Math.cos(beta),sn=Math.sin(beta);for(let i=0;i<a.length;i++)a[i]=(st?c*f[0][i]+sn*f[1][i]:0)+(rot?ex*f[2][i]:0);cached=contours(a,source==='rotor'?'#a76914':source==='stator'?'#007e6c':'#267e76');cacheKey=k;}return cached.paths+cached.arrows;};
+})();

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 120" role="img" aria-labelledby="materials-title materials-desc">
+<title id="materials-title">Vířivé proudy a hystereze</title>
+<desc id="materials-desc">Čelní řez vodivým železem: rostoucí indukce do roviny obrázku, značená křížkem, vyvolává uzavřené vířivé proudy proti směru hodinových ručiček. Vpravo hysterezní smyčka B–H se směrovými šipkami.</desc>
+<defs>
+<linearGradient id="materials-metal" x2="1" y2="1"><stop stop-color="#ecf2f2"/><stop offset="1" stop-color="#a9bfc4"/></linearGradient>
+<marker id="materials-current" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="4" markerHeight="4" orient="auto"><path d="M1 1L7 4L1 7Z" fill="#b76b2b"/></marker>
+<marker id="materials-hysteresis" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="4" markerHeight="4" orient="auto"><path d="M1 1L7 4L1 7Z" fill="#b34e38"/></marker>
+<marker id="materials-axis" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="4" markerHeight="4" orient="auto"><path d="M1 1L7 4L1 7" fill="none" stroke="#6d858b" stroke-width="1.2"/></marker>
+</defs>
+<!-- A solid conducting cross-section, not loops across insulated laminations. -->
+<path d="M12 29L18 23H84V91L78 97H12Z" fill="#91aab0" stroke="#69878f" stroke-width="1"/>
+<rect x="10" y="29" width="68" height="68" rx="5" fill="url(#materials-metal)" stroke="#567680" stroke-width="1.4"/>
+<g fill="none" stroke="#b76b2b" stroke-width="1.7">
+<circle cx="44" cy="63" r="26"/><circle cx="44" cy="63" r="18"/><circle cx="44" cy="63" r="10"/>
+<!-- Tangential arrows: CCW opposes an increasing field into the page. -->
+<path d="M44 37A26 26 0 0 0 22 49" marker-end="url(#materials-current)"/>
+<path d="M44 81A18 18 0 0 0 60 71" marker-end="url(#materials-current)"/>
+<path d="M44 53A10 10 0 0 0 35 59" marker-end="url(#materials-current)"/>
+</g>
+<g stroke="#007c69" stroke-width="1.6" fill="none"><circle cx="44" cy="63" r="4.1"/><path d="M41 60L47 66M41 66L47 60"/></g>
+<text x="44" y="18" text-anchor="middle" fill="#007c69" font-family="system-ui,sans-serif" font-size="9">rostoucí B ⊗</text>
+<path d="M95 66H173M135 106V23" stroke="#6d858b" stroke-width="1.1" fill="none" marker-end="url(#materials-axis)"/>
+<path d="M104 92C113 92 119 89 121 67C124 40 145 39 166 39C150 39 149 48 147 66C144 90 123 92 104 92Z" fill="#b34e3812" stroke="#b34e38" stroke-width="2.3"/>
+<g fill="none" stroke="#b34e38" stroke-width="2.1" stroke-linecap="round">
+<path d="M132.09 45.48 L128.07 49.04 L124.82 53.72 L122.42 59.66" marker-end="url(#materials-hysteresis)"/>
+<path d="M136.04 85.52 L139.98 82.20 L143.20 77.92 L145.58 72.56" marker-end="url(#materials-hysteresis)"/>
+</g>
+<g fill="#365762" font-family="Georgia,serif" font-style="italic" font-size="12"><text x="141" y="27">B</text><text x="165" y="80">H</text></g>
+</svg>

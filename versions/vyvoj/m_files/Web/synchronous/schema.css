@@ -1,0 +1,99 @@
+:root{--green:#007e6c;--gold:#ad701b;--purple:#8661b1;--blue:#346fc0;--ink:#19313b;--muted:#657b82;--line:#dce5e2;--bg:#eef2f1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,'Segoe UI',sans-serif}main{max-width:none;margin:auto;padding:10px 14px;min-width:0}header{margin-bottom:10px}header>span{font-size:10px;letter-spacing:1px;color:var(--green)}h1{font-size:25px;margin:0}h2{font-size:16px;margin:0}h3{font-size:14px;margin:4px 0}p{margin:5px 0;color:var(--muted)}button,select,input{font:inherit}button,select{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 8px;color:var(--ink)}button{cursor:pointer;font-size:12px}button:hover{background:#edf6f3;border-color:#93b9ae}button[aria-pressed=true]{background:var(--green);color:#fff}button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #d9b854;outline-offset:2px}input{accent-color:var(--green)}input[type=range]{width:100%;min-width:0}input:disabled{opacity:.4}[hidden]{display:none!important}a{color:var(--green)}
+.workspace{display:grid;grid-template-columns:minmax(320px,.58fr) minmax(0,1.42fr);gap:18px;height:calc(100dvh - 100px);min-height:620px;margin:0 0 8px}
+main:has(>header) .workspace{height:calc(100dvh - 172px)}
+.circuit-column{min-width:0;min-height:0;overflow:auto;scrollbar-gutter:stable;padding-right:4px;display:flex;flex-direction:column;gap:9px}
+/* The circuit is drawn directly on the page, without its own card or frame. */
+.circuit-card{padding:0;background:none;border:0;border-radius:0;min-width:0}
+.card-title{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;min-height:26px}.tag{font-size:11px;color:var(--muted)}svg{display:block;width:100%;overflow:hidden}#circuit{height:clamp(180px,22.8vh,252px);flex:none}#circuit .math-label{font-size:24px}#circuit .diagram-caption{font-size:20px}
+.equation{display:flex;flex-direction:column;justify-content:center;gap:5px;min-height:66px;padding:8px 0;font-size:12px;overflow-x:auto;flex:none;border-block:1px solid var(--line)}.equation>.katex{white-space:nowrap}
+.focus-note{font-size:12px;line-height:1.5;min-height:34px;max-height:48px;overflow:auto;color:var(--muted)}.focus-note>.katex{color:var(--purple)}
+.controls{padding:0;background:none;border:0}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:7px 12px;font-size:12px}.toolbar label{display:flex;align-items:center;gap:5px}.presets{display:flex;gap:4px;flex-wrap:wrap}.lock{margin-left:0}.load-mode{font-size:12px}.sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:9px}.sliders label{min-width:0}.sliders label>span{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600}.sliders output{margin-left:auto;min-width:48px;text-align:right;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}.sliders i{font-style:normal}.sliders small{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:10px}.control-note{font-size:11px;line-height:1.4;margin-top:6px;max-height:46px;overflow:auto}.parameters{padding-top:4px;border-top:1px solid var(--line)}.parameters label{display:grid;grid-template-columns:128px 32px minmax(60px,1fr) 35px;gap:5px;align-items:center;font-size:12px;margin:6px 0}.parameters output{text-align:right;font-variant-numeric:tabular-nums}.parameters p{font-size:11px}.parameters #lossNote{font-size:12px;color:var(--muted)}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;min-width:0}.phasor-card{display:flex;flex-direction:column;gap:5px;min-width:0;min-height:0;padding:12px}.phasor-card h2{font-size:18px}.diagram-options{display:flex;gap:12px;flex-wrap:wrap;font-size:12px}.steps{display:flex;gap:5px;flex-wrap:wrap}.steps button{padding:3px 8px}.phasor-stage{position:relative;flex:1 1 0;min-height:260px;min-width:0}.phasor-card #phasor{position:absolute;inset:0;width:100%;height:100%;min-height:0;max-height:none;contain:size}
+.metric{display:grid;grid-template-columns:auto 1fr;align-items:baseline;gap:1px 8px}.metric>span{color:var(--muted);font-size:12px}.metric strong{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;text-align:right;color:var(--green)}.metric small{display:none}
+.legend{display:flex;justify-content:center;gap:3px 12px;flex-wrap:wrap;font-size:11px;line-height:1.4}.u{color:var(--green)}.e{color:var(--gold)}.i{color:var(--blue)}.x{color:#50898a}.d{color:var(--purple)}.triangle-note{display:flex;align-items:center;gap:10px;min-height:36px;padding:4px 6px;font-size:11px;color:var(--muted)}.triangle-note>.katex{flex:none;font-size:14px}.phasor-note{font-size:10px;color:var(--muted);margin:0}.state{display:flex;gap:6px 12px;align-items:baseline;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:5px;font-size:12px}.state>span{font-weight:700;color:var(--green)}.state strong{font-size:12px;font-weight:500}.state p{flex-basis:100%;font-size:11px;margin:0}
+.try{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:11px;padding-top:4px}.try>b{font-weight:500;color:var(--muted)}.try>span{display:none}.try button{font-size:11px;padding:3px 6px}details.card{margin-top:6px;padding:0}summary{cursor:pointer;font-size:12px;color:var(--muted);padding:6px 10px}details>div{padding:8px 12px}.theory{display:grid;grid-template-columns:1fr 1fr;gap:20px}.theory article{min-width:0;overflow:auto}.theory p{font-size:12px}.theory [data-math]{margin:10px 0;font-size:13px}.explain-grid{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center}.explain-grid p{font-size:12px}#rotor{height:130px}.reactances{font-size:13px;color:var(--purple)}#stability{font-size:12px}.warning{color:#a25e21!important}.math-label{display:flex;align-items:center;justify-content:center;height:100%;font-size:15px;white-space:nowrap}.diagram-label .math-label{font-size:17px;background:transparent}.diagram-caption{font:12px system-ui;fill:var(--muted)}svg .katex,svg .katex *{background:transparent!important;box-shadow:none!important;text-shadow:none!important}
+@media(min-width:1100px) and (min-height:1000px){.workspace{min-height:800px}.circuit-column{gap:14px}.parameters label{margin:11px 0}.sliders{margin-top:14px}.phasor-card{padding:16px}}
+@media(max-width:1000px){.workspace{grid-template-columns:minmax(300px,.65fr) minmax(0,1.35fr);gap:12px}.parameters label{grid-template-columns:105px 28px minmax(50px,1fr) 32px;font-size:11px}.metric strong{font-size:16px}.phasor-card{padding:9px}.diagram-options{gap:5px}.triangle-note>span:not(.katex){display:none}}
+@media(max-width:760px){main{padding:8px}.workspace,main:has(>header) .workspace{height:auto;min-height:0;grid-template-columns:minmax(0,1fr)}.circuit-column{overflow:visible;padding:0}.phasor-card{min-height:600px}.phasor-stage{flex:none;height:480px;min-height:0}.theory{grid-template-columns:minmax(0,1fr)}.parameters label{grid-template-columns:128px 32px minmax(50px,1fr) 35px}.card-title{gap:5px}#circuit{height:240px;max-height:345px}.equation{font-size:12px}.triangle-note{display:block}.state p{font-size:11px}}
+@media(max-width:420px){.sliders{grid-template-columns:minmax(0,1fr);gap:8px}.parameters label{grid-template-columns:105px 28px minmax(50px,1fr) 32px}.phasor-stage{height:400px}.phasor-card{min-height:520px}.metric strong{font-size:15px}.steps button{font-size:11px;padding:3px 5px}}
+
+/* A small, always-visible teaching inset beside the operating values. */
+.operating-mini{flex:none;min-width:0;border:1px solid #e0e9e4;border-radius:9px;background:#fafcfb;padding:7px 10px;margin-top:4px}
+.operating-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:2px}
+.operating-title h3{font-size:12px;font-weight:600;color:var(--muted);margin:0}
+.operating-title>span{font-size:11px;color:var(--green)}
+.operating-content{display:grid;grid-template-columns:minmax(0,1fr) minmax(155px,.52fr);align-items:center;gap:12px}
+.characteristic-pictogram{margin:0;min-width:0}.operating-mini #power{height:100px;width:100%}
+.characteristic-pictogram figcaption{display:flex;justify-content:center;align-items:center;gap:8px;font-size:10px;color:var(--muted);line-height:1.3}
+.operating-dot{color:var(--gold)}.characteristic-pictogram .katex{font-size:1em}
+.operating-readouts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;min-width:0}
+.operating-readouts .metric{gap:2px 7px}.operating-readouts .metric strong{font-size:16px}.operating-readouts .metric>span{font-size:12px}
+@media(max-width:1000px){.operating-content{grid-template-columns:minmax(0,1fr) 150px;gap:6px}.operating-mini{padding:6px}.operating-readouts{gap:6px 8px}.operating-readouts .metric{display:flex;justify-content:space-between}.operating-readouts .metric strong{font-size:14px}}
+@media(max-width:760px){.phasor-card{min-height:650px}.phasor-stage{height:430px}.operating-mini #power{height:95px}.phasor-card .operating-mini{margin-top:6px}}
+@media(max-width:420px){.phasor-stage{height:350px}.phasor-card{min-height:560px}.operating-content{grid-template-columns:minmax(0,1fr) 135px}.operating-readouts{gap:6px}.operating-readouts .metric strong{font-size:13px}}
+
+.characteristic-pictogram figcaption{flex-wrap:wrap;gap:2px 6px}.operating-readouts .metric{min-width:0}.operating-readouts .metric strong{white-space:nowrap}
+@media(max-width:420px){.operating-readouts{grid-template-columns:minmax(0,1fr);gap:3px}}
+
+/* Two aligned panels, with operating values beneath the controls. */
+.circuit-column{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;gap:12px}
+.equation{font-size:16px;gap:10px;padding:12px 0;min-height:90px}
+.equation>div{min-width:0}.equation .katex{white-space:normal}
+.circuit-column .operating-mini{margin-top:auto;padding:10px;border:0;background:#f7faf8}
+.circuit-column .operating-content{grid-template-columns:minmax(0,1fr);gap:8px}
+.circuit-column .operating-readouts{grid-template-columns:repeat(2,minmax(0,1fr))}
+.circuit-column .focus-note{display:none}
+.parameters p{display:none}.control-note:empty{display:none}
+.phasor-stage{min-height:330px}.phasor-card #phasor{height:100%;inset:0}
+@media(max-width:760px){.circuit-column{padding:12px}.phasor-stage{height:500px}.equation{font-size:15px}}
+
+.torque-key{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:11px;margin-top:5px}.torque-key span:before{content:"";display:inline-block;width:18px;margin-right:4px;vertical-align:middle;border-top:2px solid}.torque-excitation{color:var(--gold)}.torque-excitation:before{border-top-style:dashed!important}.torque-reluctance{color:#50898a}.torque-reluctance:before{border-top-style:dotted!important}.torque-total{color:var(--purple)}
+
+/* Large operating values in the upper-left corner of the phasor panel. */
+.phasor-stage>.phasor-readouts{position:absolute;top:10px;left:10px;z-index:1;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:135px;padding:12px 16px;background:rgba(255,255,255,.94);border-radius:8px;pointer-events:none}
+.phasor-readouts .metric{display:grid;grid-template-columns:45px 1fr;gap:12px;align-items:baseline}
+.phasor-readouts .metric>span{font-size:16px}
+.phasor-readouts .metric strong{font-size:28px;font-weight:600;line-height:1.2}
+@media(max-width:1000px){.phasor-stage>.phasor-readouts{top:4px;left:0;padding:8px;min-width:110px;gap:9px}.phasor-readouts .metric{grid-template-columns:35px 1fr;gap:7px}.phasor-readouts .metric strong{font-size:23px}.phasor-readouts .metric>span{font-size:14px}}
+
+.circuit-column .operating-mini{flex:1 0 auto;display:flex;flex-direction:column;min-height:210px}.circuit-column .operating-content{flex:1;display:flex;flex-direction:column;justify-content:center}.circuit-column .characteristic-pictogram{width:100%}.circuit-column .operating-mini #power{height:auto;min-height:145px;max-height:250px;aspect-ratio:420/160}.operating-title h3{font-size:13px}
+
+.circuit-column .operating-mini{min-height:310px}.circuit-column .operating-content{align-items:stretch}.circuit-column .characteristic-pictogram{flex:1;display:flex;flex-direction:column}.circuit-column .operating-mini #power{flex:1;width:100%;height:auto;min-height:240px;max-height:none;aspect-ratio:420/260}.characteristic-pictogram figcaption,.torque-key{flex:none}
+
+/* Fit both panels without losing the characteristic below the viewport. */
+.circuit-column{gap:7px}#circuit{height:155px}.equation{min-height:74px;padding:7px 0;gap:6px}.parameters label{margin:4px 0}.sliders{margin-top:6px;gap:8px}.control-note{font-size:10px;line-height:1.3}.parameters{padding-top:0}.try{padding-top:0}.circuit-column .operating-mini{min-height:205px;padding:6px 8px}.circuit-column .operating-mini #power{min-height:160px}.operating-title{margin-bottom:0}.torque-key{margin-top:2px}.phasor-readouts .metric{grid-template-columns:55px 1fr}
+@media(min-height:1000px){.circuit-column{gap:8px}.parameters label{margin:5px 0}.sliders{margin-top:7px}}
+@media(max-height:850px) and (min-width:761px){#circuit{height:125px}.circuit-column{gap:4px}.equation{min-height:62px;font-size:14px}.parameters label{margin:2px 0}.control-note{display:none}.circuit-column .operating-mini{min-height:185px}.circuit-column .operating-mini #power{min-height:140px}}
+
+.circuit-column .control-note{display:none}.circuit-column .operating-mini #power{max-height:220px}.circuit-column .operating-mini{min-height:190px}.circuit-column .characteristic-pictogram{justify-content:center}
+
+/* Match chart coordinates to its actual box: no aspect-ratio letterboxing. */
+.circuit-column .operating-content{min-height:0;flex:1 1 0;justify-content:stretch}
+.circuit-column .characteristic-pictogram{min-height:0;flex:1 1 0;justify-content:stretch}
+.circuit-column .operating-mini #power{flex:1 1 0;height:0;min-height:140px;max-height:none;aspect-ratio:auto;width:100%}
+
+/* Give the equivalent circuit more room; the torque plot takes the remainder. */
+.workspace{grid-template-columns:minmax(350px,.68fr) minmax(0,1.32fr)}
+#circuit{height:clamp(160px,18vh,205px)}
+.circuit-column .operating-mini{flex:1 1 0;min-height:190px}
+@media(max-width:1000px){.workspace{grid-template-columns:minmax(320px,.72fr) minmax(0,1.28fr)}}
+@media(max-width:760px){.workspace{grid-template-columns:minmax(0,1fr)}#circuit{height:200px}.circuit-column .operating-mini{min-height:280px}}
+
+.torque-angle-note{text-align:center;font-size:10px;color:var(--muted);margin-top:3px}
+
+/* Compact phasor lettering and readable characteristic lettering. */
+#phasor .diagram-label .math-label{font-size:13px}#power .diagram-label .math-label{font-size:18px}#power text{font-size:13px}
+
+/* Readable type in the left-panel characteristic. */
+.circuit-column .operating-mini #power text{font-size:15px}
+.circuit-column .operating-mini #power .math-label{font-size:21px}
+.circuit-column .operating-title h3{font-size:15px}
+.circuit-column .characteristic-pictogram figcaption,.circuit-column .torque-key{font-size:13px}
+.circuit-column .torque-angle-note{font-size:12px;line-height:1.4}
+.circuit-column .operating-title>span{font-size:13px}
+
+#phasor .diagram-label .math-label{font-size:12px}
+
+/* Primary action for the fixed phasor frame. */
+.diagram-options #fitPoint.rescale-axes-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border:1px solid #006c5c;border-radius:8px;background:#007e6c;color:#fff;font-size:15px;font-weight:650;line-height:1.3;box-shadow:0 2px 5px #19313b18;white-space:nowrap}.diagram-options #fitPoint.rescale-axes-button:hover{background:#006958}.diagram-options #fitPoint.rescale-axes-button:active{background:#005c4e}.diagram-options #fitPoint.rescale-axes-button:focus-visible{outline:3px solid #d8aa43;outline-offset:3px}.diagram-options{flex-wrap:wrap;gap:10px}

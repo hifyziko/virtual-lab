@@ -1,0 +1,18 @@
+{
+  "frames": 201,
+  "source_frames": 201,
+  "complete_period": false,
+  "end_ms": 60.0,
+  "block_size": 16,
+  "data_bytes": 28523831,
+  "max_absolute_error_B_A_J": [
+    0.006093482410206796,
+    3.811575446875659e-05,
+    0.01615730984004471
+  ],
+  "loop_seam_rms_normalized": [
+    0.13883773714434247,
+    0.022666895739402327,
+    0.13927998148382134
+  ]
+}

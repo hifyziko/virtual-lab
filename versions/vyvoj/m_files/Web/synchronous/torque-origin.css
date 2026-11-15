@@ -1,0 +1,46 @@
+/* Three visual panels and one result band; detailed derivation opens separately. */
+main.torque-derivation.uniform-module-layout{--module-flexible-height:1;height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:8px}
+.torque-derivation .layout{display:flex;flex-direction:column;flex:1 1 0;height:0;min-height:0;gap:10px;margin:0}
+.torque-derivation .settings{display:grid;grid-template-columns:170px minmax(0,1fr) 200px;gap:7px 16px;flex:0 0 auto;overflow:visible}
+.torque-derivation .settings .row{grid-column:1;grid-row:1}
+.torque-derivation .settings>label{grid-column:1;grid-row:2}
+.torque-derivation .controls{grid-column:2;grid-row:1/3;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;align-items:center}
+.torque-derivation #losslessExample{grid-column:3;grid-row:1}
+.torque-derivation .torque-bases{grid-column:3;grid-row:2;margin:0}
+.torque-derivation #status{grid-column:1/-1;margin:0}
+.torque-derivation .graph-panel{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);grid-template-rows:auto minmax(260px,1fr) auto;gap:10px;flex:1 1 0;min-height:0;overflow:visible;padding:0;background:none;border:0}
+.torque-derivation .metrics{margin:0;min-height:30px}
+.torque-derivation .origin-diagrams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-height:0;height:100%}
+.torque-derivation .origin-phasor,.torque-derivation .origin-diagrams .voltage-box{display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0;height:100%;margin:0;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:white;max-width:none}
+.torque-derivation .origin-phasor h2,.torque-derivation .voltage-box h3,.torque-derivation .origin-curve h3{margin:0;font-size:16px}
+.torque-derivation .graph-panel .origin-phasor .plot-wrap{flex:1 1 0;min-height:0;height:0}
+.torque-derivation .origin-diagrams .voltage{flex:1 1 0;min-height:0;height:0;width:100%}
+.torque-derivation .origin-diagrams :is(.angle-key,.angle-readouts,.legend){margin:0;font-size:12px;min-height:20px;flex-shrink:0}
+.torque-derivation .origin-curve{display:flex;flex-direction:column;min-height:0;padding:10px 14px;gap:4px}
+.torque-derivation .origin-curve svg{flex:1 1 0;min-height:0;height:0;width:100%}
+.torque-derivation .moment-result{padding:8px 14px!important;border:1px solid #cbded6;border-radius:10px;background:#f1f7f4}
+.torque-derivation .moment-result h3{margin:0 0 3px;font-size:13px}
+.torque-derivation .moment-result .formula{font-size:16px;line-height:1.45;padding:0;min-height:0;overflow:visible}
+.torque-derivation .formula .katex{font-size:1em}
+.torque-derivation>details{flex-shrink:0;margin:0}
+.torque-derivation .origin-derivation{padding:12px}
+.torque-derivation .origin-derivation .equations{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.torque-derivation .origin-derivation .equations article{grid-column:auto;overflow:visible}
+.torque-derivation .origin-derivation .formula{min-height:0;font-size:18px;overflow:visible}
+.torque-derivation .origin-derivation .note{margin:12px 0 0}
+
+/* Three neighboring panels; metrics and the result span the complete row. */
+.torque-derivation .graph-panel>.metrics{grid-column:1/-1;grid-row:1}
+.torque-derivation .graph-panel>.origin-diagrams{grid-column:1;grid-row:2}
+.torque-derivation .graph-panel>.origin-curve{grid-column:2;grid-row:2;min-width:0}
+.torque-derivation .graph-panel>.moment-result{grid-column:1/-1;grid-row:3}
+
+/* Three graphs above a single three-step derivation band. */
+.torque-derivation .graph-panel{grid-template-rows:minmax(260px,1fr) auto}
+.torque-derivation .graph-panel>.origin-diagrams{grid-row:1}
+.torque-derivation .graph-panel>.origin-curve{grid-row:1}
+.torque-derivation .graph-panel>.origin-steps{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid #cbded6;border-radius:10px;background:#f5f9f7;padding:10px 0;min-width:0}
+.torque-derivation .origin-steps>article{min-width:0;padding:0 14px!important;background:none;border:0;border-radius:0}
+.torque-derivation .origin-steps>article+article{border-left:1px solid #cbded6}
+.torque-derivation .origin-steps h3{font-size:13px;margin:0 0 5px}
+.torque-derivation .origin-steps .formula{font-size:14px!important;line-height:1.5;min-height:0;padding:0;overflow:visible}

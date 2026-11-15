@@ -1,0 +1,79 @@
+/* Electromagnetism shares the same logical frame and host scale. */
+main.uniform-module-layout{--module-flexible-height:1;min-height:var(--module-host-height,1000px)!important}
+/* Skin/proximity: reserve controls, spend the remaining height on three panels. */
+.hf-embedded main.uniform-module-layout{--hf-controls:120px;--hf-gap:8px;--hf-stage:calc(var(--module-host-height,1000px) - 328px);height:var(--module-host-height,1000px)!important;max-height:none;grid-template-rows:0 36px var(--hf-controls) var(--hf-stage) 44px 64px}
+.hf-embedded main>.periodToolbar{height:44px;min-height:44px}
+.hf-embedded main>.modelNotes{height:64px;min-height:64px}
+.hf-embedded main>.layout>.card{padding:8px;gap:4px}
+.hf-embedded #concept{height:240px!important;min-height:240px;max-height:240px;margin-top:0}
+.hf-embedded .couplingCycle{height:180px;max-height:180px}
+.hf-embedded #field{height:220px!important;min-height:220px;max-height:220px}
+.hf-embedded #profile{height:200px!important;min-height:200px;max-height:200px}
+.hf-embedded .embeddedEquations .eqRow{padding:3px 0}
+.hf-embedded :is(.miniNote,.loopNote,.depthNote,.embeddedEquations .eqCaption){font-size:12px;line-height:1.3}
+
+/* Graphs yield height to equations; no fixed child may protrude into the footer. */
+.hf-embedded main>.layout>.card #field,.hf-embedded main>.layout>.card #profile,.hf-embedded main>.layout>.card #concept{height:0!important;min-height:100px;max-height:none;flex:1 1 0}
+.hf-embedded main>.layout>.card #concept{min-height:140px}
+.hf-embedded .couplingCycle{height:150px;max-height:150px}
+/* Hysteresis losses: controls and equations stay compact, both drawings fill the remainder. */
+main.uniform-module-layout:has(#hardness){height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:8px}
+main.uniform-module-layout:has(#hardness)>*{flex-shrink:0;margin-top:0;margin-bottom:0}
+main.uniform-module-layout:has(#hardness)>.layout{flex:1 1 0;min-height:0}
+main.uniform-module-layout:has(#hardness)>.layout>.card{display:flex;flex-direction:column;min-height:0;padding:10px;gap:4px}
+main.uniform-module-layout:has(#hardness) .chart{height:0;min-height:100px;max-height:none;flex:1 1 0}
+main.uniform-module-layout:has(#hardness) .layout>.card>:not(.chart){flex-shrink:0}
+main.uniform-module-layout:has(#hardness) .controls{padding:10px 12px}
+main.uniform-module-layout:has(#hardness) .equations>.card{padding:10px}
+main.uniform-module-layout:has(#hardness) .formula{font-size:20px;line-height:1.35;margin:5px 0}
+main.uniform-module-layout:has(#hardness) .energy{padding:8px;margin-top:4px}
+main.uniform-module-layout:has(#hardness) .stats{margin-top:4px}
+main.uniform-module-layout:has(#hardness) .stat{padding:6px}
+main.uniform-module-layout:has(#hardness) .buttons{margin-top:4px}
+main.uniform-module-layout:has(#hardness) .hero p{margin:0;font-size:13px}
+
+main.uniform-module-layout[data-foundation-module]{height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;max-height:none!important}
+main[data-foundation-module="mag03-hysterezni-ztraty"] .formula{overflow:visible;padding:3px 0}
+main[data-foundation-module="mag01-magnetizace"],main[data-foundation-module="em02-vzajemna-indukcnost"],main[data-foundation-module="em03-silove-ucinky"]{display:flex;flex-direction:column;gap:8px}
+main[data-foundation-module="mag01-magnetizace"]>*,main[data-foundation-module="em02-vzajemna-indukcnost"]>*,main[data-foundation-module="em03-silove-ucinky"]>*{flex-shrink:0;margin-top:0;margin-bottom:0}
+main[data-foundation-module="mag01-magnetizace"]>.stage,body.em-inductance main[data-foundation-module]>.layout,main[data-foundation-module="em03-silove-ucinky"]>.workspace{flex:1 1 0;min-height:0;height:0}
+main[data-foundation-module="mag01-magnetizace"] .stage>.card{min-height:0;display:flex;flex-direction:column}
+main[data-foundation-module="mag01-magnetizace"] .stage>.card>svg{height:0;min-height:100px;flex:1 1 0}
+body.em-inductance main[data-foundation-module] .layout>.card{min-height:0;max-height:none}
+main[data-foundation-module="em03-silove-ucinky"] .mapPanel{display:flex;flex-direction:column;min-height:0;padding:12px}
+main[data-foundation-module="em03-silove-ucinky"] #scene{height:0;min-height:100px;flex:1 1 0}
+main[data-foundation-module="em03-silove-ucinky"] .mapPanel>:not(#scene){flex-shrink:0}
+main[data-foundation-module="em03-silove-ucinky"] aside{padding:10px 14px}
+main[data-foundation-module="em03-silove-ucinky"] .result{margin:5px 0;padding:5px 8px}
+main[data-foundation-module="em03-silove-ucinky"] .laws{margin-top:8px}
+main[data-foundation-module="em03-silove-ucinky"] .laws [data-tex]{margin:6px 0}
+main[data-foundation-module="em03-silove-ucinky"] .flow{margin:8px 0}
+
+main[data-foundation-module="em03-silove-ucinky"] aside{padding-top:6px;padding-bottom:6px}
+main[data-foundation-module="mag04-virive-proudy"]{display:flex;flex-direction:column;gap:8px}
+main[data-foundation-module="mag04-virive-proudy"]>*{flex-shrink:0;margin-top:0;margin-bottom:0}
+main[data-foundation-module="mag04-virive-proudy"]>.layout{flex:1 1 0;height:0;min-height:0}
+/* Matrix follows the same rows as skin and proximity, including its map canvases. */
+.hf-embedded #hfMatrix .matrix-input{height:var(--hf-controls);min-height:var(--hf-controls);max-height:var(--hf-controls)}
+.hf-embedded #hfMatrix #mx-results,.hf-embedded #hfMatrix #mx-results[hidden],.hf-embedded #hfMatrix .matrix-results,.hf-embedded #hfMatrix figure.card,.hf-embedded #hfMatrix figure.card:last-child{height:var(--hf-stage);min-height:var(--hf-stage);max-height:var(--hf-stage)}
+.hf-embedded #hfMatrix figure.card svg{height:0!important;min-height:100px;max-height:none;flex:1 1 0}
+.hf-embedded #hfMatrix .periodToolbar{height:44px;min-height:44px}
+.hf-embedded #hfMatrix>.matrix-note{height:64px;min-height:64px}
+.hf-embedded #hfMatrix .matrix-controls{grid-auto-rows:46px;gap:4px 10px}
+.hf-embedded #hfMatrix .matrix-controls label{grid-template-rows:18px 26px;gap:2px;font-size:12px;line-height:18px}
+.hf-embedded #hfMatrix .matrix-controls input:not([type=range]),.hf-embedded #hfMatrix .matrix-controls select{height:26px}
+
+/* Shared instantaneous/RMS mode belongs beside the period controls. */
+main>.periodToolbar>.instant-control{display:flex;align-items:center;gap:6px;white-space:nowrap;font-size:13px;flex:0 0 auto}
+main>.periodToolbar>.instant-control input{width:auto;margin:0;flex:none}
+main>.layout>.card>.fieldControls:has(#mapKind){display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:8px;align-items:center}
+main>.layout>.card>.fieldControls:has(#mapKind)>label{display:flex;align-items:center;min-width:0;gap:5px;white-space:nowrap;font-size:12px}
+main>.layout>.card>.fieldControls:has(#mapKind) select{flex:1 1 0;min-width:0;width:0;padding:6px 4px;font-size:12px}
+main>.periodToolbar>.phaseControls{padding:4px 0}
+
+/* Make the shared display mode easy to find and its checked state explicit. */
+main>.periodToolbar>.instant-control{padding:5px 9px;border:1px solid #83b5a7;border-radius:6px;background:#e6f2ec;color:#006d5b;font-weight:650;cursor:pointer;line-height:1.35}
+main>.periodToolbar>.instant-control:has(input:checked){background:#007e6c;border-color:#006b5c;color:#fff}
+main>.periodToolbar>.instant-control:hover{border-color:#005f52;box-shadow:0 0 0 1px #007e6c33}
+main>.periodToolbar>.instant-control:focus-within{outline:3px solid #c99d3c;outline-offset:2px}
+main>.periodToolbar>.instant-control input{accent-color:#007e6c}

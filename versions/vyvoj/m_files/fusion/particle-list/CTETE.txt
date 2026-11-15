@@ -1,0 +1,53 @@
+Čistý přehled sedmi druhů, všechny současně. Bez výběrového menu,
+časové osy a ovládacích panelů. Povrch vychází z uživatelova konceptu:
+spojité objemy, matné osvětlení a čitelné laloky.
+
+Vibrace jsou nastavené na maximum původního ovladače: 1,5.
+Výchozí automatické otáčení je vypnuté. Ruční otočení tažením nebo
+šipkami zůstává dostupné. Pevné popisky se mění jen při ručním
+otočení nebo změně velikosti okna. Elektron je hladká modrá značka.
+Systémová preference omezení pohybu zastaví automatické pulzování.
+
+Sdílené parametry: particles/style.js, sekce colors a connected.
+Sdílený shader: particles/nuclear-shader.js, procedurální WebGL 2.
+Jediný grafický kontext, jednotlivé výřezy pro všechny druhy.
+Není potřeba síť ani rastrový obrázek.
+
+Původní uživatelský HTML je uchován v docs/fuze/podklady.
+tools/import-nuclear-shader.cjs reprodukuje převod shaderu z tohoto
+podkladu s doplněním společných barev, elektronu a vykreslení výřezů.
+Běžný build nic negeneruje z Downloads a nevyžaduje původní počítač.
+Sestavení: node tools/build-particle-study.cjs.
+
+Atomový náhled: atomy.html. Vodík, deuterium a tritium mají jeden
+elektron, neutrální helium-4 dva. Obal je společná schematická modrá
+oblast; modré body představují stejné elektrony, nejsou další částice.
+Body jsou ilustrační značky, nikoli skutečné zjištěné polohy.
+Na žádost uživatele pomalu obíhají po mírně nakloněné kružnici
+s výraznější souvislou stopou s měkkým gaussovským profilem.
+Jeden oběh trvá přibližně 14 sekund.
+Je to výslovně označené názorné schéma, nikoli skutečná trajektorie.
+Poloha elektronového popisku sleduje značku plynule; popisky jádra
+zůstávají pevné. Při systémovém omezení pohybu se oběh zastaví.
+Obal je analytický radiálně slábnoucí vizuální profil, ne vypočtený
+orbital ani časově proměnná elektronová hustota. Měřítka jsou upravená.
+Jádro se nepřekresluje: atomy používají stejný shader i jaderné konfigurace.
+
+Pro čitelnost bez rotace jsou nukleony v connected.atoms uspořádány
+do roviny a výchozí kamera je čelní. Helium-3 má tři viditelné laloky,
+alfa (jádro helia-4) čtyři. Uspořádání je didaktické schéma, nikoli
+tvrzení o skutečném rovinném tvaru jader.
+
+Doprovodné texty mají 18 px. Značky na částicích mají referenčních
+50 px při průměru částice 150 px a škálují se spolu s částicemi.
+Velikost vychází z klidového rozměru, takže při vibraci neposkakuje.
+Vnější elektronové značky i jejich odstup se škálují společně.
+Nastavení je centrální v particles/style.js (particleLabels). Náhodné zrnění bylo odstraněno a drobná
+povrchová pigmentace zeslabena. Rozlišení začíná na 1,25násobku CSS
+rozměrů, automaticky se pohybuje v rozsahu 0,85–1,5 podle dlouhodobých
+intervalů snímků. Původní limit přibližně 30 snímků/s byl odstraněn.
+To umožňuje jemnější obraz a rychlejší animaci na výkonném zařízení,
+ale skutečná snímková frekvence na uživatelově GPU dosud nebyla měřena.
+
+Samostatná jádra: jadra.html. Pět jader bez elektronového obalu,
+stejný schválený styl a společná data nucleusIds / connected.atoms.

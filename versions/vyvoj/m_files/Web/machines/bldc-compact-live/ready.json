@@ -1,0 +1,19 @@
+{
+  "validated": true,
+  "frames": 215,
+  "end_s": 0.04,
+  "motion_max_error_deg": 1.6207035713478035e-12,
+  "decoded_max_abs_error_B_A_J": [
+    0.0035880303850359674,
+    4.054917978932315e-06,
+    0.045492669728797175
+  ],
+  "peaks_B_A_J": [
+    1.829859733581543,
+    0.016596917062997818,
+    11.61381721496582
+  ],
+  "native_setup": "IntroAnimationFresh",
+  "loop": false,
+  "data_bytes": 8881865
+}

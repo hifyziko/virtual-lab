@@ -1,0 +1,8 @@
+/* Shared icon slot; optical correction keeps wide scenes and circular machines comparable. */
+.group-banner>svg{width:150px;height:112px;flex:0 0 150px;overflow:visible;transform-origin:center}
+.group-banner.common>svg{transform:scale(1.06)}
+.group-banner.transformer>svg{transform:scale(1.08)}
+.group-banner.dc>svg{transform:scale(1.08)}
+.group-banner.electromagnetism>svg,.group-banner.materials>svg{transform:scale(.88)}
+.group-banner.drive>svg{transform:scale(.82)}
+@media(max-width:650px){.group-banner>svg{width:96px;height:80px;flex-basis:96px}}
