@@ -1,6 +1,7 @@
 /* The single visual definition used by the gallery and all consuming modules. */
 (function(root){
 const style={
+ fields:{electric:"#b57825",magnetic:"#356ac3"},
  colors:{p:0xeb3026,n:0x8a8a8a,e:0x126bc3,positron:0xa638d2,neutrino:0xf2f7f5,neutrinoOutline:0x294a53},
  labels:{p:'\\mathrm p^{+}',n:'\\mathrm n',e:'\\mathrm e^{-}',positron:'\\mathrm e^{+}',neutrino:'\\nu_{\\mathrm e}'},
  radii:{p:.69,n:.69,e:.38,positron:.38,neutrino:.3},

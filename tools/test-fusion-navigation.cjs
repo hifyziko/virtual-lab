@@ -15,8 +15,8 @@ class Element{
 const Lab={catalog:[{id:'existing',group:'sync'}],modules:new Map(),home(){},route(){},register(module){this.modules.set(module.id,module);}};
 const c={Lab,LabProgress:{value:key=>'<html>'+key+'</html>'},document:{readyState:'loading',createElement:tag=>new Element(tag)},location:{hash:''},setTimeout:fn=>{timers.add(fn);return fn;},clearTimeout:fn=>timers.delete(fn),addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);}};c.window=c;vm.createContext(c);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8'),c);
-assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,5);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,3,'Only one gallery is listed');
-const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-bariera/index.html','fuze-seznam/index.html']);
+assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,6);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,4,'Fusion, gallery and drift are listed');
+const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html']);
 const windowFit=fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/module-window-fit.js'),'utf8');
 function checkViewport(app,shell,id){
  const noop=()=>{},f={Lab,location:{hash:'#'+id},document:{body:{},getElementById:name=>name==='app'?app:null,addEventListener:noop},
@@ -45,7 +45,7 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
  const published=new Set(require('./project/common.cjs').webFiles(manifest));
  for(const entry of Lab.modules.values()){
   if(entry.sourceId){assert.deepEqual(manifest.progressive.dependencies[entry.id],['fusion-'+entry.sourceId]);assert(!manifest.progressive.assets['fusion-'+entry.id],'Aliases must share the gallery payload');continue;}
-  const file=path.join(web,entry.page),html=fs.readFileSync(file,'utf8');assert(html.includes('data-fusion-page="'+entry.id+'"'));assert(html.includes('target="_top">← Plazma a fúze'));
+  const file=path.join(web,entry.page),html=fs.readFileSync(file,'utf8');assert(html.includes('data-fusion-page="'+entry.id+'"'));assert(html.includes(entry.id==='fu03-drift'?'aria-label="Zpět do skupiny Plazma a fúze">← Zpět':'target="_top">← Plazma a fúze'));
   for(const [,ref] of html.matchAll(/(?:src|href)="([^"]+)"/g)){
    const url=new URL(ref,'https://lab.invalid/'+entry.page),rel=decodeURIComponent(url.pathname.slice(1));
    assert(published.has(rel),'Runtime dependency missing from public list: '+rel);assert(fs.existsSync(path.join(web,rel)),rel);

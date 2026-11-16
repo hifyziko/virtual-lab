@@ -1,5 +1,8 @@
 # Uživatelské konvence pro výukovou grafiku
 
+- Vektorové šipky kreslit tak, aby dřík končil u základny trojúhelníkového hrotu a nevyčníval z něj. Upřednostnit společnou vyplněnou siluetu dříku a hrotu; zohlednit i krátké šipky.
+- Ovládání má být vždy malé a kompaktní při zachování čitelnosti; většinu dostupné plochy věnovat větším grafům a scéně. Uvolněné místo po zmenšení ovládání přidělit grafům, nikoli výplním panelu.
+
 - Automatická vyskakovací hlášení používat jen pro blokace, o kterých student musí vědět, aby mohl pokračovat. Běžné stavové a výukové zprávy nepřekrývají scénu. Pokud se celá zpráva nevejde do stávajícího místa v levém panelu, vůbec ji tam nezobrazovat; nepřidávat posuvník, zkrácenou náhradu ani nezvětšovat panel. Výslovně otevřený výklad není automatické stavové hlášení.
 
 - Komplexní veličiny sázet v KaTeXu s pruhem nahoře (`\overline{...}`), nikoli podtržením. Skalární velikosti nemají pruh.
@@ -30,3 +33,5 @@
 - Balíčky jsou v lokálním `handoffs/`, mimo Git i Pages. Přesun je kopie a ověření, nikoli smazání původního počítače. Na novém počítači rozbalit do nové složky a použít `node tools/project/restore.cjs`. Přihlašovací údaje a konfigurace konkrétního počítače se nepřenášejí.
 - Nepotřebné objemné FEM výsledky, exporty a cache po ověření nezávislého sestavení odstranit, nepřenášet. Zachovat kompaktní data současných animací a malé zdrojové modely/geometrii/parametry/výpočetní skripty pro přepočet na požádání. Přepočítávání nespouštět automaticky. Chráněné zálohy uvedené výše zůstávají nedotčené.
 - Pravidla a aktuální rozpracovanost musí být zapsané v projektu; nespoléhat na paměť předchozího chatu. Lokální absolutní cesty nepoužívat jako závislosti sestavení.
+
+- Fúzní balíčky: elektrické pole má barvu jantarovou `#b57825`, magnetické modrou `#356ac3` (sdílené `HiFyzikoParticleStyle.fields`). Platí pro vektory, siločáry, značky a jejich popisky. Barevná mapa velikosti pole má samostatnou kvantitativní škálu. Podklady matematických popisků v driftovém modulu jsou průhledné.

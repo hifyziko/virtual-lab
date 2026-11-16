@@ -1,5 +1,44 @@
 # Aktuální stav předání
 
+## Aktuální souhrn pro předání — 16. listopadu 2026
+
+Uživatel výslovně požádal o předávací balíček pro jiný počítač a push celé
+aktuální verze. Předává se hlavní větev main, označení aplikace zůstává 1.0.
+Starší poznámky „bez pushe“ níže popisují tehdejší dílčí stavy. Rozhodující
+commit, stav vzdálené větve a příznak pushPending uvádí _handoff/state.json
+v novém soukromém balíčku; nasazení se ověřuje v GitHub Actions.
+
+Aktuální aplikace obsahuje 58 modulů včetně pěti pokusů s drifty částic,
+průběžně doplněné fúzní scény a galerie, stručných průvodců, schválených
+siluet vybraných vozidel a navigace bez hledání. Oprava načítání rozcestníku
+je zachovaná. Elektrické pole má jantarovou a magnetické modrou barvu.
+Průvodce necituje uživatelské prezentace; Bartoš je správně identifikovaný
+jako Teorie elektrických strojů. Podrobné změny a omezení jsou níže.
+
+Před uložením tohoto stavu prošly: úplné node tools/build-release.cjs,
+node tools/project/check.cjs (včetně driftu, vozidel, fyzikálních modelů,
+navigace a lazy načítání), node tools/project/test-tools.cjs a příprava
+čistého publikačního výběru přes prepare-web.cjs. Webový výběr má 208
+souborů, přibližně 182 MiB; obsahuje všech 42 progressiveFiles. Neobsahuje
+knihy, skeny ani vývojové nástroje. Soukromý ZIP je přidává odděleně spolu
+s historií Git a aktuálními skutečnými LFS daty. Stav veřejných zdrojů
+prošel auditem. Prohlížeč se neotevíral; testy DOM/canvas a numeriky nejsou
+vizuální kontrolou skutečného WebGL obrazu na novém počítači.
+
+Při místním sestavení se u velkého generovaného HTML opakovaly chyby otevření
+souboru ve Windows. Sestavení uspělo s lokálním dočasným atomickým zápisem;
+nejde o závislost veřejného sestavení ani balíčku. Z LFS zdroje byly po
+sestavení odstraněny pouze prokázané čtyři přidané prázdné řádky: obsah
+zůstává bajtově totožný s předchozím commitem, bez zbytečné nové LFS kopie.
+
+Na novém počítači ZIP rozbalit do nové prázdné složky a spustit
+node tools/project/restore.cjs pod běžným uživatelským účtem. Poté přečíst
+pravidla a předávací soubory, nastavit vlastní Git identitu a přihlášení,
+provést git fetch origin a zkontrolovat stav; s čistým stromem pull --ff-only.
+Požadované nástroje: Node.js 24, Git a Git LFS. Přihlašovací údaje ani
+konfigurace tohoto počítače se nepřenášejí. Otevření hotové výuky:
+versions/aktualni/web/index.html. FEM přepočet se automaticky nespouští.
+
 ## 16. listopadu 2026 — oprava rozcestníku po odstranění hledání
 
 tools/physics-preview.js ještě předpokládal existenci discovery-search,
@@ -812,3 +851,215 @@ Závěrečné úplné build-release uspělo s existujícím lokálním retry pre
 (tmp/loading-optimization/retry-write.cjs) pro zamykání HTML ve Windows.
 Obě aktivní dodávky byly kompletně přestavěné včetně všech lazy balíčků.
 Závěrečná tools/project/check.cjs po úplném sestavení prošla včetně auditu.
+
+## 16. listopadu 2026 — drift: kompaktní ovládání a čisté hroty šipek
+Vektorové šipky mají jedinou vyplněnou siluetu; dřík končí u základny
+trojúhelníkového hrotu, i u krátkých vektorů. Ovládání vlevo zhuštěné,
+hodnoty vedle popisků, menší mezery a tlačítka; uvolněnou výšku získává
+graf. Obě konvence uložené v AGENTS.md. Obě dodávky a lazy manifesty
+aktualizované přes build-particle-library.cjs. Test driftu, navigace a
+načítání prošel; prohlížeč neotevřen, bez pushe. Návrh dalšího zlepšení
+vletu: zakončit výukový pokus u výstupu z pole; zatím neimplementováno.
+
+
+## 16. listopadu 2026 — drift: umístění do pole a kontrast
+Částici lze v přípravě přetáhnout dovnitř i ven z pole; obě strany používají
+stejnou Lorentzovu integraci. Celá kružnice v poli zůstává uzavřená, dráha
+přes hranici vyletí po tečně. Po puštění se podle potřeby rozšíří záběr
+kružnice; během letu je pevný. Vlet má pole na pravých 73 % scény, sytější
+podklad, tmavší směrové značky a ostrou hranici. Popisky grafu mají průhledné
+pozadí; názvy os, číselná stupnice a čas mají oddělené okraje bez překryvu.
+Rozšířen test: kroužení uvnitř a únik u hranice pro obě orientace B, skutečné
+přetažení dovnitř a zpět. Test driftu, navigace a progresivní dodávky prošel.
+Obě aktuální dodávky přestavěné dílčím sestavením. Bez prohlížeče a pushe.
+Dřívější návrh zastavit vlet u výstupu se tímto nahrazuje volným umístěním.
+
+
+## 16. listopadu 2026 — živá animace driftu a barvy polí
+Odstraněn časový záznam, krok a zpětné přehrávání. Borisova integrace
+běží nepřetržitě, uchovává omezenou stopu pro graf. Pauza a restart;
+kamera při odletu sleduje částici. Energie a velikost i znaménko B se
+mění za běhu, zachovávají polohu a čas; energie upraví velikost rychlosti.
+Jde o vnější zásah, změna B nezahrnuje indukované E (popsáno v návodu).
+Odstraněna zelená výplň oblasti a podklady všech popisků scény.
+Sdílená paleta v particles/style.js: E jantarová #b57825, B modrá #356ac3.
+Elektrické siločáry fúzních reakcí sjednoceny do jantarové; kvantitativní
+mapa velikosti zachovaná. Konvence uložená v AGENTS.md. Obě dodávky
+aktualizovány včetně lazy manifestů. Test živých změn, driftů, navigace
+a progressive prošel. Vizuální ověření neproběhlo; bez pushe.
+
+
+Drift — upřesnění ukončení vletu: kamera v pokusu entry zůstává pevná.
+Po opuštění pole se přehrávání zastaví přesně uprostřed volné oblasti
+mezi hranicí pole a levým panelem (interpolace posledního kroku).
+Fyzikální rychlost se nenuluje, končí pouze animace. Spustit je dokončené;
+Restart obnoví počáteční stav a běh. Test ověřuje konec, stabilní čas po
+skončení a restart. Test driftu a navigace prošel; obě dodávky aktualizované.
+Bez vizuální kontroly a bez pushe.
+
+
+Drift — pevná měřítka a tokamakové indukce: odstraněno automatické
+oddalování po položení a sledování kamerou. Referenční délka závisí pouze
+na druhu částice (500 eV, 5 T); při změnách energie, B, polohy a geometrie
+je pevná. Graf má pevný polohový rozsah a pevné časové okno s posuvem
+časového počátku. Křivostní pohled nemění měřítko s poloměrem. Výchozí B
+je 5 T, rozsah 1–10 T; opora ITER FAQ: toroidální pole na ose 5,3 T.
+Opravena KaTeX sazba 1000 eV odstraněním lokalizovaného seskupování číslic,
+regrese nyní používá skutečný KaTeX s throwOnError i pro 1000 eV.
+Test driftu a dodávky prošel. Bez prohlížeče a bez pushe.
+
+
+Drift — mizející stopa: širší a sytější u částice, úzká a průhledná vzadu.
+Okamžitá gyrační kružnice i spojnice ke středu jemně čárkované. Změna B
+a energie zachovává grafovou historii v pevném časovém okně; vysvětlení
+posunu středu při změně poloměru doplněné v návodu. Odletělou částici
+lze uchopit v aktuální poloze a přetáhnout dovnitř pro nový pokus.
+Okolo označení B vynechané značky mřížky, podklad průhledný. Test driftu
+včetně skutečného uchopení po ukončení a navigace prošel, obě dodávky
+aktualizované. Bez vizuální kontroly a bez pushe.
+
+
+Pauza: v rovinných pokusech lze přetáhnout částici z aktuální polohy
+a připravit nové místo startu; platí i pro gyraci a oba rovinné drifty.
+Křivostní prostorový pohled zachovává tažení pro otáčení kamery.
+Test driftu a navigace prošel, obě dodávky aktualizované.
+
+
+Drift — aktuální chování po odletu nahrazuje zastavení vlevo: částice
+po opuštění viditelné plochy automaticky respawnuje do připravené polohy
+a běží dál, se současnou energií a směrem nastavení. Čas a historie grafu
+pokračují, skok je přerušený v grafu i stopě. Technický graf má neutrální
+osy, jemnou pravidelnou mřížku, pět polohových úrovní, časové dílky
+a čárkovaný průběh středu. Měřítka zůstávají pevná. Regrese ověřuje
+skutečný návrat zpoza okraje a další běh/pauzu/tažení. Test driftu,
+navigace a progressive prošel; obě dodávky aktualizované. Bez prohlížeče.
+
+
+Drift — stabilní spodní lišta: pevná výška 50 px, pevné sloupce pro čas
+a rychlost, čas má rezervovaných 250 px a zarovnání doprava. Změna počtu
+číslic ani přechod na exponenciální sazbu neposouvá rychlost a ostatní
+ovládání. Obě dodávky přestavěné; navigační kontrola prošla. Bez prohlížeče.
+
+
+Drift — měřítko scény ukotvené v levém dolním rohu nad poznámkami,
+malá bílá karta s měrnou úsečkou a hodnotou. Umístění nezávisí na
+fyzikálních souřadnicích. Test driftu/navigace prošel, obě dodávky
+aktualizované. Bez prohlížeče.
+
+
+Gyrace — porovnání vedle sebe: ovladače Přidat vedle / Odebrat v pokusu
+gyration. Až dvě doplňkové částice z nabídky proton/deuteron/alfa/elektron,
+vlastní hmotnost, náboj, stopa a popisek; společné B, energie, úhel a čas.
+Bez vzájemných sil. Doplňkové částice používají přesný homogenní magnetický
+oběh, aby elektron nevyžadoval tisíce subkroků při iontové časové stupnici.
+Graf a číselné údaje zůstávají hlavní částici, vysvětleno v návodu.
+Přidání/odebrání připraví nový pokus. Živé B/energie mění i doplňkové
+částice. Test skutečných ovladačů ověřil tři renderované částice, jejich
+pohyb, limit počtu, živé změny a odebrání. Drift/navigace/progressive
+prošly, obě dodávky aktualizované. Bez prohlížeče a bez pushe.
+
+
+Drift — respawn nyní znamená návrat na připravený start a čekání na Spustit,
+nikoli automatický další běh. Živé změny B/energie zachovávají připravenou
+fyzikální startovní polohu (dříve se přepsala původním měřítkem modelu
+a návrat mohl skončit mimo obraz). Návrat ukončí i aktuální dávku kroků.
+Měřítko má bílou kartu pouze v gyraci; vlet i další pokusy bez podkladu.
+Test driftu/navigace prošel a obě dodávky aktualizované, bez prohlížeče.
+
+
+Drift — návrat v hlavičce sjednocen na orámované tlačítko ← Zpět; cíl
+zůstává skupina Plazma a fúze, celý název v title a aria-label. Obě
+dodávky aktualizované; navigační kontrola prošla. Bez prohlížeče.
+
+
+Vlet — přepnutí druhu částice za běhu zachovává polohu, směr, čas,
+historii i stav běhu/pauzy. Rychlost se upraví podle nové hmotnosti při
+stejné zvolené kinetické energii. Měřítko a připravený start zachovány.
+Test skutečného přepnutí za běhu i v pauze a navigace prošel; obě
+dodávky aktualizované. Bez prohlížeče.
+
+
+Gyrace — při pauze lze myší rozmístit hlavní i obě přidané částice
+samostatně. Ostatní se nepřesouvají, restart zachovává uložené rozmístění.
+Přesun v historii oddělený, nikoli fyzikální skok. Test skutečného tahu
+přidané částice ověřil neměnnost zbývajících a zachování po restartu.
+Drift/navigace prošly, obě dodávky aktualizované, bez prohlížeče.
+
+
+Drift — na výslovné přání uživatele automatické rozšíření polohové osy
+grafu při přesahu průběhu. Zaokrouhlené dílky 1/2/5, rezerva, rozsah se
+nezmenšuje. Krátký oranžový panel Přizpůsobení os uvnitř horního okraje
+grafu (1,7 s), bez změny rozměrů a bez zásahu do scény/pole. Časové okno
+a historie zůstávají. Regrese skutečných ovladačů ověřuje překročení,
+zobrazení a zmizení panelu i zachování rozšířeného rozsahu. Drift/navigace
+prošly; obě dodávky aktualizované. Bez prohlížeče.
+
+
+Gyrace — nabídka a Přidat vedle odstraněné. Čtyři přímé checkboxy pro
+proton/deuteron/alfa/elektron, lze zobrazit všechny čtyři; poslední nelze
+vypnout. Původní nabídka Částice v gyraci skrytá, v ostatních pokusech
+zachovaná. Graf výslovně uvádí hlavní částici. Rozmístění přidaných částic
+uložené podle druhu, nikoli indexu. Regrese ověřuje zapnutí elektronu,
+všech čtyř částic, vypnutí i ochranu poslední. Test driftu/navigace/
+progressive prošel, obě dodávky aktualizované. Bez prohlížeče.
+
+
+Gyrace — elektron zvýrazněný: značka stejně velká jako ostatní, jemný
+modrý prstenec a samostatná lupa oběhu vpravo dole, s fyzikálním rL.
+Lupa používá stejný čas a aktuální radiální směr, nezpomaluje elektron
+odlišně a nemění měřítko hlavní scény. Test ověřuje přítomnost detailu
+a čitelné značky. Drift/navigace prošly; obě dodávky aktualizované.
+Bez prohlížeče.
+
+
+Drift — oprava nulových popisků os: přesnost se odvozuje od rozestupu
+dílků, záporná nula normalizovaná. U malých rozsahů automaticky µm místo
+mm a ns místo µs, jednotka uvedená na ose. Regrese pro všechny čtyři
+druhy ověřuje pět různých hodnot na každé ose a absenci záporné nuly,
+skutečnou sazbu KaTeX. Drift/navigace prošly, obě dodávky aktualizované.
+Bez prohlížeče.
+
+
+Gyrace — checkboxy nyní zachovávají aktuální stavy, čas, historii a běh
+částic. Přidaná částice vznikne v aktuálním společném čase; vypnutí hlavní
+předá graf existující vybrané částici. Společný krok všech částic vychází
+z nejkratší gyrační periody: elektron tak zpomalí celou simulaci a jeho
+skutečný oběh je rozlišený. Přidání/odebrání elektronu oznámí krátký
+oranžový panel (2,4 s). Regrese ověřuje běh při checkboxech, nezměněnou
+polohu/čas při přidání, zpomalení iontu a zmizení panelu. Drift/navigace
+prošly, obě dodávky aktualizované, bez prohlížeče.
+
+
+Gyrace — logaritmický posuvník rychlosti 0,1× až 10000× umožňuje sledovat
+ionty i při zapnutém elektronu. Homogenní gyrace hlavní i dalších částic
+používá přesný oběh a společný čas; omezený počet vzorků na snímek brání
+zahlcení při vysoké rychlosti. Návod uvádí nerozlišené oběhy elektronu
+při rychlém přehrávání a možné aliasování. Ostatní pokusy mají původní
+maximum 3×. Regrese ověřila 10000×, konečné souřadnice a viditelný pohyb
+iontu s elektronem. Drift/navigace prošly, obě dodávky aktualizované.
+
+
+### Drift – společné prostorové měřítko (16. 11. 2026)
+- Opraveno optické sjednocování drah při změně druhu částice: scéna používá pevnou referenci deuteronu při 500 eV a 5 T, nezávisle na vybrané částici. Alfa částice má při stejné energii a poli přibližně 70,5 % poloměru deuteronu.
+- Regresní test kontroluje poměr skutečně vykreslených průměrů kružnic na canvasu po samostatném spuštění obou druhů částic.
+
+### Drift – porovnání gyrace a historie vletu (16. 11. 2026)
+- Gyrace místo časového grafu zobrazuje všechny vybrané částice: společné lineární pruhy Larmorových poloměrů, číselné poloměry v mm a periody v ns. Změny energie/pole se promítají za běhu.
+- Časové grafy ostatních režimů zachovány; historie se ořezává podle zobrazeného časového okna s jedním předcházejícím bodem, nikoli pevného limitu 1440 vzorků. Střed dráhy má výraznější čáru.
+- Vlet elektronu používá vlastní jemnější prostorové měřítko; gyrace ponechává společnou referenci deuteronu. Při přepnutí mezi elektronem a iontem se prostorové umístění přepočte tak, aby částice zůstala na stejném místě obrazovky; čas a běh pokračují, graf označí polohový skok přerušením čáry.
+- Testy ověřují poměr pruhů, živé hodnoty, úplné časové okno i viditelnost elektronového oblouku a zachování běhu.
+
+- Drift (16. 11.): samostatný elektron nyní používá jemnější pevné prostorové měřítko také v elektrickém, gradientním a křivostním driftu. Reference měřítka se volí při výběru částice, změny B a energie ji nemění; gyrace nadále používá společné měřítko. Testována viditelnost dráhy i pohybu ve všech třech režimech.
+
+- Elektron: odstraněny dva ostré zvýrazňovací kruhy (poloměry 19/24 px), nahrazeny menší jemnou radiální září do průhledna s poloměrem 17 px.
+
+- Gyrace: kolečko myši mění zoom kolem kurzoru (0,25 až 100 násobek), dvojklik obnoví výchozí pohled. Měřítko má stabilní délku na obrazovce a odpovídající fyzikální hodnotu. Přetahování respektuje zoom a posun kamery, přiblížení nezastaví animaci ani nespustí respawn mimo výřez. Ověřeno regresním testem.
+
+- Gyrace: prostorová ortografická kamera ovládaná tažením pozadí, funkční i za běhu bez změny fyzikálního stavu. Dvojklik obnoví kolmý pohled a zoom. Kolečko i přesouvání částice v pauze používají bázi natočené kamery; přesouvání probíhá v rovině obrazovky. V nakloněném pohledu jsou modré prostorové siločáry se směrem B a stopa pokrývá až 2,5 periody. Úhel od příčné roviny má rozsah -90 až +90 stupňů. Testováno otáčení za běhu, zoom pod kurzorem a přesouvání v nakloněném pohledu i znaménko podélné rychlosti.
+
+- Gyrace: průběžný přechod z horního okraje na dolní a opačně pro hlavní i přidané částice, bez zastavení či změny rychlosti. Zlom stopy je označen breakBefore. Přechod respektuje kameru a zoom.
+- Všechny číselné posuvníky nyní používají živou aktualizaci; zejména úhel mění složky rychlosti bez restartu času či polohy. Test ověřuje opakované přechody oběma směry a kontinuitu času/polohy při změně úhlu.
+
+- Gyrace, natočené pole: rozšířena matice z 3 × 3 na 7 × 7 siločar, příčný rozsah z 6 na 9 referenčních délek, podélná délka zkrácena z 8 na 5. Širší a kratší prostor pro posouzení čitelnosti při rotaci.
+
+- Oprava návratu gyrace: hranice se kontroluje podle gyračního středu a pouze při viditelném podélném pohybu. Přesun probíhá výhradně podél B (osy z), bez posunutí příčného středu kružnice. Samotné kroužení už nespouští teleport. Stopa se kreslí až od posledního přerušení, takže po návratu nezůstává oddělený oblouk na opačném konci. Regresní test kružnice u horního okraje prošel.

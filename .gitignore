@@ -41,6 +41,7 @@
 !/tools/test-coulomb-mobile.cjs
 !/tools/test-coulomb-quantum.cjs
 !/tools/test-coulomb.cjs
+!/tools/test-drift.cjs
 !/tools/test-fusion-controls.cjs
 !/tools/test-fusion-dt.cjs
 !/tools/test-fusion-field-worker.cjs
@@ -440,6 +441,11 @@
 !/versions/vyvoj/m_files/fusion/barrier/tunnel-reference.mp4
 !/versions/vyvoj/m_files/fusion/barrier/wave-packet.js
 !/versions/vyvoj/m_files/fusion/barrier/wave-preview.js
+!/versions/vyvoj/m_files/fusion/drift/app.js
+!/versions/vyvoj/m_files/fusion/drift/index.html
+!/versions/vyvoj/m_files/fusion/drift/layout.js
+!/versions/vyvoj/m_files/fusion/drift/model.js
+!/versions/vyvoj/m_files/fusion/drift/style.css
 !/versions/vyvoj/m_files/fusion/navigation/page.js
 !/versions/vyvoj/m_files/fusion/navigation/style.css
 !/versions/vyvoj/m_files/fusion/particle-list/CTETE.txt

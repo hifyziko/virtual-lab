@@ -2,7 +2,8 @@
 (()=>{'use strict';
  const entries=[
   {id:'fu01-reakce',group:'fusion',num:'01',title:'Fúzní reakce a Coulombova bariéra',description:'Přibližování jader, průchod bariérou a názorné ukázky jaderných reakcí.',page:'fuze-bariera/index.html',kind:'Interaktivní experiment'},
-  {id:'fu02-galerie',group:'fusion',num:'02',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
+  {id:'fu02-galerie',group:'fusion',num:'02',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'},
+  {id:'fu03-drift',group:'fusion',num:'03',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a elektrický, gradientní i křivostní drift.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'}
  ];
  const aliases={"fu02-jadra":"nuclei","fu03-atomy":"atoms","fu04-castice":"particles"};
  const routes=[...entries,...Object.entries(aliases).map(([id,mode])=>({...entries[1],id,mode,sourceId:entries[1].id}))];
@@ -35,7 +36,7 @@
   const area=template.content.querySelector('#group-area-plasma');
   if(area){
    const group=document.createElement('details');group.className='group-block topic-group fusion-topic';group.id='group-fusion';group.open=location.hash==='#group-area-plasma'||location.hash==='#group-fusion';
-   group.innerHTML='<summary class="group-banner"><div><h2>Jádra, atomy a fúzní reakce</h2><p>Od stavby hmoty k překonání bariéry a produktům reakce.</p></div><span class="topic-count">Experiment a galerie</span></summary><div class="cards">'+entries.map(entry=>'<a class="card ready" href="#'+entry.id+'"><div class="cardfoot"><span class="num">'+entry.num+'</span><span class="badge">'+entry.kind+'</span></div><h3>'+entry.title+'</h3><p>'+entry.description+'</p><div class="cardfoot"><span>Otevřít modul</span><span aria-hidden="true">↗</span></div></a>').join('')+'</div>';
+   group.innerHTML='<summary class="group-banner"><div><h2>Částice, pole a fúzní reakce</h2><p>Od stavby hmoty přes pohyb v poli k jaderným reakcím.</p></div><span class="topic-count">Experimenty a galerie</span></summary><div class="cards">'+entries.map(entry=>'<a class="card ready" href="#'+entry.id+'"><div class="cardfoot"><span class="num">'+entry.num+'</span><span class="badge">'+entry.kind+'</span></div><h3>'+entry.title+'</h3><p>'+entry.description+'</p><div class="cardfoot"><span>Otevřít modul</span><span aria-hidden="true">↗</span></div></a>').join('')+'</div>';
    area.querySelector('.physics-area-heading').after(group);
    const proposed=area.querySelector('.physics-proposals');
    if(proposed){const more=document.createElement('details');more.className='fusion-future';const summary=document.createElement('summary');summary.textContent='Další připravovaná témata';more.append(summary);proposed.before(more);more.append(proposed);const note=more.nextElementSibling;if(note?.textContent.includes('Interaktivní moduly zde ještě nejsou'))note.remove();}

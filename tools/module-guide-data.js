@@ -19,7 +19,8 @@
   syncconnect:'Vlastní výukový model fázování generátoru k síti a jeho metodika.',
   stiffness:'Bartoš: Teorie elektrických strojů, str. 124–125 (synchronizační moment); Fitzgerald: Electric Machinery, kap. 5.7.',
   regulation:'Chapman: Instructor’s Manual, příklad 5-4(b–e), tištěné str. 115–116. Jde o příručku řešení, nikoli plnou učebnici.',
-  model:'Vlastní výukový model projektu a jeho metodika; uvedené knihy elektrických strojů toto téma nepokrývají.'
+  model:'Vlastní výukový model projektu a jeho metodika; uvedené knihy elektrických strojů toto téma nepokrývají.',
+  drift:'S. Entler, V. Kindl: Jaderná fúze a fúzní elektrárny, kap. 7.3–7.4, str. 141–148 (gyrace a drifty).'
  };
  const entries = {};
  function add(id, source, controls, points, equation, related) {
@@ -197,6 +198,9 @@
  add('fu02-galerie','model',
   ['Přepínejte skupiny Vše, částice, jádra a atomy.','Tažením prohlížejte prostorové modely a porovnávejte jejich druhy a popisky.'],
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
+ add('fu03-drift','drift',
+  ['Začněte vletem do magnetického pole: nastavte částici, energii a směr a spusťte pokus. Před spuštěním lze částici přetáhnout.','Přepněte na gyraci nebo jednotlivé drifty. Animaci pozastavíte tlačítkem, restart vrátí částici. Energii a indukci měňte i za běhu.'],
+  ['Mimo pole se částice pohybuje přímo; v čistě magnetickém poli mění směr, nikoli kinetickou energii.','Elektrický drift má pro oba náboje stejný směr. Gradientní a křivostní drift obracejí směr se znaménkem náboje. Pole jsou předepsaná; model nepočítá vlastní pole plazmatu.'],String.raw`\boldsymbol v_E=\frac{\boldsymbol E\times\boldsymbol B}{B^2}`,['fu01-reakce','fu02-galerie','em03-silove-ucinky']);
  // Historical deep links use the same gallery and the same guide.
  const aliases={'fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
  window.ModuleGuideData={sources,entries,aliases};

@@ -9,6 +9,7 @@ const commands=[
  ['versions/vyvoj/m_files/Web/synchronous/test-rotor-dq.cjs'],
  ['tools/test-commutation.cjs'],
  ['tools/test-particle-library.cjs'],
+ ['tools/test-drift.cjs'],
  ['tools/test-fusion-navigation.cjs'],
  ['tools/test-fusion-controls.cjs'],
  ['tools/test-fusion-render-lifecycle.cjs'],
