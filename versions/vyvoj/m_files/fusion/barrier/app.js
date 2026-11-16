@@ -121,16 +121,36 @@ $('playbackSpeed').oninput=$('playbackSpeed').onchange=()=>{playbackUserOverride
 function slowFusionPlayback(value=.1){if(playbackUserOverride||(value===.01?playbackProductsSlowed:playbackAutoSlowed))return;if(value===.01)playbackProductsSlowed=true;else playbackAutoSlowed=true;setPlaybackSpeed(value);}
 function resetManualSpeed(){playbackUserOverride=false;playbackAutoSlowed=false,playbackProductsSlowed=false;setPlaybackSpeed(1);}
 function playbackRate(products=false){const rate=Math.abs(playbackSpeed)*shot.start*.25/Math.sqrt(2*M.thermalMean(100)/1.2);return rate*(products?Math.sqrt(931494.10242):1);}
+// Aim for roughly seven seconds across the shorter scene dimension.
+// All bodies retain one clock; only the visible playback control changes.
+function automaticPlaybackTarget(){
+ if(mode==='tunnel'||fusion?.phase==='compound')return .1;
+ if(mode!=='flight'&&fusion?.phase!=='products')return null;
+ if(!(scale>0&&W>0&&H>0&&shot?.start>0))return null;
+ const products=fusion?.phase==='products';
+ const bodies=products?[...fusion.products.products,...fusion.products.sources]:[{x,y,vx,vy},...centers];
+ const visible=bodies.filter(b=>{const [sx,sy]=project(b.x,b.y);return sx>=0&&sx<=W&&sy>=0&&sy<=H;});
+ let fastest=0;
+ for(const body of visible){const velocity=products?HiFyzikoDT.velocity(body):[body.vx||0,body.vy||0];fastest=Math.max(fastest,Math.hypot(...velocity));}
+ const unitRate=shot.start*.25/Math.sqrt(2*M.thermalMean(100)/1.2)*(products?Math.sqrt(931494.10242):1);
+ const pixelsPerSecond=fastest*unitRate*scale/Math.max(1,collisionZoom);
+ return Math.max(.000001,Math.min(1,Math.min(W,H)*.14/Math.max(pixelsPerSecond,1e-9)));
+}
+function updateAutomaticPlayback(dt=0,immediate=false){
+ if(playbackUserOverride)return;
+ const target=automaticPlaybackTarget();if(target===null)return;
+ const value=immediate||target<=playbackSpeed?target:playbackSpeed+(target-playbackSpeed)*(1-Math.exp(-dt/.5));
+ setPlaybackSpeed(value);
+}
 function showReactionEnergy(){
  const Q=fusion.reaction.Q,positive=Q>0,box=$('reactionEnergy');box.hidden=false;box.classList.toggle('noRelease',!positive);
  $('reactionEnergyTitle').textContent=positive?'Uvolněná energie':'Bez uvolnění fúzní energie';
  tex($('reactionEnergyValue'),(positive?'+':'')+(Q/1000).toFixed(3).replace('.', '{,}')+String.raw`\,\mathrm{MeV}`);
- $('reactionEnergyNote').textContent=(positive?'':'Q = 0 · ')+'Výchozí rychlost rozletu je 0,01×. Ruční nastavení má přednost.';
+ $('reactionEnergyNote').textContent=(positive?'':'Q = 0 · ')+'Automatika přizpůsobuje rychlost částicím v záběru. Ruční nastavení má přednost.';
 }
 function emitProducts(){
- slowFusionPlayback(.01);
  const sources=centers.map((t,i)=>({...t,id:i,A:t.A,Z:t.Z,px:(t.vx||0)*t.A*Math.sqrt(931494.10242),py:(t.vy||0)*t.A*Math.sqrt(931494.10242)})).filter(t=>t.id!==targetIndex);
- fusion.products=(fusion.reaction.id==='dt'?HiFyzikoDT.create:R.create)({channel:fusion.reaction,...fusion.origin,energy:dtLocalEnergy,angle:fusion.angle,sources,cell,boost:dtBoost,minimumExitRadius:fusion.reaction.id==='pp'?ppExitRadius():20});cell=fusion.products.cell;const strength=Math.max(energy+fusion.reaction.Q,energy)*16,unit=displayRadius()/Math.max(scale,1e-9);fusion.products.products.forEach(b=>{b.core=unit*visualBound(b.kind||b.id)+4*zoom/Math.max(scale,1e-9);b.surfaceStrength=strength;b.surfaceGroup='exit';});fusion.products.sources.forEach(b=>{b.core=unit*visualBound(targetKind(centers[b.id]))+4*zoom/Math.max(scale,1e-9);b.surfaceStrength=b.surfaceStrength||energy*16;});fusion.trail=fusion.products.products.map(()=>[]);fusion.phase='products';mode='products';showReactionEnergy();playFusionSound();view();fusion.timeScale=playbackRate(true);fieldKey='';$('labels').replaceChildren();lastPair='';status(fusion.reaction.id==='pp'?'Bez β⁺ přeměny: přechodný útvar se rozpadl zpět na dva protony. Energie fúze se neuvolnila.':fusion.reaction.elastic?'Pružný rozptyl: odlet vstupních částic, bez uvolnění energie fúze.':'Produkty reakce: zachování energie, náboje a hybnosti; směry jsou vybraný názorný případ.');
+ fusion.products=(fusion.reaction.id==='dt'?HiFyzikoDT.create:R.create)({channel:fusion.reaction,...fusion.origin,energy:dtLocalEnergy,angle:fusion.angle,sources,cell,boost:dtBoost,minimumExitRadius:fusion.reaction.id==='pp'?ppExitRadius():20});cell=fusion.products.cell;const strength=Math.max(energy+fusion.reaction.Q,energy)*16,unit=displayRadius()/Math.max(scale,1e-9);fusion.products.products.forEach(b=>{b.core=unit*visualBound(b.kind||b.id)+4*zoom/Math.max(scale,1e-9);b.surfaceStrength=strength;b.surfaceGroup='exit';});fusion.products.sources.forEach(b=>{b.core=unit*visualBound(targetKind(centers[b.id]))+4*zoom/Math.max(scale,1e-9);b.surfaceStrength=b.surfaceStrength||energy*16;});fusion.trail=fusion.products.products.map(()=>[]);fusion.phase='products';mode='products';updateAutomaticPlayback(0,true);showReactionEnergy();playFusionSound();view();fusion.timeScale=playbackRate(true);fieldKey='';$('labels').replaceChildren();lastPair='';status(fusion.reaction.id==='pp'?'Bez β⁺ přeměny: přechodný útvar se rozpadl zpět na dva protony. Energie fúze se neuvolnila.':fusion.reaction.elastic?'Pružný rozptyl: odlet vstupních částic, bez uvolnění energie fúze.':'Produkty reakce: zachování energie, náboje a hybnosti; směry jsou vybraný názorný případ.');
 }
 function advanceFusion(dt){
  if(fusion.phase==='compound'){fusion.time+=dt*Math.max(0,playbackSpeed)/.1;if(fusion.time>=.65)emitProducts();return;}
@@ -448,19 +468,30 @@ const potentialCanvas=document.createElement('canvas'),potentialContext=potentia
 const fieldCanvas=document.createElement('canvas'),fc=fieldCanvas.getContext('2d');let fieldKey='',lastPair='',gridKey='',worldGrid=[];
 
 // Pure numeric field work runs outside the animation/UI thread.
+// Refine near field nulls instead of stepping repeatedly across a separatrix.
+function fieldLineStep(F,x,y,sign=1,maxStep=3){
+ const f=F(x,y);if(!f)return null;
+ for(let h=maxStep;h>=.046875;h/=2){
+  const mid=F(x+sign*h*.5*f[0],y+sign*h*.5*f[1]);if(!mid)continue;
+  const nx=x+sign*h*mid[0],ny=y+sign*h*mid[1],end=F(nx,ny);
+  if(!end||f[0]*mid[0]+f[1]*mid[1]<.985||mid[0]*end[0]+mid[1]*end[1]<.985)continue;
+  return [nx,ny,Math.atan2(end[1],end[0])];
+ }
+ return null;
+}
 function fieldWorkerMain(port=self){
  port.onmessage=({data:d})=>{
  const {W,H,ox,oy,scale,sources,R,reference,arrows,style,viewKey}=d,width=d.synchronous?128:d.moving?256:Math.min(768,Math.max(384,Math.round(W*(d.renderScale||1)/3))),height=Math.max(1,Math.round(width*H/W)),pixels=new Uint8ClampedArray(width*height*4),palette=[[42,91,184],[30,172,195],[83,190,158],[179,206,90],[240,172,57],[222,91,63]],charged=sources.filter(s=>s[2]);
  for(let iy=0;iy<height;iy++)for(let ix=0;ix<width;ix++){const px=(ix+.5)*W/width,py=(iy+.5)*H/height;let ex=0,ey=0;for(const [sx,sy,z]of charged){const dx=px-sx,dy=py-sy,r2=Math.max((d.radius*.7)**2,dx*dx+dy*dy),weight=z/(r2*Math.sqrt(r2));ex+=dx*weight;ey+=dy*weight;}const strength=Math.hypot(ex,ey)*((d.referenceRadius||d.radius)*4)**2,part=Math.min(1,Math.log1p(strength)/Math.log(17))*5,index=Math.min(4,Math.floor(part)),t=part-index,k=(iy*width+ix)*4;for(let j=0;j<3;j++)pixels[k+j]=Math.round(palette[index][j]+(palette[index+1][j]-palette[index][j])*t);pixels[k+3]=255;}
  const step=d.synchronous?6:3,lines=[],heads=[],F=(x,y)=>{let fx=0,fy=0;for(const [sx,sy,z]of charged){const dx=x-sx,dy=y-sy,r2=dx*dx+dy*dy;if(r2>1){const f=z/(r2*Math.sqrt(r2));fx+=dx*f;fy+=dy*f;}}const n=Math.hypot(fx,fy);return n>1e-12?[fx/n,fy/n]:null;};
- if(arrows&&style==='source'){for(const [sx,sy,z]of charged)for(let j=0;j<24*z;j++){const a=j*Math.PI*2/(24*z);let x=sx+10*Math.cos(a),y=sy+10*Math.sin(a);const points=[x,y];for(let k=0;k<1350/step;k++){const f=F(x,y);if(!f)break;const mid=F(x+step*.5*f[0],y+step*.5*f[1]);if(!mid)break;x+=step*mid[0];y+=step*mid[1];points.push(x,y);if(j%2===0&&k%50===25)heads.push([x,y,Math.atan2(mid[1],mid[0])]);if(x<0||x>W||y<62||y>H-40)break;}lines.push({points,light:!!(j%2)});}}
- else if(arrows){const occupied=new Set(),cell=(x,y)=>Math.floor(x/16)+','+Math.floor(y/16);const trace=(sx,sy,sign)=>{let x=sx,y=sy;const points=[];for(let i=0;i<650;i++){const f=F(x,y);if(!f)break;const mid=F(x+sign*1.5*f[0],y+sign*1.5*f[1]);if(!mid)break;x+=sign*3*mid[0];y+=sign*3*mid[1];if(x<0||x>W||y<62||y>H-40||occupied.has(cell(x,y))||charged.some(s=>Math.hypot(x-s[0],y-s[1])<d.radius*1.4))break;points.push([x,y]);}return points;};for(let y=70;y<H-40;y+=38)for(let x=18;x<W;x+=38){if(occupied.has(cell(x,y)))continue;const points=[...trace(x,y,-1).reverse(),[x,y],...trace(x,y,1)];if(points.length<10)continue;points.forEach(q=>occupied.add(cell(...q)));const sampled=points;lines.push({points:sampled.flat(),light:false});for(let i=28;i<points.length-2;i+=100){const q=points[i],f=F(...q);if(f)heads.push([...q,Math.atan2(f[1],f[0])]);}}}
+ if(arrows&&style==='source'){for(const [sx,sy,z]of charged)for(let j=0;j<24*z;j++){const a=j*Math.PI*2/(24*z);let x=sx+10*Math.cos(a),y=sy+10*Math.sin(a);const points=[x,y];for(let k=0;k<1350/step;k++){const next=fieldLineStep(F,x,y,1,step);if(!next)break;[x,y]=next;points.push(x,y);if(j%2===0&&k%50===25)heads.push([x,y,next[2]]);if(x<0||x>W||y<62||y>H-40)break;}lines.push({points,light:!!(j%2)});}}
+ else if(arrows){const occupied=new Set(),cell=(x,y)=>Math.floor(x/16)+','+Math.floor(y/16);const trace=(sx,sy,sign)=>{let x=sx,y=sy;const points=[];for(let i=0;i<650;i++){const next=fieldLineStep(F,x,y,sign);if(!next)break;[x,y]=next;if(x<0||x>W||y<62||y>H-40||occupied.has(cell(x,y))||charged.some(s=>Math.hypot(x-s[0],y-s[1])<d.radius*1.4))break;points.push([x,y]);}return points;};for(let y=70;y<H-40;y+=38)for(let x=18;x<W;x+=38){if(occupied.has(cell(x,y)))continue;const points=[...trace(x,y,-1).reverse(),[x,y],...trace(x,y,1)];if(points.length<10)continue;points.forEach(q=>occupied.add(cell(...q)));const sampled=points;lines.push({points:sampled.flat(),light:false});for(let i=28;i<points.length-2;i+=100){const q=points[i],f=F(...q);if(f)heads.push([...q,Math.atan2(f[1],f[0])]);}}}
  port.postMessage({width,height,pixels,lines,heads,sources:charged,W,H,viewKey,requestId:d.requestId,radius:d.radius},[pixels.buffer]);
  };
 }
 let fieldWorker=null,fieldWorkerBusy=false,fieldWorkerView='',fieldWorkerReady=false,fieldRequestAt=-Infinity,fieldSourceKey='',fieldMotionKey='',fieldMotionAt=-Infinity,fieldRequestId=0;
 const immediateField={postMessage:d=>fieldWorker.onmessage({data:d})};fieldWorkerMain(immediateField);
-try{if(typeof Worker==='function'){const url=URL.createObjectURL(new Blob(['('+fieldWorkerMain.toString()+')()'],{type:'text/javascript'}));fieldWorker=new Worker(url);URL.revokeObjectURL(url);fieldWorker.onerror=()=>{fieldWorker.terminate();fieldWorker=null;fieldKey='';};fieldWorker.onmessage=({data:d})=>{if(d.requestId!==fieldRequestId)return;fieldWorkerBusy=false;if(d.viewKey!==fieldWorkerView)return;const renderScale=c.width/W;fieldCanvas.width=Math.round(d.W*renderScale);fieldCanvas.height=Math.round(d.H*renderScale);fc.setTransform(renderScale,0,0,renderScale,0,0);potentialCanvas.width=d.width;potentialCanvas.height=d.height;potentialContext.putImageData(new ImageData(d.pixels,d.width,d.height),0,0);fc.save();fc.globalAlpha=.82;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,d.W,d.H);fc.restore();fc.save();fc.beginPath();fc.rect(0,62,d.W,Math.max(1,d.H-102));fc.clip();for(const light of [true,false]){fc.beginPath();for(const line of d.lines){if(line.light!==light)continue;for(let i=0;i<line.points.length;i+=2){if(i)fc.lineTo(line.points[i],line.points[i+1]);else fc.moveTo(line.points[i],line.points[i+1]);}}fc.strokeStyle=light?'rgba(9,54,70,.50)':'rgba(9,54,70,.80)';fc.lineWidth=light?.45:.65;fc.stroke();}fc.beginPath();for(const [x,y,a]of d.heads){fc.moveTo(x+3*Math.cos(a),y+3*Math.sin(a));fc.lineTo(x-3*Math.cos(a-.55),y-3*Math.sin(a-.55));fc.lineTo(x-3*Math.cos(a+.55),y-3*Math.sin(a+.55));fc.closePath();}fc.fillStyle='rgba(9,54,70,.9)';fc.fill();fc.restore();fc.save();fc.globalCompositeOperation='destination-in';const fade=fc.createLinearGradient(0,0,0,d.H);fade.addColorStop(0,'rgba(0,0,0,0)');fade.addColorStop(.12,'rgba(0,0,0,1)');fade.addColorStop(.87,'rgba(0,0,0,1)');fade.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=fade;fc.fillRect(0,0,d.W,d.H);fc.restore();fieldWorkerReady=true;};window.addEventListener('pagehide',event=>{if(!event.persisted)fieldWorker?.terminate();});}}
+try{if(typeof Worker==='function'){const url=URL.createObjectURL(new Blob([fieldLineStep.toString()+';('+fieldWorkerMain.toString()+')()'],{type:'text/javascript'}));fieldWorker=new Worker(url);URL.revokeObjectURL(url);fieldWorker.onerror=()=>{fieldWorker.terminate();fieldWorker=null;fieldKey='';};fieldWorker.onmessage=({data:d})=>{if(d.requestId!==fieldRequestId)return;fieldWorkerBusy=false;if(d.viewKey!==fieldWorkerView)return;const renderScale=c.width/W;fieldCanvas.width=Math.round(d.W*renderScale);fieldCanvas.height=Math.round(d.H*renderScale);fc.setTransform(renderScale,0,0,renderScale,0,0);potentialCanvas.width=d.width;potentialCanvas.height=d.height;potentialContext.putImageData(new ImageData(d.pixels,d.width,d.height),0,0);fc.save();fc.globalAlpha=.82;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,d.W,d.H);fc.restore();fc.save();fc.beginPath();fc.rect(0,62,d.W,Math.max(1,d.H-102));fc.clip();for(const light of [true,false]){fc.beginPath();for(const line of d.lines){if(line.light!==light)continue;for(let i=0;i<line.points.length;i+=2){if(i)fc.lineTo(line.points[i],line.points[i+1]);else fc.moveTo(line.points[i],line.points[i+1]);}}fc.strokeStyle=light?'rgba(9,54,70,.50)':'rgba(9,54,70,.80)';fc.lineWidth=light?.45:.65;fc.stroke();}fc.beginPath();for(const [x,y,a]of d.heads){fc.moveTo(x+3*Math.cos(a),y+3*Math.sin(a));fc.lineTo(x-3*Math.cos(a-.55),y-3*Math.sin(a-.55));fc.lineTo(x-3*Math.cos(a+.55),y-3*Math.sin(a+.55));fc.closePath();}fc.fillStyle='rgba(9,54,70,.9)';fc.fill();fc.restore();fc.save();fc.globalCompositeOperation='destination-in';const fade=fc.createLinearGradient(0,0,0,d.H);fade.addColorStop(0,'rgba(0,0,0,0)');fade.addColorStop(.12,'rgba(0,0,0,1)');fade.addColorStop(.87,'rgba(0,0,0,1)');fade.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=fade;fc.fillRect(0,0,d.W,d.H);fc.restore();fieldWorkerReady=true;};window.addEventListener('pagehide',event=>{if(!event.persisted)fieldWorker?.terminate();});}}
 catch(e){fieldWorker=null;}
 function threadedFieldLayer(){
  const sources=fusion?(fusion.products?[...fusion.products.sources,...fusion.products.products].map(b=>[...project(b.x,b.y),b.Z]):[...centers.filter((_,i)=>i!==targetIndex).map(t=>[...project(t.x,t.y),t.Z??p.a.Z]),[...project(fusion.origin.x,fusion.origin.y),fusion.reaction.input.reduce((z,k)=>z+R.species[k].Z,0)]]):[...centers.map(t=>[...project(t.x,t.y),t.Z??p.a.Z]),[...projectilePoint(),p.b.Z]],viewKey=[W,H,c.width,c.height,ox,oy,scale,$('arrows').checked,$('lineStyle').value].join('/'),now=performance.now();
@@ -501,13 +532,13 @@ function fieldLayer(X,Y){
   // Spaced streamlines, inspired by force-core; direction comes from the electric field.
   const occupied=new Set(),directions=new Map(),cell=(px,py)=>Math.floor(px/16)+','+Math.floor(py/16);
   const F=(px,py)=>{
-   const key=Math.floor(px/5)+','+Math.floor(py/5);if(directions.has(key))return directions.get(key);
+   
    const gx=Math.max(0,Math.min(mapWidth-1,px/W*mapWidth-.5)),gy=Math.max(0,Math.min(mapHeight-1,py/H*mapHeight-.5)),ix=Math.floor(gx),iy=Math.floor(gy),jx=Math.min(mapWidth-1,ix+1),jy=Math.min(mapHeight-1,iy+1),tx=gx-ix,ty=gy-iy;
    const q=[0,1].map(k=>(worldGrid[iy*mapWidth+ix][k]*(1-tx)+worldGrid[iy*mapWidth+jx][k]*tx)*(1-ty)+(worldGrid[jy*mapWidth+ix][k]*(1-tx)+worldGrid[jy*mapWidth+jx][k]*tx)*ty);
    let fx=0,fy=0;for(const [sx,sy,z]of mapSources){const dx=q[0]-sx,dy=q[1]-sy,r=Math.max(p.R*.3,Math.hypot(dx,dy));fx+=z*dx/r**3;fy+=z*dy/r**3;}
-   const n=Math.hypot(fx,fy);let result=null;if(n>1e-15){const start=project(...q),end=project(q[0]+fx/n*.2/scale,q[1]+fy/n*.2/scale),dx=end[0]-start[0],dy=end[1]-start[1],length=Math.hypot(dx,dy);if(length>1e-9)result=[dx/length,dy/length];}directions.set(key,result);return result;
+   const n=Math.hypot(fx,fy);let result=null;if(n>1e-15){const start=project(...q),end=project(q[0]+fx/n*.2/scale,q[1]+fy/n*.2/scale),dx=end[0]-start[0],dy=end[1]-start[1],length=Math.hypot(dx,dy);if(length>1e-9)result=[dx/length,dy/length];}return result;
   };
-  const trace=(seed,sign)=>{let point=seed;const points=[];for(let i=0;i<650;i++){const d=F(...point);if(!d)break;const mid=F(point[0]+sign*1.5*d[0],point[1]+sign*1.5*d[1]);if(!mid)break;point=[point[0]+sign*3*mid[0],point[1]+sign*3*mid[1]];if(point[0]<0||point[0]>W||point[1]<0||point[1]>H||occupied.has(cell(...point))||sources.some(([sx,sy,z])=>z&&Math.hypot(point[0]-sx,point[1]-sy)<displayRadius()*1.4))break;points.push(point);}return points;};
+  const trace=(seed,sign)=>{let point=seed;const points=[];for(let i=0;i<650;i++){const next=fieldLineStep(F,...point,sign);if(!next)break;point=next.slice(0,2);if(point[0]<0||point[0]>W||point[1]<0||point[1]>H||occupied.has(cell(...point))||sources.some(([sx,sy,z])=>z&&Math.hypot(point[0]-sx,point[1]-sy)<displayRadius()*1.4))break;points.push(point);}return points;};
   for(let sy=18;sy<H;sy+=38)for(let sx=18;sx<W;sx+=38){if(occupied.has(cell(sx,sy)))continue;const seed=[sx,sy],points=[...trace(seed,-1).reverse(),seed,...trace(seed,1)];if(points.length<10)continue;points.forEach(q=>occupied.add(cell(...q)));fc.beginPath();points.forEach((q,i)=>i?fc.lineTo(...q):fc.moveTo(...q));fc.strokeStyle='rgba(9,54,70,.80)';fc.lineWidth=.65;fc.stroke();fc.fillStyle='rgba(27,99,127,.58)';for(let i=28;i<points.length-2;i+=100){const q=points[i],d=F(...q);if(!d)continue;const angle=Math.atan2(d[1],d[0]);fc.beginPath();fc.moveTo(q[0]+3*Math.cos(angle),q[1]+3*Math.sin(angle));fc.lineTo(q[0]-3*Math.cos(angle-.55),q[1]-3*Math.sin(angle-.55));fc.lineTo(q[0]-3*Math.cos(angle+.55),q[1]-3*Math.sin(angle+.55));fc.fill();}}
   fc.restore();
  }
@@ -515,7 +546,7 @@ function fieldLayer(X,Y){
  // Restore the original source-seeded, continuous schematic field lines.
  const F=(a,b)=>{let fx=0,fy=0;for(const [sx,sy,z]of sources){const dx=a-sx,dy=b-sy,r=Math.hypot(dx,dy);if(r>1){fx+=z*dx/r**3;fy+=z*dy/r**3;}}const n=Math.hypot(fx,fy);return n>1e-12?[fx/n,fy/n]:null;};
  for(const [sx,sy,z]of sources){for(let j=0;j<24*z;j++){const a=j*Math.PI*2/(24*z);let px=sx+10*Math.cos(a),py=sy+10*Math.sin(a);fc.beginPath();fc.moveTo(px,py);const arrows=[];
- for(let k=0;k<450;k++){const d=F(px,py);if(!d)break;const mid=F(px+1.5*d[0],py+1.5*d[1]);if(!mid)break;px+=3*mid[0];py+=3*mid[1];fc.lineTo(px,py);if(j%2===0&&k%50===25)arrows.push([px,py,Math.atan2(mid[1],mid[0])]);if(px<0||px>W||py<62||py>H-40)break;}
+ for(let k=0;k<450;k++){const next=fieldLineStep(F,px,py);if(!next)break;[px,py]=next;fc.lineTo(px,py);if(j%2===0&&k%50===25)arrows.push([px,py,next[2]]);if(px<0||px>W||py<62||py>H-40)break;}
  fc.strokeStyle=j%2?'rgba(9,54,70,.50)':'rgba(9,54,70,.80)';fc.lineWidth=j%2?.45:.65;fc.stroke();fc.fillStyle='rgba(9,54,70,.9)';for(const [ax,ay,angle]of arrows){fc.beginPath();fc.moveTo(ax+3*Math.cos(angle),ay+3*Math.sin(angle));fc.lineTo(ax-3*Math.cos(angle-.55),ay-3*Math.sin(angle-.55));fc.lineTo(ax-3*Math.cos(angle+.55),ay-3*Math.sin(angle+.55));fc.fill();}
  }}fc.restore();}
  // Soft fade into the scene edges, rather than an isolated rectangular patch.
@@ -656,6 +687,7 @@ function legibleMainGlyphs(items){
 }
 let uiSince=0;
 function frame(t){const dt=old?Math.min(.05,(t-old)/1000):0;old=t;if(document.hidden){requestAnimationFrame(frame);return;}
+ if(!paused&&playbackCursor===null)updateAutomaticPlayback(dt);
  const replaying=replayPlayback(dt);
  if(!paused&&!replaying&&(playbackSpeed>0||mode==='drag'||mode==='recoil'||mode==='free')){if(!reduced.matches)renderTime+=dt*Math.abs(playbackSpeed)/.1;if(fusion){advanceFusion(dt);}else if(mode==='tunnel'){tunnelTime+=dt*Math.max(0,playbackSpeed)/.1;if(tunnelTime>=tunnelApproachLength()&&!tunnelSoundStarted){tunnelSoundStarted=true;playTunnelSound();}if(tunnelTime>=tunnelApproachLength()+tunnelDuration*.8){x=tunnelTo[0];y=tunnelTo[1];vx=vy=0;mode='nuclear';if(activeReaction()&&$('fusionEnabled').checked)beginFusion();else status($('pairPreset').value==='proton|proton'?'Průchod bariérou p–p. Slabou přeměnu potřebnou pro fúzi tento model nepočítá.':batchNote||'Průchod do jaderné oblasti. Fúzi a její produkty přidáme v dalším kroku.');}}
  else if(mode==='recoil'&&recoil){recoil.time+=dt;const f=Math.min(1,recoil.time/.55),ease=1-(1-f)**3,points=recoil.points,index=ease*(points.length-1),i=Math.min(points.length-2,Math.floor(index));if(i>=0){const t=index-i;x=points[i][0]+(points[i+1][0]-points[i][0])*t;y=points[i][1]+(points[i+1][1]-points[i][1])*t;}if(f===1){recoil=null;mode=drag?'drag':'ready';const point=currentGlyphs()[0];if(point.x<35||point.x>W-35||point.y<100||point.y>H-70)fitAllParticles();if($('interaction').value==='gun')armGun(true);else status('Mez přiblížení aktualizována.');}}

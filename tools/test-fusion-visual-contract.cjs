@@ -99,7 +99,7 @@ console.log('PASS: signed shuttle interpolates recorded positions, pauses at zer
  assert.ok(Math.abs(context.sliderToSpeed(.101)-context.sliderToSpeed(.1))<.00021);
  assert.ok(!source.includes('productPresentationScale'));
  assert.equal(R.find('neutron','triton'),null);
- console.log('PASS: visible automatic 0.01x at emission, user ownership, fine nonlinear bidirectional slider and no hidden time multiplier.');
+ console.log('PASS: phase-speed helper respects user ownership; fine nonlinear bidirectional slider and no hidden time multiplier.');
 }
 {
  const a=source.indexOf('function productSpeedTex('),b=source.indexOf('function fusionGraphics()',a),context={HiFyzikoDT:global.HiFyzikoDT};vm.createContext(context);vm.runInContext(source.slice(a,b),context);
@@ -110,4 +110,29 @@ console.log('PASS: signed shuttle interpolates recorded positions, pauses at zer
   const text=context.productSpeedTex(body);assert.ok(text.includes(expected));katex.renderToString(String.raw`\begin{gathered}E=1\,\mathrm{MeV}\\`+text+String.raw`\end{gathered}`,{throwOnError:true});
  }
  console.log('PASS: relativistic product speed in km/s and two-line KaTeX labels, including massless and stationary particles.');
+}
+// Automatic presentation follows physical velocities in the visible scene.
+{
+ const F=require('../versions/vyvoj/m_files/fusion/barrier/fusion.js');
+ const elements={playbackSpeed:{value:'1',setAttribute(){}},playbackSpeedValue:{textContent:''}};
+ const context={$:id=>elements[id],stopSound(){},M:global.CoulombModel,HiFyzikoDT:F,mode:'products',fusion:null,shot:{start:1000},scale:.2,W:900,H:600,collisionZoom:1,project:(x,y)=>[450+x*.2,300+y*.2],centers:[],x:0,y:0,vx:1,vy:0};
+ vm.createContext(context);vm.runInContext(source.slice(source.indexOf('let playbackSpeed=.1,'),source.indexOf('function showReactionEnergy()')),context);
+ const speed=()=>vm.runInContext('playbackSpeed',context);
+ const targets={};
+ for(const channel of Object.values(R.channels)){
+  const products=R.create({channel,x:0,y:0,energy:12.926,angle:.73,minimumExitRadius:500});
+  const before=JSON.stringify(products);context.fusion={phase:'products',products};context.resetManualSpeed();context.updateAutomaticPlayback(0,true);
+  targets[channel.id]=speed();assert(speed()>0&&speed()<=1,channel.id);assert.equal(JSON.stringify(products),before,'Automatic playback must not alter physical state');
+  assert.equal(+elements.playbackSpeed.value,context.speedToSlider(speed()));
+ }
+ assert(targets.pp>targets.dt*5,'Slow elastic p-p must run substantially faster than D-T');
+ // Use real particles; a fast photon leaves the view while a slow proton stays.
+ const proton=R.create({channel:'pp',energy:12.926,minimumExitRadius:500}).products[0];
+ const photon=R.create({channel:'pt',energy:12.926}).products.find(p=>p.kind==='gamma');
+ context.fusion={phase:'products',products:{products:[proton,photon],sources:[]}};context.updateAutomaticPlayback(0,true);const fast=speed();photon.x=1e7;const target=context.automaticPlaybackTarget();assert(target>fast);context.updateAutomaticPlayback(.05);assert(speed()>fast&&speed()<target,'Acceleration should be gradual');
+ for(const chosen of [.023,0,-.2]){elements.playbackSpeed.value=String(context.speedToSlider(chosen));elements.playbackSpeed.oninput();context.updateAutomaticPlayback(.1,true);context.slowFusionPlayback();assert(Math.abs(speed()-chosen)<1e-12,'Slider must override every automatic phase');}
+ context.resetManualSpeed();context.mode='tunnel';context.updateAutomaticPlayback(0,true);assert.equal(speed(),.1);
+ context.mode='flight';context.fusion=null;context.updateAutomaticPlayback(0,true);assert(speed()>0&&speed()<=1);
+ assert(!source.includes('slowFusionPlayback(.01)'),'Product emission must use adaptive speed');
+ console.log('PASS: adaptive speed for every reaction, faster elastic p-p, visible-particle selection, smooth acceleration, unchanged physics and superior manual slider including stop/reverse.');
 }

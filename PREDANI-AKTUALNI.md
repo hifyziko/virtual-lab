@@ -661,3 +661,43 @@ Jiskření přepracováno: 180 ms série nepravidelných krátkých mikrooblouk�
 s tichým syčením, odfiltrování basů pod přibližně 1 kHz a zjemnění nejvyšších
 frekvencí. Hladký začátek/konec, zachována hlasitost 0,26 a vypínání zvuku.
 Spínání BLDC a skluz beze změny. Bez pushe.
+
+## 16. listopadu 2026 — samočinná rychlost fúze podle viditelného pohybu
+
+Pevných 0,01× při vzniku produktů nahrazuje automatika podle skutečných
+rychlostí částic a jejich promítnutí do aktuálního záběru. Cílem je přibližně
+sedm sekund na přejetí kratšího rozměru scény (v mezích posuvníku).
+Řídí přílet i produkty všech kanálů včetně p–p bez slabé přeměny. Po odletu
+rychlého záření z obrazu může plynule zrychlit zbývající pomalá jádra;
+zpomalení je okamžité. Tunelový a složený názorný efekt zůstávají na 0,1×.
+
+Výslovné upřesnění uživatele: automatika se zapíná sama, bez nového tlačítka;
+posuvník je nadřazený. Jeho ruční změna vypne automatické zásahy po zbytek
+pokusu, včetně nuly a zpětného chodu. Obnovení při nové přípravě respektuje
+stávající resetovací místa. Viditelný posuvník a údaj vždy sledují skutečný
+násobitel; společný čas všech částic a fyzikální vztahy se nemění.
+
+Změněny barrier/app.js, návod v index.html a rozšířen test
+ tools/test-fusion-visual-contract.cjs. Testuje všechny skutečné kanály,
+rychlejší p–p oproti D–T, výběr částic v záběru, plynulé zrychlení,
+nepozměněný fyzikální stav a přednost ručního posuvníku. Kontroly ovládání
+a tohoto kontraktu prošly. Obě aktivní dodávky aktualizovány dílčím
+sestavením tools/build-particle-library.cjs včetně lazy dokumentů a manifestů.
+Prohlížeč neotevřen; bez pushe.
+
+## 16. listopadu 2026 — zubaté siločáry při pěti jádrech
+
+Pevný integrační krok trasování siločar mohl v blízkosti nulového pole
+přeskakovat mezi protilehlými směry a kreslit pilku. Sdílený fieldLineStep
+zmenšuje krok podle změny směru na začátku, uprostřed a na konci; při
+nevyřešitelném směru čáru ukončí. Používá se ve workeru, rychlém náhledu
+i záložním vykreslení bez workeru, pro oba styly siločar. Ze záložního
+rozptýleného stylu odstraněna kvantizace směrů na pět pixelů. Výpočet
+barevné intenzity pole a fyzikální pohyb beze změny.
+
+Test test-fusion-field-worker.cjs prošel včetně pěti cílových jader a
+projektilu: oba styly, pohybový i zpřesněný náhled, omezené změny směru
+sousedních úseků a zastavení u symetrického nulového bodu bez oscilace.
+Obě dodávky aktualizovány přes build-particle-library.cjs, lazy balíčky
+včetně manifestů přepočteny. Bez vizuální kontroly v prohlížeči a bez pushe.
+Před touto opravou prošla celá project/check.cjs pro automatické přehrávání.
