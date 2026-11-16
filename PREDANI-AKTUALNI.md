@@ -1,5 +1,20 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — posouvání návodu ve fúzi (místní, bez pushe)
+
+Panel Ovládání a návod měl neomezenou výšku a dlouhý výklad přesahoval
+viditelnou část modulu. Nyní má šířku 480 a maximální výšku 680 logických
+pixelů uvnitř škálované plochy 1360 × 820, vlastní svislé posouvání a stabilní
+místo pro posuvník. Pojmenovaný region lze zaměřit klávesou Tab a posouvat
+klávesnicí. Obsah výkladu zůstává celý; rozměry grafu se nemění.
+Společné návody ostatních modulů již používají overflow:auto.
+Kontrola zdrojových stylů zahrnula společné návody (57 modulů), rozbalovací
+výklady uniform-module-layout, dialogy transformátorů a synchronních strojů.
+Další stejná chyba nebyla nalezena: společné panely mají omezenou výšku a
+overflow:auto, nativní modální dialogy využívají také výchozí posouvání
+prohlížeče. Obě dodávky sestaveny a tools/project/check.cjs prošel.
+Jde o kontrolu zdrojů a automatické testy, ne vizuální průchod prohlížečem.
+
 ## 16. listopadu 2026 — oprava prvního otevření BLDC (místní, bez pushe)
 
 Modul dc15-bldc (BLDC · elektronická komutace) postrádal v progresivním

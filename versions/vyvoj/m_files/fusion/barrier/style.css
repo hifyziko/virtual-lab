@@ -142,3 +142,7 @@ body[data-fusion-page="fu01-reakce"] .statusRow #statusDetails{font-size:11px;pa
 /* Status text must fit the existing rail slot; it cannot expand or scroll it. */
 body[data-fusion-page="fu01-reakce"] .actions .statusRow{overflow:hidden}
 body[data-fusion-page="fu01-reakce"] .statusRow #status{min-width:0;min-height:0;max-height:100%;overflow:hidden;overflow-wrap:anywhere}
+
+/* The guide scrolls within the fitted 1360 x 820 laboratory surface. */
+body[data-fusion-page="fu01-reakce"] .settingsPanel{width:480px;max-height:680px;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-gutter:stable;align-content:start}
+body[data-fusion-page="fu01-reakce"] .settingsPanel:focus-visible{outline:3px solid #725198;outline-offset:2px}
