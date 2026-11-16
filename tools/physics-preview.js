@@ -73,15 +73,12 @@
       footer.before(section);
     }
     footer.innerHTML = 'Zkušební verze 1.8.0-fyzika-preview · Interaktivní výuka v češtině · Dostupná také offline<br>Číselné modely jsou výukové idealizace. <a href="../../aktualni/web/index.html">Otevřít původní laboratoř elektrických strojů →</a>';
-    home.querySelector('.sectionline h2').textContent = current.area ? 'Témata oblasti' : 'Hledat napříč laboratoří';
-    home.querySelector('.discovery-search span').textContent = current.area ? 'Najít téma v oblasti' : 'Najít modul ve všech oblastech';
-    // Remove other areas' groups from scoped search, keeping the root search global.
+    home.querySelector('.sectionline h2').textContent = current.area ? 'Témata oblasti' : 'Vyberte oblast';
+    // Keep only the selected area's groups in its topic view.
     if (current.area) for (const section of home.querySelectorAll('.physics-area')) if (section.hidden) section.remove();
-    if (!current.area) home.querySelector('.discovery-actions').hidden = true;
     return template.innerHTML;
   };
   const route = Lab.route;
-  let previousArea;
   Lab.route = function () {
     route.call(this);
     if (document.readyState === 'loading') return;
@@ -92,25 +89,6 @@
         back.setAttribute('href', '#group-' + current.group);
         back.textContent = '← ' + (groupTitles[current.group] || current.group);
       }
-    }
-    const home = document.querySelector('.physics-home');
-    if (home && previousArea !== current.area?.id) {
-      const input = home.querySelector('#module-search');
-      input.value = '';
-      input.dispatchEvent(new Event('input', {bubbles:true}));
-    }
-    previousArea = current.area?.id;
-    if (home && !current.area) {
-      const input = home.querySelector('#module-search');
-      const updateSearch = () => {
-        const searching = !!input.value.trim();
-        for (const section of home.querySelectorAll('.physics-area')) {
-          section.hidden = !searching || ![...section.querySelectorAll('.topic-group')].some(g => !g.hidden);
-        }
-        if (!searching) home.querySelector('#search-status').textContent = 'Vyberte oblast nahoře, nebo vyhledejte konkrétní modul.';
-      };
-      input.addEventListener('input', updateSearch);
-      updateSearch();
     }
     // Fullscreen group links are maintained by the original shell.
   };

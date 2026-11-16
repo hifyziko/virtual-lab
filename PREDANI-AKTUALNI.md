@@ -1,5 +1,19 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — oprava rozcestníku po odstranění hledání
+
+tools/physics-preview.js ještě předpokládal existenci discovery-search,
+discovery-actions, module-search a search-status. Po odstranění hledání
+selhal Lab.home při zápisu textContent do null a zůstala úvodní načítací
+obrazovka. Odstraněny zbývající vazby i obsluha filtru; členění oblastí
+zůstává. Lokální kontrola tmp/check-home-no-search.mjs používá LinkeDOM
+a skutečné skripty home-discovery/physics-preview: původní kód prokazatelně
+selže, oprava projde pro hlavní stránku, tři oblasti a devět skupin včetně
+jejich výhradního rozbalování. Prohlížeč se nespouští. Souběžné změny
+nového modulu driftu jsou zachované. Bez pushe.
+Obě dodávky znovu sestaveny, tools/project/check.cjs prošel. DOM kontrola
+prošla také se skriptem physics-preview vytaženým přímo z hotového index.html.
+
 ## 16. listopadu 2026 — obrázek podle vybraného vozidla (místní, bez pushe)
 
 Modul 08-vozidla místo jedné společné karoserie kreslí pět původních
@@ -23,6 +37,15 @@ a meze stávající plochy při sklonech ±20 %, návaznost výběru i vlastníc
 parametrů a nezměněné vstupy fyziky. Test je součástí project/check.cjs.
 Souběžné úpravy rozcestníku a jiných modulů se zachovávají.
 
+## 16. listopadu 2026 — navigace bez hledání (místní, bez pushe)
+
+Na žádost uživatele odstraněno hledání na rozcestníku i v bočním stromu.
+Odstraněna také tlačítka Rozbalit vše / Sbalit vše. Tematické skupiny mají
+společné jméno details a při otevření zavírají ostatní skupiny; rozcestník
+si pamatuje jedinou skupinu. Boční navigace při otevření zvýrazní a rozbalí
+skupinu aktuálního modulu. Odkazy zpět a na hlavní rozcestník zachovány.
+Existující prohlížečový test upraven pro nové chování, prohlížeč se nespouští.
+Obě dodávky aktualni sestaveny, tools/project/check.cjs prošel.
 
 ## 16. listopadu 2026 — posouvání návodu ve fúzi (místní, bez pushe)
 
@@ -753,3 +776,39 @@ sousedních úseků a zastavení u symetrického nulového bodu bez oscilace.
 Obě dodávky aktualizovány přes build-particle-library.cjs, lazy balíčky
 včetně manifestů přepočteny. Bez vizuální kontroly v prohlížeči a bez pushe.
 Před touto opravou prošla celá project/check.cjs pro automatické přehrávání.
+
+## 16. listopadu 2026 — první modul driftů a vlet do pole (místní, bez pushe)
+
+Nový fu03-drift ve skupině Plazma a fúze; zdroje fusion/drift/, dodávka
+fuze-drift/index.html. Pět pokusů: vlet z oblasti bez pole do homogenního
+magnetického pole, gyrace, elektrický, gradientní a křivostní drift.
+Podklad: Entler–Kindl, Jaderná fúze a fúzní elektrárny, kap. 7.3–7.4,
+str. 141–148. Kniha ani její extrakce nejsou přidané do veřejného webu.
+
+Numerická Lorentzova rovnice v SI, symetrický Borisův krok; skutečné
+hmotnosti elektronu, protonu, deuteronu a alfa částice. Ostrá hranice pole
+je idealizovaná. Vlet ukazuje přímočarý pohyb, stáčení a následný výlet
+po tečně. Gradient je exponenciální profil velikosti B při pevném směru;
+křivostní pokus používá kruhové siločáry s konstantní velikostí B, aby
+oddělil křivostní drift od gradientního. Gyrační střed a magnetické drifty
+jsou v nehomogenním poli adiabatické aproximace. Bez srážek, vlastního
+pole plazmatu, polarizačního a gravitačního driftu. Druhy částic se zatím
+porovnávají přepínáním, nikoli současným párem ve scéně.
+
+Vlevo ovládání a graf příčné polohy/středu, vpravo scéna s původním
+sdíleným rendererem jader; při nedostupném WebGL označený bod. Posuvník
+času, krokování, záporné přehrávání, tažení polohy a směru vletu, otáčení
+křivostního pohledu, obrácení B, samostatný výklad. KaTeX i v dynamických
+údajích. Rozměr 1360 × 820 a stejné škálování jako fúzní reakce. Nový
+modul i jeho průvodce jsou součástí katalogu a lazy sestavení.
+
+Test tools/test-drift.cjs: analytická gyrace, směr rotace, energie/práce,
+volný pohyb před i po hranici, průměr půlkružnice a konvergence hranice,
+velikosti a znaménka driftů, skutečné obsluhy ovládání, renderovací volání
+a uvolnění zdrojů. Celá tools/project/check.cjs po dílčím sestavení prošla.
+Vizuální kontrola neproběhla; prohlížeč se podle pravidel neotevíral.
+
+Závěrečné úplné build-release uspělo s existujícím lokálním retry preloadem
+(tmp/loading-optimization/retry-write.cjs) pro zamykání HTML ve Windows.
+Obě aktivní dodávky byly kompletně přestavěné včetně všech lazy balíčků.
+Závěrečná tools/project/check.cjs po úplném sestavení prošla včetně auditu.
