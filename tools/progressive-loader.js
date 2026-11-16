@@ -1,6 +1,6 @@
 /* Keep navigation available while a selected lesson downloads. No startup prefetch. */
 (()=>{'use strict';
- const values=new Map(),pending=new Map(),received=new Map(),listeners=new Set();
+ const values=new Map(),pending=new Map(),received=new Map(),listeners=new Set(),frames=new WeakMap();
  let assets={},installed=false;
  const emit=()=>{for(const fn of listeners)fn();};
  const ready=key=>values.has(key);
@@ -84,6 +84,36 @@
    });
   },0));
  }
+ function clearFrame(frame){
+  frames.get(frame)?.();frame.srcdoc='';
+ }
+ function mountFrame(frame,key){
+  clearFrame(frame);
+  if(ready(key)){frame.srcdoc=value(key);return;}
+  const panel=document.createElement('section');panel.className='lab-loading';panel.setAttribute('aria-busy','true');
+  const status=document.createElement('p');status.setAttribute('role','status');status.textContent='Načítání animace…';
+  const progress=document.createElement('progress');progress.max=1;progress.setAttribute('aria-label','Průběh načítání animace');
+  const retry=document.createElement('button');retry.type='button';retry.textContent='Zkusit znovu';retry.hidden=true;
+  panel.append(status,progress,retry);frame.before(panel);
+  const display=frame.style.display;frame.style.display='none';let active=true;
+  const update=()=>{
+   const total=assets[key].bytes,loaded=ready(key)?total:Math.min(received.get(key)||0,total);
+   if(location.protocol!=='file:')progress.value=total?Math.min(.98,loaded/total):0;
+   if(loaded===total)status.textContent='Připravuji animaci…';
+  };
+  const cleanup=()=>{active=false;listeners.delete(update);retry.onclick=null;panel.remove();frame.style.display=display;frames.delete(frame);};
+  frames.set(frame,cleanup);listeners.add(update);update();
+  retry.onclick=()=>mountFrame(frame,key);
+  requestAnimationFrame(()=>setTimeout(()=>{
+   if(!active)return;
+   load(key).then(source=>{if(active){cleanup();frame.srcdoc=source;}}).catch(error=>{
+    if(!active)return;
+    panel.setAttribute('aria-busy','false');progress.hidden=true;retry.hidden=false;
+    status.textContent='Animaci se nepodařilo načíst. Zkontrolujte připojení a zkuste to znovu.';
+    console.warn('Animation loading failed:',key,error);
+   });
+  },0));
+ }
  function install(definitions,dependencies){
   if(installed)throw Error('Progressive loader already installed');installed=true;assets=definitions;
   for(const [id,keys] of Object.entries(dependencies)){
@@ -93,5 +123,5 @@
    module.mount=function(app,...rest){return mountAfterLoading(module,keys,original,app,[app,...rest]);};
   }
  }
- window.LabProgress={install,accept,value,ready,load};
+ window.LabProgress={install,accept,value,ready,load,mountFrame,clearFrame};
 })();

@@ -23,22 +23,30 @@ for(const record of p.preserved){
 }
 assert.deepEqual(p.dependencies['dc18-dve-pole'],['dc-simple-fields']);
 assert.deepEqual(p.dependencies['em05-reluktance'],['armature-fields']);
+assert(p.assets['dialog-transformer-field'],'Transformer field document must load on demand');
+assert.equal(p.preserved.find(item=>item.key==='dialog-transformer-field').sha256,
+ sha(fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/transformator/pole-transformatoru-live.html'))),
+ 'The transformer field animation must be identical to its source');
+const fieldDialog=html.match(/<!-- fem-field:start -->([\s\S]*?)<!-- fem-field:end -->/)[1];
+assert(!fieldDialog.includes('const source='),'Transformer FEM document remains in startup HTML');
+assert(fieldDialog.includes('LabProgress.mountFrame('));assert(fieldDialog.includes('LabProgress.clearFrame('));
 // Registering DC lessons must work before any field payload is available.
 const startup={console,Lab:{catalog:[],groupArt:{},register(){},route(){}}};startup.window=startup;
 vm.runInNewContext(html.match(/<!-- direct-current:start --><script>([\s\S]*?)<\/script>/)[1],startup);
 assert.equal(startup.DCFieldBasis,undefined);assert.equal(startup.DCLessons.length,9);
 const runtime=fs.readFileSync(path.join(__dirname,'progressive-loader.js'),'utf8');
 class Element{
- constructor(tag){this.tagName=tag;this.children=[];this.attributes={};this.hidden=false;}
+ constructor(tag){this.tagName=tag;this.children=[];this.attributes={};this.hidden=false;this.style={display:''};}
  append(...nodes){for(const node of nodes){node.parent=this;this.children.push(node);}}
  replaceChildren(...nodes){this.children=[];this.append(...nodes);}
  contains(node){return this.children.includes(node)||this.children.some(child=>child.contains(node));}
  setAttribute(key,value){this.attributes[key]=String(value);}
  remove(){if(this.parent)this.parent.children=this.parent.children.filter(node=>node!==this);}
+ before(node){node.parent=this.parent;this.parent.children.splice(this.parent.children.indexOf(this),0,node);}
 }
-function fixture(protocol='https:'){
+function fixture(protocol='https:',sampleCode='LabProgress.accept("shared",{answer:42});'){
  const app=new Element('main'),head=new Element('head'),requests=[],mounted=[],warnings=[],context={};
- const sampleCode='LabProgress.accept("shared",{answer:42});',bytes=Buffer.from(sampleCode);
+ const bytes=Buffer.from(sampleCode);
  const definitions={shared:{path:'lazy/shared.js',bytes:bytes.length,sha256:sha(bytes)}};
  let fail=false,gate=null,corrupt=false,streamCount=0;
  Object.assign(context,{console:{warn:(...args)=>warnings.push(args)},Uint8Array,TextDecoder,AbortController,crypto:crypto.webcrypto,
@@ -81,6 +89,25 @@ async function run(){
  const shared=fixture();shared.hold();shared.navigate('#first');await until(()=>shared.requests.length===1);shared.navigate('#second');await tick();shared.release();
  await until(()=>shared.mounted.length===1);assert.deepEqual(shared.mounted,['second']);assert.equal(shared.requests.length,1,'Concurrent routes must share the download');
  const offline=fixture('file:');offline.navigate('#first');await until(()=>offline.mounted.length===1);assert.equal(offline.context.LabProgress.value('shared').answer,42);
+ // Optional field dialog: no initial download, close/reopen, retry and both transports.
+ for(const protocol of ['https:','file:']){
+  const source='<html><body>Original field animation</body></html>';
+  const d=fixture(protocol,'LabProgress.accept("shared",'+JSON.stringify(source)+');'),frame=new Element('iframe');d.app.append(frame);
+  const api=d.context.LabProgress;assert.equal(d.requests.length,0);
+  api.mountFrame(frame,'shared');assert.equal(d.requests.length,0);assert.equal(frame.style.display,'none');
+  api.clearFrame(frame);await tick();await tick();assert.equal(d.requests.length,0,'Closing before paint must cancel the download');
+  assert.equal(frame.srcdoc,'');assert.equal(frame.style.display,'');assert.equal(d.app.children.length,1);
+  d.fail();api.mountFrame(frame,'shared');await until(()=>d.warnings.length===1);
+  const retry=d.app.children[0].children.find(node=>node.tagName==='button');assert.equal(retry.hidden,false);retry.onclick();
+  await until(()=>frame.srcdoc===source);assert.equal(frame.style.display,'');assert.equal(d.app.children.length,1);
+  api.clearFrame(frame);assert.equal(frame.srcdoc,'');api.mountFrame(frame,'shared');assert.equal(frame.srcdoc,source);
+  assert.equal(d.requests.length,2,'Reopening a loaded dialog must reuse its document');
+ }
+ const closing=fixture(),frame=new Element('iframe');closing.app.append(frame);closing.hold();
+ closing.context.LabProgress.mountFrame(frame,'shared');await until(()=>closing.requests.length===1);
+ closing.context.LabProgress.clearFrame(frame);closing.release();await until(()=>closing.context.LabProgress.ready('shared'));
+ assert.equal(frame.srcdoc,'','A closed dialog must never start its iframe after download');
+ assert.equal(closing.app.children.length,1);
  // Execute every actual payload, including the field renderer that captures its basis at initialization.
  const c={console,setTimeout,clearTimeout,location:{protocol:'file:'},Lab:{modules:new Map(Object.keys(p.dependencies).map(id=>[id,{id,mount(){}}]))}};
  c.window=c;vm.createContext(c);

@@ -1,5 +1,36 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — další odlehčení úvodního načítání (bez pushe)
+
+Volitelná animace „Pole v transformátoru“ už není vložena do úvodního HTML.
+`tools/build-progressive-web.cjs` ukládá celý původní dokument do samostatného
+balíčku `dialog-transformer-field` v `web/lazy/`; načítá se až po otevření
+dialogu. Původní data, renderer a ovládání zůstávají beze změny (ověřeno SHA-256
+proti `transformator/pole-transformatoru-live.html`). Loader ukazuje průběh,
+umožňuje opakování při chybě a používá cache v otevřené stránce. Zavření dialogu
+zabrání pozdnímu spuštění animace; opětovné otevření načtená data nestahuje.
+Podporováno HTTP(S) i místní file://. Manifest má nyní 41 odložených souborů;
+publikace i soukromé předání je vybírají přes `progressiveFiles`.
+
+Naměřená velikost úvodního HTML: 2 446 033 → 1 753 572 bajtů (−28,3 %).
+Zkušební gzip v Node: 1 299 070 → 781 735 bajtů (−39,8 %).
+Jde o objem dat, nikoli měření doby načítání v prohlížeči nebo skutečné
+komprese na Pages. Celý obsah je zachován; data animace se pouze odkládají.
+
+Obě dodávky aktualni sestaveny a jejich indexy jsou totožné. Prošlo
+`tools/project/check.cjs`, včetně všech původních testů a nových kontrol
+dialogu: zavření před zahájením i během stahování, opakování po chybě,
+cache a oba způsoby načítání. Prohlížeč nebyl otevřen; vzhled ani skutečná
+rychlost vykreslení nebyly vizuálně měřeny. Verze aplikace zůstává 1.0.
+
+Na tomto Windows bylo nutné opravit vlastníka kořenové složky `.git`,
+aby fungoval sandbox. Při sestavení se navíc opakovaně objevil přechodný
+`UNKNOWN` při otevření velkého generovaného HTML k zápisu. Úplné sestavení
+doběhlo s místním dočasným opakováním těchto zápisů; tento pomocník není
+závislostí projektu ani součástí veřejných zdrojů. Příčina zámku není ověřena.
+Nadbytečné prázdné řádky vzniklé přestavěním sledovaného zdrojového HTML
+byly vráceny; změny fyzikálních modulů nejsou součástí této úpravy.
+
 ## GitHub a přenos — 15. listopadu 2026
 
 ### Předání na další počítač a schválený push

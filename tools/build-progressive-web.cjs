@@ -36,6 +36,21 @@ function transform(original){
  }
  const getters='\nfor(const entry of entries)Object.defineProperty(entry,"source",{get:()=>LabProgress.ready("lesson-"+entry.id)?LabProgress.value("lesson-"+entry.id):undefined});';
  html=html.slice(0,start)+'const entries='+encode(entries)+';'+getters+html.slice(end);
+ // The transformer field dialog is optional too: its embedded FEM document
+ // must not travel with every visit to the hub. Preserve the document verbatim.
+ const fieldStart=html.indexOf('<!-- fem-field:start -->'),fieldEnd=html.indexOf('<!-- fem-field:end -->',fieldStart);
+ if(fieldStart<0||fieldEnd<0)throw Error('Missing transformer field dialog');
+ let field=html.slice(fieldStart,fieldEnd);
+ const fieldA=field.indexOf('const source=')+'const source='.length,fieldB=stringEnd(field,fieldA);
+ const fieldLiteral=field.slice(fieldA,fieldB),fieldKey='dialog-transformer-field';
+ add(fieldKey,'LabProgress.accept('+encode(fieldKey)+','+fieldLiteral+');\n');
+ preserved.push({key:fieldKey,kind:'html',sha256:sha(Buffer.from(JSON.parse(fieldLiteral)))});
+ field=field.slice(0,fieldA-'const source='.length)+field.slice(fieldB+1);
+ const open="dialog.querySelector('iframe').srcdoc=source;dialog.showModal();",close="dialog.querySelector('iframe').srcdoc=''";
+ if(!field.includes(open)||!field.includes(close))throw Error('Transformer dialog lifecycle changed');
+ field=field.replace(open,"dialog.showModal();LabProgress.mountFrame(dialog.querySelector('iframe'),"+encode(fieldKey)+");")
+  .replace(close,"LabProgress.clearFrame(dialog.querySelector('iframe'))");
+ html=html.slice(0,fieldStart)+field+html.slice(fieldEnd);
  for(const id of ['sm07-dq','sm08-rotor-dq']){
   const anchor=html.indexOf("const entry={id:'"+id+"'");
   if(anchor<0)throw Error('Missing lesson: '+id);
