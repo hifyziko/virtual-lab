@@ -1,5 +1,18 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — oprava prvního otevření BLDC (místní, bez pushe)
+
+Modul dc15-bldc (BLDC · elektronická komutace) postrádal v progresivním
+sestavení závislost dc-bldc-fields. První otevření bez předchozí návštěvy
+dc16-bldc-poloha končilo ReferenceError: DCBLDCFieldBasis is not defined,
+ještě před vykreslením řezu motoru a dokončením připojení modulu.
+Závislost doplněna v tools/build-progressive-web.cjs. Regresní test otevírá
+skutečný renderer z dodávky v izolovaném kontextu, ověřuje motor, můstek,
+diagram, napěťové průběhy a přepnutí všech šesti stavů. Původní dodávka
+v tomto testu prokazatelně selhala. Vzhled se neověřuje spuštěním prohlížeče.
+Obě dodávky aktualni přestavěny; tools/project/check.cjs včetně nové
+regrese BLDC prošel, stejně jako test-module-window-fit.cjs. Push neproveden.
+
 ## 16. listopadu 2026 — ověřeno pro výslovně požadovaný push
 
 Úplné sestavení build-release úspěšně dokončeno; dřívější chyba Missing

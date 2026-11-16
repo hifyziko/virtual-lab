@@ -34,6 +34,35 @@ assert(fieldDialog.includes('LabProgress.mountFrame('));assert(fieldDialog.inclu
 const startup={console,Lab:{catalog:[],groupArt:{},register(){},route(){}}};startup.window=startup;
 vm.runInNewContext(html.match(/<!-- direct-current:start --><script>([\s\S]*?)<\/script>/)[1],startup);
 assert.equal(startup.DCFieldBasis,undefined);assert.equal(startup.DCLessons.length,9);
+// Open electronic commutation in a fresh session, without visiting another
+// DC lesson first. A missing dependency used to abort before motor rendering
+// and before the host could finish fitting the module to the viewport.
+const bldc={console,Lab:{catalog:[],groupArt:{},register(){},route(){}},
+ requestAnimationFrame:()=>1,cancelAnimationFrame(){}};
+bldc.window=bldc;vm.createContext(bldc);
+vm.runInContext([...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].map(m=>m[1]).find(s=>s.startsWith('!function')&&s.includes('renderToString')),bldc);
+for(const rel of ['magnetic-field/contours.js','synchronous/machine-art.js'])vm.runInContext(fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web',rel),'utf8'),bldc);
+vm.runInContext(html.match(/<!-- direct-current:start --><script>([\s\S]*?)<\/script>/)[1],bldc);
+bldc.document={body:{classList:{remove(){}}}};
+bldc.MachineSound=undefined; // Audio UI is independent of the field dependency.
+bldc.LabProgress={accept(){}};
+for(const key of p.dependencies['dc15-bldc']||[])vm.runInContext(chunks.get(key),bldc);
+const bldcNodes=new Map(),bldcApp={classList:{add(){}},querySelector(selector){
+ if(!bldcNodes.has(selector))bldcNodes.set(selector,{innerHTML:'',setAttribute(){}});
+ return bldcNodes.get(selector);
+},querySelectorAll:()=>[]};
+bldc.DCBLDC.mount(bldcApp,{num:'15'});
+for(const id of ['machine','bridge','diagram','wave']){
+ const svg=bldcNodes.get('#bc-'+id).innerHTML;
+ assert(svg.includes('<path'),'Cold BLDC mount must draw '+id);
+ assert(!/NaN|undefined|Infinity|katex-error/.test(svg));
+}
+assert.equal(typeof bldc.Lab.dispose,'function','Mount must finish and install cleanup');
+for(let step=1;step<=6;step++){
+ bldcNodes.get('#bc-next').onclick();
+ assert(bldcNodes.get('#bc-machine').innerHTML.includes('Aktivní stav '+(step%6+1)+' ze 6'));
+}
+bldc.Lab.dispose();
 const runtime=fs.readFileSync(path.join(__dirname,'progressive-loader.js'),'utf8');
 class Element{
  constructor(tag){this.tagName=tag;this.children=[];this.attributes={};this.hidden=false;this.style={display:''};}

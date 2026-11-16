@@ -9,6 +9,7 @@ const dataModules={
  'dc01-princip':['dc-fields'],
  'dc02-kotva':['dc-fields','dc-coil-fields'],
  'dc17-rozvinuti':['dc-fields','dc-brush-fields'],
+ 'dc15-bldc':['dc-bldc-fields'],
  'dc16-bldc-poloha':['dc-fields','dc-bldc-fields']
 };
 // Find a JSON string without a recursive regular expression over multi-megabyte literals.
