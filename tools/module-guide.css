@@ -1,0 +1,21 @@
+/* All selectors are local; launcher and dialog do not take part in lesson fitting. */
+#module-guide-launch{position:fixed;right:10px;bottom:6px;z-index:45;box-sizing:border-box;width:32px;height:32px;padding:0;border:1px solid #007c69;border-radius:50%;background:#007c69;color:#fff;font:700 17px/1 system-ui,sans-serif;box-shadow:0 2px 8px #142b3520}
+#module-guide-launch[hidden]{display:none}
+#module-guide-launch .module-guide-launch-label{display:none}
+#module-guide-launch:focus-visible,#module-guide-dialog button:focus-visible,#module-guide-dialog a:focus-visible{outline:3px solid #e4a325;outline-offset:3px}
+#module-guide-dialog{box-sizing:border-box;position:fixed;inset:0;width:min(720px,calc(100vw - 24px));max-width:calc(100vw - 24px);max-height:calc(100dvh - 32px);margin:auto;padding:24px;border:1px solid #b5cec4;border-radius:14px;overflow:auto;overscroll-behavior:contain;background:#fff;color:#142b35;font:15px/1.55 system-ui,sans-serif;box-shadow:0 16px 64px #142b3540;text-align:left}
+#module-guide-dialog::backdrop{background:#142b3580}
+#module-guide-dialog .module-guide-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:1px solid #d9e0df;padding-bottom:16px}
+#module-guide-dialog .module-guide-eyebrow{margin:0 0 4px;color:#007c69;font-size:12px;font-weight:700}
+#module-guide-dialog h2{margin:0;font-size:23px;line-height:1.2;letter-spacing:0;overflow-wrap:anywhere}
+#module-guide-dialog h3{font-size:15px;margin:18px 0 6px;letter-spacing:0}
+#module-guide-dialog p{color:inherit}
+#module-guide-dialog li{margin:6px 0}
+#module-guide-dialog ul,#module-guide-dialog ol{padding-left:22px}
+#module-guide-dialog button{flex:0 0 auto;padding:6px 10px;border:1px solid #b5cec4;border-radius:7px;background:#f0f8f4;color:#142b35;font:inherit;cursor:pointer}
+#module-guide-dialog .module-guide-equation{padding:12px;background:#f0f8f4;border-radius:8px;text-align:center;overflow-wrap:anywhere}
+#module-guide-dialog .module-guide-related a{display:block;color:#006c5b;font-size:14px;margin:6px 0;text-underline-offset:3px}
+#module-guide-dialog .module-guide-source,#module-guide-dialog .module-guide-footnote{font-size:12px;color:#52666c;margin:16px 0 0}
+@media(min-width:1400px){#module-guide-launch{width:auto;height:30px;padding:0 12px;border-radius:7px;font-size:12px}#module-guide-launch .module-guide-launch-label{display:inline}}
+@media(max-width:600px){#module-guide-dialog{padding:16px}#module-guide-dialog h2{font-size:19px}#module-guide-dialog .module-guide-equation{font-size:12px}}
+@media print{#module-guide-launch,#module-guide-dialog{display:none!important}}

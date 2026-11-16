@@ -15,6 +15,15 @@ html=html.replaceAll('Virtuální laboratoř elektrických strojů','Virtuální
 html=html.replace(/<meta name="description" content="[^"]*">/,'<meta name="description" content="Interaktivní principy a technické aplikace. Elektřina a magnetismus, elektrické stroje a návrh oblasti plazmatu a fúze.">');
 html=html.replace('</head>',()=>'<style id="physics-preview-style">'+css+'</style></head>');
 html=html.replace('</body>',()=>'<script id="physics-preview">'+js+'</script></body>');
+if(activate){
+ // Small inline guide is available offline without downloading lesson data.
+ html=html.replace(/<style id="module-guide-style">[\s\S]*?<\/style>/g,'').replace(/<script id="module-guide(?:-data)?">[\s\S]*?<\/script>/g,'');
+ html=html.replace('</head>',()=>'<style id="module-guide-style">'+fs.readFileSync(path.join(__dirname,'module-guide.css'),'utf8')+'</style></head>');
+ for(const [id,file] of [['module-guide-data','module-guide-data.js'],['module-guide','module-guide.js']]){
+  const code=fs.readFileSync(path.join(__dirname,file),'utf8');new vm.Script(code);
+  html=html.replace('</body>',()=>'<script id="'+id+'">'+code+'</script></body>');
+ }
+}
 if(visual){
  let visualJS=fs.readFileSync(path.join(__dirname,'physics-visual.js'),'utf8');
  if(activate)visualJS=visualJS.replace("root.querySelector('.homefooter').prepend(comparison);",'');

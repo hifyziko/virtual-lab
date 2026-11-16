@@ -1,5 +1,31 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — stručné průvodce modulů podle literatury (místní, bez pushe)
+
+V aktuální aplikaci je doplněno 57 krátkých průvodců: ovládání, dvě podstatné
+souvislosti, případný vztah a odkazy na navazující pokusy. Hlavním českým
+podkladem je ověřený Chmelíkův sken stejnosměrných a komutátorových strojů
+s teorií obecného stroje; doplňuje jej Fitzgerald a stávající referenční podklady.
+Chapman zůstává označen jako Instructor’s Manual. Přesný rozsah selektivní
+revize a mapa k modulům jsou v docs/LITERATURA-MODULY.md; nejde o kontrolu
+celých knih ani kompletní revizi fyziky všech modelů. Knihy a skeny se do webu
+nepřidávají. Kopylov nebyl použit podle dřívějšího pokynu v referenčních poznámkách.
+
+Tlačítko otazníku u pravého dolního okraje (na širokém okně „Ovládání a výklad“)
+otevírá samostatný modální dialog. Průvodce se nevkládá do měřených pracovních
+ploch ani hlaviček a nemění jejich rozměry či škálování. Simulaci neresetuje;
+pokus může pod nápovědou pokračovat. Escape zavře nejprve nápovědu. Zdroje:
+tools/module-guide-data.js, module-guide.js a module-guide.css; integrace přes
+build-physics-preview.cjs. Tři historické odkazy galerie sdílejí její výklad.
+
+Obě dodávky aktualni sestaveny; prošly tools/project/check.cjs (včetně nového
+test-module-guide.cjs a progresivního načítání), test opakovaného škálování
+Web/test-module-window-fit.cjs a dodatečná kontrola skutečného DOM/KaTeXu pro
+všech 57 dialogů. Pracovní DOM při otevření a zavření zůstává shodný. Prohlížeč
+se neotevíral, překryvy a čitelnost nejsou vizuálně ověřené. Souběžné změny
+fúzního modulu v jiném chatu se zachovávají a nejsou součástí této úpravy.
+
+
 ## 16. listopadu 2026 — více prostoru pro graf (místní úprava)
 
 Předchozí stav 853c2a5 byl na výslovný pokyn odeslán a nasazen.

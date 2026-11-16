@@ -13,11 +13,15 @@
 !/SPUSTIT_VYUKU.cmd
 !/VERZE.md
 !/config/project-files.json
+!/docs/LITERATURA-MODULY.md
 !/tools/build-atom-preview.cjs
 !/tools/build-particle-library.cjs
 !/tools/build-physics-preview.cjs
 !/tools/build-progressive-web.cjs
 !/tools/build-release.cjs
+!/tools/module-guide-data.js
+!/tools/module-guide.css
+!/tools/module-guide.js
 !/tools/particle-library-navigation.js
 !/tools/physics-preview.css
 !/tools/physics-preview.js
@@ -44,6 +48,7 @@
 !/tools/test-fusion-reactions.cjs
 !/tools/test-fusion-render-lifecycle.cjs
 !/tools/test-fusion-visual-contract.cjs
+!/tools/test-module-guide.cjs
 !/tools/test-particle-library.cjs
 !/tools/test-progressive.cjs
 !/tools/test-tunneling-wave.cjs
