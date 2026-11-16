@@ -10,6 +10,8 @@ for(const m of html.matchAll(/const entry=\{id:'([^']+)',group:'([^']+)'[^;]*?ti
 const c={Lab,document:{readyState:'loading'}};c.window=c;vm.createContext(c);
 for(const file of ['versions/vyvoj/m_files/Web/direct-current/lessons.js','tools/particle-library-navigation.js','tools/module-guide-data.js'])vm.runInContext(fs.readFileSync(file,'utf8'),c);
 const {entries,sources,aliases}=c.ModuleGuideData;
+assert(!/STEJNOSMERNE|SYNCHRONNI_|prezentac|TEs|TES kni/i.test(Object.values(sources).join(' ')),'no presentation or working scan-folder citations in the guide');
+assert(Object.values(sources).some(s=>s.includes('Bartoš: Teorie elektrických strojů')),'use the correct book identity');
 assert(Lab.catalog.length>50);
 assert.deepEqual(Lab.catalog.map(e=>e.id).sort(),Object.keys(entries).sort(),'guide must cover the real final catalog, without phantom modules');
 const katex=require('../versions/vyvoj/m_files/fusion/particles/vendor/katex.js');

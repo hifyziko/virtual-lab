@@ -2,7 +2,7 @@
 (() => {
  'use strict';
  const sources = {
-  magnetic:'Fitzgerald: Electric Machinery, kap. 1.2–1.4 (tokové vazby, materiály a střídavé buzení).',
+  magnetic:'Bartoš: Teorie elektrických strojů, str. 6–7 (magnetický obvod a tokové vazby); Fitzgerald: Electric Machinery, kap. 1.2–1.4 (materiály a střídavé buzení).',
   energy:'Chmelík: kap. 33–34, tištěné str. 110 a 113 (napěťová a pohybová rovnice); Fitzgerald: Electric Machinery, kap. 3 (síla, moment a energetická bilance).',
   transformer:'Fitzgerald: Electric Machinery, kap. 2.2–2.5 a 2.7 (transformátor a náhradní schéma).',
   winding:'Fitzgerald: Electric Machinery, kap. 4.3–4.6 (rozložené vinutí, točivé pole a napětí).',
@@ -12,11 +12,12 @@
   skin:'Vlastní analytické jádro HF1/HF2; předpoklady a ověření v hf-core/README.md a hf-core/HLASENI_OVERENI.md.',
   dc:'Chmelík: Stejnosměrné a komutátorové elektrické stroje, teorie obecného elektrického stroje; kap. 4, 6 a 18, tištěné str. 13, 17 a 62.',
   commutation:'Chmelík: týž svazek, kap. 8–10, tištěné str. 25–38 (reakce kotvy, kompenzace a komutace).',
-  dcwinding:'Chmelík: kap. 10 a 18, tištěné str. 29–30 a 62; místní STEJNOSMERNE_1, snímky 72–111 (vinutí a komutace).',
-  dcdrive:'Místní prezentace STEJNOSMERNE_2, snímky 15–28 (rovnice a řízení stejnosměrného stroje).',
-  bldc:'Chmelík: kap. 22, tištěná str. 81 (elektronická komutace); místní STEJNOSMERNE_2, snímky 71–191 (spínání a určení polohy).',
-  transient:'Chmelík: kap. 38, tištěná str. 125 (budicí a tlumicí obvody); Fitzgerald: dodatek C.2; místní SYNCHRONNI_1_new, snímky 74, 77 a 88.',
-  syncconnect:'Místní SYNCHRONNI_5; poznámky k modelu v reference/synchronous/README-synchronizing.md.',
+  dcwinding:'Chmelík: kap. 10 a 18, tištěné str. 29–30 a 62 (komutace a proudové větve kotvy).',
+  dcdrive:'Chmelík: kap. 33–34, tištěné str. 110 a 113 (napěťová a pohybová rovnice); vlastní model pohonu projektu.',
+  bldc:'Chmelík: kap. 22, tištěná str. 81 (princip elektronické komutace); vlastní model řízení BLDC projektu.',
+  transient:'Chmelík: kap. 38, tištěná str. 125 (budicí a tlumicí obvody); Fitzgerald: Electric Machinery, dodatek C.2.',
+  syncconnect:'Vlastní výukový model fázování generátoru k síti a jeho metodika.',
+  stiffness:'Bartoš: Teorie elektrických strojů, str. 124–125 (synchronizační moment); Fitzgerald: Electric Machinery, kap. 5.7.',
   regulation:'Chapman: Instructor’s Manual, příklad 5-4(b–e), tištěné str. 115–116. Jde o příručku řešení, nikoli plnou učebnici.',
   model:'Vlastní výukový model projektu a jeho metodika; uvedené knihy elektrických strojů toto téma nepokrývají.'
  };
@@ -133,7 +134,7 @@
  add('sm02-schema','synchronous',
   ['Měňte buzení, zatížení a parametry stroje a sledujte uzavření fázorového obrazce.','Porovnávejte hladký a vyniklý rotor při stejném pracovním bodu.'],
   ['Svorkové napětí, vnitřní napětí výsledného toku a budicí napětí jsou různé veličiny.','Vnější úhel je mezi svorkovým a budicím napětím; vnitřní úhel mezi vnitřním a budicím napětím. Přepnutí označení úhlu nemění stroj.'],String.raw`\overline{U_a},\quad\overline{U_i},\quad\overline{U_{ib}};\qquad\beta,\ \beta'`,['sm03-torque','sm06-torque-origin']);
- add('sm03-torque','synchronous',
+ add('sm03-torque','stiffness',
   ['Měňte buzení a vyniklost a porovnávejte budicí a reluktanční část momentu.','Přepněte vnější a vnitřní úhlovou osu a sledujte tentýž pracovní bod.'],
   ['Reluktanční moment může existovat i bez buzení díky rozdílu podélné a příčné reaktance.','Statickou stabilitu určuje místní synchronizační tuhost. Hranice hladkého bezeztrátového stroje se nedá bez úprav přenést na každý model.'],String.raw`K_s=-\frac{\mathrm dM}{\mathrm d\beta}`,['sm02-schema','09-synchronni']);
  add('sm06-torque-origin','synchronous',

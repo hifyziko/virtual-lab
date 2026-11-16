@@ -2,6 +2,10 @@
 
 ## 16. listopadu 2026 — stručné průvodce modulů podle literatury (místní, bez pushe)
 
+Upřesnění uživatele: v nápovědě necitovat jeho prezentace ani pracovní název
+obrazové složky. Skenované dvoustrany jsou Bartoš: Teorie elektrických strojů;
+tento název je opraven v mapě i příslušných bibliografických údajích nápovědy.
+
 V aktuální aplikaci je doplněno 57 krátkých průvodců: ovládání, dvě podstatné
 souvislosti, případný vztah a odkazy na navazující pokusy. Hlavním českým
 podkladem je ověřený Chmelíkův sken stejnosměrných a komutátorových strojů
