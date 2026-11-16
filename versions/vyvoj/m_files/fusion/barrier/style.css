@@ -63,3 +63,38 @@ main{width:calc(100% - 28px);max-width:min(1800px,calc((100dvh - 85px)*1.7));gap
 #tunnelVideoDialog{border:1px solid #ccd9d3;border-radius:14px;padding:14px;background:#fff;color:#173d3c;max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);width:fit-content}#tunnelVideoDialog::backdrop{background:#102b35b3}.videoHeading{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:10px}#tunnelVideo{display:block;max-width:min(85vw,960px);max-height:calc(100dvh - 125px);background:#101a20;border-radius:8px}
 
 #tunnelVideoDialog{width:min(1100px,94vw);padding:14px;background:#091522;color:#e1f1fa}.waveDescription{font-size:13px;color:#a8c4d8;margin:4px 0 8px}#waveScene{display:block;width:100%;height:clamp(200px,42vh,450px);touch-action:none;cursor:grab}#waveScene:active{cursor:grabbing}#waveDensity{display:block;width:100%;height:clamp(130px,20vh,210px)}.waveControls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}.waveControls input{flex:1;min-width:120px}.waveControls output{font-size:13px;font-variant-numeric:tabular-nums}#waveLoading{color:#b8def1;padding:8px}
+
+/* Stable logical viewport: the complete desk scales together, including its
+   header and playback bar. Physical viewport media rules must not shrink
+   individual grid tracks underneath their content. */
+body[data-fusion-page="fu01-reakce"]{font-size:16px}
+body[data-fusion-page="fu01-reakce"] main{position:fixed;left:50%;top:8px;width:1360px;height:820px;max-width:none;margin:0;padding:6px 0;gap:8px;transform:translateX(-50%) scale(var(--fusion-fit,1));transform-origin:top center}
+body[data-fusion-page="fu01-reakce"] .modulehead{flex-wrap:nowrap;padding:4px 0 8px;gap:12px}
+body[data-fusion-page="fu01-reakce"] .modulehead h1{font-size:22px}
+body[data-fusion-page="fu01-reakce"] .labLayout{grid-template-columns:480px minmax(0,1fr);gap:12px}
+body[data-fusion-page="fu01-reakce"] .controlRail{font-size:14px;padding:10px;gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+body[data-fusion-page="fu01-reakce"] .controlRail .controls{gap:6px;font-size:1em}
+body[data-fusion-page="fu01-reakce"] .choiceGroup legend{margin-bottom:3px}
+body[data-fusion-page="fu01-reakce"] .choiceGroup label{padding:3px}
+body[data-fusion-page="fu01-reakce"] .controlRail .actions{padding:0 0 0 10px;gap:5px}
+body[data-fusion-page="fu01-reakce"] .controlRail .actions button{font-size:1em;padding:5px 4px}
+body[data-fusion-page="fu01-reakce"] .controlRail .actions>label{padding:3px 1px}
+body[data-fusion-page="fu01-reakce"] .analysisRail{grid-template-rows:minmax(0,1fr) auto;gap:6px}
+body[data-fusion-page="fu01-reakce"] .graphCard{padding:8px 5px 6px}
+body[data-fusion-page="fu01-reakce"] .graphCard h2{font-size:1em}
+body[data-fusion-page="fu01-reakce"] .graphNote{display:block;margin:2px 0 3px}
+body[data-fusion-page="fu01-reakce"] .graph{min-height:160px}
+body[data-fusion-page="fu01-reakce"] .graph canvas{position:absolute;inset:0}
+body[data-fusion-page="fu01-reakce"] .graph .mathlabel{font-size:15px}
+body[data-fusion-page="fu01-reakce"] .graph [data-key="title"]{font-size:14px}
+body[data-fusion-page="fu01-reakce"] .legend{gap:5px 12px;font-size:.8em}
+body[data-fusion-page="fu01-reakce"] .explain{padding:7px 9px;font-size:.9em;gap:3px}
+body[data-fusion-page="fu01-reakce"] #status{min-height:0}
+body[data-fusion-page="fu01-reakce"] .sceneTitle{top:12px}
+body[data-fusion-page="fu01-reakce"] .sceneTitle p{display:block}
+body[data-fusion-page="fu01-reakce"] #scene{position:absolute;inset:0}
+body[data-fusion-page="fu01-reakce"] .sceneBottom>span:first-child{display:flex}
+
+body[data-fusion-page="fu01-reakce"] .controlRail label.energy{display:block}
+body[data-fusion-page="fu01-reakce"] .controlRail .energy output{float:right}
+body[data-fusion-page="fu01-reakce"] .controlRail .energy input{display:block;margin:4px 0 0}

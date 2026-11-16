@@ -75,4 +75,8 @@ painter.draw(3840,2160,0,items);assert.equal(b.draws,1);
 const beforeBusy=b.draws;b.busy(true);b.time(200);painter.draw(3840,2160,2,items);assert.equal(b.draws,beforeBusy);
 b.busy(false);b.time(240);painter.draw(8000,6000,3,items);assert.equal(b.draws,beforeBusy+1);
 b.events.get('pagehide')({persisted:true});assert.equal(b.released,0);b.c.HiFyzikoFusionDispose();b.c.HiFyzikoFusionDispose();assert.equal(b.released,1);b.time(300);painter.draw(3840,2160,4,items);assert.equal(b.draws,beforeBusy+1);
+const scaled=fixture();scaled.run('particles/nucleus-view.js');scaled.resize(425,310);
+const fittedPainter=new scaled.c.HiFyzikoNucleusView(scaled.nodes.gl);fittedPainter.draw(850,620,0,items);
+assert.equal(scaled.nodes.gl.width,850);assert.equal(scaled.nodes.gl.height,620,'Scaled desk uses its visible size at device pixel ratio 2');
+fittedPainter.dispose();
 console.log('PASS: unified gallery selection, low-viewport ray bounds, one reused context, gallery buffer/frame limits, busy GPU handling, hidden-page pause and gallery/experiment disposal. Graphics calls mocked.');

@@ -37,6 +37,7 @@
 !/tools/test-coulomb-mobile.cjs
 !/tools/test-coulomb-quantum.cjs
 !/tools/test-coulomb.cjs
+!/tools/test-fusion-controls.cjs
 !/tools/test-fusion-dt.cjs
 !/tools/test-fusion-field-worker.cjs
 !/tools/test-fusion-navigation.cjs
@@ -425,6 +426,7 @@
 !/versions/vyvoj/m_files/fusion/barrier/app.js
 !/versions/vyvoj/m_files/fusion/barrier/fusion.js
 !/versions/vyvoj/m_files/fusion/barrier/index.html
+!/versions/vyvoj/m_files/fusion/barrier/layout.js
 !/versions/vyvoj/m_files/fusion/barrier/model.js
 !/versions/vyvoj/m_files/fusion/barrier/reactions.js
 !/versions/vyvoj/m_files/fusion/barrier/style.css

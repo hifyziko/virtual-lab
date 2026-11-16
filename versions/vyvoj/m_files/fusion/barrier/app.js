@@ -17,6 +17,7 @@ let cell=null,layoutPoints=[],layoutDrag=null,gripMoved=false,flightAccumulator=
 let dtBoost=[0,0];
 let fitPending=true,fusion=null,dtLocalEnergy=0,fusionExampleCount=0;let collisionZoom=1,collisionFocus=null;
 let rareEncounter=null,demoActive=false,demoPending=false,tunnelDisplayFrom=null,anticipated=new Map();
+let preparationJob=null;
 
 let playbackFrames=[],playbackHead=0,playbackCursor=null,recording=false,playbackHasProducts=false;
 const copyPlayback=value=>JSON.parse(JSON.stringify(value));
@@ -58,7 +59,7 @@ function replayPlayback(dt){
 }
 
 let tunnelGraph=null,tunnelApproachFrom=null,tunnelSoundStarted=false;
-function clearEncounter(){clearPlayback();tunnelGraph=null;tunnelApproachFrom=null;tunnelSoundStarted=false;collisionZoom=1;collisionFocus=null;$('reactionEnergy').hidden=true;tunnelGlyphs=null;previewJob=null;launchPending=false;if(fusion){$('labels').replaceChildren();lastPair='';}fusion=null;tunnelDisplayFrom=null;anticipated.clear();rareEncounter=null;demoActive=false;demoPending=false;batchNote='';updateRareButton();}
+function clearEncounter(){preparationJob=null;clearPlayback();tunnelGraph=null;tunnelApproachFrom=null;tunnelSoundStarted=false;collisionZoom=1;collisionFocus=null;$('reactionEnergy').hidden=true;tunnelGlyphs=null;previewJob=null;launchPending=false;if(fusion){$('labels').replaceChildren();lastPair='';}fusion=null;tunnelDisplayFrom=null;anticipated.clear();rareEncounter=null;demoActive=false;demoPending=false;batchNote='';updateRareButton();}
 function preferredProjectile(){return $('pairPreset').value.split('|')[1];}
 function hasProjectile(){const kind=preferredProjectile();return $('projectile').value===kind||centers.some(t=>targetKind(t)===kind);}
 function activeReaction(){return R.find($('projectile').value,centers[targetIndex]?targetKind(centers[targetIndex]):$('target').value,$('reactionBranch').value);}
@@ -66,8 +67,8 @@ function configureBranches(){const preset=$('pairPreset').value,select=$('reacti
 $('reactionBranch').onchange=()=>{clearEncounter();if($('interaction').value==='gun')armGun(true);};
 function isDT(){return p&&p.a.Z===1&&p.b.Z===1&&p.a.A+p.b.A===5&&p.a.A!==p.b.A;}
 function updateRareButton(){const reaction=activeReaction(),busy=!!fusion&&fusion.phase!=='done',pp=$('pairPreset').value==='proton|proton';$('ppActions').hidden=!pp;$('showRare').hidden=pp;$('fusionControl').hidden=pp||!reaction;$('temperature').disabled=busy;$('fusionEnabled').disabled=busy;$('reactionBranch').disabled=busy;
- const unavailable=!p||(!p.C&&!reaction?.noBarrier)||!hasProjectile();$('showRare').disabled=unavailable||mode==='tunnel'||mode==='recoil'||busy;$('launch').disabled=mode==='recoil'||!!fusion||!hasProjectile();
- const action=reaction?.elastic?'Připravit srážku':reaction&&$('fusionEnabled').checked?'Připravit reakci':'Připravit tunelování';$('showRare').textContent=fusion?.phase==='done'?'Připravit další pokus':demoPending?'Zrušit ukázku':action;$('showRare').setAttribute('aria-pressed',String(demoPending));for(const [id,branch] of [['ppWithoutBeta','pp'],['ppWithBeta','ppbeta']]){$(id).disabled=$('showRare').disabled;$(id).setAttribute('aria-pressed',String(demoPending&&$('reactionBranch').value===branch));}$('showRare').title='Připraví vybraný názorný výsledek z aktuální polohy. Spustí jej Vystřelit; nejde o četnost reakcí.';
+ const unavailable=!p||(!p.C&&!reaction?.noBarrier)||!hasProjectile();$('showRare').disabled=unavailable;$('launch').disabled=!!preparationJob||mode==='recoil'||!!fusion||!hasProjectile();
+ const action=reaction?.elastic?'Připravit srážku':reaction&&$('fusionEnabled').checked?'Připravit reakci':'Připravit tunelování';$('showRare').setAttribute('aria-busy',String(!!preparationJob));$('showRare').textContent=preparationJob?'Hledám směr… Zrušit':(fusion||mode==='tunnel'||mode==='recoil')?'Připravit nový pokus':demoPending?'Zrušit ukázku':action;$('showRare').setAttribute('aria-pressed',String(demoPending));for(const [id,branch] of [['ppWithoutBeta','pp'],['ppWithBeta','ppbeta']]){$(id).disabled=$('showRare').disabled;$(id).setAttribute('aria-busy',String(!!preparationJob&&$('reactionBranch').value===branch));$(id).setAttribute('aria-pressed',String((demoPending||preparationJob)&&$('reactionBranch').value===branch));}$('showRare').title=unavailable?'Ve scéně chybí projektil vybrané reakce. Zvol dvojici nebo obnov výchozí stav.':(fusion||mode==='tunnel')?'Ukončí probíhající ukázku, obnoví původní jádra a připraví nový pokus.':'Připraví vybraný názorný výsledek z aktuální polohy. Spustí jej Vystřelit; nejde o četnost reakcí.';
 }
 function status(text){if($('status').textContent!==text)$('status').textContent=text;}
 function startTunnel(encounter,demo=false){
@@ -157,10 +158,11 @@ function fusionGraphics(){
  for(const el of $('labels').querySelectorAll('.nucleon')){const px=parseFloat(el.style.left),py=parseFloat(el.style.top);el.hidden=px<0||px>W||py<65||py>H-45;}
  return items;
 }
-function optimalHeading(index){
+function* optimalHeading(index){
  const target=centers[index],base=Math.atan2(target.y-y,target.x-x),speed=Math.sqrt(2*Math.max(0,energy-M.multiPotential(p,centers,x,y))/p.mu);
- const score=heading=>{const moving=centers.map(q=>({...q})),state={x,y,core:shot.core,surfaceStrength:shot.surfaceStrength,vx:speed*Math.cos(heading),vy:speed*Math.sin(heading)};let previous=Infinity;
+ const score=function*(heading){const moving=centers.map(q=>({...q})),state={x,y,core:shot.core,surfaceStrength:shot.surfaceStrength,vx:speed*Math.cos(heading),vy:speed*Math.sin(heading)};let previous=Infinity;
  for(let i=0;i<14000;i++){
+  if(i%64===0)yield;
   M.mobileAdvance(p,moving,state,shot.dt,cell);const t=moving[index],rx=state.x-t.x,ry=state.y-t.y,r=Math.hypot(rx,ry);
   if(state.collision)return p.C?1e8:0;if(state.integrationLimited)return 1e9;
   if(r>previous&&i>5){if(M.nearest(moving,state.x,state.y).index!==index)return 1e8+r;const ux=state.vx-(t.vx||0),uy=state.vy-(t.vy||0),local=.5*p.mu*(ux*ux+uy*uy)+p.C/r+M.surfaceField({...state,Z:p.b.Z},{...t,Z:p.a.Z},r).U,L=p.mu*(rx*uy-ry*ux),B=L*L/(2*p.mu);
@@ -168,28 +170,46 @@ function optimalHeading(index){
    const rmin=(p.C+Math.sqrt(p.C*p.C+4*local*B))/(2*local),P=M.penetration(p,{energy:local,B,rmin}),head=M.penetration(p,{energy:local,B:0,rmin:p.C/local});return -Math.log(Math.max(1e-300,P)/Math.max(1e-300,head))+r/Math.max(shot.start,1)*1e-4;
   }previous=r;
  }return 1e9;};
- let bestAngle=base,best=score(base),step=Math.PI/24;for(let i=-12;i<=12;i++){const candidate=base+i*step,value=score(candidate);if(value<best){best=value;bestAngle=candidate;}}
- for(let i=0;i<24;i++){const left=score(bestAngle-step),right=score(bestAngle+step);if(left<best&&left<=right){bestAngle-=step;best=left;}else if(right<best){bestAngle+=step;best=right;}step*=.5;}return {heading:bestAngle,score:best};
+ let bestAngle=base,best=yield* score(base),step=Math.PI/24;for(let i=-12;i<=12;i++){const candidate=base+i*step,value=yield* score(candidate);if(value<best){best=value;bestAngle=candidate;}}
+ for(let i=0;i<24;i++){const left=yield* score(bestAngle-step),right=yield* score(bestAngle+step);if(left<best&&left<=right){bestAngle-=step;best=left;}else if(right<best){bestAngle+=step;best=right;}step*=.5;}return {heading:bestAngle,score:best};
+}
+function* preparedHeading(){
+ let index=M.nearest(centers,x,y).index,solution=yield* optimalHeading(index);
+ if(solution.score>Math.log(10))for(const candidate of centers.map((t,i)=>({i,d:Math.hypot(t.x-x,t.y-y)})).sort((a,b)=>a.d-b.d)){
+  if(candidate.i===index)continue;const alternative=yield* optimalHeading(candidate.i);
+  if(alternative.score<solution.score){solution=alternative;index=candidate.i;}if(solution.score<=Math.log(10))break;
+ }
+ return {index,solution};
+}
+function advancePreparation(job,repeat){
+ if(preparationJob!==job)return;
+ const until=performance.now()+4;let next;
+ try{do{next=job.next();}while(!next.done&&performance.now()<until);}
+ catch(error){preparationJob=null;updateRareButton();status('Příprava se nezdařila. Zkus vrátit částici a pokus opakovat.');console.warn('Fusion preparation failed',error);return;}
+ if(!next.done){requestAnimationFrame(()=>advancePreparation(job,repeat));return;}
+ preparationJob=null;const {index,solution}=next.value;
+ if(p.C&&solution.score>Math.log(10)){updateRareButton();status('Z této polohy nebylo nalezeno dostatečně čelní přiblížení. Posuň projektil nebo uprav teplotu; běžný výstřel zůstává dostupný.');return;}
+ aimTarget=index;gunHeading=visualHeading(solution.heading);angle=0;$('angle').value=0;armGun(false);targetIndex=index;demoPending=true;updateRareButton();
+ status(repeat?'Vstupní dvojice obnovena. Další pokus je připraven; stiskni Vystřelit.':'UKÁZKA PŘIPRAVENA · směr je nastaven. Stiskni Vystřelit: uvidíš celý vybraný úspěšný střet.');
 }
 $('fusionEnabled').onchange=()=>{clearEncounter();updateRareButton();};
 $('showRare').onclick=()=>{
- const repeat=fusion?.phase==='done';
- if(repeat)resetAfterFusion();
- if((!p.C&&!activeReaction()?.noBarrier)||mode==='tunnel'||!hasProjectile())return;
+ if(preparationJob){preparationJob=null;updateRareButton();status('Příprava zrušena. Můžeš změnit nastavení nebo ji spustit znovu.');return;}
+ const repeat=!!fusion||mode==='tunnel'||mode==='recoil'||playbackHasProducts;
+ if(mode==='recoil')home();else if(repeat)resetAfterFusion(true);
+ if((!p.C&&!activeReaction()?.noBarrier)||!hasProjectile())return;
  if(demoPending){demoPending=false;status('Běžný výstřel: výsledek určí fyzikální pravděpodobnost.');return;}
  $('interaction').value='gun';$('quantum').checked=true;armGun(true);
- let index=M.nearest(centers,x,y).index;
  if(!shot.canLaunch)return;
- let solution=optimalHeading(index);if(solution.score>Math.log(10)){for(const candidate of centers.map((t,i)=>({i,d:Math.hypot(t.x-x,t.y-y)})).sort((a,b)=>a.d-b.d)){if(candidate.i===index)continue;const alternative=optimalHeading(candidate.i);if(alternative.score<solution.score){solution=alternative;index=candidate.i;}if(solution.score<=Math.log(10))break;}}
- if(p.C&&solution.score>Math.log(10)){status('Z této polohy nebylo nalezeno dostatečně čelní přiblížení. Posuň projektil nebo uprav teplotu; běžný výstřel zůstává dostupný.');return;}aimTarget=index;gunHeading=visualHeading(solution.heading);angle=0;$('angle').value=0;armGun(false);targetIndex=index;demoPending=true;updateRareButton();
- status(repeat?'Vstupní dvojice obnovena. Další pokus je připraven; stiskni Vystřelit.':'UKÁZKA PŘIPRAVENA · směr je nastaven. Stiskni Vystřelit: uvidíš celý vybraný úspěšný střet.');
+ const job=preparationJob=preparedHeading();updateRareButton();status('Hledám vhodný směr pro ukázku… Přípravu lze stejným tlačítkem zrušit.');
+ requestAnimationFrame(()=>advancePreparation(job,repeat));
 };
-for(const [id,branch] of [['ppWithoutBeta','pp'],['ppWithBeta','ppbeta']])$(id).onclick=()=>{if($(id).disabled)return;resetAfterFusion();$('reactionBranch').value=branch;$('fusionEnabled').checked=true;clearEncounter();$('showRare').onclick();updateRareButton();};
+for(const [id,branch] of [['ppWithoutBeta','pp'],['ppWithBeta','ppbeta']])$(id).onclick=()=>{if($(id).disabled)return;if(preparationJob&&$('reactionBranch').value===branch){$('showRare').onclick();return;}resetAfterFusion(true);$('reactionBranch').value=branch;$('fusionEnabled').checked=true;clearEncounter();$('showRare').onclick();updateRareButton();};
 function unpause(){paused=false;}
 function home(){playbackUserOverride=false;playbackAutoSlowed=false,playbackProductsSlowed=false;manualAnchor=null;manualDisplay=false;fitPending=true;clearEncounter();unpause();updateMode();shot=M.multiShot(p,energy,angle,Math.max(1,Math.min(5,+$('targetCount').value||3)),layoutSeed);centers=shot.centers.map(t=>({...t,kind:$('target').value,A:p.a.A,Z:p.a.Z,vx:0,vy:0}));shot.centers=centers;cell=M.makeCell([...centers,{x:shot.x,y:shot.y}],shot.start);shot.cell=cell;layoutPoints=[...centers.map(t=>({x:t.x,y:t.y})),{x:shot.x,y:shot.y}];flightAccumulator=0;targetIndex=0;aimTarget=0;tried=new Set();recoil=null;({x,y,vx,vy}=shot);vx=vy=0;gunOrigin=[x,y];gunHeading=Math.atan2(centers[0].y-y,centers[0].x-x);extent=shot.start*1.4;previewLimit=0;probability=centers.length>1?null:M.penetration(p,shot);preview=M.aimPreview(p,centers,shot);trail=[];drag=null;attempted=false;chosenOutcome=null;mode='ready';tunnelTime=0;tunnelFrom=null;tunnelTo=null;stopSound();updateRareButton();status($('interaction').value==='gun'?'Zamiř tažením ve scéně, potom vystřel.':'Uchop částici. Dostupná energie omezuje přiblížení.');}
 function flightLimit(){if(!W||!H)return extent;const corners=[[0,0],[W,0],[0,H],[W,H]].map(([px,py])=>Math.hypot((px-ox)/scale,(py-oy)/scale));return Math.max(extent,Math.hypot(...gunOrigin)*1.15,...corners.map(r=>r*1.15));}
 function prepareSurface(){const unit=displayRadius()/Math.max(scale,1e-9);shot.core=unit*visualBound($('projectile').value)+4*zoom/Math.max(scale,1e-9);shot.surfaceStrength=energy*16;for(const t of centers){t.core=unit*visualBound(targetKind(t))+4*zoom/Math.max(scale,1e-9);t.surfaceStrength=energy*16;}if(p.b.Z&&centers.some(t=>t.Z&&Math.hypot(x-t.x,y-t.y)<=shot.core+t.core))shot.canLaunch=false;}
-function refreshPreview(){prepareSurface();preview=M.aimPreview(p,centers,shot);previewJob=null;previewLimit=flightLimit();}
+function refreshPreview(){if(preparationJob){preparationJob=null;updateRareButton();status('Pohled se změnil. Přípravu ukázky spusť znovu.');}prepareSurface();preview=M.aimPreview(p,centers,shot);previewJob=null;previewLimit=flightLimit();}
 function advancePreview(){if(!previewJob)return;if(mode!=='ready'){previewJob=null;return;}const until=performance.now()+3;do{const next=previewJob.next();preview=next.value;shot.closest=preview.closest;if(next.done){previewJob=null;if(launchPending){launchPending=false;launch();}break;}}while(performance.now()<until);}
 function displayJacobian(){
  const epsilon=Math.max(.001,shot.start*1e-5),at=(dx,dy)=>{const q=project(x+dx,y+dy),items=schematicItems([{id:$('projectile').value,x:q[0],y:q[1],radius:displayRadius()},...centers.map(t=>({id:targetKind(t),x:project(t.x,t.y)[0],y:project(t.x,t.y)[1],radius:displayRadius()}))]);return [items[0].x,items[0].y];},origin=at(0,0),a=at(epsilon,0),b=at(0,epsilon);return [(a[0]-origin[0])/epsilon,(b[0]-origin[0])/epsilon,(a[1]-origin[1])/epsilon,(b[1]-origin[1])/epsilon];
@@ -234,6 +254,7 @@ $('angle').oninput=()=>{angle=snapAngle(+$('angle').value)*Math.PI/180;$('angle'
 $('target').onchange=$('projectile').onchange=$('targetCount').onchange=pair;$('reset').onclick=reset;$('home').onclick=()=>{batchNote='';home();};$('interaction').onchange=()=>{resetAfterFusion(true);if($('interaction').value==='gun'){if($('projectile').value!==preferredProjectile()){const index=centers.findIndex(t=>targetKind(t)===preferredProjectile());if(index>=0)selectNucleus(index);}armGun(true);}else{resetManualSpeed();release();clearEncounter();vx=vy=0;centers.forEach(t=>{t.vx=t.vy=0;});mode='ready';updateMode();}};
 $('quantum').onchange=()=>{clearStats();if($('interaction').value==='gun')armGun(mode!=='ready');else home();};
 function launch(outcome=null){
+ if(preparationJob){status('Hledám vhodný směr. Počkej na dokončení přípravy, nebo ji zruš.');return;}
  if(!hasProjectile()){status('Vyber dvojici s dostupným projektilem.');return;}
  if(($('projectile').value!==preferredProjectile()&&centers.some(t=>targetKind(t)===preferredProjectile()))||mode!=='ready')armGun(true);
  if(!shot.canLaunch)return;if(previewJob){launchPending=true;status('Dokončuji předpověď dráhy; výstřel je připraven.');return;}
@@ -241,10 +262,10 @@ function launch(outcome=null){
 }
 $('launch').onclick=()=>{batchNote='';launch();};
 $('full').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{});};
-function syncView(){const rect=c.getBoundingClientRect();W=rect.width;H=rect.height;view();}
+function syncView(){const rect=c.getBoundingClientRect();W=c.clientWidth||rect.width;H=c.clientHeight||rect.height;view();}
 function baseView(){const points=layoutPoints.length?layoutPoints:[...centers,{x:shot.start,y:0}],minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x)),minY=Math.min(...points.map(p=>p.y)),maxY=Math.max(...points.map(p=>p.y)),padding=Math.max(35,Math.min(W,H)*.22),width=Math.max(1,W-padding*2),height=Math.max(1,H-110-padding*2),base=Math.min(width/Math.max(shot.start*.5,maxX-minX),height/Math.max(shot.start*.55,maxY-minY));scale=Math.max(.00001,base)*zoom;ox=W/2-(minX+maxX)/2*scale+panX*W;oy=65+padding+height/2-(minY+maxY)/2*scale+panY*H;}
 function fitAllParticles(){
- const rect=c.getBoundingClientRect();W=rect.width;H=rect.height;if(W<1||H<120)return;
+ const rect=c.getBoundingClientRect();W=c.clientWidth||rect.width;H=c.clientHeight||rect.height;if(W<1||H<120)return;
  zoom=1;panX=panY=0;view();
  const bounds=()=>{const items=currentGlyphs(),edges=items.map(t=>{const radius=t.radius*visualBound(t.id)+10;return {left:t.x-radius,right:t.x+radius,top:t.y-radius,bottom:t.y+radius};});return {left:Math.min(...edges.map(e=>e.left)),right:Math.max(...edges.map(e=>e.right)),top:Math.min(...edges.map(e=>e.top)),bottom:Math.max(...edges.map(e=>e.bottom))};};
  const left=20,right=W-20,top=76,bottom=H-55;
@@ -254,9 +275,10 @@ function fitAllParticles(){
 function fusionWarp(){if(!fusion)return 1;if(fusion.phase!=='compound')return 0;const u=Math.min(1,fusion.time/.65);return 1-u*u*(3-2*u);}
 function view(){baseView();collisionZoom=1;collisionFocus=null;if($('cameraScale'))$('cameraScale').hidden=true;}
 $('viewReset').onclick=fitAllParticles;
-c.closest('.scene').addEventListener('wheel',e=>{e.preventDefault();syncView();if(!W||!H)return;const rect=c.getBoundingClientRect(),px=e.clientX-rect.left,py=e.clientY-rect.top,[wx,wy]=unproject(px,py),delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?H:1);zoom=Math.max(.08,Math.min(40,zoom*Math.exp(-delta*.0015)));view();const anchor=project(wx,wy);panX+=(px-anchor[0])/W;panY+=(py-anchor[1])/H;view();if(drag&&lastPointer){const q=position(lastPointer);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}fieldKey='';if($('interaction').value==='gun'&&mode==='ready'&&!fusion&&playbackCursor===null&&shot.canLaunch!==false)refreshPreview();},{passive:false});
-function position(e){syncView();const r=c.getBoundingClientRect();return unproject(e.clientX-r.left,e.clientY-r.top);}
-function aimAtPointer(e){syncView();const rect=c.getBoundingClientRect(),origin=[currentGlyphs()[0].x,currentGlyphs()[0].y],dx=e.clientX-rect.left-origin[0],dy=e.clientY-rect.top-origin[1];if(Math.hypot(dx,dy)<16)return;const heading=Math.atan2(dy,dx);angle=snapAngle((gunHeading-heading)*180/Math.PI)*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);}
+c.closest('.scene').addEventListener('wheel',e=>{e.preventDefault();syncView();if(!W||!H)return;const [px,py]=canvasPoint(e),[wx,wy]=unproject(px,py),delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?H:1);zoom=Math.max(.08,Math.min(40,zoom*Math.exp(-delta*.0015)));view();const anchor=project(wx,wy);panX+=(px-anchor[0])/W;panY+=(py-anchor[1])/H;view();if(drag&&lastPointer){const q=position(lastPointer);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}fieldKey='';if($('interaction').value==='gun'&&mode==='ready'&&!fusion&&playbackCursor===null&&shot.canLaunch!==false)refreshPreview();},{passive:false});
+function canvasPoint(e){const r=c.getBoundingClientRect();return [(e.clientX-r.left)*(c.clientWidth||r.width)/r.width,(e.clientY-r.top)*(c.clientHeight||r.height)/r.height];}
+function position(e){syncView();return unproject(...canvasPoint(e));}
+function aimAtPointer(e){syncView();const [px,py]=canvasPoint(e),origin=[currentGlyphs()[0].x,currentGlyphs()[0].y],dx=px-origin[0],dy=py-origin[1];if(Math.hypot(dx,dy)<16)return;const heading=Math.atan2(dy,dx);angle=snapAngle((gunHeading-heading)*180/Math.PI)*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);}
 function visualBound(id){if(!S.connected.atoms[id])return .35;const bound=Math.max(...S.connected.atoms[id].map(a=>Math.hypot(...a.slice(0,3))+1.16));return 13.76*bound/Math.sqrt(13.76**2-bound**2);}
 function baseRadius(){return Math.min(W,H)*.028*zoom;}
 function contactRadius(){return (displayRadius()*(visualBound($('target').value)+visualBound($('projectile').value))*1.08+8*zoom)/Math.max(scale,.00001);}
@@ -295,7 +317,7 @@ function selectNucleus(index){manualAnchor=null;if(index>=0)materializeManual();
 }
 function hitParticle(q){const pointer=project(...q),center=projectilePoint();return Math.hypot(pointer[0]-center[0],pointer[1]-center[1])<=displayRadius()*visualBound($('projectile').value)+8;}
 function resetAfterFusion(force=false){
- if((!fusion&&!playbackHasProducts)||(!force&&fusion?.phase!=='done')||!lastShotSetup)return false;
+ if((!fusion&&!playbackHasProducts&&!(force&&mode==='tunnel'))||(!force&&fusion?.phase!=='done')||!lastShotSetup)return false;
  const saved=lastShotSetup;clearEncounter();resetManualSpeed();centers=saved.centers.map(t=>({...t,vx:0,vy:0}));x=saved.x;y=saved.y;vx=vy=0;$('projectile').value=saved.kind;cell={...saved.cell};shot={...saved.shot,centers};gunOrigin=[x,y];gunHeading=saved.heading??gunHeading;angle=saved.angle??0;$('angle').value=angle*180/Math.PI;
  trail=[];preview=[];drag=null;layoutDrag=null;recoil=null;activePointer=null;lastPointer=null;panning=aiming=false;aimAnchor=null;releaseBounds=null;tunnelFrom=tunnelTo=null;tunnelTime=0;flightAccumulator=0;mode='ready';syncActivePair();unpause();stopSound();fieldKey='';updateMode();
  if($('interaction').value==='gun')armGun(true);else updateRareButton();status('Původní jádra obnovena. Můžeš připravit další pokus.');return true;
@@ -316,7 +338,7 @@ if(layoutDrag!==null){
  const body=layoutDrag<0?{x,y}:centers[layoutDrag],safe=M.limitSeparation(others,body,next,t=>glyphClearance(id,t.id));
  if(layoutDrag<0){x=safe.x;y=safe.y;gunOrigin=[x,y];}else Object.assign(centers[layoutDrag],safe);fieldKey='';preview=[];
 }
-else if(panning){syncView();panX=aimAnchor.panX+(e.clientX-aimAnchor.clientX)/W;panY=aimAnchor.panY+(e.clientY-aimAnchor.clientY)/H;view();fieldKey='';}
+else if(panning){syncView();const at=canvasPoint(e),start=canvasPoint(aimAnchor);panX=aimAnchor.panX+(at[0]-start[0])/W;panY=aimAnchor.panY+(at[1]-start[1])/H;view();fieldKey='';}
 else if(aiming){aimAtPointer(e);}
 else if(drag){if(Math.hypot(e.clientX-aimAnchor.clientX,e.clientY-aimAnchor.clientY)>3)gripMoved=true;const q=position(e);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}};
 function release(e){manualAnchor=null;if(e&&e.pointerId!==undefined&&activePointer!==null&&e.pointerId!==activePointer)return;if(layoutDrag!==null){layoutDrag=null;cell=M.makeCell([...centers,{x,y}],shot.start);shot.cell=cell;gunOrigin=[x,y];if($('interaction').value==='gun')armGun(true);else{mode='ready';status('Rozmístění upraveno. Okolní jádra jsou při ručním přibližování zamknutá.');}fieldKey='';}
@@ -405,7 +427,7 @@ function tunnelRibbon(context,from,to,width,progress,finished=false){
  context.restore();
 }
 
-function resize(canvas,context){const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);if(canvas.width!==Math.round(r.width*d)||canvas.height!==Math.round(r.height*d)){canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);}context.setTransform(d,0,0,d,0,0);return [r.width,r.height];}
+function resize(canvas,context){const bounds=canvas.getBoundingClientRect(),r={width:canvas.clientWidth||bounds.width,height:canvas.clientHeight||bounds.height},fit=Math.min(bounds.width/r.width,bounds.height/r.height),d=Math.min((devicePixelRatio||1)*fit,2);if(canvas.width!==Math.round(r.width*d)||canvas.height!==Math.round(r.height*d)){canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);}context.setTransform(d,0,0,d,0,0);return [r.width,r.height];}
 function line(context,a,b,color,width=1){context.strokeStyle=color;context.lineWidth=width;context.beginPath();context.moveTo(...a);context.lineTo(...b);context.stroke();}
 function arrow(a,b,color){line(ctx,a,b,color,2);const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(...b);ctx.lineTo(b[0]-6*Math.cos(ang-.5),b[1]-6*Math.sin(ang-.5));ctx.lineTo(b[0]-6*Math.cos(ang+.5),b[1]-6*Math.sin(ang+.5));ctx.fill();}
 function label(host,key,s,left,top,cls=''){let el=host.querySelector('[data-key="'+key+'"]');if(!el){el=document.createElement('span');el.dataset.key=key;el.className='mathlabel '+cls;host.append(el);}tex(el,s);el.style.left=left+'px';el.style.top=top+'px';return el;}
@@ -510,7 +532,7 @@ if(fusion&&fusion.phase==='compound'){const point=project(fusion.origin.x,fusion
  if(!fusion&&$('interaction').value==='gun'){
  if(mode==='ready'&&$('interaction').value==='gun'){drawAimPreview();}path(trail,'#087f79');
  const gunGlyph=mode==='ready'?currentGlyphs()[0]:null,[gx,gy]=gunGlyph?[gunGlyph.x,gunGlyph.y]:project(...gunOrigin);ctx.save();ctx.translate(gx,gy);ctx.rotate(gunHeading-angle);ctx.scale(zoom,zoom);ctx.fillStyle='#244f55';ctx.strokeStyle='#dce9e6';ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(-21,-11,46,22,5);ctx.fill();ctx.stroke();ctx.fillStyle='#79b9aa';ctx.fillRect(20,-7,8,14);ctx.restore();
- const heading=gunHeading-angle,guideLength=aiming&&lastPointer?Math.hypot(lastPointer.clientX-c.getBoundingClientRect().left-gx,lastPointer.clientY-c.getBoundingClientRect().top-gy):Math.min(W,H)*.38;arrow([gx+Math.cos(heading)*30*zoom,gy+Math.sin(heading)*30*zoom],[gx+Math.cos(heading)*Math.max(guideLength,50*zoom),gy+Math.sin(heading)*Math.max(guideLength,50*zoom)],'#b37a32');
+ const heading=gunHeading-angle,guideLength=aiming&&lastPointer?Math.hypot(canvasPoint(lastPointer)[0]-gx,canvasPoint(lastPointer)[1]-gy):Math.min(W,H)*.38;arrow([gx+Math.cos(heading)*30*zoom,gy+Math.sin(heading)*30*zoom],[gx+Math.cos(heading)*Math.max(guideLength,50*zoom),gy+Math.sin(heading)*Math.max(guideLength,50*zoom)],'#b37a32');
  }
  if(!fusion){ctx.strokeStyle='#b58bb666';ctx.setLineDash([3,5]);ctx.beginPath();ctx.arc(...project(centers[targetIndex].x,centers[targetIndex].y),Math.min(W,H)*.13*zoom,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
  if(drag){const [tx,ty]=project(...drag),dx=tx-X,dy=ty-Y,len=Math.hypot(dx,dy),r=M.nearest(centers,x,y).distance,limit=Math.max(p.R,M.turning(p,energy)),resistance=p.C?Math.min(1,M.multiPotential(p,centers,x,y)/energy):0,color=resistance>.8?'#c1533b':'#bc8b4e';
@@ -626,6 +648,6 @@ function frame(t){const dt=old?Math.min(.05,(t-old)/1000):0;old=t;if(document.hi
  if(mode==='tunnel'||t-uiSince>70){ui();uiSince=t;}requestAnimationFrame(frame);
 }
 window.coulombGlyphs=currentGlyphs;window.coulombProjectilePoint=projectilePoint;window.coulombTunnelContact=tunnelContactPoint;window.coulombProject=project;window.coulombUnproject=unproject;
-window.coulombState=()=>({playbackSpeed,playbackUserOverride,playbackAutoSlowed,playbackHasProducts,playbackCursor,playbackHead,playbackFrameCount:playbackFrames.length,manualDisplay,tunnelGraph,tunnelApproachFrom,tunnelSoundStarted,collisionZoom,cell,preview,layoutDrag,fusion,x,y,vx,vy,mode,energy,temperature,angle,paused,zoom,scale,ox,oy,pair:p,shot,demoActive,demoPending,probability,attempts,passes,classical,tunnelTime,tunnelFrom,tunnelDisplayFrom,tunnelTo,centers,targetIndex,activePointer,layoutSeed,gunOrigin,gunHeading,aimTarget,previewLimit,releaseBounds,flightLimit:flightLimit(),displayRadius:displayRadius(),contactRadius:contactRadius(),targetBound:visualBound($('target').value),projectileBound:visualBound($('projectile').value)});
+window.coulombState=()=>({preparing:!!preparationJob,playbackSpeed,playbackUserOverride,playbackAutoSlowed,playbackHasProducts,playbackCursor,playbackHead,playbackFrameCount:playbackFrames.length,manualDisplay,tunnelGraph,tunnelApproachFrom,tunnelSoundStarted,collisionZoom,cell,preview,layoutDrag,fusion,x,y,vx,vy,mode,energy,temperature,angle,paused,zoom,scale,ox,oy,pair:p,shot,demoActive,demoPending,probability,attempts,passes,classical,tunnelTime,tunnelFrom,tunnelDisplayFrom,tunnelTo,centers,targetIndex,activePointer,layoutSeed,gunOrigin,gunHeading,aimTarget,previewLimit,releaseBounds,flightLimit:flightLimit(),displayRadius:displayRadius(),contactRadius:contactRadius(),targetBound:visualBound($('target').value),projectileBound:visualBound($('projectile').value)});
 reset();requestAnimationFrame(frame);
 })();

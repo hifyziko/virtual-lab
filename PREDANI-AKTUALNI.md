@@ -1,5 +1,43 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — malý displej a příprava fúzního pokusu (bez pushe)
+
+Uživatel hlásil překrývání panelů hlavního fúzního experimentu na menším
+notebooku. Později upřesnil, že příprava místně funguje, ale na webu je
+tlačítko zašedlé a ostatní ovládání funguje. Při kontrole byl aktuální
+zveřejněný `app.js` shodný s místním výchozím souborem (balíček
+`fusion-fu01-reakce-e5e1d31dde0494e7.js`). Přesný stav uživatelovy webové
+relace nebylo možné přečíst: nástroj odmítl přístup k již běžícímu Chromu
+podle své politiky. Nový prohlížeč ani karta nebyly otevřeny.
+
+Experiment nyní škáluje společnou logickou plochu 1360 × 820 podle šířky
+i výšky viewportu. `barrier/layout.js` nastaví měřítko synchronně před
+inicializací a přepočítává je při resize/fullscreen bez zpětné vazby ze
+škálovaného obsahu. Hlavička, laboratoř, přehrávání a patička jsou ve stejné
+vystředěné ploše. Závěrečná pravidla CSS sjednocují dřívější konfliktní
+breakpointy; canvasy jsou vyjmuté z výpočtu přirozené velikosti gridu.
+Souřadnice kliknutí, tažení, míření, posouvání a zoomu jsou převedeny do
+logického canvasu. Rozlišení 2D i původního WebGL rendereru respektuje
+skutečnou zobrazovanou velikost, aby zmenšení nezvyšovalo zbytečně zátěž GPU.
+
+Příprava již není zakázaná jen kvůli tunelování, návratu nebo probíhající
+reakci. Nabízí nový pokus; probíhající reakce/tunelování se ukončí a obnoví
+se uložené vstupní částice. Platí i pro obě p-p volby a klávesnicové ovládání.
+Chybějící projektil nadále přípravu znemožňuje, ale důvod je v titulku.
+Hledání směru používá stejný numerický postup, rozdělený na krátké kroky
+s přibližně 4ms rozpočtem. Zobrazuje stav a lze je zrušit; změna parametrů
+zahodí zastaralý výsledek a výstřel nemůže předběhnout přípravu.
+
+Obě aktivní dodávky přestavěné, včetně odložených dokumentů a manifestů.
+Prošlo úplné sestavení (s lokálním opakováním dočasně zamčených zápisů,
+viz níže), následná aktualizace fúzní dodávky a `tools/project/check.cjs`.
+Nový `tools/test-fusion-controls.cjs` ověřuje počáteční fit, resize/fullscreen,
+souřadnice při 0,65× / 1× / 1,5×, přípravu, shodu směru s původním solverem,
+zrušení, p-p volby a nový pokus v dříve blokovaných stavech. Renderovací test
+ověřuje rozlišení zmenšeného canvasu. DOM a grafické příkazy jsou simulované;
+skutečné rozložení na notebooku ani webová relace nejsou vizuálně ověřené.
+Nejde o potvrzení příčiny specifické pro HTTP. Verze zůstává 1.0, bez pushe.
+
 ## 16. listopadu 2026 — další odlehčení úvodního načítání (bez pushe)
 
 Volitelná animace „Pole v transformátoru“ už není vložena do úvodního HTML.

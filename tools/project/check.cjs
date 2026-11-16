@@ -8,6 +8,7 @@ const commands=[
  ['tools/test-commutation.cjs'],
  ['tools/test-particle-library.cjs'],
  ['tools/test-fusion-navigation.cjs'],
+ ['tools/test-fusion-controls.cjs'],
  ['tools/test-fusion-render-lifecycle.cjs'],
  ['tools/test-coulomb.cjs'],
  ['tools/test-coulomb-quantum.cjs'],
