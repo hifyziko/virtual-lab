@@ -24,7 +24,7 @@ const copyPlayback=value=>JSON.parse(JSON.stringify(value));
 function clearPlayback(){playbackFrames=[];playbackHead=0;playbackCursor=null;recording=false;playbackHasProducts=false;}
 function playbackSnapshot(){
  const f=fusion?{...fusion,trail:[],sourceTrails:{}}:null;
- return copyPlayback({x,y,vx,vy,centers,p,shot,cell,mode,targetIndex,renderTime,fusion:f,tunnelTime,tunnelFrom,tunnelTo,tunnelDisplayFrom,tunnelApproachFrom,tunnelGraph,tunnelGlyphs,tunnelSoundStarted,dtLocalEnergy,dtBoost,probability,attempts,passes,classical,chosenOutcome,demoActive,demoPending,rareEncounter,flightAccumulator,tried:[...tried],anticipated:[...anticipated],status:$('status').textContent});
+ return copyPlayback({x,y,vx,vy,centers,p,shot,cell,mode,targetIndex,renderTime,fusion:f,tunnelTime,tunnelFrom,tunnelTo,tunnelDisplayFrom,tunnelApproachFrom,tunnelGraph,tunnelGlyphs,tunnelSoundStarted,dtLocalEnergy,dtBoost,probability,attempts,passes,classical,chosenOutcome,demoActive,demoPending,rareEncounter,flightAccumulator,tried:[...tried],anticipated:[...anticipated],status:$('status').dataset.fullText||$('status').textContent,statusBlocking:$('status').dataset.blocking==='true'});
 }
 function beginRecording(){playbackAutoSlowed=false,playbackProductsSlowed=false;clearPlayback();recording=true;playbackFrames.push({time:0,state:playbackSnapshot()});}
 function recordPlayback(dt){
@@ -47,7 +47,7 @@ function restorePlayback(time){
  trail=recent.filter(t=>t.mode==='flight').map(t=>[t.x,t.y]);
  if(fusion)fusion.trail=(fusion.products?.products||[]).map((_,i)=>recent.filter(t=>t.fusion?.products?.products[i]).map(t=>{const b=t.fusion.products.products[i];return [b.x,b.y];}));
  if(changed){$('labels').replaceChildren();lastPair='';if(fusion?.products)showReactionEnergy();else $('reactionEnergy').hidden=true;}
- if(enteringFusion)slowFusionPlayback();status(state.status);fieldKey='';
+ if(enteringFusion)slowFusionPlayback();status(state.status,state.statusBlocking===true);fieldKey='';
 }
 function replayPlayback(dt){
  if(playbackSpeed<0&&playbackFrames.length){if(playbackCursor===null){playbackCursor=playbackHead;stopSound();}}
@@ -67,10 +67,23 @@ function configureBranches(){const preset=$('pairPreset').value,select=$('reacti
 $('reactionBranch').onchange=()=>{clearEncounter();if($('interaction').value==='gun')armGun(true);};
 function isDT(){return p&&p.a.Z===1&&p.b.Z===1&&p.a.A+p.b.A===5&&p.a.A!==p.b.A;}
 function updateRareButton(){const reaction=activeReaction(),busy=!!fusion&&fusion.phase!=='done',pp=$('pairPreset').value==='proton|proton';$('ppActions').hidden=!pp;$('showRare').hidden=pp;$('fusionControl').hidden=pp||!reaction;$('temperature').disabled=busy;$('fusionEnabled').disabled=busy;$('reactionBranch').disabled=busy;
- const unavailable=!p||(!p.C&&!reaction?.noBarrier)||!hasProjectile();$('showRare').disabled=unavailable;$('launch').disabled=$('interaction').value!=='gun'||!!preparationJob||mode==='recoil'||!!fusion||!hasProjectile();
+ const unavailable=!p||(!p.C&&!reaction?.noBarrier)||!hasProjectile();$('showRare').disabled=unavailable;$('launch').disabled=$('interaction').value!=='gun'||!!preparationJob||mode==='recoil'||!!fusion||!hasProjectile()||shot?.canLaunch===false;
  const action=reaction?.elastic?'Připravit srážku':reaction&&$('fusionEnabled').checked?'Připravit reakci':'Připravit tunelování';$('showRare').setAttribute('aria-busy',String(!!preparationJob));$('showRare').textContent=preparationJob?'Hledám směr… Zrušit':(fusion||mode==='tunnel'||mode==='recoil')?'Připravit nový pokus':demoPending?'Zrušit ukázku':action;$('showRare').setAttribute('aria-pressed',String(demoPending));for(const [id,branch] of [['ppWithoutBeta','pp'],['ppWithBeta','ppbeta']]){$(id).disabled=$('showRare').disabled;$(id).setAttribute('aria-busy',String(!!preparationJob&&$('reactionBranch').value===branch));$(id).setAttribute('aria-pressed',String((demoPending||preparationJob)&&$('reactionBranch').value===branch));}$('showRare').title=unavailable?'Ve scéně chybí projektil vybrané reakce. Zvol dvojici nebo obnov výchozí stav.':(fusion||mode==='tunnel')?'Ukončí probíhající ukázku, obnoví původní jádra a připraví nový pokus.':'Připraví vybraný názorný výsledek z aktuální polohy. Spustí jej Vystřelit; nejde o četnost reakcí.';
 }
-function status(text){if($('status').textContent!==text)$('status').textContent=text;}
+function fitStatus(){
+ const node=$('status');node.textContent=node.dataset.fullText||'';
+ if(node.clientWidth<=0||node.clientHeight<=0||node.scrollWidth>node.clientWidth+1||node.scrollHeight>node.clientHeight+1)node.textContent='';
+}
+function status(text,blocking=false){
+ const node=$('status');if(node.dataset.fullText===text&&node.dataset.blocking===String(blocking))return;
+ node.dataset.fullText=text;node.dataset.blocking=String(blocking);
+ $('statusDetails').hidden=!blocking;$('statusPopup').hidden=!blocking;$('statusPopupText').textContent=blocking?text:'';
+ fitStatus();
+}
+$('statusClose').onclick=()=>{$('statusPopup').hidden=true;};
+$('statusDetails').onclick=()=>{if($('status').dataset.blocking==='true')$('statusPopup').hidden=false;};
+if(typeof ResizeObserver==='function')new ResizeObserver(fitStatus).observe($('status').parentElement);
+window.addEventListener('resize',fitStatus);
 function startTunnel(encounter,demo=false){
  slowFusionPlayback();
  unpause();unlockSound();stopSound();tunnelGlyphs=currentGlyphs().map(item=>unproject(item.x,item.y));tunnelDisplayFrom=tunnelGlyphs[0];targetIndex=encounter.index;probability=encounter.probability;
@@ -185,38 +198,38 @@ function advancePreparation(job,repeat){
  if(preparationJob!==job)return;
  const until=performance.now()+4;let next;
  try{do{next=job.next();}while(!next.done&&performance.now()<until);}
- catch(error){preparationJob=null;updateRareButton();status('Příprava se nezdařila. Zkus vrátit částici a pokus opakovat.');console.warn('Fusion preparation failed',error);return;}
+ catch(error){preparationJob=null;updateRareButton();status('Příprava selhala. Vrať částici a opakuj.',true);console.warn('Fusion preparation failed',error);return;}
  if(!next.done){requestAnimationFrame(()=>advancePreparation(job,repeat));return;}
  preparationJob=null;const {index,solution}=next.value;
- if(p.C&&solution.score>Math.log(10)){updateRareButton();status('Z této polohy nebylo nalezeno dostatečně čelní přiblížení. Posuň projektil nebo uprav teplotu; běžný výstřel zůstává dostupný.');return;}
+ if(p.C&&solution.score>Math.log(10)){updateRareButton();status('Nenalezen směr ukázky. Posuň částici či změň teplotu.',true);return;}
  aimTarget=index;gunHeading=visualHeading(solution.heading);angle=0;$('angle').value=0;armGun(false);targetIndex=index;demoPending=true;updateRareButton();
- status(repeat?'Vstupní dvojice obnovena. Další pokus je připraven; stiskni Vystřelit.':'UKÁZKA PŘIPRAVENA · směr je nastaven. Stiskni Vystřelit: uvidíš celý vybraný úspěšný střet.');
+ status(repeat?'Další pokus připraven. Stiskni Vystřelit.':'Ukázka připravena. Stiskni Vystřelit.');
 }
 $('fusionEnabled').onchange=()=>{clearEncounter();updateRareButton();};
 $('showRare').onclick=()=>{
- if(preparationJob){preparationJob=null;updateRareButton();status('Příprava zrušena. Můžeš změnit nastavení nebo ji spustit znovu.');return;}
+ if(preparationJob){preparationJob=null;updateRareButton();status('Příprava zrušena.');return;}
  const repeat=!!fusion||mode==='tunnel'||mode==='recoil'||playbackHasProducts;
  if(mode==='recoil')home();else if(repeat)resetAfterFusion(true);
  if((!p.C&&!activeReaction()?.noBarrier)||!hasProjectile())return;
  if(demoPending){demoPending=false;status('Běžný výstřel: výsledek určí fyzikální pravděpodobnost.');return;}
  $('interaction').value='gun';$('quantum').checked=true;armGun(true);
  if(!shot.canLaunch)return;
- const job=preparationJob=preparedHeading();updateRareButton();status('Hledám vhodný směr pro ukázku… Přípravu lze stejným tlačítkem zrušit.');
+ const job=preparationJob=preparedHeading();updateRareButton();status('Hledám směr… Kliknutím přípravu zrušíš.');
  requestAnimationFrame(()=>advancePreparation(job,repeat));
 };
 for(const [id,branch] of [['ppWithoutBeta','pp'],['ppWithBeta','ppbeta']])$(id).onclick=()=>{if($(id).disabled)return;if(preparationJob&&$('reactionBranch').value===branch){$('showRare').onclick();return;}resetAfterFusion(true);$('reactionBranch').value=branch;$('fusionEnabled').checked=true;clearEncounter();$('showRare').onclick();updateRareButton();};
 function unpause(){paused=false;}
-function home(){playbackUserOverride=false;playbackAutoSlowed=false,playbackProductsSlowed=false;manualAnchor=null;manualDisplay=false;fitPending=true;clearEncounter();unpause();updateMode();shot=M.multiShot(p,energy,angle,Math.max(1,Math.min(5,+$('targetCount').value||3)),layoutSeed);centers=shot.centers.map(t=>({...t,kind:$('target').value,A:p.a.A,Z:p.a.Z,vx:0,vy:0}));shot.centers=centers;cell=M.makeCell([...centers,{x:shot.x,y:shot.y}],shot.start);shot.cell=cell;layoutPoints=[...centers.map(t=>({x:t.x,y:t.y})),{x:shot.x,y:shot.y}];flightAccumulator=0;targetIndex=0;aimTarget=0;tried=new Set();recoil=null;({x,y,vx,vy}=shot);vx=vy=0;gunOrigin=[x,y];gunHeading=Math.atan2(centers[0].y-y,centers[0].x-x);extent=shot.start*1.4;previewLimit=0;probability=centers.length>1?null:M.penetration(p,shot);preview=M.aimPreview(p,centers,shot);trail=[];drag=null;attempted=false;chosenOutcome=null;mode='ready';tunnelTime=0;tunnelFrom=null;tunnelTo=null;stopSound();updateRareButton();status($('interaction').value==='gun'?'Zamiř tažením ve scéně, potom vystřel.':'Uchop částici. Dostupná energie omezuje přiblížení.');}
+function home(){playbackUserOverride=false;playbackAutoSlowed=false,playbackProductsSlowed=false;manualAnchor=null;manualDisplay=false;fitPending=true;clearEncounter();unpause();updateMode();shot=M.multiShot(p,energy,angle,Math.max(1,Math.min(5,+$('targetCount').value||3)),layoutSeed);centers=shot.centers.map(t=>({...t,kind:$('target').value,A:p.a.A,Z:p.a.Z,vx:0,vy:0}));shot.centers=centers;cell=M.makeCell([...centers,{x:shot.x,y:shot.y}],shot.start);shot.cell=cell;layoutPoints=[...centers.map(t=>({x:t.x,y:t.y})),{x:shot.x,y:shot.y}];flightAccumulator=0;targetIndex=0;aimTarget=0;tried=new Set();recoil=null;({x,y,vx,vy}=shot);vx=vy=0;gunOrigin=[x,y];gunHeading=Math.atan2(centers[0].y-y,centers[0].x-x);extent=shot.start*1.4;previewLimit=0;probability=centers.length>1?null:M.penetration(p,shot);preview=M.aimPreview(p,centers,shot);trail=[];drag=null;attempted=false;chosenOutcome=null;mode='ready';tunnelTime=0;tunnelFrom=null;tunnelTo=null;stopSound();updateRareButton();status($('interaction').value==='gun'?'Tažením zamiř a vystřel.':'Táhni částici k jádru.');if($('interaction').value==='gun')armGun(false);}
 function flightLimit(){if(!W||!H)return extent;const corners=[[0,0],[W,0],[0,H],[W,H]].map(([px,py])=>Math.hypot((px-ox)/scale,(py-oy)/scale));return Math.max(extent,Math.hypot(...gunOrigin)*1.15,...corners.map(r=>r*1.15));}
-function prepareSurface(){const unit=displayRadius()/Math.max(scale,1e-9);shot.core=unit*visualBound($('projectile').value)+4*zoom/Math.max(scale,1e-9);shot.surfaceStrength=energy*16;for(const t of centers){t.core=unit*visualBound(targetKind(t))+4*zoom/Math.max(scale,1e-9);t.surfaceStrength=energy*16;}if(p.b.Z&&centers.some(t=>t.Z&&Math.hypot(x-t.x,y-t.y)<=shot.core+t.core))shot.canLaunch=false;}
-function refreshPreview(){if(preparationJob){preparationJob=null;updateRareButton();status('Pohled se změnil. Přípravu ukázky spusť znovu.');}prepareSurface();preview=M.aimPreview(p,centers,shot);previewJob=null;previewLimit=flightLimit();}
+function prepareSurface(){const unit=displayRadius()/Math.max(scale,1e-9);shot.core=unit*visualBound($('projectile').value)+4*zoom/Math.max(scale,1e-9);shot.surfaceStrength=energy*16;for(const t of centers){t.core=unit*visualBound(targetKind(t))+4*zoom/Math.max(scale,1e-9);t.surfaceStrength=energy*16;}shot.canLaunch=energy-M.multiPotential(p,centers,x,y)>1e-8&&!(p.b.Z&&centers.some(t=>t.Z&&Math.hypot(x-t.x,y-t.y)<=shot.core+t.core));}
+function refreshPreview(){if(preparationJob){preparationJob=null;updateRareButton();status('Pohled změněn. Připrav ukázku znovu.');}prepareSurface();preview=M.aimPreview(p,centers,shot);previewJob=null;previewLimit=flightLimit();updateRareButton();}
 function advancePreview(){if(!previewJob)return;if(mode!=='ready'){previewJob=null;return;}const until=performance.now()+3;do{const next=previewJob.next();preview=next.value;shot.closest=preview.closest;if(next.done){previewJob=null;if(launchPending){launchPending=false;launch();}break;}}while(performance.now()<until);}
 function displayJacobian(){
  const epsilon=Math.max(.001,shot.start*1e-5),at=(dx,dy)=>{const q=project(x+dx,y+dy),items=schematicItems([{id:$('projectile').value,x:q[0],y:q[1],radius:displayRadius()},...centers.map(t=>({id:targetKind(t),x:project(t.x,t.y)[0],y:project(t.x,t.y)[1],radius:displayRadius()}))]);return [items[0].x,items[0].y];},origin=at(0,0),a=at(epsilon,0),b=at(0,epsilon);return [(a[0]-origin[0])/epsilon,(b[0]-origin[0])/epsilon,(a[1]-origin[1])/epsilon,(b[1]-origin[1])/epsilon];
 }
 function physicalHeading(heading){const [a,b,c,d]=displayJacobian(),det=a*d-b*c;if(Math.abs(det)<1e-12)return heading;const ux=Math.cos(heading),uy=Math.sin(heading);return Math.atan2((a*uy-c*ux)/det,(d*ux-b*uy)/det);}
 function visualHeading(heading){const [a,b,c,d]=displayJacobian(),ux=Math.cos(heading),uy=Math.sin(heading);return Math.atan2(c*ux+d*uy,a*ux+b*uy);}
-function armGun(capture=true){materializeManual();if(!hasProjectile()){clearEncounter();mode='ready';shot.canLaunch=false;preview=[];vx=vy=0;updateMode();updateRareButton();status('Ve scéně chybí projektil zvolené reakce.');return;}if($('projectile').value!==preferredProjectile()){const index=centers.findIndex(t=>targetKind(t)===preferredProjectile());if(index>=0){selectNucleus(index);capture=true;}}syncActivePair();clearEncounter();unpause();stopSound();updateMode();if(capture){gunOrigin=[x,y];}x=gunOrigin[0];y=gunOrigin[1];vx=vy=0;drag=null;recoil=null;mode='ready';tunnelFrom=tunnelTo=null;tunnelTime=0;trail=[];tried=new Set();if(cell&&[...centers,{x,y}].some(t=>Math.abs(t.x-cell.x)>cell.rx||Math.abs(t.y-cell.y)>cell.ry))cell=M.makeCell([...centers,{x,y}],shot.start);const span=Math.max(shot.start,2*M.nearest(centers,x,y).distance);shot.start=span;shot.dt=.0015*span/Math.max(.1,Math.sqrt(2*energy/p.mu));const potential=M.multiPotential(p,centers,x,y),kinetic=Math.max(0,energy-potential),speed=Math.sqrt(2*kinetic/p.mu),heading=physicalHeading(gunHeading-angle);shot={...shot,x,y,vx:speed*Math.cos(heading),vy:speed*Math.sin(heading),angle,aimTarget,energy,referenceMu:p.mu,projectileKind:$('projectile').value,canLaunch:kinetic>1e-8,centers};shot.L=p.mu*(shot.x*shot.vy-shot.y*shot.vx);shot.B=shot.L**2/(2*p.mu);shot.rmin=(p.C+Math.sqrt(p.C**2+4*energy*shot.B))/(2*energy);probability=centers.length===1?M.penetration(p,shot):null;syncView();if(shot.canLaunch)refreshPreview();else{preview=[[x,y]];shot.closest=M.nearest(centers,x,y).distance;}status(shot.canLaunch?'Dělo je v aktuální poloze částice. Zamiř a vystřel.':'Pro výstřel částici oddal: chybí pohybová energie nebo se zvětšené značky překrývají.');}
+function armGun(capture=true){materializeManual();if(!hasProjectile()){clearEncounter();mode='ready';shot.canLaunch=false;preview=[];vx=vy=0;updateMode();updateRareButton();status('Ve scéně chybí projektil zvolené reakce.',true);return;}if($('projectile').value!==preferredProjectile()){const index=centers.findIndex(t=>targetKind(t)===preferredProjectile());if(index>=0){selectNucleus(index);capture=true;}}syncActivePair();clearEncounter();unpause();stopSound();updateMode();if(capture){gunOrigin=[x,y];}x=gunOrigin[0];y=gunOrigin[1];vx=vy=0;drag=null;recoil=null;mode='ready';tunnelFrom=tunnelTo=null;tunnelTime=0;trail=[];tried=new Set();if(cell&&[...centers,{x,y}].some(t=>Math.abs(t.x-cell.x)>cell.rx||Math.abs(t.y-cell.y)>cell.ry))cell=M.makeCell([...centers,{x,y}],shot.start);const span=Math.max(shot.start,2*M.nearest(centers,x,y).distance);shot.start=span;shot.dt=.0015*span/Math.max(.1,Math.sqrt(2*energy/p.mu));const potential=M.multiPotential(p,centers,x,y),kinetic=Math.max(0,energy-potential),speed=Math.sqrt(2*kinetic/p.mu),heading=physicalHeading(gunHeading-angle);shot={...shot,x,y,vx:speed*Math.cos(heading),vy:speed*Math.sin(heading),angle,aimTarget,energy,referenceMu:p.mu,projectileKind:$('projectile').value,canLaunch:kinetic>1e-8,centers};shot.L=p.mu*(shot.x*shot.vy-shot.y*shot.vx);shot.B=shot.L**2/(2*p.mu);shot.rmin=(p.C+Math.sqrt(p.C**2+4*energy*shot.B))/(2*energy);probability=centers.length===1?M.penetration(p,shot):null;syncView();if(shot.canLaunch)refreshPreview();else{preview=[[x,y]];shot.closest=M.nearest(centers,x,y).distance;}status(shot.canLaunch?'Zamiř a vystřel.':'Před výstřelem částici oddal nebo přibliž pohled.',!shot.canLaunch);updateRareButton();}
 
 function syncChoices(){document.querySelectorAll('[name="interactionChoice"]').forEach(input=>input.checked=input.value===$('interaction').value);document.querySelectorAll('[name="countChoice"]').forEach(input=>input.checked=input.value===$('targetCount').value);}
 for(const input of document.querySelectorAll('[name="interactionChoice"]'))input.addEventListener('change',()=>{if(input.checked){$('interaction').value=input.value;$('interaction').onchange();}});
@@ -241,8 +254,8 @@ function updateEnergy(){manualAnchor=null;
    if(M.multiPotential(p,centers,next.x,next.y)<=goal){let lo=0,hi=1;for(let j=0;j<35;j++){const mid=(lo+hi)/2;if(M.multiPotential(p,centers,q.x+(next.x-q.x)*mid,q.y+(next.y-q.y)*mid)>goal)lo=mid;else hi=mid;}next={x:q.x+(next.x-q.x)*hi,y:q.y+(next.y-q.y)*hi};}
    q=next;points.push([q.x,q.y]);
   }
-  recoil={points,time:0};mode='recoil';status('Nižší energie: jádro se plynule vzdaluje k nové hranici přiblížení.');
- }else status('Teplota změněna. Polohy zůstávají; nová energie mění dostupné přiblížení.');
+  recoil={points,time:0};mode='recoil';status('Nižší energie: jádro ustupuje.');
+ }else status('Teplota změněna; mění se mez přiblížení.');
  fieldKey='';updateRareButton();
 }
 $('temperature').oninput=updateEnergy;
@@ -254,10 +267,10 @@ $('angle').oninput=()=>{angle=snapAngle(+$('angle').value)*Math.PI/180;$('angle'
 $('target').onchange=$('projectile').onchange=$('targetCount').onchange=pair;$('home').onclick=()=>{batchNote='';home();};$('interaction').onchange=()=>{resetAfterFusion(true);if($('interaction').value==='gun'){if($('projectile').value!==preferredProjectile()){const index=centers.findIndex(t=>targetKind(t)===preferredProjectile());if(index>=0)selectNucleus(index);}armGun(true);}else{resetManualSpeed();release();clearEncounter();vx=vy=0;centers.forEach(t=>{t.vx=t.vy=0;});mode='ready';updateMode();}};
 $('quantum').onchange=()=>{clearStats();if($('interaction').value==='gun')armGun(mode!=='ready');else home();};
 function launch(outcome=null){
- if(preparationJob){status('Hledám vhodný směr. Počkej na dokončení přípravy, nebo ji zruš.');return;}
- if(!hasProjectile()){status('Vyber dvojici s dostupným projektilem.');return;}
+ if(preparationJob){status('Hledám směr… Vyčkej nebo přípravu zruš.');return;}
+ if(!hasProjectile()){status('Vyber dvojici s dostupným projektilem.',true);return;}
  if(($('projectile').value!==preferredProjectile()&&centers.some(t=>targetKind(t)===preferredProjectile()))||mode!=='ready')armGun(true);
- if(!shot.canLaunch)return;if(previewJob){launchPending=true;status('Dokončuji předpověď dráhy; výstřel je připraven.');return;}
+ if(!shot.canLaunch){status('Před výstřelem částici oddal nebo přibliž pohled.',true);updateRareButton();return;}if(previewJob){launchPending=true;status('Dokončuji předpověď dráhy; výstřel je připraven.');return;}
  lastShotSetup={x:shot.x,y:shot.y,kind:$('projectile').value,heading:gunHeading,angle,centers:centers.map(t=>({...t})),cell:{...cell},shot:{...shot,centers:undefined}};unlockSound();unpause();demoActive=demoPending;demoPending=false;chosenOutcome=outcome;({x,y,vx,vy}=shot);flightAccumulator=0;trail=[];tried=new Set();mode='flight';beginRecording();status(demoActive?(activeReaction()?.noBarrier?'PŘIPRAVENÁ SRÁŽKA · neutron nemá Coulombovu bariéru.':'UKÁZKA VZÁCNÉHO STŘETU · přiblížení, tunelování a zvolená reakce.'):'Běžný výstřel: částice sleduje vypočtenou dráhu.');
 }
 $('launch').onclick=()=>{batchNote='';launch();};
@@ -273,7 +286,7 @@ function fitAllParticles(){
 }
 function fusionWarp(){if(!fusion)return 1;if(fusion.phase!=='compound')return 0;const u=Math.min(1,fusion.time/.65);return 1-u*u*(3-2*u);}
 function view(){baseView();collisionZoom=1;collisionFocus=null;if($('cameraScale'))$('cameraScale').hidden=true;}
-c.closest('.scene').addEventListener('wheel',e=>{e.preventDefault();syncView();if(!W||!H)return;const [px,py]=canvasPoint(e),[wx,wy]=unproject(px,py),delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?H:1);zoom=Math.max(.08,Math.min(40,zoom*Math.exp(-delta*.0015)));view();const anchor=project(wx,wy);panX+=(px-anchor[0])/W;panY+=(py-anchor[1])/H;view();if(drag&&lastPointer){const q=position(lastPointer);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}fieldKey='';if($('interaction').value==='gun'&&mode==='ready'&&!fusion&&playbackCursor===null&&shot.canLaunch!==false)refreshPreview();},{passive:false});
+c.closest('.scene').addEventListener('wheel',e=>{e.preventDefault();syncView();if(!W||!H)return;const [px,py]=canvasPoint(e),[wx,wy]=unproject(px,py),delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?H:1);zoom=Math.max(.08,Math.min(40,zoom*Math.exp(-delta*.0015)));view();const anchor=project(wx,wy);panX+=(px-anchor[0])/W;panY+=(py-anchor[1])/H;view();if(drag&&lastPointer){const q=position(lastPointer);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}fieldKey='';if($('interaction').value==='gun'&&mode==='ready'&&!fusion&&playbackCursor===null)refreshPreview();},{passive:false});
 function canvasPoint(e){const r=c.getBoundingClientRect();return [(e.clientX-r.left)*(c.clientWidth||r.width)/r.width,(e.clientY-r.top)*(c.clientHeight||r.height)/r.height];}
 function position(e){syncView();return unproject(...canvasPoint(e));}
 function aimAtPointer(e){syncView();const [px,py]=canvasPoint(e),origin=[currentGlyphs()[0].x,currentGlyphs()[0].y],dx=px-origin[0],dy=py-origin[1];if(Math.hypot(dx,dy)<16)return;const heading=Math.atan2(dy,dx);angle=snapAngle((gunHeading-heading)*180/Math.PI)*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);}
@@ -318,7 +331,7 @@ function resetAfterFusion(force=false){
  if((!fusion&&!playbackHasProducts&&!(force&&mode==='tunnel'))||(!force&&fusion?.phase!=='done')||!lastShotSetup)return false;
  const saved=lastShotSetup;clearEncounter();resetManualSpeed();centers=saved.centers.map(t=>({...t,vx:0,vy:0}));x=saved.x;y=saved.y;vx=vy=0;$('projectile').value=saved.kind;cell={...saved.cell};shot={...saved.shot,centers};gunOrigin=[x,y];gunHeading=saved.heading??gunHeading;angle=saved.angle??0;$('angle').value=angle*180/Math.PI;
  trail=[];preview=[];drag=null;layoutDrag=null;recoil=null;activePointer=null;lastPointer=null;panning=aiming=false;aimAnchor=null;releaseBounds=null;tunnelFrom=tunnelTo=null;tunnelTime=0;flightAccumulator=0;mode='ready';syncActivePair();unpause();stopSound();fieldKey='';updateMode();
- if($('interaction').value==='gun')armGun(true);else updateRareButton();status('Původní jádra obnovena. Můžeš připravit další pokus.');return true;
+ if($('interaction').value==='gun')armGun(true);else updateRareButton();status('Jádra obnovena. Připrav další pokus.');return true;
 }
 c.onpointerdown=e=>{if(resetAfterFusion(true)){$('interaction').value='drag';updateMode();e.preventDefault();return;}if(mode==='recoil'||fusion)return;if(![0,1,2].includes(e.button)||e.isPrimary===false)return;if(activePointer!==null)release();unlockSound();const q=position(e);gripMoved=false;activePointer=e.pointerId;lastPointer={clientX:e.clientX,clientY:e.clientY};aimAnchor={clientX:e.clientX,clientY:e.clientY,angle,panX,panY};
 if(e.shiftKey&&e.button===0){
@@ -339,8 +352,8 @@ if(layoutDrag!==null){
 else if(panning){syncView();const at=canvasPoint(e),start=canvasPoint(aimAnchor);panX=aimAnchor.panX+(at[0]-start[0])/W;panY=aimAnchor.panY+(at[1]-start[1])/H;view();fieldKey='';}
 else if(aiming){aimAtPointer(e);}
 else if(drag){if(Math.hypot(e.clientX-aimAnchor.clientX,e.clientY-aimAnchor.clientY)>3)gripMoved=true;const q=position(e);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}};
-function release(e){manualAnchor=null;if(e&&e.pointerId!==undefined&&activePointer!==null&&e.pointerId!==activePointer)return;if(layoutDrag!==null){layoutDrag=null;cell=M.makeCell([...centers,{x,y}],shot.start);shot.cell=cell;gunOrigin=[x,y];if($('interaction').value==='gun')armGun(true);else{mode='ready';status('Rozmístění upraveno. Okolní jádra jsou při ručním přibližování zamknutá.');}fieldKey='';}
- const held=drag!==null;activePointer=null;lastPointer=null;panning=false;aiming=false;aimAnchor=null;stopHum();if(!held)return;drag=null;vx=vy=0;recoil=null;if($('interaction').value==='gun'){armGun(true);return;}if(!gripMoved){mode='ready';gunOrigin=[x,y];status('Jádro vybráno. Můžeš je uchopit nebo přepnout na dělo a vystřelit.');return;}syncView();const margin=Math.min(W*.25,H*.2,Math.max(28,displayRadius()*visualBound($('projectile').value)+12));releaseBounds={left:(margin-ox)/scale,right:(W-margin-ox)/scale,top:(65+margin-oy)/scale,bottom:(H-45-margin-oy)/scale};mode='free';status('Po puštění částici dál odpuzuje společné elektrické pole.');}
+function release(e){manualAnchor=null;if(e&&e.pointerId!==undefined&&activePointer!==null&&e.pointerId!==activePointer)return;if(layoutDrag!==null){layoutDrag=null;cell=M.makeCell([...centers,{x,y}],shot.start);shot.cell=cell;gunOrigin=[x,y];if($('interaction').value==='gun')armGun(true);else{mode='ready';status('Rozmístění upraveno. Okolní jádra stojí.');}fieldKey='';}
+ const held=drag!==null;activePointer=null;lastPointer=null;panning=false;aiming=false;aimAnchor=null;stopHum();if(!held)return;drag=null;vx=vy=0;recoil=null;if($('interaction').value==='gun'){armGun(true);return;}if(!gripMoved){mode='ready';gunOrigin=[x,y];status('Jádro vybráno. Táhni nebo zapni dělo.');return;}syncView();const margin=Math.min(W*.25,H*.2,Math.max(28,displayRadius()*visualBound($('projectile').value)+12));releaseBounds={left:(margin-ox)/scale,right:(W-margin-ox)/scale,top:(65+margin-oy)/scale,bottom:(H-45-margin-oy)/scale};mode='free';status('Částici nyní odpuzuje pole.');}
 c.onpointerup=release;c.onpointercancel=release;c.onlostpointercapture=e=>{if(activePointer!==null&&(!c.hasPointerCapture||!c.hasPointerCapture(activePointer)))release(e);};
 window.addEventListener('pointerup',release);window.addEventListener('pointercancel',release);window.addEventListener('blur',()=>release());
 c.addEventListener('contextmenu',e=>e.preventDefault());
@@ -349,8 +362,8 @@ function step(dt){
  if(!['flight','free'].includes(mode))return;
  const before=centers.map(t=>(x-t.x)*(vx-(t.vx||0))+(y-t.y)*(vy-(t.vy||0))),state={x,y,vx,vy,core:shot.core,surfaceStrength:shot.surfaceStrength};
  if(mode==='flight')M.mobileAdvance(p,centers,state,dt,cell);else M.multiAdvance(p,centers,state,dt);
- ({x,y,vx,vy}=state);if(state.integrationLimited){mode='done';status('Výpočet zastaven při příliš těsném přiblížení. Částici můžeš znovu uchopit.');return;}if(state.collision&&activeReaction()?.noBarrier&&$('fusionEnabled').checked){const hitIndex=state.collision.includes(0)?state.collision.find(i=>i!==0)-1:-1;if(hitIndex>=0){syncActivePair(hitIndex);const t=centers[hitIndex],rvx=vx-(t.vx||0),rvy=vy-(t.vy||0);dtLocalEnergy=.5*p.mu*(rvx*rvx+rvy*rvy);dtBoost=[(p.b.A*vx+p.a.A*(t.vx||0))/(p.a.A+p.b.A)/Math.sqrt(931494.10242),(p.b.A*vy+p.a.A*(t.vy||0))/(p.a.A+p.b.A)/Math.sqrt(931494.10242)];beginFusion();return;}}if(state.collision){mode='nuclear';status('Dosažena jaderná oblast; další jaderný střet zde nepočítáme.');return;}
- if(mode==='free'&&releaseBounds){const b=releaseBounds,screen=projectilePoint(),left=ox+b.left*scale,right=ox+b.right*scale,top=oy+b.top*scale,bottom=oy+b.bottom*scale;if(screen[0]<left||screen[0]>right||screen[1]<top||screen[1]>bottom){[x,y]=unproject(Math.max(left,Math.min(right,screen[0])),Math.max(top,Math.min(bottom,screen[1])));vx=vy=0;mode='ready';status('Částice je u okraje pracovní plochy. Můžeš ji znovu uchopit.');return;}}
+ ({x,y,vx,vy}=state);if(state.integrationLimited){mode='done';status('Výpočet zastaven při příliš těsném přiblížení. Částici můžeš znovu uchopit.',true);return;}if(state.collision&&activeReaction()?.noBarrier&&$('fusionEnabled').checked){const hitIndex=state.collision.includes(0)?state.collision.find(i=>i!==0)-1:-1;if(hitIndex>=0){syncActivePair(hitIndex);const t=centers[hitIndex],rvx=vx-(t.vx||0),rvy=vy-(t.vy||0);dtLocalEnergy=.5*p.mu*(rvx*rvx+rvy*rvy);dtBoost=[(p.b.A*vx+p.a.A*(t.vx||0))/(p.a.A+p.b.A)/Math.sqrt(931494.10242),(p.b.A*vy+p.a.A*(t.vy||0))/(p.a.A+p.b.A)/Math.sqrt(931494.10242)];beginFusion();return;}}if(state.collision){mode='nuclear';status('Dosažena jaderná oblast; další jaderný střet zde nepočítáme.');return;}
+ if(mode==='free'&&releaseBounds){const b=releaseBounds,screen=projectilePoint(),left=ox+b.left*scale,right=ox+b.right*scale,top=oy+b.top*scale,bottom=oy+b.bottom*scale;if(screen[0]<left||screen[0]>right||screen[1]<top||screen[1]>bottom){[x,y]=unproject(Math.max(left,Math.min(right,screen[0])),Math.max(top,Math.min(bottom,screen[1])));vx=vy=0;mode='ready';status('Okraj scény. Uchop částici znovu.',true);return;}}
  const near=M.nearest(centers,x,y);syncActivePair(near.index);
  if(near.distance<=p.R){const demonstration=demoActive;clearEncounter();if(!demonstration){attempts++;classical++;}mode='nuclear';vx=vy=0;status('Dosažena jaderná oblast. Výsledek reakce zatím nepočítáme.');return;}
  if(mode==='flight'){const t=near.target,rvx=vx-(t.vx||0),rvy=vy-(t.vy||0),radial=(x-t.x)*rvx+(y-t.y)*rvy;if(!tried.has(near.index)&&before[near.index]<0&&radial>=0&&(near.distance<shot.start*.7||demoActive)){tried.add(near.index);if(!demoActive)attempts++;
@@ -365,8 +378,8 @@ function step(dt){
  status(demoActive?'Toto přiblížení je příliš tečné pro připravenou ukázku. Dráha pokračuje bez vynuceného tunelu.':!$('quantum').checked?'Tunelování je vypnuté: klasický odraz.':probability<1e-6?'Průchod je při této energii a geometrii mimořádně vzácný. Částice se odráží.':'Průchod tentokrát nenastal. Částice se odklání.');
  }
  }}
- if(mode==='flight'&&demoActive&&Math.hypot(x-gunOrigin[0],y-gunOrigin[1])>shot.start*6){mode='done';vx=vy=0;status('Ukázka nenašla vhodné přiblížení. Připrav ji znovu; vzdálený tunel se nevynucuje.');}
- if(mode==='flight'&&Math.hypot(x-gunOrigin[0],y-gunOrigin[1])>shot.start*6){mode='done';status('Ukázka zastavena u hranice scény. Jádra můžeš znovu rozmístit nebo vystřelit.');}
+ if(mode==='flight'&&demoActive&&Math.hypot(x-gunOrigin[0],y-gunOrigin[1])>shot.start*6){mode='done';vx=vy=0;status('Ukázka nenašla vhodné přiblížení. Připrav ji znovu; vzdálený tunel se nevynucuje.',true);}
+ if(mode==='flight'&&Math.hypot(x-gunOrigin[0],y-gunOrigin[1])>shot.start*6){mode='done';status('Ukázka zastavena u hranice scény. Jádra můžeš znovu rozmístit nebo vystřelit.',true);}
 
 }
 
@@ -425,7 +438,7 @@ function tunnelRibbon(context,from,to,width,progress,finished=false){
  context.restore();
 }
 
-function resize(canvas,context){const bounds=canvas.getBoundingClientRect(),r={width:canvas.clientWidth||bounds.width,height:canvas.clientHeight||bounds.height},fit=Math.min(bounds.width/r.width,bounds.height/r.height),d=Math.min((devicePixelRatio||1)*fit,2);if(canvas.width!==Math.round(r.width*d)||canvas.height!==Math.round(r.height*d)){canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);}context.setTransform(d,0,0,d,0,0);return [r.width,r.height];}
+function resize(canvas,context){const bounds=canvas.getBoundingClientRect(),r={width:canvas.clientWidth||bounds.width,height:canvas.clientHeight||bounds.height},fit=Math.min(bounds.width/r.width,bounds.height/r.height),d=Math.min(Math.min(devicePixelRatio||1,2)*fit,Math.sqrt(8000000/(r.width*r.height)));if(canvas.width!==Math.round(r.width*d)||canvas.height!==Math.round(r.height*d)){canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);}context.setTransform(d,0,0,d,0,0);return [r.width,r.height];}
 function line(context,a,b,color,width=1){context.strokeStyle=color;context.lineWidth=width;context.beginPath();context.moveTo(...a);context.lineTo(...b);context.stroke();}
 function arrow(a,b,color){line(ctx,a,b,color,2);const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(...b);ctx.lineTo(b[0]-6*Math.cos(ang-.5),b[1]-6*Math.sin(ang-.5));ctx.lineTo(b[0]-6*Math.cos(ang+.5),b[1]-6*Math.sin(ang+.5));ctx.fill();}
 function label(host,key,s,left,top,cls=''){let el=host.querySelector('[data-key="'+key+'"]');if(!el){el=document.createElement('span');el.dataset.key=key;el.className='mathlabel '+cls;host.append(el);}tex(el,s);el.style.left=left+'px';el.style.top=top+'px';return el;}
@@ -435,30 +448,40 @@ const potentialCanvas=document.createElement('canvas'),potentialContext=potentia
 const fieldCanvas=document.createElement('canvas'),fc=fieldCanvas.getContext('2d');let fieldKey='',lastPair='',gridKey='',worldGrid=[];
 
 // Pure numeric field work runs outside the animation/UI thread.
-function fieldWorkerMain(){
- self.onmessage=({data:d})=>{
- const {W,H,ox,oy,scale,sources,R,reference,arrows,style,viewKey}=d,width=192,height=Math.max(1,Math.round(width*H/W)),pixels=new Uint8ClampedArray(width*height*4),palette=[[42,91,184],[30,172,195],[83,190,158],[179,206,90],[240,172,57],[222,91,63]],charged=sources.filter(s=>s[2]);
- for(let iy=0;iy<height;iy++)for(let ix=0;ix<width;ix++){const px=(ix+.5)*W/width,py=(iy+.5)*H/height;let ex=0,ey=0;for(const [sx,sy,z]of charged){const dx=px-sx,dy=py-sy,r=Math.max(d.radius*.7,Math.hypot(dx,dy));ex+=z*dx/r**3;ey+=z*dy/r**3;}const strength=Math.hypot(ex,ey)*(d.radius*4)**2,part=Math.min(1,Math.log1p(strength)/Math.log(17))*5,index=Math.min(4,Math.floor(part)),t=part-index,k=(iy*width+ix)*4;for(let j=0;j<3;j++)pixels[k+j]=Math.round(palette[index][j]+(palette[index+1][j]-palette[index][j])*t);pixels[k+3]=255;}
- const lines=[],heads=[],F=(x,y)=>{let fx=0,fy=0;for(const [sx,sy,z]of charged){const dx=x-sx,dy=y-sy,r=Math.hypot(dx,dy);if(r>1){const f=z/(r*r*r);fx+=dx*f;fy+=dy*f;}}const n=Math.hypot(fx,fy);return n>1e-12?[fx/n,fy/n]:null;};
- if(arrows&&style==='source'){for(const [sx,sy,z]of charged)for(let j=0;j<24*z;j++){const a=j*Math.PI*2/(24*z);let x=sx+10*Math.cos(a),y=sy+10*Math.sin(a);const points=[x,y];for(let k=0;k<450;k++){const f=F(x,y);if(!f)break;const mid=F(x+1.5*f[0],y+1.5*f[1]);if(!mid)break;x+=3*mid[0];y+=3*mid[1];if(k%3===0)points.push(x,y);if(j%2===0&&k%50===25)heads.push([x,y,Math.atan2(mid[1],mid[0])]);if(x<0||x>W||y<62||y>H-40)break;}lines.push({points,light:!!(j%2)});}}
- else if(arrows){const occupied=new Set(),cell=(x,y)=>Math.floor(x/16)+','+Math.floor(y/16);const trace=(sx,sy,sign)=>{let x=sx,y=sy;const points=[];for(let i=0;i<650;i++){const f=F(x,y);if(!f)break;const mid=F(x+sign*1.5*f[0],y+sign*1.5*f[1]);if(!mid)break;x+=sign*3*mid[0];y+=sign*3*mid[1];if(x<0||x>W||y<62||y>H-40||occupied.has(cell(x,y))||charged.some(s=>Math.hypot(x-s[0],y-s[1])<d.radius*1.4))break;points.push([x,y]);}return points;};for(let y=70;y<H-40;y+=38)for(let x=18;x<W;x+=38){if(occupied.has(cell(x,y)))continue;const points=[...trace(x,y,-1).reverse(),[x,y],...trace(x,y,1)];if(points.length<10)continue;points.forEach(q=>occupied.add(cell(...q)));const sampled=points.filter((_,i)=>i%3===0);lines.push({points:sampled.flat(),light:false});for(let i=28;i<points.length-2;i+=100){const q=points[i],f=F(...q);if(f)heads.push([...q,Math.atan2(f[1],f[0])]);}}}
- self.postMessage({width,height,pixels,lines,heads,sources:charged,W,H,viewKey,radius:d.radius},[pixels.buffer]);
+function fieldWorkerMain(port=self){
+ port.onmessage=({data:d})=>{
+ const {W,H,ox,oy,scale,sources,R,reference,arrows,style,viewKey}=d,width=d.synchronous?128:d.moving?256:Math.min(768,Math.max(384,Math.round(W*(d.renderScale||1)/3))),height=Math.max(1,Math.round(width*H/W)),pixels=new Uint8ClampedArray(width*height*4),palette=[[42,91,184],[30,172,195],[83,190,158],[179,206,90],[240,172,57],[222,91,63]],charged=sources.filter(s=>s[2]);
+ for(let iy=0;iy<height;iy++)for(let ix=0;ix<width;ix++){const px=(ix+.5)*W/width,py=(iy+.5)*H/height;let ex=0,ey=0;for(const [sx,sy,z]of charged){const dx=px-sx,dy=py-sy,r2=Math.max((d.radius*.7)**2,dx*dx+dy*dy),weight=z/(r2*Math.sqrt(r2));ex+=dx*weight;ey+=dy*weight;}const strength=Math.hypot(ex,ey)*((d.referenceRadius||d.radius)*4)**2,part=Math.min(1,Math.log1p(strength)/Math.log(17))*5,index=Math.min(4,Math.floor(part)),t=part-index,k=(iy*width+ix)*4;for(let j=0;j<3;j++)pixels[k+j]=Math.round(palette[index][j]+(palette[index+1][j]-palette[index][j])*t);pixels[k+3]=255;}
+ const step=d.synchronous?6:3,lines=[],heads=[],F=(x,y)=>{let fx=0,fy=0;for(const [sx,sy,z]of charged){const dx=x-sx,dy=y-sy,r2=dx*dx+dy*dy;if(r2>1){const f=z/(r2*Math.sqrt(r2));fx+=dx*f;fy+=dy*f;}}const n=Math.hypot(fx,fy);return n>1e-12?[fx/n,fy/n]:null;};
+ if(arrows&&style==='source'){for(const [sx,sy,z]of charged)for(let j=0;j<24*z;j++){const a=j*Math.PI*2/(24*z);let x=sx+10*Math.cos(a),y=sy+10*Math.sin(a);const points=[x,y];for(let k=0;k<1350/step;k++){const f=F(x,y);if(!f)break;const mid=F(x+step*.5*f[0],y+step*.5*f[1]);if(!mid)break;x+=step*mid[0];y+=step*mid[1];points.push(x,y);if(j%2===0&&k%50===25)heads.push([x,y,Math.atan2(mid[1],mid[0])]);if(x<0||x>W||y<62||y>H-40)break;}lines.push({points,light:!!(j%2)});}}
+ else if(arrows){const occupied=new Set(),cell=(x,y)=>Math.floor(x/16)+','+Math.floor(y/16);const trace=(sx,sy,sign)=>{let x=sx,y=sy;const points=[];for(let i=0;i<650;i++){const f=F(x,y);if(!f)break;const mid=F(x+sign*1.5*f[0],y+sign*1.5*f[1]);if(!mid)break;x+=sign*3*mid[0];y+=sign*3*mid[1];if(x<0||x>W||y<62||y>H-40||occupied.has(cell(x,y))||charged.some(s=>Math.hypot(x-s[0],y-s[1])<d.radius*1.4))break;points.push([x,y]);}return points;};for(let y=70;y<H-40;y+=38)for(let x=18;x<W;x+=38){if(occupied.has(cell(x,y)))continue;const points=[...trace(x,y,-1).reverse(),[x,y],...trace(x,y,1)];if(points.length<10)continue;points.forEach(q=>occupied.add(cell(...q)));const sampled=points;lines.push({points:sampled.flat(),light:false});for(let i=28;i<points.length-2;i+=100){const q=points[i],f=F(...q);if(f)heads.push([...q,Math.atan2(f[1],f[0])]);}}}
+ port.postMessage({width,height,pixels,lines,heads,sources:charged,W,H,viewKey,requestId:d.requestId,radius:d.radius},[pixels.buffer]);
  };
 }
-let fieldWorker=null,fieldWorkerBusy=false,fieldWorkerView='',fieldWorkerReady=false,fieldRequestAt=-Infinity,fieldSourceKey='';
-try{if(typeof Worker==='function'){const url=URL.createObjectURL(new Blob(['('+fieldWorkerMain.toString()+')()'],{type:'text/javascript'}));fieldWorker=new Worker(url);URL.revokeObjectURL(url);fieldWorker.onerror=()=>{fieldWorker.terminate();fieldWorker=null;fieldKey='';};fieldWorker.onmessage=({data:d})=>{fieldWorkerBusy=false;if(d.viewKey!==fieldWorkerView)return;fieldCanvas.width=Math.round(d.W);fieldCanvas.height=Math.round(d.H);potentialCanvas.width=d.width;potentialCanvas.height=d.height;potentialContext.putImageData(new ImageData(d.pixels,d.width,d.height),0,0);fc.save();fc.globalAlpha=.58;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,d.W,d.H);fc.restore();fc.save();fc.beginPath();fc.rect(0,62,d.W,Math.max(1,d.H-102));fc.clip();for(const light of [true,false]){fc.beginPath();for(const line of d.lines){if(line.light!==light)continue;for(let i=0;i<line.points.length;i+=2){if(i)fc.lineTo(line.points[i],line.points[i+1]);else fc.moveTo(line.points[i],line.points[i+1]);}}fc.strokeStyle=light?'rgba(24,112,117,.24)':'rgba(24,112,117,.46)';fc.lineWidth=light?.8:1.1;fc.stroke();}fc.beginPath();for(const [x,y,a]of d.heads){fc.moveTo(x+3*Math.cos(a),y+3*Math.sin(a));fc.lineTo(x-3*Math.cos(a-.55),y-3*Math.sin(a-.55));fc.lineTo(x-3*Math.cos(a+.55),y-3*Math.sin(a+.55));fc.closePath();}fc.fillStyle='rgba(24,105,111,.58)';fc.fill();fc.restore();fc.save();fc.globalCompositeOperation='destination-in';const fade=fc.createLinearGradient(0,0,0,d.H);fade.addColorStop(0,'rgba(0,0,0,0)');fade.addColorStop(.12,'rgba(0,0,0,1)');fade.addColorStop(.87,'rgba(0,0,0,1)');fade.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=fade;fc.fillRect(0,0,d.W,d.H);fc.restore();fieldWorkerReady=true;};window.addEventListener('pagehide',event=>{if(!event.persisted)fieldWorker?.terminate();});}}
+let fieldWorker=null,fieldWorkerBusy=false,fieldWorkerView='',fieldWorkerReady=false,fieldRequestAt=-Infinity,fieldSourceKey='',fieldMotionKey='',fieldMotionAt=-Infinity,fieldRequestId=0;
+const immediateField={postMessage:d=>fieldWorker.onmessage({data:d})};fieldWorkerMain(immediateField);
+try{if(typeof Worker==='function'){const url=URL.createObjectURL(new Blob(['('+fieldWorkerMain.toString()+')()'],{type:'text/javascript'}));fieldWorker=new Worker(url);URL.revokeObjectURL(url);fieldWorker.onerror=()=>{fieldWorker.terminate();fieldWorker=null;fieldKey='';};fieldWorker.onmessage=({data:d})=>{if(d.requestId!==fieldRequestId)return;fieldWorkerBusy=false;if(d.viewKey!==fieldWorkerView)return;const renderScale=c.width/W;fieldCanvas.width=Math.round(d.W*renderScale);fieldCanvas.height=Math.round(d.H*renderScale);fc.setTransform(renderScale,0,0,renderScale,0,0);potentialCanvas.width=d.width;potentialCanvas.height=d.height;potentialContext.putImageData(new ImageData(d.pixels,d.width,d.height),0,0);fc.save();fc.globalAlpha=.82;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,d.W,d.H);fc.restore();fc.save();fc.beginPath();fc.rect(0,62,d.W,Math.max(1,d.H-102));fc.clip();for(const light of [true,false]){fc.beginPath();for(const line of d.lines){if(line.light!==light)continue;for(let i=0;i<line.points.length;i+=2){if(i)fc.lineTo(line.points[i],line.points[i+1]);else fc.moveTo(line.points[i],line.points[i+1]);}}fc.strokeStyle=light?'rgba(9,54,70,.50)':'rgba(9,54,70,.80)';fc.lineWidth=light?.45:.65;fc.stroke();}fc.beginPath();for(const [x,y,a]of d.heads){fc.moveTo(x+3*Math.cos(a),y+3*Math.sin(a));fc.lineTo(x-3*Math.cos(a-.55),y-3*Math.sin(a-.55));fc.lineTo(x-3*Math.cos(a+.55),y-3*Math.sin(a+.55));fc.closePath();}fc.fillStyle='rgba(9,54,70,.9)';fc.fill();fc.restore();fc.save();fc.globalCompositeOperation='destination-in';const fade=fc.createLinearGradient(0,0,0,d.H);fade.addColorStop(0,'rgba(0,0,0,0)');fade.addColorStop(.12,'rgba(0,0,0,1)');fade.addColorStop(.87,'rgba(0,0,0,1)');fade.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=fade;fc.fillRect(0,0,d.W,d.H);fc.restore();fieldWorkerReady=true;};window.addEventListener('pagehide',event=>{if(!event.persisted)fieldWorker?.terminate();});}}
 catch(e){fieldWorker=null;}
 function threadedFieldLayer(){
- const sources=fusion?(fusion.products?[...fusion.products.sources,...fusion.products.products].map(b=>[...project(b.x,b.y),b.Z]):[...centers.filter((_,i)=>i!==targetIndex).map(t=>[...project(t.x,t.y),t.Z??p.a.Z]),[...project(fusion.origin.x,fusion.origin.y),fusion.reaction.input.reduce((z,k)=>z+R.species[k].Z,0)]]):[...centers.map(t=>[...project(t.x,t.y),t.Z??p.a.Z]),[...projectilePoint(),p.b.Z]],viewKey=[W,H,ox,oy,scale,$('arrows').checked,$('lineStyle').value].join('/'),now=performance.now();
+ const sources=fusion?(fusion.products?[...fusion.products.sources,...fusion.products.products].map(b=>[...project(b.x,b.y),b.Z]):[...centers.filter((_,i)=>i!==targetIndex).map(t=>[...project(t.x,t.y),t.Z??p.a.Z]),[...project(fusion.origin.x,fusion.origin.y),fusion.reaction.input.reduce((z,k)=>z+R.species[k].Z,0)]]):[...centers.map(t=>[...project(t.x,t.y),t.Z??p.a.Z]),[...projectilePoint(),p.b.Z]],viewKey=[W,H,c.width,c.height,ox,oy,scale,$('arrows').checked,$('lineStyle').value].join('/'),now=performance.now();
  if(viewKey!==fieldWorkerView){fieldWorkerView=viewKey;fieldWorkerReady=false;fieldRequestAt=-Infinity;fieldSourceKey='';}
- const sourceKey=viewKey+'/'+p.R+'/'+sources.map(s=>[Math.round(s[0]/2),Math.round(s[1]/2),s[2]].join(',')).join(';');if(!fieldWorkerBusy&&sourceKey!==fieldSourceKey&&now-fieldRequestAt>=40){fieldWorkerBusy=true;fieldRequestAt=now;fieldSourceKey=sourceKey;fieldWorker.postMessage({W,H,ox,oy,scale,sources,R:p.R,reference:M.thermalMean(100),arrows:$('arrows').checked,style:$('lineStyle').value,viewKey,radius:displayRadius()});}
- if(fieldWorkerReady)ctx.drawImage(fieldCanvas,0,0);
+ const motionKey=viewKey+'/'+p.R+'/'+sources.map(s=>[Math.round(s[0]),Math.round(s[1]),s[2]].join(',')).join(';');if(motionKey!==fieldMotionKey){fieldMotionKey=motionKey;fieldMotionAt=now;}const moving=now-fieldMotionAt<100,sourceKey=motionKey+'/'+moving;
+ if(sourceKey!==fieldSourceKey&&(moving||!fieldWorkerBusy)){
+  const request={moving,synchronous:moving,requestId:++fieldRequestId,renderScale:c.width/W,W,H,ox,oy,scale,sources,R:p.R,reference:M.thermalMean(100),arrows:$('arrows').checked,style:$('lineStyle').value,viewKey,referenceRadius:displayRadius()*zoom,radius:displayRadius()};
+  fieldSourceKey=sourceKey;fieldRequestAt=now;
+  // During interaction, render the field from this frame's exact particle positions.
+  // A delayed refinement must never overwrite a newer interactive frame.
+  if(moving)immediateField.onmessage({data:request});
+  else{fieldWorkerBusy=true;fieldWorker.postMessage(request);}
+ }
+
+ if(fieldWorkerReady)ctx.drawImage(fieldCanvas,0,0,W,H);
 }
 
 function fieldLayer(X,Y){
  if(fieldWorker){threadedFieldLayer();return;}
  const key=[Math.round(W),Math.round(H),Math.round(ox),Math.round(oy),zoom,Math.round(X/2),Math.round(Y/2),Math.round(x*scale),Math.round(y*scale),layoutSeed,centers.map(t=>Math.round(t.x*scale)+','+Math.round(t.y*scale)).join(';'),centers.length,shot.start,energy,scale,fusion?fusion.phase+'-'+Math.round(fusion.flightTime*30)+'-'+Math.round(fusionWarp()*50)+'-'+(fusion.detail?fusion.detail.stage+Math.round(fusion.detail.age*60):''):'',p.a.Z,p.b.Z,$('arrows').checked,$('lineStyle').value].join('/');
- if(key!==fieldKey){fieldKey=key;fieldCanvas.width=Math.round(W);fieldCanvas.height=Math.round(H);fc.clearRect(0,0,W,H);
+ if(key!==fieldKey){fieldKey=key;const renderScale=c.width/W;fieldCanvas.width=c.width;fieldCanvas.height=c.height;fc.setTransform(renderScale,0,0,renderScale,0,0);fc.clearRect(0,0,W,H);
  const physicalSources=fusion?[...(fusion.products?fusion.products.sources.map(b=>[b.x,b.y,b.Z]):centers.filter((t,i)=>i!==targetIndex).map(t=>[t.x,t.y,t.Z??p.a.Z])),...(fusion.products?fusion.products.products.map(b=>[b.x,b.y,b.Z]):[[fusion.origin.x,fusion.origin.y,fusion.reaction.input.reduce((z,k)=>z+R.species[k].Z,0)]])]:[...centers.map(t=>[t.x,t.y,t.Z??p.a.Z]),[x,y,p.b.Z]];const sourceKinds=fusion?(fusion.products?[...fusion.products.sources.map(b=>targetKind(centers[b.id])),...fusion.products.products.map(b=>b.kind||b.id)]:[...centers.filter((_,i)=>i!==targetIndex).map(targetKind),'alpha']):[...centers.map(targetKind),$('projectile').value],displayedSources=schematicItems(physicalSources.map(([wx,wy],i)=>({id:sourceKinds[i],x:project(wx,wy)[0],y:project(wx,wy)[1],radius:displayRadius()}))),sources=displayedSources.map((q,i)=>!fusion&&i===physicalSources.length-1?[...projectilePoint(),physicalSources[i][2]]:[q.x,q.y,physicalSources[i][2]]),mapSources=sources.map(([sx,sy,z])=>[...unproject(sx,sy),z]);
  // Magnitude of the vector sum of electric fields, in schematic scene geometry.
  const mapWidth=192,mapHeight=Math.max(1,Math.round(mapWidth*H/W));potentialCanvas.width=mapWidth;potentialCanvas.height=mapHeight;
@@ -469,10 +492,10 @@ function fieldLayer(X,Y){
  for(let iy=0;iy<mapHeight;iy++)for(let ix=0;ix<mapWidth;ix++){
  const px=(ix+.5)*W/mapWidth,py=(iy+.5)*H/mapHeight;let ex=0,ey=0;
  for(const [sx,sy,z]of sources){const dx=px-sx,dy=py-sy,r=Math.max(displayRadius()*.7,Math.hypot(dx,dy));ex+=z*dx/r**3;ey+=z*dy/r**3;}
- const strength=Math.hypot(ex,ey)*(displayRadius()*4)**2,value=Math.min(1,Math.log1p(strength)/Math.log(17)),part=value*(palette.length-1),index=Math.min(palette.length-2,Math.floor(part)),t=part-index,col=palette[index].map((c,j)=>Math.round(c+(palette[index+1][j]-c)*t));
+ const strength=Math.hypot(ex,ey)*(displayRadius()*zoom*4)**2,value=Math.min(1,Math.log1p(strength)/Math.log(17)),part=value*(palette.length-1),index=Math.min(palette.length-2,Math.floor(part)),t=part-index,col=palette[index].map((c,j)=>Math.round(c+(palette[index+1][j]-c)*t));
  potentialContext.fillStyle='rgb('+col.join(',')+')';potentialContext.fillRect(ix,iy,1,1);
  }
- fc.save();fc.globalAlpha=.58;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,W,H);fc.restore();
+ fc.save();fc.globalAlpha=.82;fc.imageSmoothingEnabled=true;fc.imageSmoothingQuality='high';fc.drawImage(potentialCanvas,0,0,W,H);fc.restore();
  if($('arrows').checked&&$('lineStyle').value==='spread'){
   fc.save();fc.beginPath();fc.rect(0,0,W,H);fc.clip();
   // Spaced streamlines, inspired by force-core; direction comes from the electric field.
@@ -485,7 +508,7 @@ function fieldLayer(X,Y){
    const n=Math.hypot(fx,fy);let result=null;if(n>1e-15){const start=project(...q),end=project(q[0]+fx/n*.2/scale,q[1]+fy/n*.2/scale),dx=end[0]-start[0],dy=end[1]-start[1],length=Math.hypot(dx,dy);if(length>1e-9)result=[dx/length,dy/length];}directions.set(key,result);return result;
   };
   const trace=(seed,sign)=>{let point=seed;const points=[];for(let i=0;i<650;i++){const d=F(...point);if(!d)break;const mid=F(point[0]+sign*1.5*d[0],point[1]+sign*1.5*d[1]);if(!mid)break;point=[point[0]+sign*3*mid[0],point[1]+sign*3*mid[1]];if(point[0]<0||point[0]>W||point[1]<0||point[1]>H||occupied.has(cell(...point))||sources.some(([sx,sy,z])=>z&&Math.hypot(point[0]-sx,point[1]-sy)<displayRadius()*1.4))break;points.push(point);}return points;};
-  for(let sy=18;sy<H;sy+=38)for(let sx=18;sx<W;sx+=38){if(occupied.has(cell(sx,sy)))continue;const seed=[sx,sy],points=[...trace(seed,-1).reverse(),seed,...trace(seed,1)];if(points.length<10)continue;points.forEach(q=>occupied.add(cell(...q)));fc.beginPath();points.forEach((q,i)=>i?fc.lineTo(...q):fc.moveTo(...q));fc.strokeStyle='rgba(28,103,131,.42)';fc.lineWidth=1;fc.stroke();fc.fillStyle='rgba(27,99,127,.58)';for(let i=28;i<points.length-2;i+=100){const q=points[i],d=F(...q);if(!d)continue;const angle=Math.atan2(d[1],d[0]);fc.beginPath();fc.moveTo(q[0]+3*Math.cos(angle),q[1]+3*Math.sin(angle));fc.lineTo(q[0]-3*Math.cos(angle-.55),q[1]-3*Math.sin(angle-.55));fc.lineTo(q[0]-3*Math.cos(angle+.55),q[1]-3*Math.sin(angle+.55));fc.fill();}}
+  for(let sy=18;sy<H;sy+=38)for(let sx=18;sx<W;sx+=38){if(occupied.has(cell(sx,sy)))continue;const seed=[sx,sy],points=[...trace(seed,-1).reverse(),seed,...trace(seed,1)];if(points.length<10)continue;points.forEach(q=>occupied.add(cell(...q)));fc.beginPath();points.forEach((q,i)=>i?fc.lineTo(...q):fc.moveTo(...q));fc.strokeStyle='rgba(9,54,70,.80)';fc.lineWidth=.65;fc.stroke();fc.fillStyle='rgba(27,99,127,.58)';for(let i=28;i<points.length-2;i+=100){const q=points[i],d=F(...q);if(!d)continue;const angle=Math.atan2(d[1],d[0]);fc.beginPath();fc.moveTo(q[0]+3*Math.cos(angle),q[1]+3*Math.sin(angle));fc.lineTo(q[0]-3*Math.cos(angle-.55),q[1]-3*Math.sin(angle-.55));fc.lineTo(q[0]-3*Math.cos(angle+.55),q[1]-3*Math.sin(angle+.55));fc.fill();}}
   fc.restore();
  }
  else if($('arrows').checked){fc.save();fc.beginPath();fc.rect(0,62,W,Math.max(1,H-102));fc.clip();
@@ -493,13 +516,13 @@ function fieldLayer(X,Y){
  const F=(a,b)=>{let fx=0,fy=0;for(const [sx,sy,z]of sources){const dx=a-sx,dy=b-sy,r=Math.hypot(dx,dy);if(r>1){fx+=z*dx/r**3;fy+=z*dy/r**3;}}const n=Math.hypot(fx,fy);return n>1e-12?[fx/n,fy/n]:null;};
  for(const [sx,sy,z]of sources){for(let j=0;j<24*z;j++){const a=j*Math.PI*2/(24*z);let px=sx+10*Math.cos(a),py=sy+10*Math.sin(a);fc.beginPath();fc.moveTo(px,py);const arrows=[];
  for(let k=0;k<450;k++){const d=F(px,py);if(!d)break;const mid=F(px+1.5*d[0],py+1.5*d[1]);if(!mid)break;px+=3*mid[0];py+=3*mid[1];fc.lineTo(px,py);if(j%2===0&&k%50===25)arrows.push([px,py,Math.atan2(mid[1],mid[0])]);if(px<0||px>W||py<62||py>H-40)break;}
- fc.strokeStyle=j%2?'rgba(24,112,117,.24)':'rgba(24,112,117,.46)';fc.lineWidth=j%2?.8:1.1;fc.stroke();fc.fillStyle='rgba(24,105,111,.58)';for(const [ax,ay,angle]of arrows){fc.beginPath();fc.moveTo(ax+3*Math.cos(angle),ay+3*Math.sin(angle));fc.lineTo(ax-3*Math.cos(angle-.55),ay-3*Math.sin(angle-.55));fc.lineTo(ax-3*Math.cos(angle+.55),ay-3*Math.sin(angle+.55));fc.fill();}
+ fc.strokeStyle=j%2?'rgba(9,54,70,.50)':'rgba(9,54,70,.80)';fc.lineWidth=j%2?.45:.65;fc.stroke();fc.fillStyle='rgba(9,54,70,.9)';for(const [ax,ay,angle]of arrows){fc.beginPath();fc.moveTo(ax+3*Math.cos(angle),ay+3*Math.sin(angle));fc.lineTo(ax-3*Math.cos(angle-.55),ay-3*Math.sin(angle-.55));fc.lineTo(ax-3*Math.cos(angle+.55),ay-3*Math.sin(angle+.55));fc.fill();}
  }}fc.restore();}
  // Soft fade into the scene edges, rather than an isolated rectangular patch.
  fc.save();fc.globalCompositeOperation='destination-in';const fade=fc.createLinearGradient(0,0,0,H);fade.addColorStop(0,'rgba(0,0,0,0)');fade.addColorStop(.12,'rgba(0,0,0,1)');fade.addColorStop(.87,'rgba(0,0,0,1)');fade.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=fade;fc.fillRect(0,0,W,H);fc.restore();
 
  }
- ctx.drawImage(fieldCanvas,0,0);
+ ctx.drawImage(fieldCanvas,0,0,W,H);
 }
 function tracePoint(nodes,index=0){const q=[nodes[index].x,nodes[index].y];q.nodes=nodes;q.nodeIndex=index;return q;}
 const traceCache=new WeakMap();
@@ -536,7 +559,7 @@ if(fusion&&fusion.phase==='compound'){const point=project(fusion.origin.x,fusion
  if(drag){const [tx,ty]=project(...drag),dx=tx-X,dy=ty-Y,len=Math.hypot(dx,dy),r=M.nearest(centers,x,y).distance,limit=Math.max(p.R,M.turning(p,energy)),resistance=p.C?Math.min(1,M.multiPotential(p,centers,x,y)/energy):0,color=resistance>.8?'#c1533b':'#bc8b4e';
 ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(X,Y);for(let i=1;i<=40;i++){const t=i/40,wiggle=Math.sin(t*Math.PI*12)*Math.sin(t*Math.PI)*Math.min(6,len*.08);ctx.lineTo(X+dx*t-dy/Math.max(1,len)*wiggle,Y+dy*t+dx/Math.max(1,len)*wiggle);}ctx.stroke();ctx.beginPath();ctx.arc(tx,ty,8,0,Math.PI*2);ctx.stroke();
 if(p.C){arrow([X,Y+Math.min(W,H)*.13*zoom],[X+(x-centers[targetIndex].x)/r*(20+65*resistance),Y+Math.min(W,H)*.13*zoom+(y-centers[targetIndex].y)/r*(20+65*resistance)],color);ctx.setLineDash([3,7]);ctx.strokeStyle='#bd725b66';ctx.beginPath();for(let i=0;i<=96;i++){const angle=i*Math.PI/48,point=project(centers[targetIndex].x+limit*Math.cos(angle),centers[targetIndex].y+limit*Math.sin(angle));if(i)ctx.lineTo(...point);else ctx.moveTo(...point);}ctx.stroke();ctx.setLineDash([]);}
-status(!p.C?'Neutron nemá Coulombův odpor.':resistance>.995?'Bariéra: dál tě dostupná energie nepustí.':resistance>.35?'Odpor výrazně roste. Pružná spojnice ukazuje tah myši.':'Táhni blíž k jádru. Odpor při přibližování poroste.');}
+status(!p.C?'Neutron nemá Coulombův odpor.':resistance>.995?'Dosažena mez přiblížení.':resistance>.35?'Odpor roste. Spojnice ukazuje tah.':'Táhni blíž; odpor poroste.');}
  if(mode==='tunnel'&&tunnelTime>=tunnelApproachLength()){const f=tunnelBlend(),dest=tunnelContactPoint();tunnelRibbon(ctx,tunnelVisualPoint(0,f.t),dest,Math.min(W,H)*.11*zoom,f.t);for(const [xx,yy,weight]of [[X,Y,1-f.smooth],[...dest,f.smooth]]){const rad=Math.min(W,H)*.14*zoom,gr=ctx.createRadialGradient(xx,yy,0,xx,yy,rad);gr.addColorStop(0,'rgba(145,130,204,'+(.27*weight*f.shimmer)+')');gr.addColorStop(1,'rgba(145,130,204,0)');ctx.fillStyle=gr;ctx.fillRect(xx-rad,yy-rad,rad*2,rad*2);}}
  ctx.restore();
  const pk=centers.map(targetKind).join(',')+$('projectile').value;if(pk!==lastPair){$('labels').replaceChildren();lastPair=pk;}
@@ -565,20 +588,21 @@ function graphBarrierInterval(total,energy){
  for(let i=1;i<=2400;i++){const q=.3+i*.005,next=total(q)>energy;if(!above&&next&&inner===null)inner=root(previous,q);if(above&&!next&&inner!==null)return {inner,outer:root(previous,q)};previous=q;above=next;}
  return null;
 }
+// Use the same radius range for one through five targets at a given energy.
+function graphRange(pair,energy){const radius=6*Math.max(24,60*1439.96448/Math.max(.001,energy));return Math.max(6,1+Math.log(Math.max(1,radius/pair.R))/1.5);}
 function graph(){
  const snapshot=tunnelGraph||{pair:p,centers,targetIndex,x,y,energy,graphRadius:shot.start*6},gp=snapshot.pair,graphCenters=snapshot.centers,graphTarget=snapshot.targetIndex,graphEnergy=snapshot.energy;
 
  const [w,h]=resize(g,gc),left=60,right=w-25,top=38,bottom=h-42,zero=top+(bottom-top)*.72;
  if(h<100||w<150)return;gc.clearRect(0,0,w,h);
  // Quantified logarithmic radius and linear model graphEnergy; the deep nuclear well is clipped.
- const qMax=Math.max(6,1+Math.log(Math.max(1,snapshot.graphRadius/gp.R))/1.5),sx=q=>left+q/qMax*(right-left),sy=u=>zero-u*(zero-top)/yMax;
+ const qMax=graphRange(gp,graphEnergy),sx=q=>left+q/qMax*(right-left),sy=u=>zero-u*(zero-top)/yMax;
  const {target,distance,qOf,nuclear,repulsion,background,total}=barrierProfile(snapshot);
  const energyUnit=Math.max(1,gp.C/gp.R),tickText=v=>Math.abs(v)>=100?Math.round(v).toString():fmt(v);let peak=.01;for(let i=0;i<=500;i++)peak=Math.max(peak,repulsion(.3+(qMax-.3)*i/500)+nuclear(.3+(qMax-.3)*i/500));const yMax=Math.max(peak,M.thermalMean(Number($('temperature').max))/energyUnit)*1.12;
  for(let i=0;i<=2;i++){const value=yMax*i/2,yy=sy(value);label($('graphLabels'),'ytick'+i,tickText(value*energyUnit),left-30,yy);line(gc,[left-4,yy],[left,yy],'#718280');if(i){gc.setLineDash([2,5]);line(gc,[left,yy],[right,yy],'#dce6e4',.7);gc.setLineDash([]);}}
  const negative=-yMax*(bottom-zero)/(zero-top);label($('graphLabels'),'yneg',tickText(negative*energyUnit),left-30,bottom);
  for(let exponent=0;exponent<=8;exponent++){const r=10**exponent,q=qOf(r),tick=label($('graphLabels'),'xtick'+exponent,String(r),sx(q),bottom+16);tick.hidden=q<0||q>qMax;if(!tick.hidden)line(gc,[sx(q),bottom],[sx(q),bottom+4],'#718280');}
  line(gc,[left,bottom],[right,bottom],'#b8c7c2');
- label($('graphLabels'),'title',fusion?String.raw`\text{Bariéra před reakcí}`:String.raw`\text{Společný potenciál}`,w/2,12);
  label($('graphLabels'),'axisU',String.raw`U/\mathrm{keV}`,left+8,top-16);label($('graphLabels'),'axisR',String.raw`r/\mathrm{fm}`,right-24,bottom+30);
  line(gc,[left,top],[left,bottom],'#718280');line(gc,[left,zero],[right,zero],'#718280');
  gc.save();gc.beginPath();gc.rect(left,top,right-left,bottom-top);gc.clip();gc.fillStyle='#e0eef155';gc.fillRect(left,top,sx(1.4)-left,bottom-top);
@@ -586,7 +610,7 @@ function graph(){
  if(graphCenters.length>1){gc.beginPath();for(let i=0;i<=400;i++){const q=.3+(qMax-.3)*i/400;if(i)gc.lineTo(sx(q),sy(total(q)));else gc.moveTo(sx(q),sy(total(q)));}for(let i=400;i>=0;i--){const q=.3+(qMax-.3)*i/400;gc.lineTo(sx(q),sy(repulsion(q)+nuclear(q)));}gc.closePath();gc.fillStyle='#487eb570';gc.fill();}
  curve(q=>repulsion(q)+nuclear(q),'#a7aaa5',[5,4]);curve(total,'#146e70',[]);
  let overflowStart=null,overflow=false;for(let i=0;i<=501;i++){const q=.3+(qMax-.3)*Math.min(i,500)/500,above=i<=500&&total(q)>yMax;if(above&&overflowStart===null)overflowStart=q;if(!above&&overflowStart!==null){const px=sx((overflowStart+q)/2);line(gc,[px-4,top+7],[px,top+2],'#146e70',1.7);line(gc,[px,top+2],[px+4,top+7],'#146e70',1.7);overflowStart=null;overflow=true;}}
- const graphNote=document.querySelector('.graphNote'),note=overflow?'Pevná osa pro dvojici · vyšší hrbol okolí přesahuje graf ↑':'Pevná osa pro dvojici · vzdálenost logaritmicky';if(graphNote.textContent!==note)graphNote.textContent=note;
+ const graphNote=document.querySelector('.graphNote'),note=overflow?'Pevná osa · log. vzdálenost · přesah ↑':'Pevná osa · logaritmická vzdálenost';if(graphNote.textContent!==note)graphNote.textContent=note;
 
  const energyRatio=gp.C?graphEnergy/(gp.C/gp.R):0,energyY=sy(energyRatio),band=gp.C?graphBarrierInterval(total,energyRatio):null;
  const active=tunnelFrom&&(mode==='tunnel'||mode==='nuclear'||!!fusion),phase=active?Math.max(0,Math.min(1,(tunnelTime-tunnelApproachLength())/(tunnelDuration*.8))):0,tunneled=!!(active&&band&&tunnelTime>=tunnelApproachLength()),entryQ=band?band.outer:qOf(distance),exitQ=band?band.inner:entryQ;
@@ -606,21 +630,20 @@ function graph(){
 
  gc.save();gc.setLineDash([3,5]);line(gc,[mx,bottom],[mx,my],'rgba(190,128,34,.65)',1.1);gc.setLineDash([]);line(gc,[mx,bottom-5],[mx,bottom+1],'#b57825',2);gc.restore();
  gc.beginPath();gc.arc(Math.max(left+6,Math.min(right-6,mx)),Math.max(top+6,Math.min(bottom-6,my)),6,0,Math.PI*2);gc.fillStyle='#efaa3e';gc.fill();gc.strokeStyle='#603e18';gc.stroke();gc.restore();
- label($('graphLabels'),'sum',String.raw`\text{Součet}`,sx(4.7),top+18);
  tex($('surroundingValue'),String.raw`U_{\mathrm{okolí}}=`+(background(q)*energyUnit).toFixed(3).replace('.', '{,}')+String.raw`\,\mathrm{keV}`);
- label($('graphLabels'),'well',String.raw`\text{Jaderná jáma pokračuje dolů}`,sx(3.8),zero+(bottom-zero)*.6).hidden=!gp.C;
+ label($('graphLabels'),'well',String.raw`\text{Potenciálová jáma}`,sx(3.8),zero+(bottom-zero)*.6).hidden=!gp.C;
 
 }
 
 function scientific(n){if(n===0)return p.C?String.raw`\text{pod rozlišením výpočtu}`:'0';if(n>=.001)return fmt(n*100)+'\\,\\%';const e=Math.floor(Math.log10(n));return fmt(n/10**e)+'\\cdot10^{'+e+'}';}
 function ui(){
  updateRareButton();
- $('lesson').textContent=fusion?(fusion.plan?'Vybraný směr odletu; nejde o náhodný vzorek úhlů reakce.':'Vybraný výstupní kanál, nikoli výpočet četnosti reakcí. Směry a rozdělení energie tří produktů jsou názorný příklad se zachováním energie a hybnosti.'):demoActive?'Vybraný úspěšný případ. Pohyb a délka efektu nejsou skutečnou dráhou ani dobou tunelování.':$('interaction').value==='drag'?'Ruční tah vybírá polohy dostupné při zvolené energii; další energii nepřidává. Volný pohyb ukazuje dělo.':'Nižší energie znamená širší bariéru a vzácnější průchod, nikoli ostrý práh. Prostupnost není pravděpodobnost fúze.';tex($('temperatureValue'),'T='+fmt(temperature)+'\\,\\mathrm{MK}');tex($('angleValue'),(angle*180/Math.PI).toFixed(3).replace('.', '{,}')+'^{\\circ}');const pair=null,r=M.nearest(centers,x,y).distance;tex($('distance'),(pair?'r_{\\mathrm{detail}}=':'r=')+fmt(r)+'\\,\\mathrm{fm}');tex($('values'),'\\langle E\\rangle=\\tfrac32 k_B T='+fmt(M.thermalMean(temperature))+'\\,\\mathrm{keV}');delete $('turning').dataset.texValue;delete $('probability').dataset.texValue;const closest=shot.closest;
+ $('lesson').textContent=fusion?(fusion.plan?'Vybraný směr odletu; nejde o náhodný vzorek úhlů reakce.':'Vybraný výstupní kanál, nikoli výpočet četnosti reakcí. Směry a rozdělení energie tří produktů jsou názorný příklad se zachováním energie a hybnosti.'):demoActive?'Vybraný úspěšný případ. Pohyb a délka efektu nejsou skutečnou dráhou ani dobou tunelování.':$('interaction').value==='drag'?'Ruční tah vybírá polohy dostupné při zvolené energii; další energii nepřidává. Volný pohyb ukazuje dělo.':'Nižší energie znamená širší bariéru a vzácnější průchod, nikoli ostrý práh. Prostupnost není pravděpodobnost fúze.';tex($('temperatureValue'),'T='+fmt(temperature)+'\\,\\mathrm{MK}');tex($('angleValue'),(angle*180/Math.PI).toFixed(3).replace('.', '{,}')+'^{\\circ}');const pair=null,r=M.nearest(centers,x,y).distance;tex($('distance'),(pair?'r_{\\mathrm{detail}}=':'r=')+fmt(r)+'\\,\\mathrm{fm}');tex($('values'),'\\langle E\\rangle='+fmt(M.thermalMean(temperature))+'\\,\\mathrm{keV}');delete $('turning').dataset.texValue;delete $('probability').dataset.texValue;$('reactionFormula').hidden=!fusion;const closest=shot.closest;
  if(Number.isFinite(closest)){tex($('turning'),String.raw`r_{\min,\mathrm{klas.}}=`+fmt(Math.max(p.R,closest))+String.raw`\,\mathrm{fm}`);}else{$('turning').textContent='Bod obratu: —';}
- if(probability===null||!Number.isFinite(probability)){$('probability').textContent='Odhad průchodu: přibližte jádra';}
+ if(probability===null||!Number.isFinite(probability)){$('probability').textContent='';}
  else if(centers.length===1&&shot.rmin<=p.R){$('probability').textContent='Klasický průchod';}
  else{tex($('probability'),String.raw`P_{\mathrm{WKB}}\approx `+scientific(probability));}
- tex($('statistics'),'N='+attempts+'\\quad N_{\\mathrm{tunel}}='+passes+'\\quad N_{\\mathrm{klas.}}='+classical);if(fusion){tex($('values'),fusion.reaction.tex);tex($('probability'),'Q='+fmt(fusion.reaction.Q/1000)+String.raw`\,\mathrm{MeV}`);tex($('turning'),fusion.reaction.elastic?String.raw`\text{Pružný rozptyl; bez trvalého sloučení}`:fusion.reaction.weak?String.raw`\text{Vybraná vzácná slabá přeměna}`:String.raw`\text{Vybraný výstupní kanál reakce}`);} graph();}
+ tex($('statistics'),'N='+attempts+'\\quad N_{\\mathrm{tunel}}='+passes+'\\quad N_{\\mathrm{klas.}}='+classical);if(fusion){tex($('reactionFormula'),fusion.reaction.tex);tex($('probability'),'Q='+fmt(fusion.reaction.Q/1000)+String.raw`\,\mathrm{MeV}`);tex($('turning'),fusion.reaction.elastic?String.raw`\text{Pružný rozptyl; bez trvalého sloučení}`:fusion.reaction.weak?String.raw`\text{Vybraná vzácná slabá přeměna}`:String.raw`\text{Vybraný výstupní kanál reakce}`);} graph();}
 
 
 function schematicItems(items){return items.map((item,layoutIndex)=>({...item,layoutIndex}));}
@@ -635,7 +658,7 @@ let uiSince=0;
 function frame(t){const dt=old?Math.min(.05,(t-old)/1000):0;old=t;if(document.hidden){requestAnimationFrame(frame);return;}
  const replaying=replayPlayback(dt);
  if(!paused&&!replaying&&(playbackSpeed>0||mode==='drag'||mode==='recoil'||mode==='free')){if(!reduced.matches)renderTime+=dt*Math.abs(playbackSpeed)/.1;if(fusion){advanceFusion(dt);}else if(mode==='tunnel'){tunnelTime+=dt*Math.max(0,playbackSpeed)/.1;if(tunnelTime>=tunnelApproachLength()&&!tunnelSoundStarted){tunnelSoundStarted=true;playTunnelSound();}if(tunnelTime>=tunnelApproachLength()+tunnelDuration*.8){x=tunnelTo[0];y=tunnelTo[1];vx=vy=0;mode='nuclear';if(activeReaction()&&$('fusionEnabled').checked)beginFusion();else status($('pairPreset').value==='proton|proton'?'Průchod bariérou p–p. Slabou přeměnu potřebnou pro fúzi tento model nepočítá.':batchNote||'Průchod do jaderné oblasti. Fúzi a její produkty přidáme v dalším kroku.');}}
- else if(mode==='recoil'&&recoil){recoil.time+=dt;const f=Math.min(1,recoil.time/.55),ease=1-(1-f)**3,points=recoil.points,index=ease*(points.length-1),i=Math.min(points.length-2,Math.floor(index));if(i>=0){const t=index-i;x=points[i][0]+(points[i+1][0]-points[i][0])*t;y=points[i][1]+(points[i+1][1]-points[i][1])*t;}if(f===1){recoil=null;mode=drag?'drag':'ready';const point=currentGlyphs()[0];if(point.x<35||point.x>W-35||point.y<100||point.y>H-70)fitAllParticles();if($('interaction').value==='gun')armGun(true);else status('Nová hranice přiblížení odpovídá zvolené teplotě.');}}
+ else if(mode==='recoil'&&recoil){recoil.time+=dt;const f=Math.min(1,recoil.time/.55),ease=1-(1-f)**3,points=recoil.points,index=ease*(points.length-1),i=Math.min(points.length-2,Math.floor(index));if(i>=0){const t=index-i;x=points[i][0]+(points[i+1][0]-points[i][0])*t;y=points[i][1]+(points[i+1][1]-points[i][1])*t;}if(f===1){recoil=null;mode=drag?'drag':'ready';const point=currentGlyphs()[0];if(point.x<35||point.x>W-35||point.y<100||point.y>H-70)fitAllParticles();if($('interaction').value==='gun')armGun(true);else status('Mez přiblížení aktualizována.');}}
 
  else if(mode==='drag'&&drag){syncActivePair();const next=manualApproach(dt);x=next.x;y=next.y;targetIndex=M.nearest(centers,x,y).index;updateHum();}
  else if(['flight','free'].includes(mode)){const rate=mode==='free'?shot.start*.025/Math.sqrt(2*M.thermalMean(100)/1.2):playbackRate(),duration=dt*rate/Math.max(1,collisionZoom);flightAccumulator+=duration;let ticks=0;while(flightAccumulator>1e-10&&ticks++<2000&&['flight','free'].includes(mode)){const h=Math.min(shot.dt,flightAccumulator);step(h);flightAccumulator-=h;}if(mode==='flight'||mode==='done'){trail.push(tracePoint([{x,y,kind:$('projectile').value},...centers.map(t=>({x:t.x,y:t.y,kind:targetKind(t)}))]));if(trail.length>1200)trail.shift();}}

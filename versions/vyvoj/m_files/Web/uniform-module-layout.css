@@ -112,3 +112,9 @@ body:has(>main.uniform-module-layout){margin:0!important;padding:0!important}
 #app :is(.modulehead,.module-window-heading):has(>.badge){grid-template-columns:88px auto minmax(0,1fr) auto auto!important}
 #app :is(.modulehead,.module-window-heading):has(>.badge)>.badge{grid-column:4!important;grid-row:1!important;white-space:nowrap}
 #app :is(.modulehead,.module-window-heading):has(>.badge)>.actions{grid-column:5!important;grid-row:1!important}
+
+/* Outer lesson surfaces inherit the area background through transparent frames. */
+html:has(main.uniform-module-layout),body:has(main.uniform-module-layout),main.uniform-module-layout{background:transparent!important}
+
+/* Soft module surface; fusion uses its own framing. */
+html:not(:has(body[data-fusion-page])) body>main,html:not(:has(body[data-fusion-page])) body>.workspace{position:relative;isolation:isolate;background:transparent!important}html:not(:has(body[data-fusion-page])) body>main::before,html:not(:has(body[data-fusion-page])) body>.workspace::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:28px;background:#e9f3ed;mask-image:linear-gradient(to right,transparent,#000 24px,#000 calc(100% - 24px),transparent),linear-gradient(to bottom,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-composite:intersect}

@@ -62,6 +62,12 @@ body.em-lesson:not(.em-inductance):not(.rod-view-active) main.uniform-module-lay
 body.em-lesson:not(.em-inductance):not(.rod-view-active) main.uniform-module-layout .statTitle{margin:4px 0 2px}
 body.rod-view-active main.uniform-module-layout>.motional-rod-panel{flex:1 1 0;height:0;min-height:0;overflow:visible;grid-template-rows:auto auto minmax(0,1fr) minmax(68px,max-content)}
 body.rod-view-active main.uniform-module-layout .rod-details{min-height:0}
+</style><style id="em01-soft-backplate">/* EM01 trial: a soft backplate, without changing content opacity. */
+body:has(#motional-rod-panel) main{position:relative;isolation:isolate}
+body:has(#motional-rod-panel) main::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:28px;background:#e9f3ed;mask-image:linear-gradient(to right,transparent,#000 24px,#000 calc(100% - 24px),transparent),linear-gradient(to bottom,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-composite:intersect}
+</style><style id="em01-separate-cards">
+/* EM01: three distinct cards over the soft outer surface. */
+body:has(#motional-rod-panel) main>.layout{background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible;gap:12px}
 </style><style id="em-refinement">/* Shared readable PowerLab layout for the two induction lessons. */
 .layout{gap:0;border:1px solid #dbe4e1;border-radius:12px;overflow:hidden;background:#fff;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,.95fr)}
 .card{border:0;border-right:1px solid #e1e9e5;border-radius:0;box-shadow:none;min-height:0;padding:16px}.card:last-child{border-right:0}
@@ -266,6 +272,18 @@ body.rod-view-active main.uniform-module-layout .rod-details{min-height:0}
 .rod-view-active .rod-details .rod-status{height:auto;min-height:76px;font-size:12px}
 .rod-view-active .rod-details .rod-note{font-size:12px}
 }
+.rod-view-switch{box-sizing:border-box;padding:8px 16px;flex-wrap:wrap}
+html:has(#motional-rod-panel),body:has(#motional-rod-panel){background:transparent!important}
+body:has(#motional-rod-panel) main{background:transparent!important}
+#rod-scene{touch-action:none;user-select:none;cursor:ew-resize}
+#rod-scene[data-dragging]{cursor:grabbing}
+
+/* EM01 trial: a soft backplate, without changing content opacity. */
+body:has(#motional-rod-panel) main{position:relative;isolation:isolate}
+body:has(#motional-rod-panel) main::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:28px;background:#e9f3ed;mask-image:linear-gradient(to right,transparent,#000 24px,#000 calc(100% - 24px),transparent),linear-gradient(to bottom,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-composite:intersect}
+
+/* EM01: three distinct cards over the soft outer surface. */
+body:has(#motional-rod-panel) main>.layout{background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible;gap:12px}
 </style><!-- motional-rod-style:end --></head><body>
 <main><div class="hero"><div><div class="eyebrow">EM01 · INTERAKTIVNÍ VÝUKOVÝ MODUL</div><h1>Indukované napětí: dvě příčiny změny toku</h1></div><p>Stejná dvojice závitů. Jednou se mění budicí pole, podruhé poloha přijímací cívky.</p></div>
 <div class="toolbar"><div class="tabs"><button class="tab active" data-mode="transform">Transformační napětí</button><button class="tab" data-mode="motion">Pohybové napětí</button><span class="tag">Tok počítaný z B₁</span><button class="tab playbtn" id="play">Ⅱ Pozastavit</button></div>
@@ -531,6 +549,17 @@ function drawCurrentPreview(amplitude,frequency,p){
  svg('text',{x:282,y:h-3,'text-anchor':'middle','font-size':15,fill:'#526e77'},g,mode==='transform'?'Vyšší frekvence → hustší vlny':'Pohybové napětí: budicí proud je konstantní');
 }
 function init(){
+ if(MODULE==='EM01'){
+  const surface=$('scene');let dragging=null;
+  const point=e=>{const m=surface.getScreenCTM();return m?new DOMPoint(e.clientX,e.clientY).matrixTransform(m.inverse()):null};
+  const bearing=p=>Math.atan2(ORY-p.y,p.x-(ORX+SCALE*C.d));
+  surface.style.touchAction='none';surface.style.cursor='grab';
+  const hint=document.createElementNS(NS,'title');hint.textContent='Táhněte cívku kolem jejího středu pro změnu natočení.';surface.prepend(hint);
+  surface.addEventListener('pointerdown',e=>{if(e.button!==0||dragging||mode!=='motion')return;const p=point(e);if(!p)return;const r=Math.hypot(p.x-(ORX+SCALE*C.d),p.y-ORY);if(r<12||r>SCALE*C.r2+40)return;dragging={id:e.pointerId,angle:bearing(p)};run=false;setData('play','▶ Přehrát');surface.setPointerCapture(e.pointerId);surface.style.cursor='grabbing';e.preventDefault()});
+  surface.addEventListener('pointermove',e=>{if(!dragging||dragging.id!==e.pointerId)return;const p=point(e);if(!p)return;const a=bearing(p),delta=Math.atan2(Math.sin(a-dragging.angle),Math.cos(a-dragging.angle));dragging.angle=a;phase=((phase+delta/(2*PI))%1+1)%1;$('phase').value=phase*1000;render()});
+  const stop=e=>{if(!dragging||dragging.id!==e.pointerId)return;dragging=null;surface.style.cursor='grab';if(surface.hasPointerCapture(e.pointerId))surface.releasePointerCapture(e.pointerId)};
+  for(const event of ['pointerup','pointercancel','lostpointercapture'])surface.addEventListener(event,stop);
+ }
  document.body.classList.add('em-lesson');if(MODULE==='EM02')document.body.classList.add('em-inductance');
  if(['EM01','EM02'].includes(MODULE)){mathifyText(document.querySelector('main'));document.querySelectorAll('.control>label').forEach(label=>{const output=label.querySelector('output');if(!output)return;const title=document.createElement('span');for(const child of [...label.childNodes])if(child!==output)title.append(child);label.prepend(title)})}
  if(MODULE==='EM01'){const mid=document.querySelector('main>.layout>.card:nth-child(2)'),tools=document.createElement('div');tools.className='em-graph-tools';mid.querySelector('.chartBox').before(tools);tools.append(mid.querySelector('.presets'),mid.querySelector('.scaleControls'));}
@@ -834,6 +863,15 @@ const details=document.createElement('aside');details.className='rod-details';pa
 details.append(panel.querySelector('.rod-graph'));const note=details.querySelector('p.rod-note');const extra=document.createElement('details');extra.className='rod-explanation';extra.innerHTML='<summary>Podrobnosti pokusu</summary>';const copy=document.createElement('p');copy.textContent=note.textContent.replace(note.querySelector('#rod-force-note').textContent,'').trim();extra.append(copy);while(note.childNodes.length>1)note.lastChild.remove();note.append(document.createTextNode(' '+copy.textContent));
 const statusMessages=['Cívka i pole stojí. Indukované napětí zaniká.','Obě strany jsou blízko uzlů pole. I za pohybu je výsledné napětí malé.','Cívka stojí, pole se posouvá. Měnící se tok vytváří elektrické pole, které přerozděluje náboje. Magnetická síla od pohybu vodiče je nulová.','Vodič se pohybuje v homogenním poli. Magnetická síla přemisťuje elektrony; mezi konci vzniká napětí uᵢ = Blv.'];const status=$('rod-status');status.replaceChildren();statusMessages.forEach(text=>{const ghost=document.createElement('span');ghost.className='rod-status-reserve';ghost.setAttribute('aria-hidden','true');ghost.textContent=text;status.append(ghost)});const statusText=document.createElement('span');statusText.id='rod-status-text';status.append(statusText);
 const movingField=()=>$('rod-motion-mode').value==='field';
+// Map pointer coordinates through the SVG matrix, including host scaling.
+const dragScene=$('rod-scene');let drag=null;
+function pointerPoint(e){const matrix=dragScene.getScreenCTM();return matrix?new DOMPoint(e.clientX,e.clientY).matrixTransform(matrix.inverse()):null}
+dragScene.addEventListener('pointerdown',e=>{if(e.button!==0||drag)return;const p=pointerPoint(e);if(!p)return;const fieldMode=movingField();if(!fieldMode&&(Math.abs(p.x-(240+420*x))>35||p.y<90||p.y>380))return;drag={id:e.pointerId,start:p.x,value:fieldMode?+$('rod-field-speed').value:+slider.value,fieldMode};dragScene.setPointerCapture(e.pointerId);dragScene.dataset.dragging='';e.preventDefault()});
+dragScene.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;const p=pointerPoint(e);if(!p)return;const control=drag.fieldMode?$('rod-field-speed'):slider;const value=drag.value+(p.x-drag.start)/420*(drag.fieldMode?.4:100);const step=+control.step;control.value=String(Math.max(+control.min,Math.min(+control.max,Math.round(value/step)*step)));control.dispatchEvent(new Event('input',{bubbles:true}));draw()});
+function endDrag(e){if(!drag||drag.id!==e.pointerId)return;drag=null;delete dragScene.dataset.dragging;if(dragScene.hasPointerCapture(e.pointerId))dragScene.releasePointerCapture(e.pointerId)}
+for(const type of ['pointerup','pointercancel','lostpointercapture'])dragScene.addEventListener(type,endDrag);
+// The scene redraws its children; keep the instruction on the stable SVG itself.
+dragScene.setAttribute('aria-label','Táhněte vodič pro změnu polohy; v režimu pohyblivého pole táhněte vodorovně pro změnu jeho rychlosti.');
 function sample(){const shift=movingField()?fieldPhase:0,left=movingField()?280:240+420*x,right=movingField()?left+320:left;return {left,right,bL:movingField()?field(left-shift):B,bR:movingField()?field(right-shift):0,shift}}
 function relativeSpeed(){return movingField()?-v:v}
 function draw(){const uniform=panel.closest('main').classList.contains('uniform-module-layout'),parentOffset=uniform?0:window.frameElement?window.frameElement.getBoundingClientRect().top+parent.scrollY:0,viewport=uniform?(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--module-host-height'))||1000):window.frameElement?parent.innerHeight:innerHeight,top=panel.getBoundingClientRect().top+scrollY;panel.style.setProperty('--rod-available',Math.max(400,viewport-parentOffset-top-90)+'px');meterRange=movingField()?.115:.12;B=+$('rod-induction').value;math('rod-induction-out',fmt(B)+'\\,\\mathrm T');math('rod-field-speed-out',fmt(+$('rod-field-speed').value)+'\\,\\mathrm{m/s}');const {left,right,bL,bR,shift:fieldShift}=sample(),cx=(left+right)/2,mx=movingField()?cx:cx+140,emf=L*relativeSpeed()*(bL-bR);u=qL-qR;const blend=0;

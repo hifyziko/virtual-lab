@@ -51,7 +51,7 @@ Závazné zadání vycházející z odsouhlasených úprav projektu. Platí pro 
 - Ovladače seskupit přehledně, případně jemně barevně odlišit. Skrýt parametry, které pro zvolenou geometrii nedávají smysl.
 - Reset či „Srovnat“ musí srovnat všechny příslušné parametry skupiny, včetně amplitud i fázových posunů, pokud je skupina obsahuje.
 - Nenabízet přehrávání tam, kde nepomáhá vysvětlení. U zkratového proudu ponechat ruční časový odečet bez tlačítka Přehrát.
-- Oznámení o změně rozsahu ukázat dočasně přímo u grafu, bez dialogu a bez posunutí rozložení. Použít jemné meruňkové pozadí a tmavší oranžový text.
+- Automatické vyskakovací oznámení zobrazit jen při blokaci, kterou student musí znát pro pokračování. Běžné informace patří pouze do existujícího místa v levém panelu, pokud se tam celé vejdou. Jinak se vůbec nezobrazí; bez posuvníku, zkrácené náhrady, překrytí grafu nebo změny rozložení. To platí i pro oznámení o změně rozsahu.
 - Číslovat moduly od 01 samostatně v každé sekci a řadit je podle návaznosti výkladu.
 
 ## 6. Aktuální uspořádání zkratového proudu

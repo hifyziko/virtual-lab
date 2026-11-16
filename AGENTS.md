@@ -1,5 +1,7 @@
 # Uživatelské konvence pro výukovou grafiku
 
+- Automatická vyskakovací hlášení používat jen pro blokace, o kterých student musí vědět, aby mohl pokračovat. Běžné stavové a výukové zprávy nepřekrývají scénu. Pokud se celá zpráva nevejde do stávajícího místa v levém panelu, vůbec ji tam nezobrazovat; nepřidávat posuvník, zkrácenou náhradu ani nezvětšovat panel. Výslovně otevřený výklad není automatické stavové hlášení.
+
 - Komplexní veličiny sázet v KaTeXu s pruhem nahoře (`\overline{...}`), nikoli podtržením. Skalární velikosti nemají pruh.
 - Ve fázorových diagramech je reálná osa svislá, imaginární vodorovná. Zachovat orientaci násobení j; v aktuálním modulu je kladná reálná osa nahoru a kladná imaginární doleva.
 - Ve fázorovém diagramu náhradního schématu synchronního stroje leží na kladné reálné ose svorkové napětí Ua (výslovná úprava uživatele). Vnitřní napětí Ui odpovídá uzlu mezi reakcí kotvy a rozptylovou reaktancí s odporem; obecně neleží na reálné ose. Budicí napětí značit Uib, ne Ef. Rozlišovat svorkové U a vnitřní Ui.

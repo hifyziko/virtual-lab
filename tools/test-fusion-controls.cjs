@@ -29,7 +29,7 @@ function fixture(fit=1){
   // Reproduce busy UI states with a real saved shot, without simulating minutes
   // of slowed playback or needing a GPU. This hook is never shipped.
   if(file==='barrier/app.js')source=source.replace('reset();requestAnimationFrame(frame);',
-   "window.testFit=fitAllParticles;window.testReadouts=()=>{graph=()=>{};ui();};window.testBusy=phase=>{mode=phase;fusion=['compound','products'].includes(phase)?{phase}:null;x=0;y=0;updateRareButton();};reset();requestAnimationFrame(frame);");
+   "window.testSurface=factor=>{scale*=factor;prepareSurface();updateRareButton();};window.testStatus=status;window.testFitStatus=fitStatus;window.testGraphRange=()=>graphRange(p,energy);window.testFit=fitAllParticles;window.testReadouts=()=>{graph=()=>{};ui();};window.testBusy=phase=>{mode=phase;fusion=['compound','products'].includes(phase)?{phase}:null;x=0;y=0;updateRareButton();};reset();requestAnimationFrame(frame);");
   vm.runInContext(source,c,{filename:file});
  }
  return {c,get,state:()=>c.coulombState(),drain(){let steps=0;while(callbacks.length){assert(++steps<20000,'Preparation must finish');callbacks.shift()();}return steps;}};
@@ -83,4 +83,28 @@ for(const fit of [.65,1,1.5]){
 }
 console.log('PASS: stable initial/resize/fullscreen fit, scaled pointer hits, asynchronous preparation, unchanged heading, launch, cancellation and p-p actions. DOM/canvas mocked; no browser opened.');
 
-{const f=fixture();f.c.testReadouts();assert.equal(f.get('turning').textContent,'Bod obratu: —');assert.equal(f.get('probability').textContent,'Odhad průchodu: přibližte jádra');}
+{const f=fixture();f.c.testReadouts();assert.equal(f.get('turning').textContent,'Bod obratu: —');assert.equal(f.get('probability').textContent,'');assert(!f.get('values').dataset.texValue.includes('k_B'));assert(f.get('values').dataset.texValue.includes('12{,}9')); }
+
+{const f=fixture(),range=f.c.testGraphRange();for(const count of [1,5,2,4,3]){f.get("targetCount").value=String(count);f.get("targetCount").onchange();assert.equal(f.c.testGraphRange(),range,"Graph range must not jump when target count changes");f.c.testReadouts();}}
+
+// Routine messages never open an overlay, and must fit the reserved slot in full.
+{
+ const f=fixture(),node=f.get('status'),message='Produkty reakce: zachování energie, náboje a hybnosti; směry jsou vybraný názorný případ.';
+ node.clientWidth=180;node.clientHeight=32;
+ Object.defineProperty(node,'scrollHeight',{get:()=>Math.ceil(node.textContent.length/28)*16});
+ Object.defineProperty(node,'scrollWidth',{configurable:true,get:()=>node.clientWidth});
+ f.c.testStatus(message);assert(f.get('statusPopup').hidden);assert(f.get('statusDetails').hidden);assert.equal(node.textContent,'','Do not abbreviate or scroll an overflowing message');
+ f.get('statusDetails').onclick();assert(f.get('statusPopup').hidden,'Routine text cannot be reopened over the scene');
+ f.c.testStatus('Táhni částici k jádru.');assert.equal(node.textContent,'Táhni částici k jádru.');assert(f.get('statusPopup').hidden);
+ node.clientHeight=0;f.c.testFitStatus();assert.equal(node.textContent,'','No room means no text');
+ node.clientHeight=32;f.c.testFitStatus();assert.equal(node.textContent,'Táhni částici k jádru.','Resize restores text when it fits');
+ Object.defineProperty(node,'scrollWidth',{get:()=>node.clientWidth+8});f.c.testFitStatus();assert.equal(node.textContent,'','Horizontal overflow is also omitted');
+ f.c.testStatus(message,true);assert(!f.get('statusPopup').hidden);assert(!f.get('statusDetails').hidden);assert.equal(f.get('statusPopupText').textContent,message);assert.equal(node.textContent,'');
+ f.get('statusClose').onclick();f.c.testStatus(message,true);assert(f.get('statusPopup').hidden,'Dismissed blockers must not reopen on repeat');
+ f.get('statusDetails').onclick();assert(!f.get('statusPopup').hidden);
+ f.c.testStatus('Pokus připraven.');assert(f.get('statusPopup').hidden);assert(f.get('statusDetails').hidden);assert.equal(f.get('statusPopupText').textContent,'');
+}
+
+
+{const f=fixture();f.get('showRare').onclick();f.drain();f.get('home').onclick();assert.equal(f.state().shot.canLaunch,true,'Returning in gun mode must arm the new shot');assert(!f.get('launch').disabled);f.get('launch').onclick();assert.equal(f.state().mode,'flight');}
+{const f=fixture();f.get('showRare').onclick();f.drain();f.c.testSurface(.000001);assert.equal(f.state().shot.canLaunch,false);assert(f.get('launch').disabled);f.get('launch').onclick();assert(!f.get('statusPopup').hidden,'A blocked launch must explain how to continue');f.c.testSurface(1000000);assert.equal(f.state().shot.canLaunch,true,'Zoom-related overlap must not permanently latch launch off');assert(!f.get('launch').disabled);f.get('launch').onclick();assert.equal(f.state().mode,'flight');}

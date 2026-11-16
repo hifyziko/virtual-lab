@@ -393,6 +393,17 @@ function drawCurrentPreview(amplitude,frequency,p){
  svg('text',{x:282,y:h-3,'text-anchor':'middle','font-size':15,fill:'#526e77'},g,mode==='transform'?'Vyšší frekvence → hustší vlny':'Pohybové napětí: budicí proud je konstantní');
 }
 function init(){
+ if(MODULE==='EM01'){
+  const surface=$('scene');let dragging=null;
+  const point=e=>{const m=surface.getScreenCTM();return m?new DOMPoint(e.clientX,e.clientY).matrixTransform(m.inverse()):null};
+  const bearing=p=>Math.atan2(ORY-p.y,p.x-(ORX+SCALE*C.d));
+  surface.style.touchAction='none';surface.style.cursor='grab';
+  const hint=document.createElementNS(NS,'title');hint.textContent='Táhněte cívku kolem jejího středu pro změnu natočení.';surface.prepend(hint);
+  surface.addEventListener('pointerdown',e=>{if(e.button!==0||dragging||mode!=='motion')return;const p=point(e);if(!p)return;const r=Math.hypot(p.x-(ORX+SCALE*C.d),p.y-ORY);if(r<12||r>SCALE*C.r2+40)return;dragging={id:e.pointerId,angle:bearing(p)};run=false;setData('play','▶ Přehrát');surface.setPointerCapture(e.pointerId);surface.style.cursor='grabbing';e.preventDefault()});
+  surface.addEventListener('pointermove',e=>{if(!dragging||dragging.id!==e.pointerId)return;const p=point(e);if(!p)return;const a=bearing(p),delta=Math.atan2(Math.sin(a-dragging.angle),Math.cos(a-dragging.angle));dragging.angle=a;phase=((phase+delta/(2*PI))%1+1)%1;$('phase').value=phase*1000;render()});
+  const stop=e=>{if(!dragging||dragging.id!==e.pointerId)return;dragging=null;surface.style.cursor='grab';if(surface.hasPointerCapture(e.pointerId))surface.releasePointerCapture(e.pointerId)};
+  for(const event of ['pointerup','pointercancel','lostpointercapture'])surface.addEventListener(event,stop);
+ }
  document.body.classList.add('em-lesson');if(MODULE==='EM02')document.body.classList.add('em-inductance');
  if(['EM01','EM02'].includes(MODULE)){mathifyText(document.querySelector('main'));document.querySelectorAll('.control>label').forEach(label=>{const output=label.querySelector('output');if(!output)return;const title=document.createElement('span');for(const child of [...label.childNodes])if(child!==output)title.append(child);label.prepend(title)})}
  if(MODULE==='EM01'){const mid=document.querySelector('main>.layout>.card:nth-child(2)'),tools=document.createElement('div');tools.className='em-graph-tools';mid.querySelector('.chartBox').before(tools);tools.append(mid.querySelector('.presets'),mid.querySelector('.scaleControls'));}

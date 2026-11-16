@@ -1,5 +1,34 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — ověřeno pro výslovně požadovaný push
+
+Úplné sestavení build-release úspěšně dokončeno; dřívější chyba Missing
+home group anchor se v aktuálním zdroji již neobjevila. Lokální Windows
+zápisy vyžadovaly existující dočasný retry preload, který není součástí webu.
+Obě dodávky znovu sestaveny ze zdrojů, bez ruční obnovy manifestů.
+Projektové testy a kontrola veřejných souborů prošly. Součástí změn jsou
+stromová navigace, jemné podklady, opravy a grafika fúze, ovládání indukce
+a zesílené zvuky s novým jiskřením. Níže jsou historické průběžné poznámky.
+
+
+## 16. listopadu 2026 — vyskakovací hlášení jen při blokaci (místní, bez pushe)
+
+Na pokyn uživatele statusPopup ve fúzním experimentu nezobrazuje běžné informace
+o letu, průchodu, produktech či dokončení, ani když jsou dlouhé. Zobrazí se jen
+u výslovně označené blokace (např. nepřípustný výstřel, chybějící projektil,
+selhání přípravy nebo zastavený výpočet) s vysvětlením dalšího postupu.
+Tlačítko Blokace umožní po zavření znovu přečíst pouze tuto blokující zprávu.
+Běžná zpráva v levém panelu se zobrazí celá, jen pokud se skutečně vejde do
+vyhrazeného místa podle scrollWidth/Height a clientWidth/Height. Jinak zůstane
+místo prázdné, bez zkrácení, posuvníku nebo přerozdělení rozměrů. Při změně
+velikosti se kontrola opakuje. Záznam přehrávání uchovává i druh zprávy.
+
+Pravidlo je uložené v kořenovém AGENTS.md a versions/PRAVIDLA_LADENI_MODULU.md.
+Test ovládání pokrývá běžné dlouhé zprávy, oba směry přetečení, nulové místo,
+opětovné zobrazení po zvětšení i otevření/zavření blokace. Modelové a přehrávací
+kontroly z test-fusion-visual-contract.cjs prošly. Vzhled nebyl ověřen prohlížečem.
+Souběžné úpravy fúze a dalších modulů se zachovávají.
+
 ## 16. listopadu 2026 — stručné průvodce modulů podle literatury (místní, bez pushe)
 
 Upřesnění uživatele: v nápovědě necitovat jeho prezentace ani pracovní název
@@ -29,7 +58,6 @@ všech 57 dialogů. Pracovní DOM při otevření a zavření zůstává shodný
 se neotevíral, překryvy a čitelnost nejsou vizuálně ověřené. Souběžné změny
 fúzního modulu v jiném chatu se zachovávají a nejsou součástí této úpravy.
 
-
 ## 16. listopadu 2026 — více prostoru pro graf (místní úprava)
 
 Předchozí stav 853c2a5 byl na výslovný pokyn odeslán a nasazen.
@@ -40,6 +68,8 @@ hodnota okolí je v legendě po najetí nebo zaměření klávesnicí.
 Nevypočtený bod obratu ukazuje pomlčku místo NaN. Počet jader je opět
 přímo v hlavním panelu pod tlačítky. Obě dodávky aktualni přestavěny.
 Vizuální kontrola v prohlížeči neproběhla.
+Nabídka Nastavení je na přání uživatele přejmenovaná na Ovládání a návod.
+Z uživatelského návodu odstraněna věta Podklad s odkazem na učebnici, oddíly a strany.
 
 
 ## 16. listopadu 2026 — stabilní graf a jednodušší ovládání fúze (bez dalšího pushe)
@@ -484,3 +514,150 @@ Nový tools/test-tunneling-wave.cjs ověřuje R+T=1 (max chyba cca 8,9e-16), kon
 Doplnění k úpravě grafu 16. 11.: na přání uživatele odstraněna tlačítka
 Rozmístit znovu, Obnovit pohled a Výchozí stav z Nastavení. Celá obrazovka
 je vpravo v hlavičce a používá sdílený handler fusion/navigation/page.js.
+
+Další zhutnění ovládání podle snímku uživatele: horní řádek 180 místo 220 px,
+popisky dvojice a větve vedle výběru, kratší potvrzení přípravy a p–p volby.
+Delší stavové zprávy se posouvají ve vyhrazeném prostoru a nemění graf.
+Ušetřených 40 logických pixelů dostává graf. Bez pushe.
+
+Název Potenciálová bariéra a stručná poznámka k osám jsou v jediném řádku;
+uvolněnou výšku využívá graf. Poznámka nadále upozorňuje na přesah křivky.
+
+Průběžné pokyny k tažení, míření, přípravě a změně teploty textově zkráceny,
+například „Táhni částici k jádru.“ Delší fyzikální vysvětlení zůstávají v návodu.
+
+Popisek v grafu opraven na „Potenciálová jáma“; návod vysvětluje původ
+v přitažlivé složce silné interakce. Fyzikální výpočet beze změny.
+
+Na přání uživatele odstraněn popisek „Součet“ uvnitř grafu bariéry.
+
+Odstraněn i vnitřní titulek „Společný potenciál“ (při reakci „Bariéra před reakcí“); hlavní nadpis grafu zůstává.
+
+Údaje pod grafem: jeden pevný řádek 40 místo 72 px, pouze střední energie
+a dostupný WKB odhad (při reakci Q). Matematické písmo zvětšeno o 50 %.
+Bod obratu a rovnice reakce přesunuty do Ovládání a návod.
+Rozsah vzdáleností v grafu již nezávisí na počtu jader ani velikosti scény;
+používá společný rozsah pro 1–5 cílů při dané energii a dvojici.
+
+Ostrost fúzní scény: 2D a WebGL buffer sleduje fyzické rozlišení displeje
+(DPR do 2, limit 8 milionů pixelů), nikoli pevný limit násobku logické plochy.
+Worker kreslí siločáry do plátna v rozlišení scény, zachovává všechny body
+křivek a mapu počítá v šířce 384–768 místo 192. Vyšší krytí barev a tmavší
+siločáry; fyzikální paleta i modely zachované. Delší zprávy nad 70 znaků
+mají stručný stav a zavíratelnou bublinu ve scéně; lze ji znovu otevřít přes
+Podrobnosti. Stejná zavřená zpráva se opakováním neotevírá. Bez pushe.
+
+Odezva pole: při pohybu se barevná mapa počítá v šířce 256 bodů a nové
+polohy se odesílají od 16 ms místo 40 ms. Po 100 ms klidu se automaticky
+dopočítá plná kvalita 384–768. Siločáry zůstávají v plném rozlišení.
+Výpočet intenzity používá ekvivalentní vzdálenost na druhou a odmocninu.
+
+Sjednocení vrstev při pohybu: rychlý náhled pole se počítá synchronně
+z aktuálních souřadnic částic, zpřesnění po zastavení zůstává ve workeru.
+Číslo požadavku brání přepsání novějšího pole opožděnou odpovědí.
+Relativní barevná škála nyní zohledňuje zoom stejně jako projekce poloh.
+Náhled mapy má během pohybu 128 bodů, siločáry zůstávají v rozlišení canvasu.
+
+Siločáry zjemněny: tloušťka 0,45/0,65 místo 0,8/1,1 logického pixelu,
+stejně v hlavním i záložním rendereru; kontrast zachován.
+
+Oprava nečinného zeleného Vystřelit: home v režimu děla novou částici
+řádně připraví přes armGun. Dostupnost výstřelu zohledňuje canLaunch;
+překrytí značek při zoomu už není trvale zaklapnutá blokace. Každý přepočet
+povrchů stav obnoví a zoom jej provádí i po předchozím zákazu. Neplatný
+výstřel hlásí důvod. Regresní testy: návrat → výstřel, zablokování zoomem
+→ obnovení → výstřel; prošly. Přesný stav uživatelovy relace neověřen.
+
+## 16. listopadu 2026 — indukované napětí: odsazení a přímé tažení (bez pushe)
+
+Popisek Pohybové napětí má vodorovné odsazení; vnější pozadí modulu je
+průhledné, aby navazovalo na okolní stránku bez barevného podkladu.
+V homogenním poli lze uchopit vodič a táhnout jej; ovládá stejnou cílovou
+polohu jako posuvník a zachovává původní dynamiku. V režimu pohyblivého
+pole vodorovný tah mění rychlost pole včetně znaménka, synchronně s
+posuvníkem. Cívku lze v režimu otáčení táhnout kolem středu; ruční změna
+úhlu pozastaví přehrávání stejně jako posuvník fáze. Souřadnice respektují
+SVG transformaci i měřítko hostitele, tah končí také při pointercancel.
+Zdroje: em-core/motional-rod.css, motional-rod.js a ui.js.
+Kontroly obsluh tažení v Node VM prošly (měřítko, meze, obrácení rychlosti,
+zrušení tahu, přechod úhlu přes nulu); model, renderer a opakované škálování
+prošly. Vizuální kontrola v prohlížeči neproběhla. Sestavení používá místní
+dočasné opakování zápisu kvůli již známému zamykání velkého HTML.
+
+Obnova dostupnosti: nalezen částečný web bez registrace fúze a bez progressive
+manifestu. Obě dodávky znovu doplněny fúzí a lazy balíčky; navigační test
+a progressive testy obou dodávek prošly. Kořenový manifest obnoven
+z vložené instalace loaderu a SHA-256 ověřených balíčků; originalBytes zde
+představuje rekonstruovaný součet shellu a balíčků, ne původní monolit.
+Úplný build-release nad aktuálním zdrojem selhal v direct-current/integrate.cjs
+na Missing home group anchor; tato samostatná chyba sestavení zůstává.
+Žádný push. Prohlížeč neotevírán.
+
+Sjednocení vnějších podkladů všech modulů dle opravy indukovaného napětí:
+společný host a tělo vložených lekcí mají průhledné pozadí bez zeleného
+obdélníku s ostrými rohy. Sdílená prezentační vrstva pokrývá i starší
+vložené lekce, uniform-module-layout a fúzní stránky také samostatné otevření.
+Vnitřní karty, grafy a fyzikální barevné mapy zůstávají zachované.
+Dokončení: obě aktuální dodávky přestavěny; kontrola progressive payloadů,
+hashů a navigace prošla. Ověřena přítomnost všech tří úprav v lazy EM01.
+Celý project/check.cjs se zastavil na nesouvisejícím testu
+ test-fusion-visual-contract.cjs:83 — maketa statusu nemá dataset.fullText
+vyžadovaný souběžně změněným fúzním app.js. Tento test ani fúzní zdroje
+nebyly v této úpravě měněny. Audit veřejných souborů prošel. Bez pushe.
+
+Zkouška pouze EM01: světle zelená vrstva pod hlavním modulem, rohy 28 px
+a vytracení okrajů 24 px. Obsah bez změny průhlednosti. Ostatní moduly
+zůstávají průhledné. Obě lazy dodávky aktualizované. Bez pushe.
+
+EM01: společný obal tří hlavních karet je průhledný, bez rámečku a stínu,
+mezery mezi kartami 12 px. Bílé karty mají vlastní původní okraje.
+Obě aktuální dodávky včetně lazy hashů aktualizované, bez pushe.
+
+Schválený jemný zelený podklad EM01 rozšířen na všechny výukové moduly
+kromě fúze: nativní workspaces a vložené lekce, rohy 28 px, vytracení 24 px.
+Fúzní stránky s data-fusion-page a fusion-module-host výslovně vyloučeny.
+Vnitřní karty a vědecké plochy zachované. Bez pushe.
+
+Zkušební strom navigace: ?navigation=tree před hashem zapíná tlačítko
+Moduly vlevo, výsuvný dialog s hledáním bez diakritiky, skupinami a aktivním
+modulem. Používá katalog a existující hash odkazy, bez přednačítání lekcí.
+Výchozí navigace beze změny, první varianta bez připnutí. Současně odstraněn
+duplicitní podklad hostitelského workspace s iframe; podklad vlastní lekce.
+Bez vizuálního ověření a bez pushe.
+
+Zkušební navigace je nyní v modulech zapnutá při běžném otevření; uživatel
+předchozí variantu za parametrem neviděl. Pro srovnání lze vypnout pomocí
+?navigation=classic. Tlačítko Moduly vlevo. Bez pushe.
+
+Při stromové navigaci skryty odkazy a.back v hlavičkách nativních i
+vložených modulů. Klasická varianta je zachovává. Bez pushe.
+
+Uživatel navigaci hledal na index.html# (rozcestník). Moduly jsou proto
+trvale viditelné i na rozcestníku, bez parametrů. Strom obsahuje Rozcestník.
+Odkazy a.back skryté vždy v hostiteli i vložených lekcích. Bez pushe.
+
+Navigační tlačítko Moduly zvětšené na nejméně 142 × 50 CSS px, písmo 18 px,
+bílý text na tmavě zeleném podkladu. Umístění vlevo nahoře; nezávislé
+na měřítku modulů. Na úzkém displeji 120 × 46 px. Bez pushe.
+
+Upřesnění uživatele: původní tlačítko Zpět v hlavičkách modulů zachovat.
+Odstraněna pravidla, která je skrývala v nativních i vložených modulech.
+Strom Moduly zůstává doplňkovou navigací. Bez pushe.
+
+Na žádost uživatele zesílen společný MachineSound: jiskření 0,065 → 0,13,
+spínání 0,025 → 0,05 a skluz 0,09 → 0,18 (přibližně +6 dB amplitudy).
+Zdroj i obě aktuální dodávky aktualizovány; bez pushe.
+
+Ve stromové navigaci zvýrazněn horní odkaz Hlavní rozcestník (#),
+který vrací na nejvyšší úroveň laboratoře. Bez pushe.
+
+BLDC: společný zvuk switch při změně sektoru zesílen z 0,05 na 0,10
+(dalších přibližně +6 dB). Platí pro oba BLDC moduly. Bez pushe.
+
+Další zesílení zvuků strojů na přání uživatele: jiskření 0,26, spínání
+0,20, skluz 0,36; všechny přibližně +6 dB proti předchozímu stavu. Bez pushe.
+
+Jiskření přepracováno: 180 ms série nepravidelných krátkých mikrooblouků
+s tichým syčením, odfiltrování basů pod přibližně 1 kHz a zjemnění nejvyšších
+frekvencí. Hladký začátek/konec, zachována hlasitost 0,26 a vypínání zvuku.
+Spínání BLDC a skluz beze změny. Bez pushe.

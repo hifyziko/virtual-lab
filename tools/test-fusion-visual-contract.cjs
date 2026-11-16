@@ -75,7 +75,7 @@ console.log('PASS: scene tunnel entry matches graph U=E with neighbours; quantum
 // Reversible playback restores recorded states and interpolates only positions
 // within a phase. It must never integrate the physical equations backwards.
 {
- const start=source.indexOf('let playbackFrames='),end=source.indexOf('let tunnelGraph=null',start),element={textContent:'recording',hidden:false,replaceChildren(){}};
+ const start=source.indexOf('let playbackFrames='),end=source.indexOf('let tunnelGraph=null',start),element={textContent:'recording',dataset:{},hidden:false,replaceChildren(){}};
  const context={$:()=>element,stopSound(){},showReactionEnergy(){},status(){},playbackSpeed:1,paused:false,manualDisplay:false,lastPair:'',fieldKey:''};
  for(const name of 'x y vx vy renderTime tunnelTime dtLocalEnergy probability attempts passes classical flightAccumulator targetIndex'.split(' '))context[name]=0;
  for(const name of 'tunnelFrom tunnelTo tunnelDisplayFrom tunnelApproachFrom tunnelGraph tunnelGlyphs tunnelSoundStarted chosenOutcome demoActive demoPending rareEncounter fusion cell'.split(' '))context[name]=null;

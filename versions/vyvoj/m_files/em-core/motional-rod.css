@@ -94,3 +94,15 @@
 .rod-view-active .rod-details .rod-status{height:auto;min-height:76px;font-size:12px}
 .rod-view-active .rod-details .rod-note{font-size:12px}
 }
+.rod-view-switch{box-sizing:border-box;padding:8px 16px;flex-wrap:wrap}
+html:has(#motional-rod-panel),body:has(#motional-rod-panel){background:transparent!important}
+body:has(#motional-rod-panel) main{background:transparent!important}
+#rod-scene{touch-action:none;user-select:none;cursor:ew-resize}
+#rod-scene[data-dragging]{cursor:grabbing}
+
+/* EM01 trial: a soft backplate, without changing content opacity. */
+body:has(#motional-rod-panel) main{position:relative;isolation:isolate}
+body:has(#motional-rod-panel) main::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:28px;background:#e9f3ed;mask-image:linear-gradient(to right,transparent,#000 24px,#000 calc(100% - 24px),transparent),linear-gradient(to bottom,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-composite:intersect}
+
+/* EM01: three distinct cards over the soft outer surface. */
+body:has(#motional-rod-panel) main>.layout{background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible;gap:12px}

@@ -81,3 +81,6 @@ body.fusion-gallery{margin:0;font-size:17px;line-height:1.4}
 @media(max-width:600px){
  .fusion-gallery[data-mode=all] .views{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr))}
 }
+
+/* Outer page backplate follows the host; scientific scene backgrounds stay local. */
+html:has(body[data-fusion-page]),body[data-fusion-page],body[data-fusion-page] main{background:transparent!important}

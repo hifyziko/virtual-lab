@@ -72,14 +72,14 @@ body[data-fusion-page="fu01-reakce"] main{position:fixed;left:50%;top:8px;width:
 body[data-fusion-page="fu01-reakce"] .modulehead{flex-wrap:nowrap;padding:4px 0 8px;gap:12px}
 body[data-fusion-page="fu01-reakce"] .modulehead h1{font-size:22px}
 body[data-fusion-page="fu01-reakce"] .labLayout{grid-template-columns:480px minmax(0,1fr);gap:12px}
-body[data-fusion-page="fu01-reakce"] .controlRail{font-size:14px;padding:10px;gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:220px minmax(0,1fr)}
+body[data-fusion-page="fu01-reakce"] .controlRail{font-size:14px;padding:10px;gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:180px minmax(0,1fr)}
 body[data-fusion-page="fu01-reakce"] .controlRail .controls{gap:6px;font-size:1em}
 body[data-fusion-page="fu01-reakce"] .choiceGroup legend{margin-bottom:3px}
 body[data-fusion-page="fu01-reakce"] .choiceGroup label{padding:3px}
 body[data-fusion-page="fu01-reakce"] .controlRail .actions{padding:0 0 0 10px;gap:5px}
 body[data-fusion-page="fu01-reakce"] .controlRail .actions button{font-size:1em;padding:5px 4px}
 body[data-fusion-page="fu01-reakce"] .controlRail .actions>label{padding:3px 1px}
-body[data-fusion-page="fu01-reakce"] .analysisRail{grid-template-rows:minmax(0,1fr) 72px;gap:6px}
+body[data-fusion-page="fu01-reakce"] .analysisRail{grid-template-rows:minmax(0,1fr) 40px;gap:6px}
 body[data-fusion-page="fu01-reakce"] .graphCard{padding:8px 5px 6px}
 body[data-fusion-page="fu01-reakce"] .graphCard h2{font-size:1em}
 body[data-fusion-page="fu01-reakce"] .graphNote{display:block;margin:2px 0 3px}
@@ -118,3 +118,27 @@ body[data-fusion-page="fu01-reakce"] .advancedControls .aimControl input{grid-co
 body[data-fusion-page="fu01-reakce"] .controlRail .actions{grid-template-rows:auto auto auto minmax(0,1fr)}
 body[data-fusion-page="fu01-reakce"] .actions .countControl{grid-column:1/-1;grid-row:3}
 body[data-fusion-page="fu01-reakce"] .actions #status{grid-row:4}
+
+/* Compact controls leave the saved height to the graph in every reaction mode. */
+body[data-fusion-page="fu01-reakce"] .controls>label:has(select){flex-direction:row;align-items:center;gap:6px}
+body[data-fusion-page="fu01-reakce"] .controls>label>select{min-width:0;flex:1;width:0}
+body[data-fusion-page="fu01-reakce"] .actions #status{align-self:stretch;min-height:0;overflow:auto;padding:2px 0;line-height:1.3}
+
+body[data-fusion-page="fu01-reakce"] .graphHeading{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex:none}
+body[data-fusion-page="fu01-reakce"] .graphHeading h2{white-space:nowrap;font-size:14px}
+body[data-fusion-page="fu01-reakce"] .graphHeading .graphNote{margin:0;white-space:nowrap;font-size:10px}
+
+/* One fixed-height readout row, independent of target count or probability. */
+body[data-fusion-page="fu01-reakce"] .explain{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;min-width:0;white-space:nowrap}
+body[data-fusion-page="fu01-reakce"] .explain .katex{font-size:1.5em}
+body[data-fusion-page="fu01-reakce"] #probability{min-width:0}
+
+body[data-fusion-page="fu01-reakce"] .actions .statusRow{grid-column:1/-1;grid-row:4;min-height:0;display:flex;align-items:start;gap:6px;overflow:auto}
+body[data-fusion-page="fu01-reakce"] .statusRow #status{flex:1}
+body[data-fusion-page="fu01-reakce"] .statusRow #statusDetails{font-size:11px;padding:3px}
+.statusPopup{position:absolute;z-index:6;right:12px;top:90px;width:320px;max-width:calc(100% - 24px);padding:12px 36px 12px 14px;border:1px solid #b9a4ce;border-radius:10px;background:#fff;box-shadow:0 4px 18px #243f4930;font-size:14px;line-height:1.45}
+.statusPopup p{margin:0}.statusPopup button{position:absolute;right:5px;top:4px;border:0;padding:2px 6px;font-size:20px}
+
+/* Status text must fit the existing rail slot; it cannot expand or scroll it. */
+body[data-fusion-page="fu01-reakce"] .actions .statusRow{overflow:hidden}
+body[data-fusion-page="fu01-reakce"] .statusRow #status{min-width:0;min-height:0;max-height:100%;overflow:hidden;overflow-wrap:anywhere}
