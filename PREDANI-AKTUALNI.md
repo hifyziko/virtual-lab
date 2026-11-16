@@ -1,5 +1,22 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — stabilní graf a jednodušší ovládání fúze (bez dalšího pushe)
+
+Po nasazení f6700e1 uživatel upřesnil, že příprava přidává ovládání děla
+a zmenšuje graf. Horní ovládací řádek má nyní stálých 220 logických pixelů,
+údaje pod grafem 100; ani změna režimu, větve či délky stavové zprávy
+nepřerozděluje plochu grafu. Stavová zpráva je u akčních tlačítek, mimo graf.
+Vystřelit má trvale stejné místo; v ručním režimu je neaktivní.
+
+Na přání uživatele jsou přepínače Pole a Siločáry v řádku s názvem.
+Zvuk, počet jader, styl siločar, přesný náměr a volba navazující reakce jsou
+v Nastavení. V hlavním panelu zůstávají režim, dvojice/větev, teplota
+a příprava/výstřel/návrat. Všechny původní funkce a jejich ID zůstávají.
+Obě dodávky aktualni včetně lazy balíčků aktualizované; projektové testy
+prošly. Regresní test ověřuje stálou přítomnost tlačítka a správné povolení
+výstřelu. Skutečný obraz prohlížeče nebyl vizuálně zkontrolován.
+Předchozí push byl dokončen a nasazen; tato další úprava je pouze místní.
+
 ## 16. listopadu 2026 — malý displej a příprava fúzního pokusu (bez pushe)
 
 Uživatel hlásil překrývání panelů hlavního fúzního experimentu na menším

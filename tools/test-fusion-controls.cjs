@@ -47,9 +47,12 @@ function fixture(fit=1){
 }
 for(const fit of [.65,1,1.5]){
  const f=fixture(fit),before=f.state();assert(!f.get('showRare').disabled);
+ assert.equal(f.get('launch').hidden,false,'Launch keeps its place before preparing');
+ assert.equal(f.get('launch').disabled,true,'Manual mode cannot accidentally launch');
  f.get('showRare').onclick();assert(f.state().preparing);assert(!f.state().demoPending);assert(f.get('launch').disabled);
  assert.match(f.get('status').textContent,/Hledám/);assert(f.drain()>1,'Search must yield to the UI');
  const ready=f.state();assert(ready.demoPending);assert(!ready.preparing);assert(!f.get('launch').disabled);
+ assert.equal(f.get('launch').hidden,false,'Preparing must not insert a new row of controls');
  // Golden result from the published synchronous solver, same seed and scene.
  assert(Math.abs(ready.gunHeading-3.141354888440202)<1e-10);assert.equal(ready.targetIndex,0);
  assert.deepEqual(JSON.parse(JSON.stringify(ready.centers.map(t=>[t.x,t.y]))),JSON.parse(JSON.stringify(before.centers.map(t=>[t.x,t.y]))));

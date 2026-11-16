@@ -72,14 +72,14 @@ body[data-fusion-page="fu01-reakce"] main{position:fixed;left:50%;top:8px;width:
 body[data-fusion-page="fu01-reakce"] .modulehead{flex-wrap:nowrap;padding:4px 0 8px;gap:12px}
 body[data-fusion-page="fu01-reakce"] .modulehead h1{font-size:22px}
 body[data-fusion-page="fu01-reakce"] .labLayout{grid-template-columns:480px minmax(0,1fr);gap:12px}
-body[data-fusion-page="fu01-reakce"] .controlRail{font-size:14px;padding:10px;gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+body[data-fusion-page="fu01-reakce"] .controlRail{font-size:14px;padding:10px;gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:220px minmax(0,1fr)}
 body[data-fusion-page="fu01-reakce"] .controlRail .controls{gap:6px;font-size:1em}
 body[data-fusion-page="fu01-reakce"] .choiceGroup legend{margin-bottom:3px}
 body[data-fusion-page="fu01-reakce"] .choiceGroup label{padding:3px}
 body[data-fusion-page="fu01-reakce"] .controlRail .actions{padding:0 0 0 10px;gap:5px}
 body[data-fusion-page="fu01-reakce"] .controlRail .actions button{font-size:1em;padding:5px 4px}
 body[data-fusion-page="fu01-reakce"] .controlRail .actions>label{padding:3px 1px}
-body[data-fusion-page="fu01-reakce"] .analysisRail{grid-template-rows:minmax(0,1fr) auto;gap:6px}
+body[data-fusion-page="fu01-reakce"] .analysisRail{grid-template-rows:minmax(0,1fr) 100px;gap:6px}
 body[data-fusion-page="fu01-reakce"] .graphCard{padding:8px 5px 6px}
 body[data-fusion-page="fu01-reakce"] .graphCard h2{font-size:1em}
 body[data-fusion-page="fu01-reakce"] .graphNote{display:block;margin:2px 0 3px}
@@ -98,3 +98,14 @@ body[data-fusion-page="fu01-reakce"] .sceneBottom>span:first-child{display:flex}
 body[data-fusion-page="fu01-reakce"] .controlRail label.energy{display:block}
 body[data-fusion-page="fu01-reakce"] .controlRail .energy output{float:right}
 body[data-fusion-page="fu01-reakce"] .controlRail .energy input{display:block;margin:4px 0 0}
+
+/* The graph has a reserved area; controls and messages cannot resize it. */
+body[data-fusion-page="fu01-reakce"] .headerOption{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:14px}
+body[data-fusion-page="fu01-reakce"] .controlRail .actions{grid-template-rows:auto auto minmax(0,1fr);align-content:start;align-items:start}
+body[data-fusion-page="fu01-reakce"] .controlRail #showRare,body[data-fusion-page="fu01-reakce"] .controlRail #ppActions{grid-row:1;order:0}
+body[data-fusion-page="fu01-reakce"] .controlRail #launch,body[data-fusion-page="fu01-reakce"] .controlRail #home{grid-row:2;order:0}
+body[data-fusion-page="fu01-reakce"] .actions #status{grid-column:1/-1;grid-row:3;font-size:12px;line-height:1.4;align-self:start;padding:6px 0}
+body[data-fusion-page="fu01-reakce"] .advancedControls{display:grid;gap:12px;border-bottom:1px solid #dce5de;padding-bottom:12px}
+body[data-fusion-page="fu01-reakce"] .advancedControls .choiceGroup label{display:flex;align-items:center;justify-content:center;gap:4px}
+body[data-fusion-page="fu01-reakce"] .advancedControls .aimControl{display:grid;grid-template-columns:1fr auto;gap:4px}
+body[data-fusion-page="fu01-reakce"] .advancedControls .aimControl input{grid-column:1/-1;width:100%}
