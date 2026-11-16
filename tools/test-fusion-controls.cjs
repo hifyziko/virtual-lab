@@ -29,7 +29,7 @@ function fixture(fit=1){
   // Reproduce busy UI states with a real saved shot, without simulating minutes
   // of slowed playback or needing a GPU. This hook is never shipped.
   if(file==='barrier/app.js')source=source.replace('reset();requestAnimationFrame(frame);',
-   "window.testBusy=phase=>{mode=phase;fusion=['compound','products'].includes(phase)?{phase}:null;x=0;y=0;updateRareButton();};reset();requestAnimationFrame(frame);");
+   "window.testFit=fitAllParticles;window.testReadouts=()=>{graph=()=>{};ui();};window.testBusy=phase=>{mode=phase;fusion=['compound','products'].includes(phase)?{phase}:null;x=0;y=0;updateRareButton();};reset();requestAnimationFrame(frame);");
   vm.runInContext(source,c,{filename:file});
  }
  return {c,get,state:()=>c.coulombState(),drain(){let steps=0;while(callbacks.length){assert(++steps<20000,'Preparation must finish');callbacks.shift()();}return steps;}};
@@ -77,8 +77,10 @@ for(const phase of ['tunnel','compound','products','recoil']){
 }
 // Pointer hit testing uses logical canvas coordinates at every layout scale.
 for(const fit of [.65,1,1.5]){
- const f=fixture(fit);f.get('viewReset').onclick();const q=f.c.coulombProjectilePoint();
+ const f=fixture(fit);f.c.testFit();const q=f.c.coulombProjectilePoint();
  f.get('scene').onpointerdown({clientX:20+q[0]*fit,clientY:30+q[1]*fit,button:0,pointerId:1,isPrimary:true,preventDefault(){}});
  assert.equal(f.state().activePointer,1);assert.equal(f.state().mode,'drag');
 }
 console.log('PASS: stable initial/resize/fullscreen fit, scaled pointer hits, asynchronous preparation, unchanged heading, launch, cancellation and p-p actions. DOM/canvas mocked; no browser opened.');
+
+{const f=fixture();f.c.testReadouts();assert.equal(f.get('turning').textContent,'Bod obratu: —');assert.equal(f.get('probability').textContent,'Odhad průchodu: přibližte jádra');}

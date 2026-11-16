@@ -1,5 +1,17 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — více prostoru pro graf (místní úprava)
+
+Předchozí stav 853c2a5 byl na výslovný pokyn odeslán a nasazen.
+Tato úprava zatím odeslána není. Spodní údaje zabírají 72 místo 100 px,
+graf má spodní okraj 42 místo 75 px. Trvalé E/Uc a U okolí odstraněny;
+hodnota okolí je v legendě po najetí nebo zaměření klávesnicí.
+Český popisek odhadu je běžný text, bez sazby diakritiky přes KaTeX.
+Nevypočtený bod obratu ukazuje pomlčku místo NaN. Počet jader je opět
+přímo v hlavním panelu pod tlačítky. Obě dodávky aktualni přestavěny.
+Vizuální kontrola v prohlížeči neproběhla.
+
+
 ## 16. listopadu 2026 — stabilní graf a jednodušší ovládání fúze (bez dalšího pushe)
 
 Po nasazení f6700e1 uživatel upřesnil, že příprava přidává ovládání děla
@@ -438,3 +450,7 @@ Nový tools/test-tunneling-wave.cjs ověřuje R+T=1 (max chyba cca 8,9e-16), kon
 
 15. 11. 2026 — Doplněny okamžité rychlosti produktů pod jejich energetické popisky, v km/s s oddělenými tisíci. Používají přímo relativistickou rychlost z hybnosti solveru (v/c × 299792,458 km/s), nezávislou na posuvníku přehrávání. Foton a nehmotná aproximace neutrina mají také označení c; vysvětlení vztažné soustavy a aproximace je v titulku popisku. Údaje zůstávají i u označení mimo záběr a při přehrávání záznamu. Ověřena numerická konverze a skutečné vykreslení dvouřádkového zápisu KaTeXem pro klidovou, hmotnou a nehmotnou částici; navigace prošla, obě dodávky aktualizovány.
 15. 11. 2026 — Okamžitá rychlost v km/s doplněna také k vystřelenému jádru během letu (i při přehrávání záznamu). Vychází z vx/vy vstupního solveru s převodem jeho jednotek, nezávisí na časovém posuvníku. Při tunelové ilustraci a ručním tahu se skryje; při fúzi ji nahradí údaje produktů. Popisek zůstává u okraje i mimo záběr. Převod jednotek a regresní testy prošly, obě dodávky přestavěny.
+
+Doplnění k úpravě grafu 16. 11.: na přání uživatele odstraněna tlačítka
+Rozmístit znovu, Obnovit pohled a Výchozí stav z Nastavení. Celá obrazovka
+je vpravo v hlavičce a používá sdílený handler fusion/navigation/page.js.

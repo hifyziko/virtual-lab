@@ -248,11 +248,10 @@ function updateEnergy(){manualAnchor=null;
 $('temperature').oninput=updateEnergy;
 document.querySelector('.settingsPanel').addEventListener('pointerdown',event=>{if(event.target.closest('#angle,[name="countChoice"],#fusionEnabled'))resetAfterFusion(true);},true);
 document.querySelector('.controlRail').addEventListener('pointerdown',event=>{if(event.target.closest('button,input,select')&&!event.target.closest('#sound'))resetAfterFusion(true);},true);
-$('shuffle').onclick=()=>{layoutSeed=(Math.random()*4294967296)>>>0;zoom=1;panX=panY=0;home();};
 $('pairPreset').onchange=()=>{const [target,projectile]=$('pairPreset').value.split('|');$('target').value=target;$('projectile').value=projectile;pair();};
 function snapAngle(degrees){return Math.round((((degrees+180)%360+360)%360-180)*1000)/1000;}
 $('angle').oninput=()=>{angle=snapAngle(+$('angle').value)*Math.PI/180;$('angle').value=angle*180/Math.PI;clearStats();armGun(false);};
-$('target').onchange=$('projectile').onchange=$('targetCount').onchange=pair;$('reset').onclick=reset;$('home').onclick=()=>{batchNote='';home();};$('interaction').onchange=()=>{resetAfterFusion(true);if($('interaction').value==='gun'){if($('projectile').value!==preferredProjectile()){const index=centers.findIndex(t=>targetKind(t)===preferredProjectile());if(index>=0)selectNucleus(index);}armGun(true);}else{resetManualSpeed();release();clearEncounter();vx=vy=0;centers.forEach(t=>{t.vx=t.vy=0;});mode='ready';updateMode();}};
+$('target').onchange=$('projectile').onchange=$('targetCount').onchange=pair;$('home').onclick=()=>{batchNote='';home();};$('interaction').onchange=()=>{resetAfterFusion(true);if($('interaction').value==='gun'){if($('projectile').value!==preferredProjectile()){const index=centers.findIndex(t=>targetKind(t)===preferredProjectile());if(index>=0)selectNucleus(index);}armGun(true);}else{resetManualSpeed();release();clearEncounter();vx=vy=0;centers.forEach(t=>{t.vx=t.vy=0;});mode='ready';updateMode();}};
 $('quantum').onchange=()=>{clearStats();if($('interaction').value==='gun')armGun(mode!=='ready');else home();};
 function launch(outcome=null){
  if(preparationJob){status('Hledám vhodný směr. Počkej na dokončení přípravy, nebo ji zruš.');return;}
@@ -262,7 +261,6 @@ function launch(outcome=null){
  lastShotSetup={x:shot.x,y:shot.y,kind:$('projectile').value,heading:gunHeading,angle,centers:centers.map(t=>({...t})),cell:{...cell},shot:{...shot,centers:undefined}};unlockSound();unpause();demoActive=demoPending;demoPending=false;chosenOutcome=outcome;({x,y,vx,vy}=shot);flightAccumulator=0;trail=[];tried=new Set();mode='flight';beginRecording();status(demoActive?(activeReaction()?.noBarrier?'PŘIPRAVENÁ SRÁŽKA · neutron nemá Coulombovu bariéru.':'UKÁZKA VZÁCNÉHO STŘETU · přiblížení, tunelování a zvolená reakce.'):'Běžný výstřel: částice sleduje vypočtenou dráhu.');
 }
 $('launch').onclick=()=>{batchNote='';launch();};
-$('full').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{});};
 function syncView(){const rect=c.getBoundingClientRect();W=c.clientWidth||rect.width;H=c.clientHeight||rect.height;view();}
 function baseView(){const points=layoutPoints.length?layoutPoints:[...centers,{x:shot.start,y:0}],minX=Math.min(...points.map(p=>p.x)),maxX=Math.max(...points.map(p=>p.x)),minY=Math.min(...points.map(p=>p.y)),maxY=Math.max(...points.map(p=>p.y)),padding=Math.max(35,Math.min(W,H)*.22),width=Math.max(1,W-padding*2),height=Math.max(1,H-110-padding*2),base=Math.min(width/Math.max(shot.start*.5,maxX-minX),height/Math.max(shot.start*.55,maxY-minY));scale=Math.max(.00001,base)*zoom;ox=W/2-(minX+maxX)/2*scale+panX*W;oy=65+padding+height/2-(minY+maxY)/2*scale+panY*H;}
 function fitAllParticles(){
@@ -275,7 +273,6 @@ function fitAllParticles(){
 }
 function fusionWarp(){if(!fusion)return 1;if(fusion.phase!=='compound')return 0;const u=Math.min(1,fusion.time/.65);return 1-u*u*(3-2*u);}
 function view(){baseView();collisionZoom=1;collisionFocus=null;if($('cameraScale'))$('cameraScale').hidden=true;}
-$('viewReset').onclick=fitAllParticles;
 c.closest('.scene').addEventListener('wheel',e=>{e.preventDefault();syncView();if(!W||!H)return;const [px,py]=canvasPoint(e),[wx,wy]=unproject(px,py),delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?H:1);zoom=Math.max(.08,Math.min(40,zoom*Math.exp(-delta*.0015)));view();const anchor=project(wx,wy);panX+=(px-anchor[0])/W;panY+=(py-anchor[1])/H;view();if(drag&&lastPointer){const q=position(lastPointer);drag=[q[0]-grabOffset[0],q[1]-grabOffset[1]];}fieldKey='';if($('interaction').value==='gun'&&mode==='ready'&&!fusion&&playbackCursor===null&&shot.canLaunch!==false)refreshPreview();},{passive:false});
 function canvasPoint(e){const r=c.getBoundingClientRect();return [(e.clientX-r.left)*(c.clientWidth||r.width)/r.width,(e.clientY-r.top)*(c.clientHeight||r.height)/r.height];}
 function position(e){syncView();return unproject(...canvasPoint(e));}
@@ -571,7 +568,7 @@ function graphBarrierInterval(total,energy){
 function graph(){
  const snapshot=tunnelGraph||{pair:p,centers,targetIndex,x,y,energy,graphRadius:shot.start*6},gp=snapshot.pair,graphCenters=snapshot.centers,graphTarget=snapshot.targetIndex,graphEnergy=snapshot.energy;
 
- const [w,h]=resize(g,gc),left=60,right=w-25,top=38,bottom=h-75,zero=top+(bottom-top)*.72;
+ const [w,h]=resize(g,gc),left=60,right=w-25,top=38,bottom=h-42,zero=top+(bottom-top)*.72;
  if(h<100||w<150)return;gc.clearRect(0,0,w,h);
  // Quantified logarithmic radius and linear model graphEnergy; the deep nuclear well is clipped.
  const qMax=Math.max(6,1+Math.log(Math.max(1,snapshot.graphRadius/gp.R))/1.5),sx=q=>left+q/qMax*(right-left),sy=u=>zero-u*(zero-top)/yMax;
@@ -582,7 +579,7 @@ function graph(){
  for(let exponent=0;exponent<=8;exponent++){const r=10**exponent,q=qOf(r),tick=label($('graphLabels'),'xtick'+exponent,String(r),sx(q),bottom+16);tick.hidden=q<0||q>qMax;if(!tick.hidden)line(gc,[sx(q),bottom],[sx(q),bottom+4],'#718280');}
  line(gc,[left,bottom],[right,bottom],'#b8c7c2');
  label($('graphLabels'),'title',fusion?String.raw`\text{Bariéra před reakcí}`:String.raw`\text{Společný potenciál}`,w/2,12);
- label($('graphLabels'),'axisU',String.raw`U/\mathrm{keV}`,left+8,top-16);label($('graphLabels'),'axisR',String.raw`r/\mathrm{fm}`,right-24,bottom+35);
+ label($('graphLabels'),'axisU',String.raw`U/\mathrm{keV}`,left+8,top-16);label($('graphLabels'),'axisR',String.raw`r/\mathrm{fm}`,right-24,bottom+30);
  line(gc,[left,top],[left,bottom],'#718280');line(gc,[left,zero],[right,zero],'#718280');
  gc.save();gc.beginPath();gc.rect(left,top,right-left,bottom-top);gc.clip();gc.fillStyle='#e0eef155';gc.fillRect(left,top,sx(1.4)-left,bottom-top);
  const curve=(fn,color,dash)=>{gc.beginPath();for(let i=0;i<=500;i++){const q=.3+(qMax-.3)*i/500;if(i)gc.lineTo(sx(q),sy(fn(q)));else gc.moveTo(sx(q),sy(fn(q)));}gc.strokeStyle=color;gc.lineWidth=2;gc.setLineDash(dash);gc.stroke();gc.setLineDash([]);};
@@ -610,15 +607,20 @@ function graph(){
  gc.save();gc.setLineDash([3,5]);line(gc,[mx,bottom],[mx,my],'rgba(190,128,34,.65)',1.1);gc.setLineDash([]);line(gc,[mx,bottom-5],[mx,bottom+1],'#b57825',2);gc.restore();
  gc.beginPath();gc.arc(Math.max(left+6,Math.min(right-6,mx)),Math.max(top+6,Math.min(bottom-6,my)),6,0,Math.PI*2);gc.fillStyle='#efaa3e';gc.fill();gc.strokeStyle='#603e18';gc.stroke();gc.restore();
  label($('graphLabels'),'sum',String.raw`\text{Součet}`,sx(4.7),top+18);
- const others=label($('graphLabels'),'others',String.raw`U_{\mathrm{okolí}}=`+(background(q)*energyUnit).toFixed(3).replace('.', '{,}')+String.raw`\,\mathrm{keV}`,w/2,h-15);others.style.color='#285c9a';others.title='Příspěvek ostatních cílových jader k potenciální energii v poloze markeru; je zahrnut v celkové křivce.';
+ tex($('surroundingValue'),String.raw`U_{\mathrm{okolí}}=`+(background(q)*energyUnit).toFixed(3).replace('.', '{,}')+String.raw`\,\mathrm{keV}`);
  label($('graphLabels'),'well',String.raw`\text{Jaderná jáma pokračuje dolů}`,sx(3.8),zero+(bottom-zero)*.6).hidden=!gp.C;
- label($('graphLabels'),'readout',gp.C?'E/U_C(R)='+fmt(100*graphEnergy/(gp.C/gp.R))+'\\,\\%':String.raw`\text{Neutron nemá Coulombovu bariéru}`,w/2,h-38);
+
 }
 
 function scientific(n){if(n===0)return p.C?String.raw`\text{pod rozlišením výpočtu}`:'0';if(n>=.001)return fmt(n*100)+'\\,\\%';const e=Math.floor(Math.log10(n));return fmt(n/10**e)+'\\cdot10^{'+e+'}';}
 function ui(){
  updateRareButton();
- $('lesson').textContent=fusion?(fusion.plan?'Vybraný směr odletu; nejde o náhodný vzorek úhlů reakce.':'Vybraný výstupní kanál, nikoli výpočet četnosti reakcí. Směry a rozdělení energie tří produktů jsou názorný příklad se zachováním energie a hybnosti.'):demoActive?'Vybraný úspěšný případ. Pohyb a délka efektu nejsou skutečnou dráhou ani dobou tunelování.':$('interaction').value==='drag'?'Ruční tah vybírá polohy dostupné při zvolené energii; další energii nepřidává. Volný pohyb ukazuje dělo.':'Nižší energie znamená širší bariéru a vzácnější průchod, nikoli ostrý práh. Prostupnost není pravděpodobnost fúze.';tex($('temperatureValue'),'T='+fmt(temperature)+'\\,\\mathrm{MK}');tex($('angleValue'),(angle*180/Math.PI).toFixed(3).replace('.', '{,}')+'^{\\circ}');const pair=null,r=M.nearest(centers,x,y).distance;tex($('distance'),(pair?'r_{\\mathrm{detail}}=':'r=')+fmt(r)+'\\,\\mathrm{fm}');tex($('values'),'\\langle E\\rangle=\\tfrac32 k_B T='+fmt(M.thermalMean(temperature))+'\\,\\mathrm{keV}');tex($('turning'),'r_{\\min,\\,klas.}='+fmt(Math.max(p.R,shot.closest))+'\\,\\mathrm{fm}');tex($('probability'),centers.length>1?(probability===null?String.raw`\text{Odhad průchodu po přiblížení}`:String.raw`\text{Lokální WKB odhad: }`+scientific(probability)):shot.rmin<=p.R?'\\text{Klasický přístup bez tunelování}':'P_{\\mathrm{WKB}}\\approx '+scientific(probability));tex($('statistics'),'N='+attempts+'\\quad N_{\\mathrm{tunel}}='+passes+'\\quad N_{\\mathrm{klas.}}='+classical);if(fusion){tex($('values'),fusion.reaction.tex);tex($('probability'),'Q='+fmt(fusion.reaction.Q/1000)+String.raw`\,\mathrm{MeV}`);tex($('turning'),fusion.reaction.elastic?String.raw`\text{Pružný rozptyl; bez trvalého sloučení}`:fusion.reaction.weak?String.raw`\text{Vybraná vzácná slabá přeměna}`:String.raw`\text{Vybraný výstupní kanál reakce}`);} graph();}
+ $('lesson').textContent=fusion?(fusion.plan?'Vybraný směr odletu; nejde o náhodný vzorek úhlů reakce.':'Vybraný výstupní kanál, nikoli výpočet četnosti reakcí. Směry a rozdělení energie tří produktů jsou názorný příklad se zachováním energie a hybnosti.'):demoActive?'Vybraný úspěšný případ. Pohyb a délka efektu nejsou skutečnou dráhou ani dobou tunelování.':$('interaction').value==='drag'?'Ruční tah vybírá polohy dostupné při zvolené energii; další energii nepřidává. Volný pohyb ukazuje dělo.':'Nižší energie znamená širší bariéru a vzácnější průchod, nikoli ostrý práh. Prostupnost není pravděpodobnost fúze.';tex($('temperatureValue'),'T='+fmt(temperature)+'\\,\\mathrm{MK}');tex($('angleValue'),(angle*180/Math.PI).toFixed(3).replace('.', '{,}')+'^{\\circ}');const pair=null,r=M.nearest(centers,x,y).distance;tex($('distance'),(pair?'r_{\\mathrm{detail}}=':'r=')+fmt(r)+'\\,\\mathrm{fm}');tex($('values'),'\\langle E\\rangle=\\tfrac32 k_B T='+fmt(M.thermalMean(temperature))+'\\,\\mathrm{keV}');delete $('turning').dataset.texValue;delete $('probability').dataset.texValue;const closest=shot.closest;
+ if(Number.isFinite(closest)){tex($('turning'),String.raw`r_{\min,\mathrm{klas.}}=`+fmt(Math.max(p.R,closest))+String.raw`\,\mathrm{fm}`);}else{$('turning').textContent='Bod obratu: —';}
+ if(probability===null||!Number.isFinite(probability)){$('probability').textContent='Odhad průchodu: přibližte jádra';}
+ else if(centers.length===1&&shot.rmin<=p.R){$('probability').textContent='Klasický průchod';}
+ else{tex($('probability'),String.raw`P_{\mathrm{WKB}}\approx `+scientific(probability));}
+ tex($('statistics'),'N='+attempts+'\\quad N_{\\mathrm{tunel}}='+passes+'\\quad N_{\\mathrm{klas.}}='+classical);if(fusion){tex($('values'),fusion.reaction.tex);tex($('probability'),'Q='+fmt(fusion.reaction.Q/1000)+String.raw`\,\mathrm{MeV}`);tex($('turning'),fusion.reaction.elastic?String.raw`\text{Pružný rozptyl; bez trvalého sloučení}`:fusion.reaction.weak?String.raw`\text{Vybraná vzácná slabá přeměna}`:String.raw`\text{Vybraný výstupní kanál reakce}`);} graph();}
 
 
 function schematicItems(items){return items.map((item,layoutIndex)=>({...item,layoutIndex}));}
