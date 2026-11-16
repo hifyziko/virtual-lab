@@ -1,5 +1,29 @@
 # Aktuální stav předání
 
+## 16. listopadu 2026 — obrázek podle vybraného vozidla (místní, bez pushe)
+
+Modul 08-vozidla místo jedné společné karoserie kreslí pět původních
+schematických siluet podle předvolby: Tesla Model 3, Škoda Enyaq, BMW i4,
+VW ID.4 a Hyundai Ioniq 6. Liší se obrysem střechy a karoserie, okny,
+proporcemi, barvou a drobnými detaily. Volba Vlastní parametry používá
+neutrální siluetu. Nejde o rozměrové výkresy ani převzaté fotografie.
+Není doložený rok původní Tesly; tato nejistota parametrů zůstává zachovaná.
+
+Renderer vehicle-art.js se vkládá přes Web/build-vehicle.cjs před vlastní
+vehicle-module.js. Silueta používá stejnou rotaci na svahu jako silové šipky
+a původní plochu grafu. Výběr mění také přístupný popis canvasu. Nezměnily
+se parametry předvoleb, fyzikální model, osy, rozvržení ani ovladače.
+
+Vzhled byl porovnán s veřejnými podklady výrobců (jen jako vizuální reference):
+Tesla konfigurátor SIDE; Škoda Enyaq 2025 technický list; BMW i4 2022 prospekt;
+VW ID.4 tiskový materiál k designu; Hyundai původní Ioniq 6, design 2022.
+Vektorový porovnávací náhled byl zkontrolován jako PNG bez prohlížeče.
+Test tools/test-vehicle-art.cjs ověřuje šest různých kreseb, konečné souřadnice
+a meze stávající plochy při sklonech ±20 %, návaznost výběru i vlastních
+parametrů a nezměněné vstupy fyziky. Test je součástí project/check.cjs.
+Souběžné úpravy rozcestníku a jiných modulů se zachovávají.
+
+
 ## 16. listopadu 2026 — posouvání návodu ve fúzi (místní, bez pushe)
 
 Panel Ovládání a návod měl neomezenou výšku a dlouhý výklad přesahoval
