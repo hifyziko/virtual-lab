@@ -1,6 +1,6 @@
 .field-presentation{margin-top:8px;padding:8px 11px}.field-display-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px}.field-display-head strong{font-weight:600;color:#007e6c}.field-display-head label{display:flex;gap:7px;align-items:center;font-size:12px;white-space:nowrap}.field-display-head select{width:auto;margin:0;padding:3px 7px;font-size:12px}.field-presentation details{border:0;margin-top:3px;background:transparent}.field-presentation summary{padding:4px 0;font-size:12px}.field-presentation details p{font-size:12px;margin:4px 0 0;color:#60747b}.realistic-machine .numerical-flux path{stroke-linejoin:round}.machine{height:clamp(280px,calc(var(--window-height,100dvh) - 490px),650px)}.field-presentation [hidden],.switches label[hidden]{display:none!important}.legend>[data-rotor-field-legend]{transition:none}.relative-note{min-height:36px}@media(max-width:850px){.machine{height:320px}.field-display-head{align-items:flex-start;flex-wrap:wrap}}@media(max-width:600px){.field-display-head{gap:5px}.machine{height:320px}.field-presentation summary{font-size:12px;line-height:1.4}}
 
-.support #fieldExplanation{margin:10px;border:1px solid #d9e2e1;border-radius:8px;background:#f7faf8}.support #fieldExplanation p{padding:0 10px 10px;font-size:12px;color:#60747b}
+
 
 .switches #numericalSourceLabel{display:inline-flex;gap:6px;align-items:center}.switches #numericalSource{display:inline-block;width:auto;margin:0;padding:3px 6px;font-size:12px}.switches{align-items:center}
 

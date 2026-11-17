@@ -111,15 +111,16 @@ function sourceNode(tag,title,{classes=[],interactive=false}={}){
  };
  return n;
 }
+const fieldNote=sourceNode('details','Reálnější zobrazení · vypočtené pole');
 const theory=sourceNode('details','Jak číst graf a co model zahrnuje');
 const learning=sourceNode('details','Proč jedna drážková rozteč nestačí?',{classes:['.learning-explanation']});
 const controls=sourceNode('details','Pokročilé nastavení',{interactive:true});
 const positions=sourceNode('details','Přesné polohy vodičů',{classes:['.precisePositions']});
 const live=sourceNode('details','Lorentzova síla',{interactive:true});
 const modal=sourceNode('dialog','Od sil k momentu');
-const root={ownerDocument:c.document,isConnected:true,querySelector:()=>null,querySelectorAll:()=>[theory,learning,controls,positions,live,modal]};
+const root={ownerDocument:c.document,isConnected:true,querySelector:()=>null,querySelectorAll:()=>[theory,learning,controls,positions,live,modal,fieldNote]};
 c.location.hash='#dc02-kotva';c.ModuleGuide.collect(root);
-for(const n of [theory,learning,modal])assert.equal(n.style.display,'none','theory removed from scene flow');
+for(const n of [theory,learning,modal,fieldNote])assert.equal(n.style.display,'none','theory removed from scene flow');
 for(const n of [controls,positions,live])assert.equal(n.style.display,undefined,'interactive/settings/scene content retained');
 c.ModuleGuide.collect(root);assert.equal(theory.style.writes,1,'repeated fitting does not keep mutating layout');
 theory.value='current snapshot 17';c.ModuleGuide.open();
@@ -183,3 +184,5 @@ dialog.events.click({target:{closest:selector=>selector==='[data-guide-target]'?
 assert(scrolled&&dialog.open);assert.equal(c.location.hash,'#tr01-matematicky','contents must not navigate away from the running lesson');
 guideContent.querySelectorAll=oldQuery;
 console.log('PASS: study contents lists chapters and scrolls within the dialog without routing or closing the lesson.');
+
+for(const file of ['princip-template.html','princip.html']){const source=fs.readFileSync('versions/vyvoj/m_files/Web/induction/'+file,'utf8');assert(!source.includes('fieldExplanation'),'Redundant field accordion removed');assert(source.includes('id="showNumericalField"'),'Numerical field toggle retained');}

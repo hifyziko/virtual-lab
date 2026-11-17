@@ -1,8 +1,25 @@
 # Aktuální stav předání
 
+## Oprava načítání a využití plochy — 17. listopadu 2026
+
+Helicita dříve načítala všech 18 datových souborů (284 MB); veřejný výběr
+navíc neobsahoval části 15–17, takže načítání končilo chybou. Sestavení nyní
+beze změny vzorků rozděluje původní bázi do 62 balíčků podle poloměru a režimu.
+První helikální pokus načítá jen 5,4 MB, další balíčky až podle volby.
+Plynulé přechody připraví potřebné poloměry před animací; nepočítají trajektorie.
+Mapu odrazu připravuje přehrávač pouze pro zobrazovaný stav, cache má limit.
+Test helicity ověřuje úplný veřejný výběr, shodu všech vzorků a opakování po chybě.
+
+Odstraněn redundantní pruh „Reálnější zobrazení · vypočtené pole“ u principu AM;
+přepínač vypočteného pole zůstává. Společný dialog přebírá i obdobné textové pruhy.
+Oba řezy principu AM využívají celou zbývající výšku; starý limit výšky scény
+a závislost na skrytém panelu výkladu byly odstraněny. Uživatel výslovně schválil
+push a nový soukromý ZIP po kontrole. Přesný commit a stav odeslání uvádí
+`_handoff/state.json` v novém balíčku.
+
 ## Přesun na jiný počítač — 17. listopadu 2026
 
-Předávací ZIP: `HiFyziko-predani-2026-11-17-fuze-a-rovnovaha.zip`.
+Předávací ZIP: `HiFyziko-predani-2026-11-17-oprava-nacitani.zip`.
 Uživatel výslovně schválil push po úspěšné kontrole. Větev main, origin
 https://github.com/hifyziko/virtual-lab.git. Přesný commit, stav odeslání,
 manifest a LFS objekty uvádí `_handoff/` uvnitř soukromého balíčku.
@@ -11,8 +28,8 @@ Hotovo: sjednocený dialog výkladu, magnetické udržení a helicita včetně
 předpočítaných stavů, dva nové GS moduly rovnováhy/divertoru, velké indikátory
 načítání a dřívější dnešní změny synchronního stroje. Neprobíhá další přepočet.
 Plné sestavení a všechny funkční kontroly prošly; audit veřejných souborů
-prošel samostatně mimo omezení sandboxu. Publikační výběr: 248 souborů,
-přibližně 609 MiB, bez knih/PDF, privátních podkladů a přihlašovacích údajů.
+prošel samostatně mimo omezení sandboxu. Publikační výběr: 295 souborů,
+přibližně 651 MiB, bez knih/PDF, privátních podkladů a přihlašovacích údajů.
 Jediný veřejný zdroj nad 100 MiB je spravovaný přes Git LFS.
 
 Na novém počítači rozbalit do nové složky, spustit

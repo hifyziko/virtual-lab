@@ -45,15 +45,13 @@
     const summary=settings.parentElement.querySelector('summary');if(summary)summary.textContent='Další nastavení';
    }
   }
-  const field=scope.querySelector('#fieldExplanation');
-  if(field?.parentElement?.matches('details.support'))field.parentElement.after(field);
   const candidates=scope.querySelectorAll('details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]');
   for(const node of candidates){
    if(nodes.includes(node)||node.closest('[data-guide-source]'))continue;
    if(node.matches('details')){
-    if(node.matches('.precisePositions,.matrix-advanced,.experiment,#fieldExplanation'))continue;
+    if(node.matches('.precisePositions,.matrix-advanced,.experiment'))continue;
     if(node.querySelector('input,select,textarea,button,canvas,[contenteditable]'))continue;
-    if(!node.matches('.learning-explanation')&&!/výklad|vysvětlení|model|vztah|předpoklad|jak |pole uvnitř|v praxi|podrobnosti pokusu/i.test(node.querySelector('summary')?.textContent||''))continue;
+    if(!node.matches('.learning-explanation')&&!/výklad|vysvětlení|model|vztah|předpoklad|jak |pole uvnitř|v praxi|podrobnosti pokusu|reálnější zobrazení|vypočtené pole/i.test(node.querySelector('summary')?.textContent||''))continue;
    }
    node.setAttribute('data-guide-source','');
    node.style.setProperty('display','none','important');

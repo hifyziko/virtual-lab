@@ -4,6 +4,8 @@ const commands=[
  ['versions/vyvoj/tools/test-navigation.cjs','versions/aktualni/web/index.html'],
  ['tools/test-progressive.cjs'],
  ['tools/test-module-guide.cjs'],
+ ['versions/vyvoj/m_files/Web/test-module-window-fit.cjs'],
+ ['versions/vyvoj/m_files/Web/test-sync-window-fit.cjs'],
  ['tools/test-vehicle-art.cjs'],
  ['versions/vyvoj/m_files/Web/synchronous/test-synchronizing.cjs'],
  ['versions/vyvoj/m_files/Web/synchronous/test-princip-sound.cjs'],

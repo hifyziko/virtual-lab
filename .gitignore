@@ -22,6 +22,7 @@
 !/tools/module-guide-data.js
 !/tools/module-guide.css
 !/tools/module-guide.js
+!/tools/pack-helicity.cjs
 !/tools/particle-library-navigation.js
 !/tools/physics-preview.css
 !/tools/physics-preview.js
@@ -415,6 +416,8 @@
 !/versions/vyvoj/m_files/Web/synchronous/v-curves.html
 !/versions/vyvoj/m_files/Web/synchronous/v-curves.js
 !/versions/vyvoj/m_files/Web/synchronous/voltage-pictogram.js
+!/versions/vyvoj/m_files/Web/test-module-window-fit.cjs
+!/versions/vyvoj/m_files/Web/test-sync-window-fit.cjs
 !/versions/vyvoj/m_files/Web/tocive-pole.js
 !/versions/vyvoj/m_files/Web/transformator/TR02_magnetizacni_proud.html
 !/versions/vyvoj/m_files/Web/transformator/apply-lesson-frame.cjs

@@ -1,5 +1,14 @@
 /* AM/SM share the standard logical content canvas. Never conceal overflow. */
 main.uniform-module-layout[data-machine-viewport]{min-height:var(--module-host-height,1000px)!important}
+/* The two AM cuts receive all height released by the consolidated guide.
+   Flex allocation is independent of previously scaled SVG measurements. */
+main.uniform-module-layout[data-machine-viewport="am01-princip"]{--module-flexible-height:1;height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:8px}
+main[data-machine-viewport="am01-princip"]>:is(.controls,.omega-strip,.support){flex-shrink:0;margin-top:0;margin-bottom:0}
+main[data-machine-viewport="am01-princip"]>.layout{flex:1 1 0;min-height:0;margin:0;align-items:stretch}
+main[data-machine-viewport="am01-princip"]>.layout>.card{display:flex;flex-direction:column;min-height:0}
+main[data-machine-viewport="am01-princip"] .layout>.card>:not(.machine-view){flex-shrink:0}
+main[data-machine-viewport="am01-princip"] .machine-view{flex:1 1 0;min-height:0}
+main[data-machine-viewport="am01-princip"] .machine{width:100%;height:100%;min-height:0;max-height:none}
 main[data-machine-viewport] :is(.settings,.inspector,.circuit-column){overflow:visible;max-height:none}
 main[data-machine-viewport] :is(.focus-note,.control-note){max-height:none;overflow:visible}
 main[data-machine-viewport="sm02-schema"] .equation{overflow:visible}
