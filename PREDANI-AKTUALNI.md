@@ -1,5 +1,36 @@
 # Aktuální stav předání
 
+## Výchozí zapnutý a výraznější zvuk polí — 17. listopadu 2026
+
+Na výslovné upřesnění uživatele je zvuk synchronního principu výchozí
+zapnutý (stav tlačítka i audio ovladače). AudioContext se podle pravidel
+prohlížeče otevře až při prvním ovládání pohybu, např. Točit rychle,
+posunu pole nebo spuštění pokusu. Nevyžaduje další zapnutí tlačítkem.
+První aktivace a opětovné zapnutí přehrají zkušební pulz; zkouška může
+doběhnout i v klidu, zatímco tlačítko pauzy a skrytí stránky ji přeruší.
+Vypnutí uživatelem zůstává respektované, další ovládání je samo nezapne.
+
+Pulz je delší (při běžném rychlém míjení přibližně půl sekundy), má delší
+náběh a výraznější tělo místo krátkého šustnutí. Filtrovaný šum doplňuje
+jemný klesající trojúhelníkový tón. Hlavní zesílení zvýšeno z 0,14 na
+0,28, vrchol obálky z 0,32 na 0,7. Počet souběžných hlasů je nadále
+omezený. Obě zvukové větve se při vypnutí a odstranění správně ukončí.
+Při zablokované inicializaci lze zvuk zapnout znovu; nepodporovaný
+prohlížeč zůstává bez zvuku a experiment pokračuje.
+
+Rozšířený zvukový test ověřuje výchozí aktivaci gestem, zkušební pulz,
+délku a zesílení obálky, druhou vrstvu, ztišení a odpojení oscilátorů.
+Původní modelové testy a celková kontrola prošly. Plné sestavení provedeno;
+z obou výsledných progressive payloadů sm01-princip výslovně ověřeno,
+že obsahují výchozí zapnutý stav, novou syntézu a zkušební pulz.
+Poslech v prohlížeči nebyl ověřen; jeho UI přístup byl dříve zamítnut.
+
+Při celkové kontrole opraven i čtečkový test KaTeXu v rozpracovaném
+test-confinement.cjs: atributy data-tex nyní dekóduje z HTML entit stejně
+jako DOM. Souběžná platná formule s &gt; dříve způsobovala falešnou chybu
+testu. Samotné výukové vztahy ani zobrazení se tím nemění; tento soubor
+zůstává s ostatní rozpracovanou částí confinement mimo zdejší commit.
+
 ## Názorný zvuk míjení synchronních polí — 17. listopadu 2026
 
 Princip synchronního stroje má volitelné tlačítko Zvuk míjení polí
