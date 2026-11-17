@@ -156,16 +156,19 @@
   const c=$('lorentzCanvas'),g=c.getContext('2d'),[w,h]=size(c),parent=$('lorentzMath'),right=[Math.cos(lorentzYaw),-Math.sin(lorentzYaw),0],up=[-Math.sin(lorentzYaw)*Math.sin(lorentzTilt),-Math.cos(lorentzYaw)*Math.sin(lorentzTilt),Math.cos(lorentzTilt)],depth=M.cross(right,up);
   for(const el of parent.children)el.hidden=true;const placed=[],segments=[];
   // Fixed SI references preserve magnitude changes; a shared fit prevents clipping.
-  const visualLength=(key,norm)=>{const scales={v:[82,1e4,2e7],b:[88,.1,6],c:[90,100,1.5e8],fb:[54,1e-17,3e-11],e:[28,1,1e7],fe:[28,1e-17,3e-11],f:[28,1e-17,3e-11]},[maximum,reference,range]=scales[key];return key==='b'?maximum*Math.sqrt(norm/range):maximum*Math.log1p(norm/reference)/Math.log1p(range/reference);};
+  const visualLength=(key,norm)=>{const scales={v:[82,1e4,2e7],b:[88,.1,6],c:[128,100,1.5e8],fb:[54,1e-17,3e-11],e:[64,1,1e7],fe:[28,1e-17,3e-11],f:[28,1e-17,3e-11]},[maximum,reference,range]=scales[key];return key==='b'?maximum*Math.sqrt(norm/range):maximum*Math.log1p(norm/reference)/Math.log1p(range/reference);};
   const mainFit=Math.min(1,100/Math.max(visualLength('v',M.norm(state.v)),visualLength('b',M.norm(fields.B)),visualLength('c',M.norm(product)),visualLength('fb',M.norm(magneticForce)),1));
+  const totalForce=magneticForce.map((v,k)=>v+electricForce[k]),forceMaximum=M.norm(magneticForce)+Math.max(M.norm(electricForce),config.mode==='electric'?Math.abs(config.q)*Number($('electric').max):0),forceGain=forceMaximum?90*Math.log1p(forceMaximum/1e-18)/Math.log1p(3e-11/1e-18)/forceMaximum:0;
+
   function vector(key,value,origin,color,zeroTolerance=0){
-   const norm=M.norm(value),zero=norm<=zeroTolerance,length=visualLength(key,norm)*(['v','b','c','fb'].includes(key)?mainFit:1),unit=zero?[0,0,0]:value.map(v=>v/norm),dx=M.dot(unit,right),dy=-M.dot(unit,up),projected=Math.hypot(dx,dy);
+   const norm=M.norm(value),zero=norm<=zeroTolerance,length=(['fb','fe','f'].includes(key)?norm*forceGain:visualLength(key,norm))*mainFit,unit=zero?[0,0,0]:value.map(v=>v/norm),dx=M.dot(unit,right),dy=-M.dot(unit,up),projected=Math.hypot(dx,dy);
    let tip=[origin[0]+length*dx,origin[1]+length*dy],labelPoint;
    if(zero)return;
    else if(projected<.12){g.strokeStyle=color;g.lineWidth=1.3;g.beginPath();g.arc(...origin,4,0,2*Math.PI);g.stroke();if(M.dot(unit,depth)>0){g.fillStyle=color;g.beginPath();g.arc(...origin,1.5,0,2*Math.PI);g.fill();}else{line(g,[origin[0]-3,origin[1]-3],[origin[0]+3,origin[1]+3],color);line(g,[origin[0]-3,origin[1]+3],[origin[0]+3,origin[1]-3],color);}labelPoint=[origin[0]+12,origin[1]-12];}
    else{arrow(origin,tip,color,g,1.8);const gap=key==='fb'||key==='fe'?26:22;labelPoint=[tip[0]+gap*dx/projected,tip[1]+gap*dy/projected];}
    segments.push([origin,tip]);
    const symbol={v:'\\mathbf v',b:'\\mathbf B',fb:'\\mathbf F_B',e:'\\mathbf E',fe:'\\mathbf F_E',f:'\\mathbf F',c:'\\mathbf c'}[key],el=label(parent,key,symbol+(zero?'=0':''),Math.max(17,Math.min(w-17,labelPoint[0])),Math.max(12,Math.min(h-12,labelPoint[1])));el.style.color=color;el.hidden=false;
+   if(electric&&['c','fb','fe','f'].includes(key)){el.hidden=true;return;}
    const hw=key==='fb'||key==='fe'?15:10,hh=10,preferred=[parseFloat(el.style.left),parseFloat(el.style.top)],offsets=[[0,0],[-12,0],[12,0],[0,-22],[0,22],[-24,0],[24,0],[-12,-22],[12,22]];
    let point=preferred;for(const offset of offsets){const candidate=[Math.max(hw+2,Math.min(w-hw-2,preferred[0]+offset[0])),Math.max(hh+2,Math.min(h-hh-2,preferred[1]+offset[1]))];const hitsArrow=segments.some(([a,b])=>[.15,.3,.5,.7,.9,1].some(t=>Math.abs(a[0]+(b[0]-a[0])*t-candidate[0])<hw+3&&Math.abs(a[1]+(b[1]-a[1])*t-candidate[1])<hh+3));if(!hitsArrow&&!placed.some(p=>Math.abs(p.x-candidate[0])<p.hw+hw+2&&Math.abs(p.y-candidate[1])<p.hh+hh+2)){point=candidate;break;}}
    el.style.left=point[0]+'px';el.style.top=point[1]+'px';placed.push({x:point[0],y:point[1],hw,hh});
@@ -178,7 +181,11 @@
   g.fillStyle='#596e78';g.beginPath();g.arc(...origin,2.5,0,2*Math.PI);g.fill();
   vector('v',state.v,origin,'#b17b2c');vector('b',fields.B,origin,HiFyzikoParticleStyle.fields.magnetic,0,62);
   vector('c',product,origin,'#198476',M.norm(state.v)*M.norm(fields.B)*1e-10,90);vector('fb',magneticForce,origin,'#925daa',magneticTolerance,58);
-  if(electric){vector('e',fields.E,[w*.21,198],HiFyzikoParticleStyle.fields.electric,0,24);vector('fe',electricForce,[w*.5,198],'#ad6528',0,24);vector('f',magneticForce.map((v,k)=>v+electricForce[k]),[w*.79,198],'#314c59',magneticTolerance,24);}
+  if(electric){
+   const bEnd=point(magneticForce.map(v=>v*forceGain*mainFit)),eEnd=point(electricForce.map(v=>v*forceGain*mainFit)),fEnd=point(totalForce.map(v=>v*forceGain*mainFit));
+   line(g,bEnd,fEnd,'#ad6528',1.3,[3,3]);line(g,eEnd,fEnd,'#925daa',1.1,[3,3]);
+   vector('e',fields.E,origin,HiFyzikoParticleStyle.fields.electric);vector('fe',electricForce,origin,'#ad6528');vector('f',totalForce,origin,'#314c59',magneticTolerance);
+  }
     const noB=M.norm(fields.B)===0,noMag=M.norm(magneticForce)<=magneticTolerance;
   const legend={b:['\\mathbf B'+(noB?'=0':''),HiFyzikoParticleStyle.fields.magnetic],c:['\\mathbf c=\\mathbf v\\times\\mathbf B'+(noMag?'=0':''),'#198476'],fb:['\\mathbf F_B'+(noMag?'=0':'=q\\mathbf c'),'#925daa'],fe:['\\mathbf F_E=q\\mathbf E','#ad6528'],f:['\\mathbf F=\\mathbf F_E+\\mathbf F_B','#314c59']};
   for(const [key,[formula,color]]of Object.entries(legend)){tex($('lorentzKey-'+key),formula);$('lorentzKey-'+key).style.color=color;}

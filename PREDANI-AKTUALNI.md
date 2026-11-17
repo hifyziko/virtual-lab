@@ -1,5 +1,19 @@
 # Aktuální stav předání
 
+## Elektrická složka přímo v soustavě — 17. listopadu 2026
+
+E, F_E, F_B i výsledná F nyní vycházejí ze stejného počátku jako v a B.
+Samostatná spodní řada vektorů je odstraněná. Síly mají společné lineární
+měřítko, takže koncový bod F přesně odpovídá součtu F_E+F_B v projekci.
+Přerušované spojnice ukazují příspěvky obou složek. Volba sílového měřítka
+používá dostupný rozsah E, takže změna E nepřeškáluje nezměněné F_B.
+E má vlastní názornou stupnici jako ostatní pole; síly se vzájemně sčítají
+ve společné stupnici. Při zapnutém E jsou označení sil v pevné barevné
+legendě, aby se nepřekrývala u společného počátku.
+Test ověřil společný počátek všech vektorů a přesný součet sil v obou
+směrech B pro proton, elektron i alfa částici. Ověřena stabilita F_B při
+změně E; test-drift, navigace a progressive obou dodávek prošly.
+
 ## Propojené velikosti šipek a náhled v poli — 17. listopadu 2026
 
 Předchozí šipky piktogramu byly normalizované a u čekající částice mimo
