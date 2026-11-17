@@ -1,5 +1,27 @@
 # Aktuální stav předání
 
+## Plynulé nastavení společného driftu — 17. listopadu 2026
+
+U Grad-B odstraněn odklon: všechny rovinné drifty mají rychlost kolmou
+k B. Výchozí gradient je záporný v modelu i ovladači, tedy silnější pole
+vlevo; uživatel jej dál může obrátit. Směr B se ve všech pokusech tohoto
+modulu rozlišuje odstínem značek a siločar: kladný modrý, obrácený červený.
+Velikost a sytost dál vyjadřují velikost pole, místní záře odpovídá jeho
+barvě a vytrácí se do průhledna. Tečky/křížky i prostorové šipky zůstaly.
+
+Společný E×B + Grad-B již nemá graf ani jeho legendu. Číselné údaje
+zůstávají. Nastavení v tomto pokusu zachovává běh/pauzu i fyzikální čas:
+také hmotnosti, výběr hlavního náboje a zapnutí druhého. Při změně hmotnosti
+zůstává poloha a kinetická energie; výklad výslovně uvádí vnější změnu
+modelu. Přepnutí hlavní částice mezi již přítomnými náboji přebírá její
+skutečný stav. Přidaný druhý náboj začíná v aktuální poloze hlavního,
+se zvolenou počáteční energií a ve stejném fyzikálním čase.
+
+Ověřeno test-drift (včetně změn za běhu, zachování polohy a času,
+obou odstínů ve všech šesti pokusech, skrytého grafu a směru gradientu),
+navigace a progressive. Obě aktuální dodávky aktualizovány. Vizuální
+kontrola v prohlížeči neproběhla; prohlížeč se automaticky nespouštěl.
+
 ## Společný drift a přechod hmotností — 17. listopadu 2026
 
 Drift má nový pokus E×B + Grad-B. E a gradient se ovládají nezávisle;

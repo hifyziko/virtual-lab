@@ -2,6 +2,7 @@
  const M=DriftModel,$=id=>document.getElementById(id),canvas=$('scene'),graph=$('graph'),ctx=canvas.getContext('2d'),gc=graph.getContext('2d');
  const names={entry:'Z přímky na kružnici',gyration:'Kroužení kolem siločáry',electric:'E×B drift',gradient:'Grad-B drift',combined:'E×B + Grad-B drift',curvature:'Drift zakřivení'};
  const electricMode=()=>['electric','combined'].includes($('mode').value);
+ const planarDrift=()=>['electric','gradient','combined'].includes($('mode').value);
  const tex=(el,s)=>{if(el.dataset.texValue===s)return;el.dataset.texValue=s;katex.render(s,el,{throwOnError:false});};
  const num=(n,d=2)=>(Object.is(Number(n.toFixed(d)),-0)?0:Number(n.toFixed(d))).toLocaleString('cs-CZ',{maximumFractionDigits:d,useGrouping:false}).replace(',','{,}');
  const quantity=(n,unit)=>{const a=Math.abs(n);if(!a)return '0\\,\\mathrm{'+unit+'}';const exp=Math.floor(Math.log10(a));return (exp<-2||exp>3?num(n/10**exp)+'\\cdot10^{'+exp+'}':num(n))+'\\,\\mathrm{'+unit+'}';};
@@ -14,7 +15,7 @@
  // Exact homogeneous-field orbit, with the same physical dt for all species.
  function advanceCompanion(item,dt,time){const c=item.config,old=item.samples.at(-1);if(c.mode==='combined'){const state=M.advance(c,old,dt);item.samples.push({...state,t:time,...M.diagnostics(c,state)});const cutoff=time-graphWindow();while(item.samples.length>1&&item.samples[1].t<cutoff)item.samples.shift();return;}const omega=c.q*c.B/c.m,a=omega*dt,co=Math.cos(a),si=Math.sin(a),sinc=a===0?1:si/a,cosc=a===0?0:2*Math.sin(a/2)**2/a,v=old.v,r=old.r;const state={v:[v[0]*co+v[1]*si,v[1]*co-v[0]*si,v[2]],r:[r[0]+dt*(v[0]*sinc+v[1]*cosc),r[1]+dt*(v[1]*sinc-v[0]*cosc),r[2]+v[2]*dt]};item.samples.push({...state,t:time,...M.diagnostics(c,state)});if(item.samples.length>1440)item.samples.shift();}
  const animationRate=()=>10**Number($('rate').value);
- function parameters(){return {mode:$('mode').value,species:$('mode').value==='combined'?$('pairFocus').value:$('species').value,B:fieldSign*Number($('b').value)/1000,energy:Number($('energy').value),pitch:electricMode()?0:Number($('pitch').value),massBlend:Number($('massBlend').value)/100,electric:Number($('electric').value),gradient:Number($('gradient').value)/100,radius:Number($('radius').value),angle:Number($('angle').value),start:config?.start||[-3,0]};}
+ function parameters(){return {mode:$('mode').value,species:$('mode').value==='combined'?$('pairFocus').value:$('species').value,B:fieldSign*Number($('b').value)/1000,energy:Number($('energy').value),pitch:planarDrift()?0:Number($('pitch').value),massBlend:Number($('massBlend').value)/100,electric:Number($('electric').value),gradient:Number($('gradient').value)/100,radius:Number($('radius').value),angle:Number($('angle').value),start:config?.start||[-3,0]};}
  function syncMagneticRange(){
   const input=$('b'),minimum=$('mode').value==='entry'?0:100;input.min=String(minimum);input.value=String(Math.max(minimum,Math.min(6000,Number(input.value))));
  }
@@ -33,7 +34,7 @@
   graphMin=-4*config.length;graphMax=4*config.length;axisNoticeUntil=0;$('axisNotice').hidden=true;
   $('rate').max=config.mode==='gyration'?'4':String(Math.log10(3));$('rate').value=String(Math.min(Number($('rate').value),Number($('rate').max)));
   frame=0;companions=config.mode==='combined'&&$('showPair').checked?[makePair()]:config.mode==='gyration'?companionIds.map((id,j)=>makeCompanion(id,j)):[];$('pairRow').hidden=$('massRow').hidden=config.mode!=='combined';tex($('massValue'),'m_p/m_-='+num((M.species.proton.m/M.species.electron.m)**config.massBlend,1));$('compareRow').hidden=config.mode!=='gyration';$('speciesRow').hidden=['gyration','combined'].includes(config.mode);for(const [id,node]of particleChoices)$(node).checked=id===config.species||companionIds.includes(id);$('graphTitle').textContent=config.mode==='gyration'?'Příčný pohyb · '+{proton:'proton',deuteron:'deuteron',alpha:'alfa částice',electron:'elektron'}[config.species]:'Příčný pohyb';
-  $('electricRow').hidden=!electricMode();$('gradientRow').hidden=!['gradient','combined'].includes(config.mode);$('radiusRow').hidden=config.mode!=='curvature';$('angleRow').hidden=config.mode!=='entry';$('pitchRow').hidden=config.mode==='entry'||electricMode();
+  $('electricRow').hidden=!electricMode();$('gradientRow').hidden=!['gradient','combined'].includes(config.mode);$('radiusRow').hidden=config.mode!=='curvature';$('angleRow').hidden=config.mode!=='entry';$('pitchRow').hidden=config.mode==='entry'||planarDrift();
   $('sceneTitle').textContent=names[config.mode];$('sceneHint').textContent=config.mode==='entry'?'Přetáhni částici dovnitř nebo ven z pole a spusť pokus.':config.mode==='curvature'?'Tažení: otáčení · kolečko: zoom · dvojklik: výchozí pohled.':config.mode==='gyration'?'Tažení pozadí: otáčení · kolečko: zoom · dvojklik: kolmý pohled.':'Kolečko: zoom · dvojklik: výchozí pohled · při pauze lze částici přetáhnout.';
   $('geometry').textContent=config.mode==='curvature'?'Prostorový pohled · kruhové siločáry konstantní velikosti pole':config.mode==='gyration'?'Prostorový pohled · magnetické pole podél siločar':'Příčný průmět · magnetické pole kolmo k ploše';
   tex($('bValue'),quantity(config.B,'T'));tex($('energyValue'),quantity(config.energy,'eV'));tex($('pitchValue'),num(config.pitch,0)+'^\\circ');tex($('angleValue'),num(config.angle,0)+'^\\circ');tex($('electricValue'),quantity(config.electric,'V\\,m^{-1}'));tex($('gradientValue'),quantity(config.gradient/config.length,'m^{-1}'));tex($('radiusValue'),quantity(config.R,'m'));
@@ -68,7 +69,7 @@
  }
  function path(points,color,lw=1.5,dash=[]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash(dash);let started=false;for(const p of points){if(!p){started=false;continue;}const xy=project(p);if(started)ctx.lineTo(...xy);else ctx.moveTo(...xy);started=true;}ctx.stroke();ctx.setLineDash([]);}
  function magneticAppearance(B){
-  const level=Math.sqrt(Math.max(0,Math.min(1,Math.abs(B)/6))),hex=HiFyzikoParticleStyle.fields.magnetic,rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)).join(',');
+  const level=Math.sqrt(Math.max(0,Math.min(1,Math.abs(B)/6))),hex=B<0?'#c34d45':HiFyzikoParticleStyle.fields.magnetic,rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)).join(',');
   return {color:'rgba('+rgb+','+(.24+.66*level).toFixed(3)+')',lineColor:'rgba('+rgb+','+(.12+.32*level).toFixed(3)+')',rgb,glowAlpha:.06+.12*level,radius:2.4+4.6*level,width:.75+level,arrowLength:.55+level};
  }
  function drawMagneticGlow(x,y,style,radius){
@@ -96,7 +97,7 @@
    for(let x=40;x<width-20;x+=48)for(let y=100;y<height-55;y+=48){
     if(config.mode==='entry'&&(x<boundary+12||(Math.abs(x-(boundary+90))<54&&Math.abs(y-100)<23)))continue;
     if(electricMode()&&Math.abs(x-(width-65))<50&&y<165||['gradient','combined'].includes(config.mode)&&Math.abs(x-width/2)<65&&y<130)continue;
-    const r=[camera[0]+(x-frame.origin[0])*L/frame.scale,camera[1]+(frame.origin[1]-y)*L/frame.scale,0],B=M.norm(M.fields(config,r).B),mark=magneticAppearance(B);if(!B)continue;
+    const r=[camera[0]+(x-frame.origin[0])*L/frame.scale,camera[1]+(frame.origin[1]-y)*L/frame.scale,0],B=M.norm(M.fields(config,r).B),mark=magneticAppearance(sign*B);if(!B)continue;
     drawMagneticGlow(x,y,mark,config.mode==='entry'?Math.min(mark.radius*3.2,x-boundary):mark.radius*3.2);
     ctx.strokeStyle=mark.color;ctx.lineWidth=mark.width;ctx.beginPath();ctx.arc(x,y,mark.radius,0,2*Math.PI);ctx.stroke();
     if(sign>0){ctx.fillStyle=mark.color;ctx.beginPath();ctx.arc(x,y,mark.radius*.35,0,2*Math.PI);ctx.fill();}else{const d=mark.radius*.72;line(ctx,[x-d,y-d],[x+d,y+d],mark.color,mark.width);line(ctx,[x-d,y+d],[x+d,y-d],mark.color,mark.width);}
@@ -212,9 +213,9 @@
   const electron=config.species==='electron'?s:companions.find(item=>item.config.species==='electron')?.samples.at(-1);if(electron)electronDetail(electron,glyphs);else for(const key of ['electronZoomTitle','electronZoomRadius'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();
   if(view)view.draw(width,height,s.t/config.timePeriod,glyphs);else{ctx.beginPath();ctx.fillStyle=config.q>0?'#d74732':'#126bc3';ctx.arc(...p,7,0,2*Math.PI);ctx.fill();}
   label($('sceneMath'),'particle',particleSymbol(config.species),p[0],p[1]-25);
-  const comparing=config.mode==='gyration';$('pairLegend').hidden=config.mode!=='combined';$('comparison').hidden=!comparing;graph.hidden=comparing;$('graphMath').hidden=comparing;$('graphLegend').hidden=comparing||config.mode==='combined';$('graphTitle').textContent=comparing?'Porovnání částic':config.mode==='combined'?'Separace nábojů':'Příčný pohyb';if(comparing){$('axisNotice').hidden=true;drawComparison();}else drawGraph(i);tex($('timeValue'),quantity(s.t*1e6,'\\mu s'));tex($('rateValue'),num(animationRate())+'\\times');
+  const comparing=config.mode==='gyration';$('plotArea').hidden=$('graphTitle').hidden=config.mode==='combined';$('comparison').hidden=!comparing;graph.hidden=comparing||config.mode==='combined';$('graphMath').hidden=comparing||config.mode==='combined';$('graphLegend').hidden=comparing||config.mode==='combined';$('graphTitle').textContent=comparing?'Porovnání částic':config.mode==='combined'?'Separace nábojů':'Příčný pohyb';if(comparing){$('axisNotice').hidden=true;drawComparison();}else if(config.mode!=='combined')drawGraph(i);else $('axisNotice').hidden=true;tex($('timeValue'),quantity(s.t*1e6,'\\mu s'));tex($('rateValue'),num(animationRate())+'\\times');
   if(!$('readouts').children.length)for(let j=0;j<4;j++)$('readouts').append(document.createElement('div'));
-  drawScale();drawLorentz(s);
+  drawScale();drawLorentz(s);tex($('massValue'),'m_p/m_-='+num((M.species.proton.m/M.species.electron.m)**config.massBlend,1));
   const values=['E_k='+quantity(s.energy,'eV'),s.center?'r_L='+quantity(s.rho,'m'):'B=0','|\\mathbf v_d|='+quantity(M.norm(s.drift),'m\\,s^{-1}'),'T_c='+(Number.isFinite(config.period)?quantity(config.period*1e6,'\\mu s'):'\\infty')];values.forEach((t,j)=>tex($('readouts').children[j],t));
   const status=config.mode==='combined'?'Společný E×B posun, opačný Grad-B drift.':!config.B?'Magnetické pole je vypnuté. Částice se pohybuje přímo.':ended?'Částice opustila pole. Pokus skončil.':config.mode==='entry'?(s.center?'Částice se stáčí; magnetické pole nekoná práci.':i?'Mimo pole pokračuje částice přímo.':'Připraveno k vletu do magnetického pole.'):config.mode==='electric'?'Směr elektrického driftu nezávisí na náboji.':['gradient','combined'].includes(config.mode)?'Změna znaménka náboje obrací směr driftu.':config.mode==='curvature'?'Drift směřuje kolmo k rovině kruhových siločar.':'Bez příčného driftu. Podélný pohyb se zachovává.';
   $('status').textContent=status;if($('status').scrollHeight>$('status').clientHeight||$('status').scrollWidth>$('status').clientWidth)$('status').textContent='';
@@ -256,7 +257,18 @@
   if(selected.includes('electron')!==hadElectron){$('speedNotice').textContent=selected.includes('electron')?'Zpomalení času pro elektron':'Obnovení času pro ionty';$('speedNotice').hidden=false;speedNoticeUntil=Date.now()+2400;}
   render();
  };
- $('pairFocus').onchange=$('showPair').onchange=$('massBlend').oninput=()=>prepare();
+ $('massBlend').oninput=()=>liveChange();
+ $('showPair').onchange=()=>{
+  if($('showPair').checked){const state=samples.at(-1),item=makePair();item.initial.r=[...state.r];item.samples=[{r:[...state.r],v:[...item.initial.v],t:state.t,...M.diagnostics(item.config,{r:state.r,v:item.initial.v})}];companions=[item];}else companions=[];
+  clearPairLabels();render();
+ };
+ function clearPairLabels(){for(const el of [...$('sceneMath').children])if(el.dataset.key?.startsWith('companion')||el.dataset.key?.startsWith('electronZoom'))el.remove();}
+ $('pairFocus').onchange=()=>{
+  const old={config,initial:config.initial,samples},target=companions.find(item=>item.config.species===$('pairFocus').value);
+  if(target){config=target.config;samples=target.samples;config.initial=target.initial;companions=[old];}
+  else{const previous=config,state=samples.at(-1),next=M.setup(parameters());next.length=previous.length;next.initial.r=[...previous.initial.r];const current={r:[...state.r],v:liveVelocity(state.v,previous,next)};config=next;samples=[{...current,t:state.t,...M.diagnostics(next,current)}];}
+  frame=samples.length-1;clearPairLabels();render();
+ };
  $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncMagneticRange();syncElectricLimits(true);prepare();};$('reverse').onclick=()=>{fieldSign=-fieldSign;liveChange();};$('vectors').onchange=render;$('centers').onchange=render;
  const forceCanvas=$('lorentzCanvas');
  forceCanvas.onpointerdown=event=>{lorentzDrag={x:event.clientX,y:event.clientY,yaw:lorentzYaw,tilt:lorentzTilt};forceCanvas.setPointerCapture(event.pointerId);event.preventDefault?.();};

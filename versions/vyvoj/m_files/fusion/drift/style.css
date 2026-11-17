@@ -76,3 +76,5 @@ body[data-fusion-page="fu03-drift"] .controls #magneticRow input{position:absolu
 #pairRow{display:flex;align-items:center;justify-content:space-between;gap:8px}#pairRow label{display:flex;gap:5px;align-items:center}#pairRow select{width:156px}#pairRow input{width:auto}#massRow{height:58px}.massEnds{display:flex;justify-content:space-between;font-size:10px;color:#687c86}#massValue{float:right}#pairLegend span{font-weight:600}
 
 body[data-fusion-page="fu03-drift"] .controls>label#massRow{display:grid;grid-template-columns:1fr auto;gap:0 8px;height:58px}#massRow input,#massRow .massEnds{grid-column:1/-1}body:has(#mode option[value="combined"]:checked) #sceneMath [data-key="external"]{color:#b57825}
+
+body:has(#mode option[value="combined"]:checked) .measurement{flex:none;margin-top:auto}body:has(#mode option[value="combined"]:checked) #readouts{margin-top:4px}
