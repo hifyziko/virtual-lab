@@ -1,5 +1,15 @@
 # Aktuální stav předání
 
+## Větší nákres a obrácené otáčení — 17. listopadu 2026
+
+Karta piktogramu má šířku 360 px, nákres výšku 280 px a soustava je
+přibližně o 22 % větší. Hlavní vztah i symbolická legenda jsou menší
+a nižší; větší část karty připadá grafice. Vodorovný i svislý směr tažení
+myší je obrácený dle požadavku uživatele. Dvojklik nadále obnoví výchozí
+pohled. Zvětšení zachovává společné měřítko sil a přesný vektorový součet.
+Test obou směrů tažení a fyzikální/ovládací testy driftu prošly.
+Obě dodávky aktualizovány; navigace a progressive ověřeny.
+
 ## Elektrická složka přímo v soustavě — 17. listopadu 2026
 
 E, F_E, F_B i výsledná F nyní vycházejí ze stejného počátku jako v a B.

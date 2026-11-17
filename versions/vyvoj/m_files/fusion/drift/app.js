@@ -153,7 +153,7 @@
   $('lorentzPreview').hidden=!preview;
   const electric=M.norm(fields.E)>0,product=M.cross(state.v,fields.B),magneticForce=product.map(v=>v*config.q),electricForce=fields.E.map(v=>v*config.q),magneticTolerance=Math.abs(config.q)*M.norm(state.v)*M.norm(fields.B)*1e-10;
   tex($('lorentzFormula'),electric?'\\mathbf F=q(\\mathbf E+\\mathbf v\\times\\mathbf B)':'\\mathbf F=\\mathbf F_B=q(\\mathbf v\\times\\mathbf B)');
-  const c=$('lorentzCanvas'),g=c.getContext('2d'),[w,h]=size(c),parent=$('lorentzMath'),right=[Math.cos(lorentzYaw),-Math.sin(lorentzYaw),0],up=[-Math.sin(lorentzYaw)*Math.sin(lorentzTilt),-Math.cos(lorentzYaw)*Math.sin(lorentzTilt),Math.cos(lorentzTilt)],depth=M.cross(right,up);
+  const c=$('lorentzCanvas'),g=c.getContext('2d'),[w,h]=size(c),parent=$('lorentzMath'),right=[Math.cos(lorentzYaw),-Math.sin(lorentzYaw),0],up=[-Math.sin(lorentzYaw)*Math.sin(lorentzTilt),-Math.cos(lorentzYaw)*Math.sin(lorentzTilt),Math.cos(lorentzTilt)],depth=M.cross(right,up),diagramScale=Math.min(w/342,h/280)*1.22;
   for(const el of parent.children)el.hidden=true;const placed=[],segments=[];
   // Fixed SI references preserve magnitude changes; a shared fit prevents clipping.
   const visualLength=(key,norm)=>{const scales={v:[82,1e4,2e7],b:[88,.1,6],c:[128,100,1.5e8],fb:[54,1e-17,3e-11],e:[64,1,1e7],fe:[28,1e-17,3e-11],f:[28,1e-17,3e-11]},[maximum,reference,range]=scales[key];return key==='b'?maximum*Math.sqrt(norm/range):maximum*Math.log1p(norm/reference)/Math.log1p(range/reference);};
@@ -161,7 +161,7 @@
   const totalForce=magneticForce.map((v,k)=>v+electricForce[k]),forceMaximum=M.norm(magneticForce)+Math.max(M.norm(electricForce),config.mode==='electric'?Math.abs(config.q)*Number($('electric').max):0),forceGain=forceMaximum?90*Math.log1p(forceMaximum/1e-18)/Math.log1p(3e-11/1e-18)/forceMaximum:0;
 
   function vector(key,value,origin,color,zeroTolerance=0){
-   const norm=M.norm(value),zero=norm<=zeroTolerance,length=(['fb','fe','f'].includes(key)?norm*forceGain:visualLength(key,norm))*mainFit,unit=zero?[0,0,0]:value.map(v=>v/norm),dx=M.dot(unit,right),dy=-M.dot(unit,up),projected=Math.hypot(dx,dy);
+   const norm=M.norm(value),zero=norm<=zeroTolerance,length=(['fb','fe','f'].includes(key)?norm*forceGain:visualLength(key,norm))*mainFit*diagramScale,unit=zero?[0,0,0]:value.map(v=>v/norm),dx=M.dot(unit,right),dy=-M.dot(unit,up),projected=Math.hypot(dx,dy);
    let tip=[origin[0]+length*dx,origin[1]+length*dy],labelPoint;
    if(zero)return;
    else if(projected<.12){g.strokeStyle=color;g.lineWidth=1.3;g.beginPath();g.arc(...origin,4,0,2*Math.PI);g.stroke();if(M.dot(unit,depth)>0){g.fillStyle=color;g.beginPath();g.arc(...origin,1.5,0,2*Math.PI);g.fill();}else{line(g,[origin[0]-3,origin[1]-3],[origin[0]+3,origin[1]+3],color);line(g,[origin[0]-3,origin[1]+3],[origin[0]+3,origin[1]-3],color);}labelPoint=[origin[0]+12,origin[1]-12];}
@@ -173,11 +173,11 @@
    let point=preferred;for(const offset of offsets){const candidate=[Math.max(hw+2,Math.min(w-hw-2,preferred[0]+offset[0])),Math.max(hh+2,Math.min(h-hh-2,preferred[1]+offset[1]))];const hitsArrow=segments.some(([a,b])=>[.15,.3,.5,.7,.9,1].some(t=>Math.abs(a[0]+(b[0]-a[0])*t-candidate[0])<hw+3&&Math.abs(a[1]+(b[1]-a[1])*t-candidate[1])<hh+3));if(!hitsArrow&&!placed.some(p=>Math.abs(p.x-candidate[0])<p.hw+hw+2&&Math.abs(p.y-candidate[1])<p.hh+hh+2)){point=candidate;break;}}
    el.style.left=point[0]+'px';el.style.top=point[1]+'px';placed.push({x:point[0],y:point[1],hw,hh});
   }
-  const origin=[w*.5,108],point=v=>[origin[0]+M.dot(v,right),origin[1]-M.dot(v,up)];
+  const origin=[w*.5,h*.5],point=v=>[origin[0]+M.dot(v,right)*diagramScale,origin[1]-M.dot(v,up)*diagramScale];
   // A quiet Cartesian ground grid and full x/y/z axes make handedness visible.
   for(const coordinate of [-60,-30,0,30,60]){line(g,point([-60,coordinate,0]),point([60,coordinate,0]),'#e7ecef',.7);line(g,point([coordinate,-60,0]),point([coordinate,60,0]),'#e7ecef',.7);}
   if(M.norm(fields.B)&&M.norm(state.v)){const vu=state.v.map(v=>v/M.norm(state.v)*64),bu=fields.B.map(v=>v/M.norm(fields.B)*64),plane=[[0,0,0],vu,vu.map((v,k)=>v+bu[k]),bu].map(point);g.fillStyle='rgba(53,106,195,.055)';g.beginPath();g.moveTo(...plane[0]);for(const p of plane.slice(1))g.lineTo(...p);g.closePath();g.fill();}
-  for(const [axis,key]of [[[1,0,0],'x'],[[0,1,0],'y'],[[0,0,1],'z']]){line(g,point(axis.map(v=>-v*64)),origin,'#c6d0d6',.8,[3,4]);const end=point(axis.map(v=>v*94));line(g,origin,end,'#b1bec6',.9);arrow(point(axis.map(v=>v*88)),end,'#b1bec6',g);const p=point(axis.map(v=>v*(key==='z'?113:125))),el=label(parent,'axis-'+key,key,p[0],p[1]);el.style.color='#788a95';el.hidden=false;placed.push({x:p[0],y:p[1],hw:9,hh:10});}
+  for(const [axis,key]of [[[1,0,0],'x'],[[0,1,0],'y'],[[0,0,1],'z']]){line(g,point(axis.map(v=>-v*64)),origin,'#c6d0d6',.8,[3,4]);const end=point(axis.map(v=>v*94));line(g,origin,end,'#b1bec6',.9);arrow(point(axis.map(v=>v*88)),end,'#b1bec6',g);const p=point(axis.map(v=>v*(key==='z'?113:125))),el=label(parent,'axis-'+key,key,Math.max(12,Math.min(w-12,p[0])),Math.max(12,Math.min(h-12,p[1])));el.style.color='#788a95';el.hidden=false;placed.push({x:p[0],y:p[1],hw:9,hh:10});}
   g.fillStyle='#596e78';g.beginPath();g.arc(...origin,2.5,0,2*Math.PI);g.fill();
   vector('v',state.v,origin,'#b17b2c');vector('b',fields.B,origin,HiFyzikoParticleStyle.fields.magnetic,0,62);
   vector('c',product,origin,'#198476',M.norm(state.v)*M.norm(fields.B)*1e-10,90);vector('fb',magneticForce,origin,'#925daa',magneticTolerance,58);
@@ -250,7 +250,7 @@
  $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncMagneticRange();syncElectricLimits(true);prepare();};$('reverse').onclick=()=>{fieldSign=-fieldSign;liveChange();};$('vectors').onchange=render;$('centers').onchange=render;
  const forceCanvas=$('lorentzCanvas');
  forceCanvas.onpointerdown=event=>{lorentzDrag={x:event.clientX,y:event.clientY,yaw:lorentzYaw,tilt:lorentzTilt};forceCanvas.setPointerCapture(event.pointerId);event.preventDefault?.();};
- forceCanvas.onpointermove=event=>{if(!lorentzDrag)return;const scale=forceCanvas.clientWidth/forceCanvas.getBoundingClientRect().width;lorentzYaw=lorentzDrag.yaw+(event.clientX-lorentzDrag.x)*scale*.008;lorentzTilt=Math.max(.18,Math.min(1.25,lorentzDrag.tilt+(event.clientY-lorentzDrag.y)*scale*.006));render();};
+ forceCanvas.onpointermove=event=>{if(!lorentzDrag)return;const scale=forceCanvas.clientWidth/forceCanvas.getBoundingClientRect().width;lorentzYaw=lorentzDrag.yaw-(event.clientX-lorentzDrag.x)*scale*.008;lorentzTilt=Math.max(.18,Math.min(1.25,lorentzDrag.tilt-(event.clientY-lorentzDrag.y)*scale*.006));render();};
  forceCanvas.onpointerup=forceCanvas.onpointercancel=()=>{lorentzDrag=null;};
  forceCanvas.ondblclick=()=>{lorentzYaw=.7;lorentzTilt=.55;render();};
  $('lorentzPanel').ontoggle=()=>{if($('lorentzPanel').open)render();};
