@@ -51,3 +51,18 @@ body[data-fusion-page="fu03-drift"] .controls #electricRow input{position:absolu
 body[data-fusion-page="fu03-drift"] .controls #magneticRow{position:relative;min-width:0;height:42px;padding-right:80px;white-space:nowrap}
 body[data-fusion-page="fu03-drift"] .controls #bValue{position:absolute;right:0;top:0;display:flex;align-items:center;justify-content:flex-end;float:none;width:80px;height:20px;white-space:nowrap}
 body[data-fusion-page="fu03-drift"] .controls #magneticRow input{position:absolute;left:0;bottom:0;width:100%;margin:0}
+
+/* A collapsible force reminder stays outside the scene layout flow. */
+#lorentzPanel{position:absolute;right:14px;bottom:45px;z-index:4;width:340px;border:1px solid #ccd8de;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 2px 8px #29445412;color:#294454}
+#lorentzPanel:not([open]){width:160px}
+#lorentzPanel summary{display:flex;align-items:center;gap:6px;height:30px;padding:5px 9px;cursor:pointer;list-style:none;font-size:13px;font-weight:650;white-space:nowrap}
+#lorentzPanel summary::-webkit-details-marker{display:none}
+#lorentzPanel summary::before{content:'▸';display:inline-block;transition:transform .15s}
+#lorentzPanel[open] summary::before{transform:rotate(90deg)}
+#lorentzCharge{margin-left:auto;font-size:11px;font-weight:400}
+#lorentzPanel:not([open]) #lorentzCharge{display:none}
+#lorentzContent{padding:0 8px 5px}#lorentzFormula{height:27px;display:flex;align-items:center;justify-content:center;font-size:13px;white-space:nowrap}
+.lorentzDiagram{position:relative;height:260px}.lorentzDiagram canvas,#lorentzMath{position:absolute;inset:0;width:100%;height:100%}#lorentzMath{pointer-events:none}#lorentzMath .mathlabel{font-size:12px;background:rgba(255,255,255,.9);padding:0 2px;line-height:1.1}
+#lorentzContent p{margin:2px 0 0;text-align:center;font-size:10px;color:#687d88;white-space:nowrap}
+
+#lorentzRelation{height:24px;text-align:center;font-size:12px;white-space:nowrap}

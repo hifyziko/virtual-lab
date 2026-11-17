@@ -1,5 +1,25 @@
 # Aktuální stav předání
 
+## Sbalitelný kartézský piktogram Lorentzovy síly — 17. listopadu 2026
+
+Do pravého dolního rohu přidána karta Lorentzova síla s rozbalením
+a sbalením kliknutím na záhlaví. Po připomínce k čitelnosti používá větší
+izometrický pohled s kartézskou mřížkou a osami x, y, z. Zobrazuje aktuální
+náboj, v, B, zelený součin v×B a fialovou magnetickou sílu q(v×B) z místního
+pole a skutečné rychlosti. Vztah směru síly k součinu je uveden podle náboje.
+Při nenulovém E přibudou v samostatné spodní části E, F_E a výsledná F
+a v záhlaví úplný Lorentzův vztah; při E=0 zůstává magnetická část.
+Nulová magnetická síla je označená i pro v rovnoběžné s B. Délky vektorů
+jsou výslovně názorné. Sbalení neovlivňuje polohu, rychlost, čas ani
+přehrávání; skrytou kartu nevykresluje. Detail elektronu je vlevo nad
+měřítkem. Popisky mají ochranu proti vzájemnému překrytí.
+Ověřeny směry vektorů i součinu pro proton, elektron a alfa částici,
+magnetická nula a rovnoběžnost v/B, sbalení za běhu a obě dodávky.
+Test-drift, test-fusion-navigation a test-progressive prošly.
+Další uživatelský návrh: ovládání, výklad a modelové podrobnosti sdružovat
+pod jedno Vysvětlení vlevo vedle celé obrazovky; napříč projektem navázat
+na společný ModuleGuide, nevytvářet další samostatné výkladové pásy.
+
 ## Měkká záře jednotlivých značek B — 17. listopadu 2026
 
 Plošné modré podbarvení je podle upřesnění uživatele odstraněné. Místo něj

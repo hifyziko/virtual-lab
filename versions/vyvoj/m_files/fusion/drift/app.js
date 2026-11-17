@@ -52,13 +52,13 @@
  }
 
  function line(g,a,b,color,width=1,dash=[]){g.beginPath();g.strokeStyle=color;g.lineWidth=width;g.setLineDash(dash);g.moveTo(...a);g.lineTo(...b);g.stroke();g.setLineDash([]);}
- function arrow(a,b,color){
+ function arrow(a,b,color,g=ctx){
   const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(length<.01)return;
   const ux=dx/length,uy=dy/length,head=Math.min(9*Math.cos(.4),length*.65),wing=head*Math.tan(.4),shaft=Math.min(1,wing*.5),base=[b[0]-head*ux,b[1]-head*uy];
   // One filled silhouette: the shaft ends at the head base, never at its tip.
   const offset=(p,w)=>[p[0]-uy*w,p[1]+ux*w];
   const points=[offset(a,shaft),offset(base,shaft),offset(base,wing),b,offset(base,-wing),offset(base,-shaft),offset(a,-shaft)];
-  ctx.beginPath();ctx.fillStyle=color;ctx.moveTo(...points[0]);for(const p of points.slice(1))ctx.lineTo(...p);ctx.closePath();ctx.fill();
+  g.beginPath();g.fillStyle=color;g.moveTo(...points[0]);for(const p of points.slice(1))g.lineTo(...p);g.closePath();g.fill();
  }
  function path(points,color,lw=1.5,dash=[]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash(dash);let started=false;for(const p of points){if(!p){started=false;continue;}const xy=project(p);if(started)ctx.lineTo(...xy);else ctx.moveTo(...xy);started=true;}ctx.stroke();ctx.setLineDash([]);}
  function magneticAppearance(B){
@@ -117,7 +117,7 @@
  function electronDetail(state,glyphs){
   const xy=project(state.r),glow=ctx.createRadialGradient(...xy,2,...xy,17);glow.addColorStop(0,'rgba(18,107,195,.22)');glow.addColorStop(.45,'rgba(18,107,195,.12)');glow.addColorStop(1,'rgba(18,107,195,0)');ctx.beginPath();ctx.arc(...xy,17,0,2*Math.PI);ctx.fillStyle=glow;ctx.fill();
   if(config.mode!=='gyration'||!state.center)return;
-  const x=width-192,y=height-220,c=[x+88,y+86],radius=42;
+  const x=18,y=height-300,c=[x+88,y+86],radius=42;
   ctx.fillStyle='#f6f9fc';ctx.fillRect(x,y,176,168);ctx.strokeStyle='#b9cde0';ctx.lineWidth=1;ctx.strokeRect(x,y,176,168);
   ctx.beginPath();ctx.arc(...c,radius,0,2*Math.PI);ctx.setLineDash([3,5]);ctx.strokeStyle='#6a9ccc';ctx.stroke();ctx.setLineDash([]);
   line(ctx,[c[0]-5,c[1]],[c[0]+5,c[1]],'#6590b7');line(ctx,[c[0],c[1]-5],[c[0],c[1]+5],'#6590b7');
@@ -146,6 +146,36 @@
   for(const [key,color]of [['r','#bd7030'],['center','#167d73']]){if(key==='center'&&!$('centers').checked)continue;gc.strokeStyle=color;gc.lineWidth=key==='r'?.9:1.8;gc.setLineDash(key==='center'?[5,4]:[]);gc.beginPath();let move=true;for(let i=0;i<=index;i++){const s=samples[i];if(!s[key]){move=true;continue;}if(s.breakBefore)move=true;const xy=[px(s.t),py(s[key][axis])];if(move)gc.moveTo(...xy);else gc.lineTo(...xy);move=false;}gc.stroke();gc.setLineDash([]);}
   line(gc,[px(samples[index].t),top],[px(samples[index].t),bottom],'#617c6e',1,[3,3]);gc.restore();
  }
+ function drawLorentz(state){
+  const panel=$('lorentzPanel');tex($('lorentzCharge'),'q='+(config.q<0?'-':'+')+(Math.abs(config.q/M.e)>1.5?'2':'')+'e');
+  if(panel.open===false)return;
+  const fields=M.fields(config,state.r),electric=M.norm(fields.E)>0,product=M.cross(state.v,fields.B),magneticForce=product.map(v=>v*config.q),electricForce=fields.E.map(v=>v*config.q),magneticTolerance=Math.abs(config.q)*M.norm(state.v)*M.norm(fields.B)*1e-10;
+  tex($('lorentzFormula'),electric?'\\boldsymbol F=q(\\boldsymbol E+\\boldsymbol v\\times\\boldsymbol B)':'\\boldsymbol F=\\boldsymbol F_B=q(\\boldsymbol v\\times\\boldsymbol B)');
+  const c=$('lorentzCanvas'),g=c.getContext('2d'),[w,h]=size(c),parent=$('lorentzMath'),right=[Math.SQRT1_2,-Math.SQRT1_2,0],up=[-1/Math.sqrt(6),-1/Math.sqrt(6),Math.sqrt(2/3)],depth=M.cross(right,up);
+  for(const el of parent.children)el.hidden=true;const placed=[];
+  function vector(key,value,origin,color,zeroTolerance=0,length=78){
+   const norm=M.norm(value),zero=norm<=zeroTolerance,unit=zero?[0,0,0]:value.map(v=>v/norm),dx=M.dot(unit,right),dy=-M.dot(unit,up),projected=Math.hypot(dx,dy);
+   let tip=[origin[0]+length*dx,origin[1]+length*dy],labelPoint;
+   if(zero){labelPoint=[origin[0]+(key==='b'?-12:18),origin[1]+(key==='b'?-29:31)];}
+   else if(projected<.12){g.strokeStyle=color;g.lineWidth=1.3;g.beginPath();g.arc(...origin,4,0,2*Math.PI);g.stroke();if(M.dot(unit,depth)>0){g.fillStyle=color;g.beginPath();g.arc(...origin,1.5,0,2*Math.PI);g.fill();}else{line(g,[origin[0]-3,origin[1]-3],[origin[0]+3,origin[1]+3],color);line(g,[origin[0]-3,origin[1]+3],[origin[0]+3,origin[1]-3],color);}labelPoint=[origin[0]+12,origin[1]-12];}
+   else{arrow(origin,tip,color,g);labelPoint=[tip[0]+8*dx/projected,tip[1]+8*dy/projected];}
+   const symbol={v:'\\boldsymbol v',b:'\\boldsymbol B',fb:'\\boldsymbol F_B',e:'\\boldsymbol E',fe:'\\boldsymbol F_E',f:'\\boldsymbol F',c:'\\boldsymbol v\\times\\boldsymbol B'}[key],el=label(parent,key,symbol+(zero?'=0':''),Math.max(17,Math.min(w-17,labelPoint[0])),Math.max(12,Math.min(h-12,labelPoint[1])));el.style.color=color;el.hidden=false;
+   const hw=key==='c'?38:zero?24:key==='fb'||key==='fe'?15:10,hh=10,preferred=[parseFloat(el.style.left),parseFloat(el.style.top)],offsets=[[0,0],[-12,0],[12,0],[0,-22],[0,22],[-24,0],[24,0],[-12,-22],[12,22]];
+   let point=preferred;for(const offset of offsets){const candidate=[Math.max(hw+2,Math.min(w-hw-2,preferred[0]+offset[0])),Math.max(hh+2,Math.min(h-hh-2,preferred[1]+offset[1]))];if(!placed.some(p=>Math.abs(p.x-candidate[0])<p.hw+hw+2&&Math.abs(p.y-candidate[1])<p.hh+hh+2)){point=candidate;break;}}
+   el.style.left=point[0]+'px';el.style.top=point[1]+'px';placed.push({x:point[0],y:point[1],hw,hh});
+  }
+  const origin=[w*.5,110],point=v=>[origin[0]+M.dot(v,right),origin[1]-M.dot(v,up)];
+  // A quiet Cartesian ground grid and full x/y/z axes make handedness visible.
+  for(const coordinate of [-60,-30,0,30,60]){line(g,point([-60,coordinate,0]),point([60,coordinate,0]),'#e7ecef',.7);line(g,point([coordinate,-60,0]),point([coordinate,60,0]),'#e7ecef',.7);}
+  if(M.norm(fields.B)&&M.norm(state.v)){const vu=state.v.map(v=>v/M.norm(state.v)*64),bu=fields.B.map(v=>v/M.norm(fields.B)*64),plane=[[0,0,0],vu,vu.map((v,k)=>v+bu[k]),bu].map(point);g.fillStyle='rgba(53,106,195,.055)';g.beginPath();g.moveTo(...plane[0]);for(const p of plane.slice(1))g.lineTo(...p);g.closePath();g.fill();}
+  for(const [axis,key]of [[[1,0,0],'x'],[[0,1,0],'y'],[[0,0,1],'z']]){line(g,point(axis.map(v=>-v*80)),origin,'#c6d0d6',.8,[3,4]);arrow(origin,point(axis.map(v=>v*108)),'#a2b0b8',g);const p=point(axis.map(v=>v*123)),el=label(parent,'axis-'+key,key,p[0],p[1]);el.style.color='#788a95';el.hidden=false;placed.push({x:p[0],y:p[1],hw:9,hh:10});}
+  g.fillStyle='#596e78';g.beginPath();g.arc(...origin,2.5,0,2*Math.PI);g.fill();
+  vector('v',state.v,origin,'#b17b2c');vector('b',fields.B,origin,HiFyzikoParticleStyle.fields.magnetic,0,62);
+  vector('c',product,origin,'#198476',M.norm(state.v)*M.norm(fields.B)*1e-10,90);vector('fb',magneticForce,origin,'#925daa',magneticTolerance,58);
+  if(electric){const heading=label(parent,'electric-heading','\\text{Elektrická část a výsledná síla}',w/2,194);heading.style.color='#687d88';heading.hidden=false;vector('e',fields.E,[w*.21,230],HiFyzikoParticleStyle.fields.electric,0,28);vector('fe',electricForce,[w*.5,230],'#ad6528',0,28);vector('f',magneticForce.map((v,k)=>v+electricForce[k]),[w*.79,230],'#314c59',magneticTolerance,28);}
+  else{const zero=label(parent,'magnetic-heading','\\text{Magnetická část}',w/2,222);zero.style.color='#687d88';zero.hidden=false;}
+  tex($('lorentzRelation'),config.q<0?'q<0:\\quad\\boldsymbol F_B\\;\\text{proti}\\;\\boldsymbol v\\times\\boldsymbol B':'q>0:\\quad\\boldsymbol F_B\\;\\text{ve směru}\\;\\boldsymbol v\\times\\boldsymbol B');
+ }
  function render(){
   if(disposed||!config)return;[width,height]=size(canvas);const i=Math.min(samples.length-1,Math.max(0,Math.floor(frame))),s=samples[i];drawField();
   drawTail(i);
@@ -160,7 +190,7 @@
   label($('sceneMath'),'particle',{electron:'\\mathrm e^-',proton:'\\mathrm p^+',deuteron:'\\mathrm D^+',alpha:'{}^4\\mathrm{He}^{2+}'}[config.species],p[0],p[1]-25);
   const comparing=config.mode==='gyration';$('comparison').hidden=!comparing;graph.hidden=comparing;$('graphMath').hidden=comparing;$('graphLegend').hidden=comparing;$('graphTitle').textContent=comparing?'Porovnání částic':'Příčný pohyb';if(comparing){$('axisNotice').hidden=true;drawComparison();}else drawGraph(i);tex($('timeValue'),quantity(s.t*1e6,'\\mu s'));tex($('rateValue'),num(animationRate())+'\\times');
   if(!$('readouts').children.length)for(let j=0;j<4;j++)$('readouts').append(document.createElement('div'));
-  drawScale();
+  drawScale();drawLorentz(s);
   const values=['E_k='+quantity(s.energy,'eV'),s.center?'r_L='+quantity(s.rho,'m'):'B=0','|\\boldsymbol v_d|='+quantity(M.norm(s.drift),'m\\,s^{-1}'),'T_c='+(Number.isFinite(config.period)?quantity(config.period*1e6,'\\mu s'):'\\infty')];values.forEach((t,j)=>tex($('readouts').children[j],t));
   const status=!config.B?'Magnetické pole je vypnuté. Částice se pohybuje přímo.':ended?'Částice opustila pole. Pokus skončil.':config.mode==='entry'?(s.center?'Částice se stáčí; magnetické pole nekoná práci.':i?'Mimo pole pokračuje částice přímo.':'Připraveno k vletu do magnetického pole.'):config.mode==='electric'?'Směr elektrického driftu nezávisí na náboji.':config.mode==='gradient'?'Změna znaménka náboje obrací směr driftu.':config.mode==='curvature'?'Drift směřuje kolmo k rovině kruhových siločar.':'Bez příčného driftu. Podélný pohyb se zachovává.';
   $('status').textContent=status;if($('status').scrollHeight>$('status').clientHeight||$('status').scrollWidth>$('status').clientWidth)$('status').textContent='';
@@ -203,6 +233,7 @@
   render();
  };
  $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncMagneticRange();syncElectricLimits(true);prepare();};$('reverse').onclick=()=>{fieldSign=-fieldSign;liveChange();};$('vectors').onchange=render;$('centers').onchange=render;
+ $('lorentzPanel').ontoggle=()=>{if($('lorentzPanel').open)render();};
  $('help').onclick=()=>{playing=false;$('play').textContent='Spustit';$('guide').showModal();};$('closeHelp').onclick=()=>$('guide').close();
  const point=event=>{const r=canvas.getBoundingClientRect();return [(event.clientX-r.left)*width/r.width,(event.clientY-r.top)*height/r.height];};
  canvas.onwheel=event=>{if(drag)return;event.preventDefault();const p=point(event),{right,up,origin,scale}=projectionFrame(),old=extent,delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?height:1);extent=Math.max(.01,Math.min(40,extent*Math.exp(Math.max(-500,Math.min(500,delta))*.002)));const dx=(p[0]-origin[0])*config.length*(old-extent)/(scale*old),dy=(origin[1]-p[1])*config.length*(old-extent)/(scale*old);camera=camera.map((v,k)=>v+right[k]*dx+up[k]*dy);render();};
