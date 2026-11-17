@@ -1,5 +1,16 @@
 # Aktuální stav předání
 
+## Výraznější velikost značek a podtón B — 17. listopadu 2026
+
+Na další žádost uživatele je rozdíl velikosti značek mezi slabým a silným
+polem výraznější (poloměr přibližně 3 až 7 px pro 0,1–6 T); prostorové šipky
+mají také výraznější odstupňování. Přidán jemný modrý podtón oblasti pole
+s průhledností přibližně 2,5–9 %. U vletu nezačíná před hranicí pole,
+při B=0 chybí. U Grad-B používá plynulý přechod podle skutečné místní
+velikosti pole. Znaménko sytost ani podtón nemění, model pohybu zůstává stejný.
+Ověřeno test-drift.cjs, test-fusion-navigation.cjs a test-progressive.cjs;
+obě dodávky obsahují shodný aktuální zdroj modulu. Prohlížeč nebyl otevřen.
+
 ## Drifty: tlačítko směru a síla B — 17. listopadu 2026
 
 Podle posledního upřesnění je rozsah velikosti B 0,1–6 T (výchozí 0,5 T).

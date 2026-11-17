@@ -63,11 +63,19 @@
  function path(points,color,lw=1.5,dash=[]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash(dash);let started=false;for(const p of points){if(!p){started=false;continue;}const xy=project(p);if(started)ctx.lineTo(...xy);else ctx.moveTo(...xy);started=true;}ctx.stroke();ctx.setLineDash([]);}
  function magneticAppearance(B){
   const level=Math.sqrt(Math.max(0,Math.min(1,Math.abs(B)/6))),hex=HiFyzikoParticleStyle.fields.magnetic,rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)).join(',');
-  return {color:'rgba('+rgb+','+(.24+.66*level).toFixed(3)+')',lineColor:'rgba('+rgb+','+(.12+.32*level).toFixed(3)+')',radius:3.2+1.3*level,width:.8+.7*level,arrowLength:.72+.48*level};
+  return {color:'rgba('+rgb+','+(.24+.66*level).toFixed(3)+')',lineColor:'rgba('+rgb+','+(.12+.32*level).toFixed(3)+')',tintColor:'rgba('+rgb+','+(.015+.075*level).toFixed(3)+')',radius:2.4+4.6*level,width:.75+level,arrowLength:.55+level};
+ }
+ function drawFieldTint(style,boundary){
+  if(config.mode==='gradient'){
+   const frame=projectionFrame(),tint=ctx.createLinearGradient(0,0,width,0);
+   for(let i=0;i<=32;i++){const x=width*i/32,r=[camera[0]+(x-frame.origin[0])*config.length/frame.scale,camera[1],0];tint.addColorStop(i/32,magneticAppearance(M.norm(M.fields(config,r).B)).tintColor);}
+   ctx.fillStyle=tint;ctx.fillRect(0,0,width,height);
+  }else{const left=config.mode==='entry'?boundary:0;ctx.fillStyle=style.tintColor;ctx.fillRect(left,0,width-left,height);}
  }
  function drawField(){
   const boundary=Math.max(0,Math.min(width,project([0,0,0])[0])),L=config.length,sign=Math.sign(config.B),style=magneticAppearance(config.B);
   if(!sign){for(const key of ['inside','outside','external'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();label($('sceneMath'),'b','B=0',width-65,110);return;}
+  drawFieldTint(style,boundary);
   if($('sceneMath').querySelector('[data-key="b"]')?.dataset.texValue==='B=0')$('sceneMath').querySelector('[data-key="b"]').remove();
   if(config.mode==='curvature'){
    for(const z of [-1,0,1])for(const r of [.8,1,1.2]){const points=Array.from({length:121},(_,i)=>{const t=2*Math.PI*i/120;return [config.R*r*Math.cos(t),config.R*r*Math.sin(t),z*L];});path(points,style.lineColor,style.width*.8);}
