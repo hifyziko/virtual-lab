@@ -4,7 +4,7 @@
  const add=(a,b)=>a.map((v,i)=>v+b[i]),mul=(a,s)=>a.map(v=>v*s),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),norm=a=>Math.hypot(...a);
  function setup(p={}){
   const c={mode:'entry',species:'deuteron',B:.05,energy:500,pitch:0,electric:1500,gradient:.12,radius:6,angle:0,start:[-3,0],...p};
-  Object.assign(c,species[c.species]);c.speed=Math.sqrt(2*c.energy*e/c.m);c.length=c.m*c.speed/(Math.abs(c.q)*.05);c.period=2*Math.PI*c.m/(Math.abs(c.q)*Math.abs(c.B));c.timePeriod=2*Math.PI*c.m/(Math.abs(c.q)*Math.max(Math.abs(c.B),1));c.R=c.radius*c.length;
+  Object.assign(c,species[c.species]);c.speed=Math.sqrt(2*c.energy*e/c.m);c.length=c.m*c.speed/(Math.abs(c.q)*.05);c.period=2*Math.PI*c.m/(Math.abs(c.q)*Math.abs(c.B));c.timePeriod=2*Math.PI*c.m/(Math.abs(c.q)*Math.max(Math.abs(c.B),.1));c.R=c.radius*c.length;
   const a=c.pitch*Math.PI/180,az=c.angle*Math.PI/180,vp=c.speed*Math.cos(a),vl=c.speed*Math.sin(a);
   c.initial={r:c.mode==='curvature'?[c.R,0,0]:c.mode==='entry'?[c.start[0]*c.length,c.start[1]*c.length,0]:[0,0,0],v:c.mode==='curvature'?[vp,vl,0]:[vp*Math.cos(az),vp*Math.sin(az),vl]};return c;
  }

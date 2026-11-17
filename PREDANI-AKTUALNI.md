@@ -1,5 +1,22 @@
 # Aktuální stav předání
 
+## Drifty: tlačítko směru a síla B — 17. listopadu 2026
+
+Podle posledního upřesnění je rozsah velikosti B 0,1–6 T (výchozí 0,5 T).
+Nula je dovolená pouze u vletu do pole, kde lze ukázat pokračující přímý let.
+V gyraci a všech driftech se minimum hlídá i při přechodu z vletu a při změně
+za běhu. Směr opět přepíná Obrátit B pole, se zachováním velikosti, rychlosti,
+polohy a času. Síla pole se názorně zobrazuje sytostí původní sdílené modré,
+mírným růstem značek a výrazností prostorových siločar a šipek. Grad-B
+používá skutečnou místní velikost pole v místě každé značky. Znaménko mění
+tečku/křížek či orientaci šipky, nikoli sytost a velikost. Měřítko pohledu
+a délka časového okna byly přizpůsobeny výchozímu B=0,5 T. Platí i předchozí
+omezení E a funkční zoom. Regresní test ověřuje obrat v každém pokusu,
+limity a nulový vlet, barevnost/velikost při slabém a silném poli, prostorové
+vykreslení a místní rozdíly Grad-B.
+Obě dodávky byly aktualizovány; tools/project/check.cjs i samostatné testy
+driftu, navigace a progresivního načítání prošly. Prohlížeč nebyl otevřen.
+
 ## Podepsané B přes nulu ve všech pokusech — 17. listopadu 2026
 
 Tlačítko Obrátit pole je odstraněné. Společný posuvník B má rozsah −10 až

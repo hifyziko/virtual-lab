@@ -5,14 +5,17 @@
  const num=(n,d=2)=>(Object.is(Number(n.toFixed(d)),-0)?0:Number(n.toFixed(d))).toLocaleString('cs-CZ',{maximumFractionDigits:d,useGrouping:false}).replace(',','{,}');
  const quantity=(n,unit)=>{const a=Math.abs(n);if(!a)return '0\\,\\mathrm{'+unit+'}';const exp=Math.floor(Math.log10(a));return (exp<-2||exp>3?num(n/10**exp)+'\\cdot10^{'+exp+'}':num(n))+'\\,\\mathrm{'+unit+'}';};
  function label(parent,key,s,x,y){let el=parent.querySelector('[data-key="'+key+'"]');if(!el){el=document.createElement('span');el.className='mathlabel';el.dataset.key=key;parent.append(el);}tex(el,s);el.style.left=x+'px';el.style.top=y+'px';return el;}
- let graphMin=0,graphMax=0,axisNoticeUntil=0,speedNoticeUntil=0;let companions=[],companionIds=[],companionStarts={};let ended=false,entered=false,camera=[0,0,0],config,samples,frame=0,playing=false,electricFraction=.4,last=0,raf=0,disposed=false,view=null,gyaw=0,gtilt=0,yaw=-.65,tilt=.65,drag=null,width=900,height=650,extent=1;
+ let graphMin=0,graphMax=0,axisNoticeUntil=0,speedNoticeUntil=0;let companions=[],companionIds=[],companionStarts={};let ended=false,entered=false,camera=[0,0,0],config,samples,frame=0,playing=false,fieldSign=1,electricFraction=.4,last=0,raf=0,disposed=false,view=null,gyaw=0,gtilt=0,yaw=-.65,tilt=.65,drag=null,width=900,height=650,extent=1;
  try{view=new HiFyzikoNucleusView($('nuclei'));}catch{/* A labeled marker remains available without WebGL. */}
  for(const el of document.querySelectorAll('[data-tex]'))tex(el,el.dataset.tex);
  function makeCompanion(id,index){const c=M.setup({...parameters(),species:id});c.length=config.length;const initial={r:[...(companionStarts[id]||[[-3,0],[3,0],[0,2.5]][index].map(v=>v*config.length).concat(0))],v:[...c.initial.v]};return {config:c,initial,samples:[{...initial,t:0,...M.diagnostics(c,initial)}]};}
  // Exact homogeneous-field orbit, with the same physical dt for all species.
  function advanceCompanion(item,dt,time){const c=item.config,old=item.samples.at(-1),omega=c.q*c.B/c.m,a=omega*dt,co=Math.cos(a),si=Math.sin(a),sinc=a===0?1:si/a,cosc=a===0?0:2*Math.sin(a/2)**2/a,v=old.v,r=old.r;const state={v:[v[0]*co+v[1]*si,v[1]*co-v[0]*si,v[2]],r:[r[0]+dt*(v[0]*sinc+v[1]*cosc),r[1]+dt*(v[1]*sinc-v[0]*cosc),r[2]+v[2]*dt]};item.samples.push({...state,t:time,...M.diagnostics(c,state)});if(item.samples.length>1440)item.samples.shift();}
  const animationRate=()=>10**Number($('rate').value);
- function parameters(){return {mode:$('mode').value,species:$('species').value,B:Number($('b').value)/1000,energy:Number($('energy').value),pitch:Number($('pitch').value),electric:Number($('electric').value),gradient:Number($('gradient').value)/100,radius:Number($('radius').value),angle:Number($('angle').value),start:config?.start||[-3,0]};}
+ function parameters(){return {mode:$('mode').value,species:$('species').value,B:fieldSign*Number($('b').value)/1000,energy:Number($('energy').value),pitch:Number($('pitch').value),electric:Number($('electric').value),gradient:Number($('gradient').value)/100,radius:Number($('radius').value),angle:Number($('angle').value),start:config?.start||[-3,0]};}
+ function syncMagneticRange(){
+  const input=$('b'),minimum=$('mode').value==='entry'?0:100;input.min=String(minimum);input.value=String(Math.max(minimum,Math.min(6000,Number(input.value))));
+ }
  function syncElectricLimits(keepFraction=false){
   if($('mode').value!=='electric')return;
   const c=M.setup(parameters()),input=$('electric'),previous=Number(input.max),limit=.08*Math.abs(c.B)*c.speed;
@@ -22,8 +25,8 @@
   input.disabled=false;input.min=String(-maximum);input.max=String(maximum);input.step=String(step);input.value=String(Math.max(-maximum,Math.min(maximum,Math.round(value/step)*step)));
  }
  function prepare(keepView=false){
-  const savedView={extent,camera:[...camera]};syncElectricLimits();
-  playing=false;ended=false;entered=false;$('play').disabled=false;$('play').textContent='Spustit';config=M.setup(parameters());config.length=M.setup({species:config.mode!=='gyration'&&config.species==='electron'?'electron':'deuteron',energy:500,B:5}).length/100;config.R=config.radius*config.length;config.initial.r=config.mode==='curvature'?[config.R,0,0]:[config.start[0]*config.length,config.start[1]*config.length,(config.start[2]||0)*config.length];samples=[{r:[...config.initial.r],v:[...config.initial.v],t:0,...M.diagnostics(config,config.initial)}];camera=[0,0,0];
+  const savedView={extent,camera:[...camera]};syncMagneticRange();syncElectricLimits();
+  playing=false;ended=false;entered=false;$('play').disabled=false;$('play').textContent='Spustit';config=M.setup(parameters());config.length=M.setup({species:config.mode!=='gyration'&&config.species==='electron'?'electron':'deuteron',energy:500,B:.5}).length/10;config.R=config.radius*config.length;config.initial.r=config.mode==='curvature'?[config.R,0,0]:[config.start[0]*config.length,config.start[1]*config.length,(config.start[2]||0)*config.length];samples=[{r:[...config.initial.r],v:[...config.initial.v],t:0,...M.diagnostics(config,config.initial)}];camera=[0,0,0];
   extent=keepView?savedView.extent:1;if(keepView)camera=savedView.camera;
   graphMin=-4*config.length;graphMax=4*config.length;axisNoticeUntil=0;$('axisNotice').hidden=true;
   $('rate').max=config.mode==='gyration'?'4':String(Math.log10(3));$('rate').value=String(Math.min(Number($('rate').value),Number($('rate').max)));
@@ -58,19 +61,34 @@
   ctx.beginPath();ctx.fillStyle=color;ctx.moveTo(...points[0]);for(const p of points.slice(1))ctx.lineTo(...p);ctx.closePath();ctx.fill();
  }
  function path(points,color,lw=1.5,dash=[]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash(dash);let started=false;for(const p of points){if(!p){started=false;continue;}const xy=project(p);if(started)ctx.lineTo(...xy);else ctx.moveTo(...xy);started=true;}ctx.stroke();ctx.setLineDash([]);}
+ function magneticAppearance(B){
+  const level=Math.sqrt(Math.max(0,Math.min(1,Math.abs(B)/6))),hex=HiFyzikoParticleStyle.fields.magnetic,rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)).join(',');
+  return {color:'rgba('+rgb+','+(.24+.66*level).toFixed(3)+')',lineColor:'rgba('+rgb+','+(.12+.32*level).toFixed(3)+')',radius:3.2+1.3*level,width:.8+.7*level,arrowLength:.72+.48*level};
+ }
  function drawField(){
-  const boundary=Math.max(0,Math.min(width,project([0,0,0])[0])),L=config.length,sign=Math.sign(config.B);
+  const boundary=Math.max(0,Math.min(width,project([0,0,0])[0])),L=config.length,sign=Math.sign(config.B),style=magneticAppearance(config.B);
   if(!sign){for(const key of ['inside','outside','external'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();label($('sceneMath'),'b','B=0',width-65,110);return;}
   if($('sceneMath').querySelector('[data-key="b"]')?.dataset.texValue==='B=0')$('sceneMath').querySelector('[data-key="b"]').remove();
   if(config.mode==='curvature'){
-   for(const z of [-1,0,1])for(const r of [.8,1,1.2]){const points=Array.from({length:121},(_,i)=>{const t=2*Math.PI*i/120;return [config.R*r*Math.cos(t),config.R*r*Math.sin(t),z*L];});path(points,HiFyzikoParticleStyle.fields.magnetic,1);}
-   const p=project([config.R,0,0]),q=project([config.R,sign*L,0]);arrow(p,q,HiFyzikoParticleStyle.fields.magnetic);label($('sceneMath'),'b','\\boldsymbol B',q[0]+15,q[1]);return;
+   for(const z of [-1,0,1])for(const r of [.8,1,1.2]){const points=Array.from({length:121},(_,i)=>{const t=2*Math.PI*i/120;return [config.R*r*Math.cos(t),config.R*r*Math.sin(t),z*L];});path(points,style.lineColor,style.width*.8);}
+   const p=project([config.R,0,0]),q=project([config.R,sign*L*style.arrowLength,0]);arrow(p,q,style.color);label($('sceneMath'),'b','\\boldsymbol B',q[0]+15,q[1]);return;
   }
-  if(config.mode==='gyration'&&Math.abs(gtilt)>.02){for(const x of [-4.5,-3,-1.5,0,1.5,3,4.5])for(const y of [-4.5,-3,-1.5,0,1.5,3,4.5]){const a=[x*L,y*L,-2.5*L],b=[x*L,y*L,2.5*L];path([a,b],'rgba(53,106,195,.3)',.8);const mid=[x*L,y*L,0],tip=[x*L,y*L,sign*L];arrow(project(mid),project(tip),HiFyzikoParticleStyle.fields.magnetic);}const tip=project([4.5*L,4.5*L,sign*L]);label($('sceneMath'),'b','\\boldsymbol B',tip[0]+16,tip[1]-12);}else{if(config.mode==='gyration')$('sceneMath').querySelector('[data-key="b"]')?.remove();
-  for(let x=40;x<width-20;x+=48)for(let y=100;y<height-55;y+=48){if(config.mode==='entry'&&(x<boundary+12||(Math.abs(x-(boundary+90))<54&&Math.abs(y-100)<23)))continue;if(config.mode==='electric'&&Math.abs(x-(width-65))<50&&y<165||config.mode==='gradient'&&Math.abs(x-width/2)<65&&y<130)continue;ctx.strokeStyle=HiFyzikoParticleStyle.fields.magnetic;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(x,y,4,0,2*Math.PI);ctx.stroke();if(sign>0){ctx.fillStyle=HiFyzikoParticleStyle.fields.magnetic;ctx.beginPath();ctx.arc(x,y,1.6,0,2*Math.PI);ctx.fill();}else{line(ctx,[x-3,y-3],[x+3,y+3],HiFyzikoParticleStyle.fields.magnetic,1.2);line(ctx,[x-3,y+3],[x+3,y-3],HiFyzikoParticleStyle.fields.magnetic,1.2);}}
+  if(config.mode==='gyration'&&Math.abs(gtilt)>.02){
+   for(const x of [-4.5,-3,-1.5,0,1.5,3,4.5])for(const y of [-4.5,-3,-1.5,0,1.5,3,4.5]){const a=[x*L,y*L,-2.5*L],b=[x*L,y*L,2.5*L];path([a,b],style.lineColor,style.width*.65);const mid=[x*L,y*L,0],tip=[x*L,y*L,sign*L*style.arrowLength];arrow(project(mid),project(tip),style.color);}
+   const tip=project([4.5*L,4.5*L,sign*L*style.arrowLength]);label($('sceneMath'),'b','\\boldsymbol B',tip[0]+16,tip[1]-12);
+  }else{
+   if(config.mode==='gyration')$('sceneMath').querySelector('[data-key="b"]')?.remove();
+   const frame=projectionFrame();
+   for(let x=40;x<width-20;x+=48)for(let y=100;y<height-55;y+=48){
+    if(config.mode==='entry'&&(x<boundary+12||(Math.abs(x-(boundary+90))<54&&Math.abs(y-100)<23)))continue;
+    if(config.mode==='electric'&&Math.abs(x-(width-65))<50&&y<165||config.mode==='gradient'&&Math.abs(x-width/2)<65&&y<130)continue;
+    const r=[camera[0]+(x-frame.origin[0])*L/frame.scale,camera[1]+(frame.origin[1]-y)*L/frame.scale,0],B=M.norm(M.fields(config,r).B),mark=magneticAppearance(B);if(!B)continue;
+    ctx.strokeStyle=mark.color;ctx.lineWidth=mark.width;ctx.beginPath();ctx.arc(x,y,mark.radius,0,2*Math.PI);ctx.stroke();
+    if(sign>0){ctx.fillStyle=mark.color;ctx.beginPath();ctx.arc(x,y,mark.radius*.35,0,2*Math.PI);ctx.fill();}else{const d=mark.radius*.72;line(ctx,[x-d,y-d],[x+d,y+d],mark.color,mark.width);line(ctx,[x-d,y+d],[x+d,y-d],mark.color,mark.width);}
+   }
   }
-  if(config.mode==='entry'){line(ctx,[boundary,74],[boundary,height-40],HiFyzikoParticleStyle.fields.magnetic,2);label($('sceneMath'),'outside','B=0',boundary-80,100);label($('sceneMath'),'inside','\\boldsymbol B'+(sign>0?'\\;\\odot':'\\;\\otimes'),boundary+90,100);}
-  if(config.mode==='electric'||config.mode==='gradient'){const direction=config.mode==='electric'?Math.sign(config.electric):Math.sign(config.gradient),a=config.mode==='electric'?[width-65,110-35*direction*Math.min(1,Math.abs(config.electric)/(Number($('electric').max)||1))]:[width/2-45*direction,110],b=config.mode==='electric'?[width-65,110+35*direction*Math.min(1,Math.abs(config.electric)/(Number($('electric').max)||1))]:[width/2+45*direction,110];if(direction)arrow(a,b,config.mode==='electric'?HiFyzikoParticleStyle.fields.electric:HiFyzikoParticleStyle.fields.magnetic);label($('sceneMath'),'external',config.mode==='electric'?'\\boldsymbol E':'\\nabla B',config.mode==='electric'?width-88:width/2,config.mode==='electric'?110:91);}
+  if(config.mode==='entry'){line(ctx,[boundary,74],[boundary,height-40],style.color,style.width+.5);label($('sceneMath'),'outside','B=0',boundary-80,100);label($('sceneMath'),'inside','\\boldsymbol B'+(sign>0?'\\;\\odot':'\\;\\otimes'),boundary+90,100);}
+  if(config.mode==='electric'||config.mode==='gradient'){const direction=config.mode==='electric'?Math.sign(config.electric):Math.sign(config.gradient),half=35*Math.min(1,Math.abs(config.electric)/(Number($('electric').max)||1)),a=config.mode==='electric'?[width-65,110-half*direction]:[width/2-45*direction,110],b=config.mode==='electric'?[width-65,110+half*direction]:[width/2+45*direction,110];if(direction)arrow(a,b,config.mode==='electric'?HiFyzikoParticleStyle.fields.electric:style.color);label($('sceneMath'),'external',config.mode==='electric'?'\\boldsymbol E':'\\nabla B',config.mode==='electric'?width-88:width/2,config.mode==='electric'?110:91);}
  }
  function drawScale(){
   const barLength=projectionFrame().scale*extent,a=[30,height-83],b=[30+barLength,height-83],cardWidth=Math.max(125,barLength+32);
@@ -106,7 +124,7 @@
   }
  }
  function drawGraph(index){
-  const [w,h]=size(graph),axis=config.mode==='curvature'?2:config.mode==='electric'?0:1,windowTime=8*2*Math.PI*config.m/(Math.abs(config.q)*5),tmax=Math.max(windowTime,samples.at(-1).t),tmin=Math.max(0,tmax-windowTime);
+  const [w,h]=size(graph),axis=config.mode==='curvature'?2:config.mode==='electric'?0:1,windowTime=8*2*Math.PI*config.m/(Math.abs(config.q)*.5),tmax=Math.max(windowTime,samples.at(-1).t),tmin=Math.max(0,tmax-windowTime);
   let low=graphMin,high=graphMax;for(const state of samples){if(state.t<tmin)continue;for(const point of [state.r,$('centers').checked?state.center:null])if(point){low=Math.min(low,point[axis]);high=Math.max(high,point[axis]);}}
   if(low<graphMin||high>graphMax){const span=Math.max(high-low,config.length),raw=span/4,power=10**Math.floor(Math.log10(raw)),step=[1,2,5,10].find(v=>v*power>=raw)*power;graphMin=Math.min(graphMin,Math.floor((low-span*.08)/step)*step);graphMax=Math.max(graphMax,Math.ceil((high+span*.08)/step)*step);axisNoticeUntil=Date.now()+1700;$('axisNotice').hidden=false;}
   const min=graphMin,max=graphMax,yFactor=(max-min)*1000<.1?1e6:1000,yUnit=yFactor===1e6?'\\mu m':'mm',tFactor=windowTime<1e-6?1e9:1e6,tUnit=tFactor===1e9?'ns':'\\mu s',digits=step=>Math.max(0,Math.min(10,1-Math.floor(Math.log10(Math.abs(step))))),yd=digits((max-min)*yFactor/4),td=digits(windowTime*tFactor/4);
@@ -152,7 +170,7 @@
    if(config.mode!=='gyration'&&(screen[0]<-16||screen[0]>width+16||screen[1]<58||screen[1]>height-24)){const initial=M.setup(parameters()).initial;state={r:[...config.initial.r],v:[...initial.v]};respawn=true;entered=false;playing=false;$('play').textContent='Spustit';}
    for(const item of companions){advanceCompanion(item,elapsed,old.t+elapsed);wrapGyration(item.config,item.samples.at(-1));}
    samples.push({...state,t:old.t+elapsed,breakBefore:respawn||wrapped,...M.diagnostics(config,state)});if(ended||respawn)break;}
-  if(config.mode==='gyration'){if(samples.length>1440)samples.splice(0,samples.length-1440);}else{const cutoff=samples.at(-1).t-8*2*Math.PI*config.m/(Math.abs(config.q)*5);let first=0;while(first+1<samples.length&&samples[first+1].t<cutoff)first++;if(first)samples.splice(0,first);}frame=samples.length-1;
+  if(config.mode==='gyration'){if(samples.length>1440)samples.splice(0,samples.length-1440);}else{const cutoff=samples.at(-1).t-8*2*Math.PI*config.m/(Math.abs(config.q)*.5);let first=0;while(first+1<samples.length&&samples[first+1].t<cutoff)first++;if(first)samples.splice(0,first);}frame=samples.length-1;
  }
  function tick(now){if(disposed)return;if(speedNoticeUntil&&Date.now()>speedNoticeUntil){$('speedNotice').hidden=true;speedNoticeUntil=0;}if(axisNoticeUntil&&Date.now()>axisNoticeUntil){$('axisNotice').hidden=true;axisNoticeUntil=0;}const dt=Math.min((now-last)/1000,.08);last=now;if(playing){advance(dt);render();}raf=requestAnimationFrame(tick);}
  $('play').onclick=()=>{if(ended)return;playing=!playing;$('play').textContent=playing?'Pozastavit':'Spustit';};
@@ -161,7 +179,7 @@
   const factor=Math.sqrt(next.energy*old.m/(old.energy*next.m));if(next.pitch===old.pitch&&next.angle===old.angle)return v.map(x=>x*factor);
   const speed=M.norm(v)*factor,pitch=next.pitch*Math.PI/180,phase=next.angle!==old.angle?next.angle*Math.PI/180:Math.atan2(v[1],v[0]);return [speed*Math.cos(pitch)*Math.cos(phase),speed*Math.cos(pitch)*Math.sin(phase),speed*Math.sin(pitch)];
  }
- function liveChange(){syncElectricLimits();for(const item of companions){const old=item.config,state=item.samples.at(-1),next=M.setup({...parameters(),species:old.species});next.length=old.length;next.R=next.radius*next.length;state.v=liveVelocity(state.v,old,next);item.config=next;Object.assign(state,M.diagnostics(next,state));}const wasPlaying=playing,old=config,next=M.setup(parameters()),state=samples.at(-1),factor=Math.sqrt(next.energy*old.m/(old.energy*next.m));next.length=old.length;const entryScaleChange=next.mode==='entry'&&next.species!==old.species&&(next.species==='electron'||old.species==='electron');if(entryScaleChange)next.length=M.setup({species:next.species==='electron'?'electron':'deuteron',energy:500,B:5}).length/100;const positionScale=next.length/old.length;next.R=next.radius*next.length;next.initial.r=old.initial.r.map(v=>v*positionScale);config=next;const current={r:state.r.map(v=>v*positionScale),v:liveVelocity(state.v,old,next)};samples.push({...current,t:state.t,breakBefore:entryScaleChange,...M.diagnostics(config,current)});frame=samples.length-1;tex($('bValue'),quantity(config.B,'T'));tex($('energyValue'),quantity(config.energy,'eV'));tex($('pitchValue'),num(config.pitch,0)+'^\\circ');tex($('angleValue'),num(config.angle,0)+'^\\circ');tex($('electricValue'),quantity(config.electric,'V\\,m^{-1}'));tex($('gradientValue'),quantity(config.gradient/config.length,'m^{-1}'));tex($('radiusValue'),quantity(config.R,'m'));playing=wasPlaying;render();}
+ function liveChange(){syncMagneticRange();syncElectricLimits();for(const item of companions){const old=item.config,state=item.samples.at(-1),next=M.setup({...parameters(),species:old.species});next.length=old.length;next.R=next.radius*next.length;state.v=liveVelocity(state.v,old,next);item.config=next;Object.assign(state,M.diagnostics(next,state));}const wasPlaying=playing,old=config,next=M.setup(parameters()),state=samples.at(-1),factor=Math.sqrt(next.energy*old.m/(old.energy*next.m));next.length=old.length;const entryScaleChange=next.mode==='entry'&&next.species!==old.species&&(next.species==='electron'||old.species==='electron');if(entryScaleChange)next.length=M.setup({species:next.species==='electron'?'electron':'deuteron',energy:500,B:.5}).length/10;const positionScale=next.length/old.length;next.R=next.radius*next.length;next.initial.r=old.initial.r.map(v=>v*positionScale);config=next;const current={r:state.r.map(v=>v*positionScale),v:liveVelocity(state.v,old,next)};samples.push({...current,t:state.t,breakBefore:entryScaleChange,...M.diagnostics(config,current)});frame=samples.length-1;tex($('bValue'),quantity(config.B,'T'));tex($('energyValue'),quantity(config.energy,'eV'));tex($('pitchValue'),num(config.pitch,0)+'^\\circ');tex($('angleValue'),num(config.angle,0)+'^\\circ');tex($('electricValue'),quantity(config.electric,'V\\,m^{-1}'));tex($('gradientValue'),quantity(config.gradient/config.length,'m^{-1}'));tex($('radiusValue'),quantity(config.R,'m'));playing=wasPlaying;render();}
  for(const id of ['pitch','electric','gradient','radius','angle','b','energy'])$(id).oninput=liveChange;
  const particleChoices=[['proton','showProton'],['deuteron','showDeuteron'],['alpha','showAlpha'],['electron','showElectron']];
  for(const [id,node]of particleChoices)$(node).onchange=()=>{
@@ -175,7 +193,7 @@
   if(selected.includes('electron')!==hadElectron){$('speedNotice').textContent=selected.includes('electron')?'Zpomalení času pro elektron':'Obnovení času pro ionty';$('speedNotice').hidden=false;speedNoticeUntil=Date.now()+2400;}
   render();
  };
- $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncElectricLimits(true);prepare();};$('vectors').onchange=render;$('centers').onchange=render;
+ $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncMagneticRange();syncElectricLimits(true);prepare();};$('reverse').onclick=()=>{fieldSign=-fieldSign;liveChange();};$('vectors').onchange=render;$('centers').onchange=render;
  $('help').onclick=()=>{playing=false;$('play').textContent='Spustit';$('guide').showModal();};$('closeHelp').onclick=()=>$('guide').close();
  const point=event=>{const r=canvas.getBoundingClientRect();return [(event.clientX-r.left)*width/r.width,(event.clientY-r.top)*height/r.height];};
  canvas.onwheel=event=>{if(drag)return;event.preventDefault();const p=point(event),{right,up,origin,scale}=projectionFrame(),old=extent,delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?height:1);extent=Math.max(.01,Math.min(40,extent*Math.exp(Math.max(-500,Math.min(500,delta))*.002)));const dx=(p[0]-origin[0])*config.length*(old-extent)/(scale*old),dy=(origin[1]-p[1])*config.length*(old-extent)/(scale*old);camera=camera.map((v,k)=>v+right[k]*dx+up[k]*dy);render();};
