@@ -1,5 +1,9 @@
 # Aktuální stav předání
 
+17. 11. 2026 — Podle dalšího upřesnění obráceno pouze svislé otáčení
+piktogramu (nahoru/dolů); vodorovný směr zůstává. Test driftu, navigace
+a progressive obou aktualizovaných dodávek prošly.
+
 ## Větší nákres a obrácené otáčení — 17. listopadu 2026
 
 Karta piktogramu má šířku 360 px, nákres výšku 280 px a soustava je

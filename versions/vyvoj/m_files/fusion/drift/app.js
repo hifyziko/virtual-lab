@@ -250,7 +250,7 @@
  $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncMagneticRange();syncElectricLimits(true);prepare();};$('reverse').onclick=()=>{fieldSign=-fieldSign;liveChange();};$('vectors').onchange=render;$('centers').onchange=render;
  const forceCanvas=$('lorentzCanvas');
  forceCanvas.onpointerdown=event=>{lorentzDrag={x:event.clientX,y:event.clientY,yaw:lorentzYaw,tilt:lorentzTilt};forceCanvas.setPointerCapture(event.pointerId);event.preventDefault?.();};
- forceCanvas.onpointermove=event=>{if(!lorentzDrag)return;const scale=forceCanvas.clientWidth/forceCanvas.getBoundingClientRect().width;lorentzYaw=lorentzDrag.yaw-(event.clientX-lorentzDrag.x)*scale*.008;lorentzTilt=Math.max(.18,Math.min(1.25,lorentzDrag.tilt-(event.clientY-lorentzDrag.y)*scale*.006));render();};
+ forceCanvas.onpointermove=event=>{if(!lorentzDrag)return;const scale=forceCanvas.clientWidth/forceCanvas.getBoundingClientRect().width;lorentzYaw=lorentzDrag.yaw-(event.clientX-lorentzDrag.x)*scale*.008;lorentzTilt=Math.max(.18,Math.min(1.25,lorentzDrag.tilt+(event.clientY-lorentzDrag.y)*scale*.006));render();};
  forceCanvas.onpointerup=forceCanvas.onpointercancel=()=>{lorentzDrag=null;};
  forceCanvas.ondblclick=()=>{lorentzYaw=.7;lorentzTilt=.55;render();};
  $('lorentzPanel').ontoggle=()=>{if($('lorentzPanel').open)render();};
