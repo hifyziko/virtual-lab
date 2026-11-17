@@ -33,14 +33,14 @@ for(const B of [-.05,.05]){
 }
 // Run real controls and rendering with a deterministic DOM/canvas fixture.
 const html=fs.readFileSync(path.join(base,'index.html'),'utf8'),nodes=new Map(),noop=()=>{};let lastItems,lastGlyph,renderCalls=0,disposed=false;
-let canvasPath=[],orbitWidths=[],lastGraphPath=[],electricArrow,lastPhysics,integratedTime=0;
-const context=new Proxy({beginPath(){canvasPath=[];},moveTo(x,y){canvasPath.push([x,y]);},lineTo(x,y){canvasPath.push([x,y]);},stroke(){if(this.strokeStyle==='#bd7030'&&canvasPath.length>2)lastGraphPath=canvasPath.slice();if(this.strokeStyle==='rgba(22,125,115,.24)'&&canvasPath.length===121)orbitWidths.push(Math.max(...canvasPath.map(p=>p[0]))-Math.min(...canvasPath.map(p=>p[0])));},fill(){if(this.fillStyle==='#b57825')electricArrow=canvasPath.slice();},createRadialGradient:()=>({addColorStop:noop}),createLinearGradient:()=>({addColorStop:noop})},{get:(o,k)=>o[k]||noop});
+let canvasPath=[],orbitWidths=[],lastGraphPath=[],electricArrow,lastPhysics,integratedTime=0,scaleCards=0;
+const context=new Proxy({beginPath(){canvasPath=[];},moveTo(x,y){canvasPath.push([x,y]);},lineTo(x,y){canvasPath.push([x,y]);},stroke(){if(this.strokeStyle==='#bd7030'&&canvasPath.length>2)lastGraphPath=canvasPath.slice();if(this.strokeStyle==='rgba(22,125,115,.24)'&&canvasPath.length===121)orbitWidths.push(Math.max(...canvasPath.map(p=>p[0]))-Math.min(...canvasPath.map(p=>p[0])));},fillRect(x,y,w,h){if(this.fillStyle==='#ffffff'&&x===16&&h===61)scaleCards++;},fill(){if(this.fillStyle==='#b57825')electricArrow=canvasPath.slice();},createRadialGradient:()=>({addColorStop:noop}),createLinearGradient:()=>({addColorStop:noop})},{get:(o,k)=>o[k]||noop});
 function element(tag='div'){return {tagName:tag,children:[],dataset:{},style:{},value:'',textContent:'',checked:false,hidden:false,clientWidth:tag==='canvas'?880:400,clientHeight:tag==='canvas'?630:40,scrollHeight:20,scrollWidth:200,getContext:()=>context,getBoundingClientRect:()=>({left:0,top:0,width:880,height:630}),append(...items){this.children.push(...items);},replaceChildren(...items){this.children=items;},querySelector(selector){return this.children.find(c=>selector==='[data-key="'+c.dataset.key+'"]')||null;},remove(){},setPointerCapture:noop,showModal(){this.open=true;},close(){this.open=false;}};}
 for(const [,tag,id,attrs]of html.matchAll(/<(\w+)\b[^>]*\bid="([^"]+)"([^>]*)>/g)){const el=element(tag);el.value=attrs.match(/value="([^"]*)"/)?.[1]||'';el.checked=/\bchecked\b/.test(attrs);nodes.set(id,el);}
 nodes.get('mode').value='entry';nodes.get('species').value='deuteron';nodes.get('graph').clientWidth=400;nodes.get('graph').clientHeight=200;
 let testNow=0,animation;const env={Date:{now:()=>testNow},console,DriftModel:{...M,step(c,state,dt){integratedTime+=dt;return M.step(c,state,dt);},diagnostics(c,state){lastPhysics={config:c,state,...M.diagnostics(c,state)};return M.diagnostics(c,state);}},HiFyzikoParticleStyle:{fields:{electric:"#b57825",magnetic:"#356ac3"}},document:{getElementById:id=>nodes.get(id),querySelectorAll:()=>[],createElement:element},katex:{render(t,el){assert(!/NaN|Infinity|undefined/.test(t),t);require('../versions/vyvoj/m_files/fusion/particles/vendor/katex.js').renderToString(t,{throwOnError:true});el.tex=t;}},HiFyzikoNucleusView:class{draw(w,h,t,items){renderCalls++;lastGlyph=items[0];lastItems=items.filter(p=>!p.detail);}dispose(){disposed=true;}},ResizeObserver:class{observe(){}disconnect(){}},devicePixelRatio:1,addEventListener:noop,removeEventListener:noop,requestAnimationFrame:fn=>{animation=fn;return 1;},cancelAnimationFrame:noop};env.window=env;
 vm.runInNewContext(fs.readFileSync(path.join(base,'app.js'),'utf8'),env);
-for(const mode of ['entry','gyration','electric','gradient','curvature']){nodes.get('mode').value=mode;nodes.get('mode').onchange();nodes.get('play').onclick();animation(100);nodes.get('play').onclick();nodes.get('reverse').onclick();nodes.get('reset').onclick();}
+for(const mode of ['entry','gyration','electric','gradient','curvature']){const cards=scaleCards;nodes.get('mode').value=mode;nodes.get('mode').onchange();assert(scaleCards>cards,'White scale card in '+mode);nodes.get('play').onclick();animation(100);nodes.get('play').onclick();nodes.get('reverse').onclick();nodes.get('reset').onclick();}
 nodes.get('species').value='electron';nodes.get('species').onchange();nodes.get('help').onclick();assert(nodes.get('guide').open);nodes.get('closeHelp').onclick();assert(!nodes.get('guide').open);assert(renderCalls>20);nodes.get('play').onclick();animation(200);const before=nodes.get('timeValue').tex;nodes.get('energy').value='1000';nodes.get('energy').oninput();assert.equal(nodes.get('timeValue').tex,before,'Energy change preserves time');assert(nodes.get('readouts').children[0].tex.includes('1000'),'Live energy update');nodes.get('b').value='7500';nodes.get('b').oninput();assert.equal(nodes.get('timeValue').tex,before,'B change preserves time');animation(100000);assert.notEqual(nodes.get('timeValue').tex,before,'Animation continues');nodes.get('reset').onclick();nodes.get('play').onclick();
 nodes.get('species').value='deuteron';nodes.get('b').value='5000';nodes.get('energy').value='500';nodes.get('mode').value='entry';nodes.get('mode').onchange();
 const scene=nodes.get('scene'),scale=Math.min((880-90)/12,(630-135)/10),origin=880*.27;
@@ -106,9 +106,9 @@ nodes.get('mode').onchange();scene.ondblclick();nodes.get('pitch').value='0';nod
 // Verify the real E control, field arrow, graph axis and live integration together.
 const defaultElectric=Number(html.match(/id="electric"[^>]*value="([^"]+)"/)[1]);
 const defaultB=Number(html.match(/id="b"[^>]*value="([^"]+)"/)[1])/1000;
-assert(defaultElectric/(defaultB*M.setup({species:'deuteron',energy:500}).speed)>.1,'Default E makes ion drift visible');
+assert(defaultElectric/(defaultB*M.setup({species:'deuteron',energy:500}).speed)>.02,'Default E keeps a moderate visible drift');
 const maxElectric=Number(html.match(/id="electric"[^>]*max="([^"]+)"/)[1]);
-assert(maxElectric/(defaultB*M.setup({species:'electron',energy:500}).speed)>.3,'E range makes electron drift visible too');
+assert(maxElectric<300000,'Static E range no longer permits extreme intensities');
 for(const species of ['deuteron','electron'])for(const fieldSign of [-1,1])for(const electric of [-defaultElectric,0,defaultElectric]){
  nodes.get('species').value=species;nodes.get('b').value='5000';nodes.get('energy').value='500';nodes.get('pitch').value='0';nodes.get('rate').value='0';nodes.get('mode').value='electric';nodes.get('mode').onchange();
  if(Math.sign(lastPhysics.config.B)!==fieldSign)nodes.get('reverse').onclick();
@@ -125,6 +125,33 @@ for(const species of ['deuteron','electron'])for(const fieldSign of [-1,1])for(c
  const afterChange=lastPhysics,changedAt=integratedTime;for(let j=0;j<5;j++)animation(driftTick+=80);
  if(electric)relative(lastPhysics.center[0]-afterChange.center[0],electric/lastPhysics.config.B*(integratedTime-changedAt),1e-8,'Moving E control reverses drift during playback');
 }
+
+// Every experiment zooms around the cursor without touching physics or playback.
+for(const mode of ['entry','gyration','electric','gradient','curvature']){
+ nodes.get('mode').value=mode;nodes.get('mode').onchange();scene.ondblclick();
+ const before={...lastGlyph},time=nodes.get('timeValue').tex,energy=nodes.get('readouts').children[0].tex,measure=nodes.get('sceneMath').querySelector('[data-key="scale"]').tex;
+ scene.onwheel({clientX:before.x,clientY:before.y,deltaY:-200,deltaMode:0,preventDefault:noop});
+ relative(lastGlyph.x,before.x,1e-12,'Zoom-in anchor x in '+mode);relative(lastGlyph.y,before.y,1e-12,'Zoom-in anchor y in '+mode);assert.notEqual(nodes.get('sceneMath').querySelector('[data-key="scale"]').tex,measure);
+ scene.onwheel({clientX:before.x,clientY:before.y,deltaY:200,deltaMode:0,preventDefault:noop});
+ relative(lastGlyph.x,before.x,1e-12,'Zoom-out anchor x in '+mode);relative(lastGlyph.y,before.y,1e-12,'Zoom-out anchor y in '+mode);assert.equal(nodes.get('timeValue').tex,time);assert.equal(nodes.get('readouts').children[0].tex,energy);
+ nodes.get('play').onclick();scene.onwheel({clientX:400,clientY:300,deltaY:2,deltaMode:1,preventDefault:noop});assert.equal(nodes.get('play').textContent,'Pozastavit','Zoom preserves playing in '+mode);scene.ondblclick();
+ assert.equal(nodes.get('timeValue').tex,time,'Reset view does not reset time');
+}
+// Stress all E extremes at both ends of B/energy, for all selectable species.
+for(const species of Object.keys(M.species))for(const b of [1000,10000])for(const energy of [50,1000])for(const fieldSign of [-1,1])for(const electricSign of [-1,1]){
+ nodes.get('species').value=species;nodes.get('b').value=String(b);nodes.get('energy').value=String(energy);nodes.get('mode').value='electric';nodes.get('mode').onchange();if(Math.sign(lastPhysics.config.B)!==fieldSign)nodes.get('reverse').onclick();
+ nodes.get('electric').value=String(electricSign*Number(nodes.get('electric').max)*100);nodes.get('electric').oninput();
+ assert(Math.abs(lastPhysics.config.electric)<=.08*Math.abs(lastPhysics.config.B)*lastPhysics.config.speed,'E is capped to a moderate drift for '+species);
+ assert.equal(Math.sign(lastPhysics.config.electric),electricSign);nodes.get('rate').value=String(Math.log10(3));nodes.get('play').onclick();const started=integratedTime;
+ for(let j=0;j<60;j++){animation(driftTick+=80);assert(lastGlyph.x>=59.99&&lastGlyph.x<=820.01&&lastGlyph.y>=164.99&&lastGlyph.y<=505.01,'E extreme stays visible for '+species);assert.equal(nodes.get('play').textContent,'Pozastavit','No offscreen reset at E limit');}
+ assert(integratedTime>started,'Physics keeps advancing at E limit');
+ const before=nodes.get('timeValue').tex;nodes.get('b').value='1000';nodes.get('b').oninput();nodes.get('energy').value='50';nodes.get('energy').oninput();assert(Math.abs(lastPhysics.config.electric)<=.08*Math.abs(lastPhysics.config.B)*lastPhysics.config.speed,'Parameter changes recalculate cap');assert.equal(nodes.get('timeValue').tex,before,'Limiting E keeps time');
+}
+const css=fs.readFileSync(path.join(base,'style.css'),'utf8');
+assert(/#electricRow\{[^}]*grid-column:1\/-1[^}]*height:42px[^}]*white-space:nowrap/.test(css),'E instrument row has fixed geometry');
+assert(/#electricValue\{[^}]*width:220px[^}]*height:20px[^}]*white-space:nowrap/.test(css),'Minus sign has reserved space');
+assert(!/body:not[^}]*scale[^}]*background:transparent/.test(css),'Scale stays white outside gyration');
+assert(html.includes('E×B drift')&&html.includes('Grad-B drift')&&html.includes('Drift zakřivení')&&!html.includes('Elektrický drift')&&!html.includes('Gradientní drift'),'Names match chapter 7.4');
 
 env.HiFyzikoFusionDispose();assert(disposed,'GPU lifecycle');
 console.log('PASS: analytic gyration, entry/exit, energy/work, all drift signs and magnitudes, boundary convergence, controls, rendering math and disposal.');

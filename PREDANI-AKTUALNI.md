@@ -1,5 +1,22 @@
 # Aktuální stav předání
 
+## Klidnější E×B drift, zoom a stabilní údaje — 17. listopadu 2026
+
+Na další připomínky byl široký rozsah E nahrazen přizpůsobivým limitem
+|E| ≤ 0,08 |B| v (v odpovídá zvolené energii a částici). Změna B nebo energie
+limit přepočítá, změna částice zachovává relativní polohu ovladače. Kamera
+udržuje částici v záběru bez resetování fyziky; graf zachovává skutečné
+souřadnice. Kolečko přibližuje a oddaluje kolem kurzoru ve všech pěti pokusech
+včetně driftu zakřivení. Dvojklik obnoví pohled, bez změny fyziky či času.
+Při tažení částice zůstává přiblížení zachované. Měřítko má ve všech pokusech
+bílou kartu vykreslenou nad trajektoriemi. Názvy v nabídce, scéně, průvodci
+a rozcestníku odpovídají rukopisu: E×B drift, Grad-B drift, Drift zakřivení.
+Údaj E má samostatný pevný řádek a místo pro znaménko i exponent, takže
+záporné hodnoty nemění rozměry ovládání. Regresní test zahrnuje 64 krajních
+kombinací částice, B, energie a obou znamének polí, obousměrný zoom každého
+pokusu, zachování fyziky, bílou kartu měřítka a pevné rozměry řádku E.
+Úplné sestavení a tools/project/check.cjs prošly. Prohlížeč nebyl otevírán.
+
 ## Galerie na konci a elektrický drift — 17. listopadu 2026
 
 Galerie je poslední položkou skupiny za driftovým experimentem (čísla 01/02/03),

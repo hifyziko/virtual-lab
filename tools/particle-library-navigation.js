@@ -2,7 +2,7 @@
 (()=>{'use strict';
  const entries=[
   {id:'fu01-reakce',group:'fusion',num:'01',title:'Fúzní reakce a Coulombova bariéra',description:'Přibližování jader, průchod bariérou a názorné ukázky jaderných reakcí.',page:'fuze-bariera/index.html',kind:'Interaktivní experiment'},
-  {id:'fu03-drift',group:'fusion',num:'02',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a elektrický, gradientní i křivostní drift.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'},
+  {id:'fu03-drift',group:'fusion',num:'02',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a E×B drift, Grad-B drift i drift zakřivení.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'},
   {id:'fu02-galerie',group:'fusion',num:'03',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
  ];
  const aliases={"fu02-jadra":"nuclei","fu03-atomy":"atoms","fu04-castice":"particles"};

@@ -200,7 +200,7 @@
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
  add('fu03-drift','drift',
   ['Začněte vletem do magnetického pole: nastavte částici, energii a směr a spusťte pokus. Před spuštěním lze částici přetáhnout.','Přepněte na gyraci nebo jednotlivé drifty. Animaci pozastavíte tlačítkem, restart vrátí částici. Energii a indukci měňte i za běhu.'],
-  ['Mimo pole se částice pohybuje přímo; v čistě magnetickém poli mění směr, nikoli kinetickou energii.','Elektrický drift má pro oba náboje stejný směr. Gradientní a křivostní drift obracejí směr se znaménkem náboje. Pole jsou předepsaná; model nepočítá vlastní pole plazmatu.'],String.raw`\boldsymbol v_E=\frac{\boldsymbol E\times\boldsymbol B}{B^2}`,['fu01-reakce','fu02-galerie','em03-silove-ucinky']);
+  ['Mimo pole se částice pohybuje přímo; v čistě magnetickém poli mění směr, nikoli kinetickou energii.','E×B drift má pro oba náboje stejný směr. Grad-B drift a drift zakřivení obracejí směr se znaménkem náboje. Pole jsou předepsaná; model nepočítá vlastní pole plazmatu.'],String.raw`\boldsymbol v_E=\frac{\boldsymbol E\times\boldsymbol B}{B^2}`,['fu01-reakce','fu02-galerie','em03-silove-ucinky']);
  // Historical deep links use the same gallery and the same guide.
  const aliases={'fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
  window.ModuleGuideData={sources,entries,aliases};

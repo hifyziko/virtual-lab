@@ -31,7 +31,7 @@ body[data-fusion-page="fu03-drift"] .playback>span:last-child{justify-self:end;w
 
 .compareControls{display:flex;align-items:center;gap:6px}.controls .compareControls select{width:135px;margin:0}.controls .compareControls button{white-space:nowrap}
 
-body:not(:has(#mode option[value="gyration"]:checked)) #sceneMath .mathlabel[data-key="scale"]{background:transparent}
+
 
 body[data-fusion-page="fu03-drift"] header .back{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:7px 14px;border:1px solid #c5d7ce;border-radius:8px;background:#fff;color:#276754;font-size:14px;font-weight:600;white-space:nowrap;text-decoration:none}body[data-fusion-page="fu03-drift"] header .back:hover{background:#e9f3ec}
 
@@ -42,3 +42,8 @@ body[data-fusion-page="fu03-drift"] header .back{display:inline-flex;align-items
 #speedNotice{position:absolute;top:62px;left:50%;transform:translateX(-50%);z-index:5;padding:7px 13px;border:1px solid #efc27b;border-radius:7px;background:#fff1d9;color:#925719;font-size:13px;font-weight:600;pointer-events:none;white-space:nowrap}
 
 #comparison{position:absolute;inset:0;padding:12px 10px;display:flex;flex-direction:column;gap:6px;color:#344b57} .comparisonHead,.comparisonRow{display:grid;grid-template-columns:58px minmax(45px,1fr) 86px 78px;align-items:center;gap:8px}.comparisonHead{font-size:11px;color:#61747e;min-height:26px}.comparisonRow{min-height:35px;border-top:1px solid #e6ecef;font-size:12px}.comparisonRow>span:nth-last-child(-n+2),.comparisonHead>span:nth-last-child(-n+2){text-align:right}.radiusTrack{height:7px;background:#e8eef2}.radiusBar{height:100%;background:#547d99}#bar-electron{background:#326bc0}#comparison p{font-size:11px;color:#61747e;margin:4px 0 0}
+
+/* Keep the signed electric-field readout in one fixed instrument row. */
+body[data-fusion-page="fu03-drift"] .controls #electricRow{grid-column:1/-1;position:relative;min-width:0;height:42px;padding-right:220px;white-space:nowrap}
+body[data-fusion-page="fu03-drift"] .controls #electricValue{position:absolute;right:0;top:0;display:flex;align-items:center;justify-content:flex-end;float:none;width:220px;height:20px;white-space:nowrap;font-variant-numeric:tabular-nums}
+body[data-fusion-page="fu03-drift"] .controls #electricRow input{position:absolute;left:0;bottom:0;width:100%;margin:0}
