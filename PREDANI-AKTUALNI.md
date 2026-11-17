@@ -1,5 +1,20 @@
 # Aktuální stav předání
 
+## Podepsané B přes nulu ve všech pokusech — 17. listopadu 2026
+
+Tlačítko Obrátit pole je odstraněné. Společný posuvník B má rozsah −10 až
++10 T s nulou uprostřed ve všech pěti pokusech; záporné i kladné údaje mají
+pevné místo. Změna za běhu zachovává polohu, rychlost i čas. V B=0 pole
+nekreslí magnetické značky, pohyb je přímočarý, gyrační střed neexistuje
+a fyzikální cyklotronová perioda je nekonečná. Krok animace má samostatnou
+konečnou časovou referenci, analytická gyrace používá stabilní limit sinc
+pro nulovou úhlovou rychlost. Rozsah E se mění s |B|; relativní poloha
+ovladače se zachovává i přes B=0, kde je E vypnuté. Délka šipky E odpovídá
+její poloze v dostupném rozsahu. Testy pokrývají volný pohyb B=0, přechody
+kladné → nulové → záporné B ve všech pokusech a pro všechny částice,
+souběžnou gyraci více druhů při B=0 a návrat rozsahu E i délku její šipky.
+Úplné sestavení i tools/project/check.cjs prošly, prohlížeč nebyl otevřen.
+
 ## Klidnější E×B drift, zoom a stabilní údaje — 17. listopadu 2026
 
 Na další připomínky byl široký rozsah E nahrazen přizpůsobivým limitem

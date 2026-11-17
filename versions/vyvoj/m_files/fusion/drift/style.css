@@ -47,3 +47,7 @@ body[data-fusion-page="fu03-drift"] header .back{display:inline-flex;align-items
 body[data-fusion-page="fu03-drift"] .controls #electricRow{grid-column:1/-1;position:relative;min-width:0;height:42px;padding-right:220px;white-space:nowrap}
 body[data-fusion-page="fu03-drift"] .controls #electricValue{position:absolute;right:0;top:0;display:flex;align-items:center;justify-content:flex-end;float:none;width:220px;height:20px;white-space:nowrap;font-variant-numeric:tabular-nums}
 body[data-fusion-page="fu03-drift"] .controls #electricRow input{position:absolute;left:0;bottom:0;width:100%;margin:0}
+
+body[data-fusion-page="fu03-drift"] .controls #magneticRow{position:relative;min-width:0;height:42px;padding-right:80px;white-space:nowrap}
+body[data-fusion-page="fu03-drift"] .controls #bValue{position:absolute;right:0;top:0;display:flex;align-items:center;justify-content:flex-end;float:none;width:80px;height:20px;white-space:nowrap}
+body[data-fusion-page="fu03-drift"] .controls #magneticRow input{position:absolute;left:0;bottom:0;width:100%;margin:0}

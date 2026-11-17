@@ -31,6 +31,12 @@ for(const B of [-.05,.05]){
  const insideConfig=M.setup({start:[2,0],B}),orbit=M.simulate(insideConfig,{turns:5});assert(orbit.every(s=>s.r[0]>0&&s.center),'Orbit placed wholly inside the field stays inside');
  const edgeConfig=M.setup({start:[.2,0],B}),escape=M.simulate(edgeConfig,{turns:5});assert(escape.some(s=>s.r[0]<0&&!s.center),'Orbit near the boundary can escape');
 }
+// B=0 is free flight, with finite integration timing and no cyclotron orbit.
+for(const mode of ['entry','gyration','electric','gradient','curvature'])for(const species of Object.keys(M.species)){
+ const c=M.setup({mode,species,B:0,electric:0}),history=M.simulate(c,{turns:2});assert.equal(c.period,Infinity);assert(Number.isFinite(c.timePeriod));
+ for(const state of history){assert(state.r.every(Number.isFinite)&&state.v.every(Number.isFinite));relative(state.energy,c.energy,1e-12,'Zero field preserves energy');assert.equal(state.center,null);for(let k=0;k<3;k++)assert(Math.abs(state.r[k]-c.initial.r[k]-c.initial.v[k]*state.t)<c.length*1e-9,'Zero field gives straight motion');}
+}
+
 // Run real controls and rendering with a deterministic DOM/canvas fixture.
 const html=fs.readFileSync(path.join(base,'index.html'),'utf8'),nodes=new Map(),noop=()=>{};let lastItems,lastGlyph,renderCalls=0,disposed=false;
 let canvasPath=[],orbitWidths=[],lastGraphPath=[],electricArrow,lastPhysics,integratedTime=0,scaleCards=0;
@@ -40,7 +46,7 @@ for(const [,tag,id,attrs]of html.matchAll(/<(\w+)\b[^>]*\bid="([^"]+)"([^>]*)>/g
 nodes.get('mode').value='entry';nodes.get('species').value='deuteron';nodes.get('graph').clientWidth=400;nodes.get('graph').clientHeight=200;
 let testNow=0,animation;const env={Date:{now:()=>testNow},console,DriftModel:{...M,step(c,state,dt){integratedTime+=dt;return M.step(c,state,dt);},diagnostics(c,state){lastPhysics={config:c,state,...M.diagnostics(c,state)};return M.diagnostics(c,state);}},HiFyzikoParticleStyle:{fields:{electric:"#b57825",magnetic:"#356ac3"}},document:{getElementById:id=>nodes.get(id),querySelectorAll:()=>[],createElement:element},katex:{render(t,el){assert(!/NaN|Infinity|undefined/.test(t),t);require('../versions/vyvoj/m_files/fusion/particles/vendor/katex.js').renderToString(t,{throwOnError:true});el.tex=t;}},HiFyzikoNucleusView:class{draw(w,h,t,items){renderCalls++;lastGlyph=items[0];lastItems=items.filter(p=>!p.detail);}dispose(){disposed=true;}},ResizeObserver:class{observe(){}disconnect(){}},devicePixelRatio:1,addEventListener:noop,removeEventListener:noop,requestAnimationFrame:fn=>{animation=fn;return 1;},cancelAnimationFrame:noop};env.window=env;
 vm.runInNewContext(fs.readFileSync(path.join(base,'app.js'),'utf8'),env);
-for(const mode of ['entry','gyration','electric','gradient','curvature']){const cards=scaleCards;nodes.get('mode').value=mode;nodes.get('mode').onchange();assert(scaleCards>cards,'White scale card in '+mode);nodes.get('play').onclick();animation(100);nodes.get('play').onclick();nodes.get('reverse').onclick();nodes.get('reset').onclick();}
+for(const mode of ['entry','gyration','electric','gradient','curvature']){const cards=scaleCards;nodes.get('mode').value=mode;nodes.get('mode').onchange();assert(scaleCards>cards,'White scale card in '+mode);nodes.get('play').onclick();animation(100);nodes.get('play').onclick();nodes.get('b').value=String(-Number(nodes.get('b').value));nodes.get('b').oninput();nodes.get('reset').onclick();}
 nodes.get('species').value='electron';nodes.get('species').onchange();nodes.get('help').onclick();assert(nodes.get('guide').open);nodes.get('closeHelp').onclick();assert(!nodes.get('guide').open);assert(renderCalls>20);nodes.get('play').onclick();animation(200);const before=nodes.get('timeValue').tex;nodes.get('energy').value='1000';nodes.get('energy').oninput();assert.equal(nodes.get('timeValue').tex,before,'Energy change preserves time');assert(nodes.get('readouts').children[0].tex.includes('1000'),'Live energy update');nodes.get('b').value='7500';nodes.get('b').oninput();assert.equal(nodes.get('timeValue').tex,before,'B change preserves time');animation(100000);assert.notEqual(nodes.get('timeValue').tex,before,'Animation continues');nodes.get('reset').onclick();nodes.get('play').onclick();
 nodes.get('species').value='deuteron';nodes.get('b').value='5000';nodes.get('energy').value='500';nodes.get('mode').value='entry';nodes.get('mode').onchange();
 const scene=nodes.get('scene'),scale=Math.min((880-90)/12,(630-135)/10),origin=880*.27;
@@ -111,7 +117,7 @@ const maxElectric=Number(html.match(/id="electric"[^>]*max="([^"]+)"/)[1]);
 assert(maxElectric<300000,'Static E range no longer permits extreme intensities');
 for(const species of ['deuteron','electron'])for(const fieldSign of [-1,1])for(const electric of [-defaultElectric,0,defaultElectric]){
  nodes.get('species').value=species;nodes.get('b').value='5000';nodes.get('energy').value='500';nodes.get('pitch').value='0';nodes.get('rate').value='0';nodes.get('mode').value='electric';nodes.get('mode').onchange();
- if(Math.sign(lastPhysics.config.B)!==fieldSign)nodes.get('reverse').onclick();
+ if(Math.sign(lastPhysics.config.B)!==fieldSign){nodes.get('b').value=String(-Number(nodes.get('b').value));nodes.get('b').oninput();}
  nodes.get('electric').value=String(electric);nodes.get('electric').oninput();
  assert.equal(lastPhysics.config.electric,electric,'E input reaches solver');
  assert(nodes.get('graphMath').querySelector('[data-key="axis"]').tex.startsWith('x'),'E drift graph uses horizontal displacement');
@@ -139,7 +145,7 @@ for(const mode of ['entry','gyration','electric','gradient','curvature']){
 }
 // Stress all E extremes at both ends of B/energy, for all selectable species.
 for(const species of Object.keys(M.species))for(const b of [1000,10000])for(const energy of [50,1000])for(const fieldSign of [-1,1])for(const electricSign of [-1,1]){
- nodes.get('species').value=species;nodes.get('b').value=String(b);nodes.get('energy').value=String(energy);nodes.get('mode').value='electric';nodes.get('mode').onchange();if(Math.sign(lastPhysics.config.B)!==fieldSign)nodes.get('reverse').onclick();
+ nodes.get('species').value=species;nodes.get('b').value=String(b);nodes.get('energy').value=String(energy);nodes.get('mode').value='electric';nodes.get('mode').onchange();if(Math.sign(lastPhysics.config.B)!==fieldSign){nodes.get('b').value=String(-Number(nodes.get('b').value));nodes.get('b').oninput();}
  nodes.get('electric').value=String(electricSign*Number(nodes.get('electric').max)*100);nodes.get('electric').oninput();
  assert(Math.abs(lastPhysics.config.electric)<=.08*Math.abs(lastPhysics.config.B)*lastPhysics.config.speed,'E is capped to a moderate drift for '+species);
  assert.equal(Math.sign(lastPhysics.config.electric),electricSign);nodes.get('rate').value=String(Math.log10(3));nodes.get('play').onclick();const started=integratedTime;
@@ -152,6 +158,25 @@ assert(/#electricRow\{[^}]*grid-column:1\/-1[^}]*height:42px[^}]*white-space:now
 assert(/#electricValue\{[^}]*width:220px[^}]*height:20px[^}]*white-space:nowrap/.test(css),'Minus sign has reserved space');
 assert(!/body:not[^}]*scale[^}]*background:transparent/.test(css),'Scale stays white outside gyration');
 assert(html.includes('E×B drift')&&html.includes('Grad-B drift')&&html.includes('Drift zakřivení')&&!html.includes('Elektrický drift')&&!html.includes('Gradientní drift'),'Names match chapter 7.4');
+
+// Signed B slider crosses zero in every mode, while the simulation keeps running.
+assert(!html.includes('id="reverse"')&&!html.includes('Obrátit pole'),'No separate reversal button');
+assert(/id="b"[^>]*min="-10000"[^>]*max="10000"/.test(html),'B slider is symmetric across zero');
+for(const mode of ['entry','gyration','electric','gradient','curvature'])for(const species of Object.keys(M.species)){
+ nodes.get('species').value=species;nodes.get('b').value='1000';nodes.get('mode').value=mode;nodes.get('mode').onchange();nodes.get('rate').value='-1';nodes.get('play').onclick();
+ for(const value of ['1000','100','0','-100','-1000','0','1000']){
+  const time=nodes.get('timeValue').tex,position={...lastGlyph};nodes.get('b').value=value;nodes.get('b').oninput();
+  assert.equal(nodes.get('timeValue').tex,time,'Signed B keeps time in '+mode);assert.equal(lastGlyph.x,position.x,'Signed B keeps x');assert.equal(lastGlyph.y,position.y,'Signed B keeps y');assert.equal(lastPhysics.config.B,Number(value)/1000);
+  if(value==='0'&&mode==='electric'){assert.equal(lastPhysics.config.electric,0);assert(nodes.get('electric').disabled);}
+  animation(driftTick+=80);assert(lastItems.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)),'Finite frame through zero in '+mode);assert.equal(nodes.get('play').textContent,'Pozastavit','Zero crossing preserves playback in '+mode);
+ }
+}
+nodes.get('species').value='deuteron';nodes.get('mode').value='electric';nodes.get('b').value='5000';nodes.get('mode').onchange();
+nodes.get('electric').value=nodes.get('electric').max;nodes.get('electric').oninput();const fullArrow=Math.abs(electricArrow[3][1]-electricArrow[0][1]);
+nodes.get('electric').value=String(Number(nodes.get('electric').max)/2);nodes.get('electric').oninput();relative(Math.abs(electricArrow[3][1]-electricArrow[0][1]),fullArrow/2,.002,'E arrow length follows control magnitude');
+const fraction=Number(nodes.get('electric').value)/Number(nodes.get('electric').max);for(const value of ['1000','0','-1000','-5000']){nodes.get('b').value=value;nodes.get('b').oninput();if(value!=='0'){relative(Number(nodes.get('electric').value)/Number(nodes.get('electric').max),fraction,.004,'E selection survives changing |B| and crossing zero');assert(!nodes.get('electric').disabled);}}
+// Several species also pass B=0 in the exact common-time gyration solver.
+nodes.get('mode').value='gyration';nodes.get('mode').onchange();for(const id of ['showProton','showAlpha','showElectron']){nodes.get(id).checked=true;nodes.get(id).onchange();}nodes.get('b').value='0';nodes.get('b').oninput();nodes.get('rate').value='-1';nodes.get('play').onclick();for(let j=0;j<5;j++)animation(driftTick+=80);assert.equal(lastItems.length,4);assert(lastItems.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));
 
 env.HiFyzikoFusionDispose();assert(disposed,'GPU lifecycle');
 console.log('PASS: analytic gyration, entry/exit, energy/work, all drift signs and magnitudes, boundary convergence, controls, rendering math and disposal.');

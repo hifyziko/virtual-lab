@@ -5,19 +5,21 @@
  const num=(n,d=2)=>(Object.is(Number(n.toFixed(d)),-0)?0:Number(n.toFixed(d))).toLocaleString('cs-CZ',{maximumFractionDigits:d,useGrouping:false}).replace(',','{,}');
  const quantity=(n,unit)=>{const a=Math.abs(n);if(!a)return '0\\,\\mathrm{'+unit+'}';const exp=Math.floor(Math.log10(a));return (exp<-2||exp>3?num(n/10**exp)+'\\cdot10^{'+exp+'}':num(n))+'\\,\\mathrm{'+unit+'}';};
  function label(parent,key,s,x,y){let el=parent.querySelector('[data-key="'+key+'"]');if(!el){el=document.createElement('span');el.className='mathlabel';el.dataset.key=key;parent.append(el);}tex(el,s);el.style.left=x+'px';el.style.top=y+'px';return el;}
- let graphMin=0,graphMax=0,axisNoticeUntil=0,speedNoticeUntil=0;let companions=[],companionIds=[],companionStarts={};let ended=false,entered=false,camera=[0,0,0],config,samples,frame=0,playing=false,sign=1,last=0,raf=0,disposed=false,view=null,gyaw=0,gtilt=0,yaw=-.65,tilt=.65,drag=null,width=900,height=650,extent=1;
+ let graphMin=0,graphMax=0,axisNoticeUntil=0,speedNoticeUntil=0;let companions=[],companionIds=[],companionStarts={};let ended=false,entered=false,camera=[0,0,0],config,samples,frame=0,playing=false,electricFraction=.4,last=0,raf=0,disposed=false,view=null,gyaw=0,gtilt=0,yaw=-.65,tilt=.65,drag=null,width=900,height=650,extent=1;
  try{view=new HiFyzikoNucleusView($('nuclei'));}catch{/* A labeled marker remains available without WebGL. */}
  for(const el of document.querySelectorAll('[data-tex]'))tex(el,el.dataset.tex);
  function makeCompanion(id,index){const c=M.setup({...parameters(),species:id});c.length=config.length;const initial={r:[...(companionStarts[id]||[[-3,0],[3,0],[0,2.5]][index].map(v=>v*config.length).concat(0))],v:[...c.initial.v]};return {config:c,initial,samples:[{...initial,t:0,...M.diagnostics(c,initial)}]};}
  // Exact homogeneous-field orbit, with the same physical dt for all species.
- function advanceCompanion(item,dt,time){const c=item.config,old=item.samples.at(-1),omega=c.q*c.B/c.m,a=omega*dt,co=Math.cos(a),si=Math.sin(a),v=old.v,r=old.r;const state={v:[v[0]*co+v[1]*si,v[1]*co-v[0]*si,v[2]],r:[r[0]+(v[0]*si+v[1]*(1-co))/omega,r[1]+(v[1]*si-v[0]*(1-co))/omega,r[2]+v[2]*dt]};item.samples.push({...state,t:time,...M.diagnostics(c,state)});if(item.samples.length>1440)item.samples.shift();}
+ function advanceCompanion(item,dt,time){const c=item.config,old=item.samples.at(-1),omega=c.q*c.B/c.m,a=omega*dt,co=Math.cos(a),si=Math.sin(a),sinc=a===0?1:si/a,cosc=a===0?0:2*Math.sin(a/2)**2/a,v=old.v,r=old.r;const state={v:[v[0]*co+v[1]*si,v[1]*co-v[0]*si,v[2]],r:[r[0]+dt*(v[0]*sinc+v[1]*cosc),r[1]+dt*(v[1]*sinc-v[0]*cosc),r[2]+v[2]*dt]};item.samples.push({...state,t:time,...M.diagnostics(c,state)});if(item.samples.length>1440)item.samples.shift();}
  const animationRate=()=>10**Number($('rate').value);
- function parameters(){return {mode:$('mode').value,species:$('species').value,B:sign*Number($('b').value)/1000,energy:Number($('energy').value),pitch:Number($('pitch').value),electric:Number($('electric').value),gradient:Number($('gradient').value)/100,radius:Number($('radius').value),angle:Number($('angle').value),start:config?.start||[-3,0]};}
+ function parameters(){return {mode:$('mode').value,species:$('species').value,B:Number($('b').value)/1000,energy:Number($('energy').value),pitch:Number($('pitch').value),electric:Number($('electric').value),gradient:Number($('gradient').value)/100,radius:Number($('radius').value),angle:Number($('angle').value),start:config?.start||[-3,0]};}
  function syncElectricLimits(keepFraction=false){
   if($('mode').value!=='electric')return;
-  const c=M.setup(parameters()),input=$('electric'),limit=.08*Math.abs(c.B)*c.speed,step=10**(Math.floor(Math.log10(limit))-3),maximum=Math.floor(limit/step)*step;
-  const value=Number(input.value)*(keepFraction?maximum/(Number(input.max)||100000):1);
-  input.min=String(-maximum);input.max=String(maximum);input.step=String(step);input.value=String(Math.max(-maximum,Math.min(maximum,Math.round(value/step)*step)));
+  const c=M.setup(parameters()),input=$('electric'),previous=Number(input.max),limit=.08*Math.abs(c.B)*c.speed;
+  if(previous>0&&!input.disabled)electricFraction=Math.max(-1,Math.min(1,Number(input.value)/previous));
+  if(!limit){input.min='0';input.max='0';input.step='1';input.value='0';input.disabled=true;return;}
+  const step=10**(Math.floor(Math.log10(limit))-3),maximum=Math.floor(limit/step)*step,value=keepFraction||previous===0||Math.abs(c.B)!==Math.abs(config?.B??c.B)?electricFraction*maximum:Number(input.value);
+  input.disabled=false;input.min=String(-maximum);input.max=String(maximum);input.step=String(step);input.value=String(Math.max(-maximum,Math.min(maximum,Math.round(value/step)*step)));
  }
  function prepare(keepView=false){
   const savedView={extent,camera:[...camera]};syncElectricLimits();
@@ -57,7 +59,9 @@
  }
  function path(points,color,lw=1.5,dash=[]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash(dash);let started=false;for(const p of points){if(!p){started=false;continue;}const xy=project(p);if(started)ctx.lineTo(...xy);else ctx.moveTo(...xy);started=true;}ctx.stroke();ctx.setLineDash([]);}
  function drawField(){
-  const boundary=Math.max(0,Math.min(width,project([0,0,0])[0])),L=config.length;
+  const boundary=Math.max(0,Math.min(width,project([0,0,0])[0])),L=config.length,sign=Math.sign(config.B);
+  if(!sign){for(const key of ['inside','outside','external'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();label($('sceneMath'),'b','B=0',width-65,110);return;}
+  if($('sceneMath').querySelector('[data-key="b"]')?.dataset.texValue==='B=0')$('sceneMath').querySelector('[data-key="b"]').remove();
   if(config.mode==='curvature'){
    for(const z of [-1,0,1])for(const r of [.8,1,1.2]){const points=Array.from({length:121},(_,i)=>{const t=2*Math.PI*i/120;return [config.R*r*Math.cos(t),config.R*r*Math.sin(t),z*L];});path(points,HiFyzikoParticleStyle.fields.magnetic,1);}
    const p=project([config.R,0,0]),q=project([config.R,sign*L,0]);arrow(p,q,HiFyzikoParticleStyle.fields.magnetic);label($('sceneMath'),'b','\\boldsymbol B',q[0]+15,q[1]);return;
@@ -66,14 +70,14 @@
   for(let x=40;x<width-20;x+=48)for(let y=100;y<height-55;y+=48){if(config.mode==='entry'&&(x<boundary+12||(Math.abs(x-(boundary+90))<54&&Math.abs(y-100)<23)))continue;if(config.mode==='electric'&&Math.abs(x-(width-65))<50&&y<165||config.mode==='gradient'&&Math.abs(x-width/2)<65&&y<130)continue;ctx.strokeStyle=HiFyzikoParticleStyle.fields.magnetic;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(x,y,4,0,2*Math.PI);ctx.stroke();if(sign>0){ctx.fillStyle=HiFyzikoParticleStyle.fields.magnetic;ctx.beginPath();ctx.arc(x,y,1.6,0,2*Math.PI);ctx.fill();}else{line(ctx,[x-3,y-3],[x+3,y+3],HiFyzikoParticleStyle.fields.magnetic,1.2);line(ctx,[x-3,y+3],[x+3,y-3],HiFyzikoParticleStyle.fields.magnetic,1.2);}}
   }
   if(config.mode==='entry'){line(ctx,[boundary,74],[boundary,height-40],HiFyzikoParticleStyle.fields.magnetic,2);label($('sceneMath'),'outside','B=0',boundary-80,100);label($('sceneMath'),'inside','\\boldsymbol B'+(sign>0?'\\;\\odot':'\\;\\otimes'),boundary+90,100);}
-  if(config.mode==='electric'||config.mode==='gradient'){const direction=config.mode==='electric'?Math.sign(config.electric):Math.sign(config.gradient),a=config.mode==='electric'?[width-65,110-35*direction]:[width/2-45*direction,110],b=config.mode==='electric'?[width-65,110+35*direction]:[width/2+45*direction,110];if(direction)arrow(a,b,config.mode==='electric'?HiFyzikoParticleStyle.fields.electric:HiFyzikoParticleStyle.fields.magnetic);label($('sceneMath'),'external',config.mode==='electric'?'\\boldsymbol E':'\\nabla B',config.mode==='electric'?width-88:width/2,config.mode==='electric'?110:91);}
+  if(config.mode==='electric'||config.mode==='gradient'){const direction=config.mode==='electric'?Math.sign(config.electric):Math.sign(config.gradient),a=config.mode==='electric'?[width-65,110-35*direction*Math.min(1,Math.abs(config.electric)/(Number($('electric').max)||1))]:[width/2-45*direction,110],b=config.mode==='electric'?[width-65,110+35*direction*Math.min(1,Math.abs(config.electric)/(Number($('electric').max)||1))]:[width/2+45*direction,110];if(direction)arrow(a,b,config.mode==='electric'?HiFyzikoParticleStyle.fields.electric:HiFyzikoParticleStyle.fields.magnetic);label($('sceneMath'),'external',config.mode==='electric'?'\\boldsymbol E':'\\nabla B',config.mode==='electric'?width-88:width/2,config.mode==='electric'?110:91);}
  }
  function drawScale(){
   const barLength=projectionFrame().scale*extent,a=[30,height-83],b=[30+barLength,height-83],cardWidth=Math.max(125,barLength+32);
   ctx.fillStyle='#ffffff';ctx.fillRect(16,height-104,cardWidth,61);ctx.strokeStyle='#dbe2e6';ctx.lineWidth=.8;ctx.strokeRect(16,height-104,cardWidth,61);
   line(ctx,a,b,'#344c59',2);line(ctx,[a[0],a[1]-4],[a[0],a[1]+4],'#344c59');line(ctx,[b[0],b[1]-4],[b[0],b[1]+4],'#344c59');label($('sceneMath'),'scale',quantity(config.length*extent,'m'),16+cardWidth/2,height-61);
  }
- function drawTail(index,history=samples,period=config.period){
+ function drawTail(index,history=samples,period=config.timePeriod){
   const now=history[index].t,duration=period*(config.mode==='gyration'?2.5:.85),first=Math.max(0,index-(config.mode==='gyration'?1200:360));ctx.save();ctx.lineCap='round';
   let start=first;for(let j=index;j>first;j--)if(history[j].breakBefore){start=j;break;}
   for(let j=start+1;j<=index;j++){const a=history[j-1],b=history[j],age=now-b.t;if(b.breakBefore)continue;if(age>duration||age<0)continue;const weight=1-age/duration;line(ctx,project(a.r),project(b.r),'rgba(185,121,57,'+(.8*weight*weight)+')',.3+6*weight*weight);}
@@ -98,7 +102,7 @@
   tex($('radiusHeading'),'r_L\\,(\\mathrm{mm})');tex($('periodHeading'),'T_c\\,(\\mathrm{ns})');
   for(const id of ['proton','deuteron','alpha','electron']){const item=items.find(item=>item.config.species===id);$('compare-'+id).hidden=!item;if(!item)continue;
    const state=item.samples.at(-1);tex($('name-'+id),{proton:'\\mathrm p^+',deuteron:'\\mathrm D^+',alpha:'{}^4\\mathrm{He}^{2+}',electron:'\\mathrm e^-'}[id]);
-   $('bar-'+id).style.width=(100*state.rho/maximum)+'%';tex($('rho-'+id),num(state.rho*1000,state.rho*1000<.01?5:3));tex($('period-'+id),num(item.config.period*1e9,item.config.period*1e9<.1?4:2));
+   $('bar-'+id).style.width=(100*state.rho/maximum)+'%';tex($('rho-'+id),item.config.B?num(state.rho*1000,state.rho*1000<.01?5:3):'\\text{—}');tex($('period-'+id),Number.isFinite(item.config.period)?num(item.config.period*1e9,item.config.period*1e9<.1?4:2):'\\infty');
   }
  }
  function drawGraph(index){
@@ -123,15 +127,15 @@
   const velScale=config.length*.95/config.speed,tip=project(s.r.map((r,k)=>r+s.v[k]*velScale));
   if($('vectors').checked){arrow(p,tip,'#b17b2c');label($('sceneMath'),'v','\\boldsymbol v',tip[0]+12,tip[1]-12);const f=M.norm(s.force);const old=$('sceneMath').querySelector('[data-key="f"]');if(f){const fp=project(s.r.map((r,k)=>r+s.force[k]/f*config.length*.7));arrow(p,fp,'#925daa');label($('sceneMath'),'f','\\boldsymbol F',fp[0]+12,fp[1]-10);}else old?.remove();}else{for(const key of ['v','f'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();}
   const glyphs=[{id:config.species,x:p[0],y:p[1],radius:12,vibration:0}];
-  for(let j=0;j<companions.length;j++){const item=companions[j],state=item.samples.at(-1),xy=project(state.r);drawTail(item.samples.length-1,item.samples,item.config.period);if(centerOn)drawGyrationCircle(state);if(!view){ctx.beginPath();ctx.fillStyle=item.config.q>0?'#d74732':'#126bc3';ctx.arc(...xy,7,0,2*Math.PI);ctx.fill();}glyphs.push({id:item.config.species,x:xy[0],y:xy[1],radius:12,vibration:0});label($('sceneMath'),'companion'+j,{electron:'\\mathrm e^-',proton:'\\mathrm p^+',deuteron:'\\mathrm D^+',alpha:'{}^4\\mathrm{He}^{2+}'}[item.config.species],xy[0],xy[1]-25);}
+  for(let j=0;j<companions.length;j++){const item=companions[j],state=item.samples.at(-1),xy=project(state.r);drawTail(item.samples.length-1,item.samples,item.config.timePeriod);if(centerOn)drawGyrationCircle(state);if(!view){ctx.beginPath();ctx.fillStyle=item.config.q>0?'#d74732':'#126bc3';ctx.arc(...xy,7,0,2*Math.PI);ctx.fill();}glyphs.push({id:item.config.species,x:xy[0],y:xy[1],radius:12,vibration:0});label($('sceneMath'),'companion'+j,{electron:'\\mathrm e^-',proton:'\\mathrm p^+',deuteron:'\\mathrm D^+',alpha:'{}^4\\mathrm{He}^{2+}'}[item.config.species],xy[0],xy[1]-25);}
   const electron=config.species==='electron'?s:companions.find(item=>item.config.species==='electron')?.samples.at(-1);if(electron)electronDetail(electron,glyphs);else for(const key of ['electronZoomTitle','electronZoomRadius'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();
-  if(view)view.draw(width,height,s.t/config.period,glyphs);else{ctx.beginPath();ctx.fillStyle=config.q>0?'#d74732':'#126bc3';ctx.arc(...p,7,0,2*Math.PI);ctx.fill();}
+  if(view)view.draw(width,height,s.t/config.timePeriod,glyphs);else{ctx.beginPath();ctx.fillStyle=config.q>0?'#d74732':'#126bc3';ctx.arc(...p,7,0,2*Math.PI);ctx.fill();}
   label($('sceneMath'),'particle',{electron:'\\mathrm e^-',proton:'\\mathrm p^+',deuteron:'\\mathrm D^+',alpha:'{}^4\\mathrm{He}^{2+}'}[config.species],p[0],p[1]-25);
   const comparing=config.mode==='gyration';$('comparison').hidden=!comparing;graph.hidden=comparing;$('graphMath').hidden=comparing;$('graphLegend').hidden=comparing;$('graphTitle').textContent=comparing?'Porovnání částic':'Příčný pohyb';if(comparing){$('axisNotice').hidden=true;drawComparison();}else drawGraph(i);tex($('timeValue'),quantity(s.t*1e6,'\\mu s'));tex($('rateValue'),num(animationRate())+'\\times');
   if(!$('readouts').children.length)for(let j=0;j<4;j++)$('readouts').append(document.createElement('div'));
   drawScale();
-  const values=['E_k='+quantity(s.energy,'eV'),s.center?'r_L='+quantity(s.rho,'m'):'B=0','|\\boldsymbol v_d|='+quantity(M.norm(s.drift),'m\\,s^{-1}'),'T_c='+quantity(config.period*1e6,'\\mu s')];values.forEach((t,j)=>tex($('readouts').children[j],t));
-  const status=ended?'Částice opustila pole. Pokus skončil.':config.mode==='entry'?(s.center?'Částice se stáčí; magnetické pole nekoná práci.':i?'Mimo pole pokračuje částice přímo.':'Připraveno k vletu do magnetického pole.'):config.mode==='electric'?'Směr elektrického driftu nezávisí na náboji.':config.mode==='gradient'?'Změna znaménka náboje obrací směr driftu.':config.mode==='curvature'?'Drift směřuje kolmo k rovině kruhových siločar.':'Bez příčného driftu. Podélný pohyb se zachovává.';
+  const values=['E_k='+quantity(s.energy,'eV'),s.center?'r_L='+quantity(s.rho,'m'):'B=0','|\\boldsymbol v_d|='+quantity(M.norm(s.drift),'m\\,s^{-1}'),'T_c='+(Number.isFinite(config.period)?quantity(config.period*1e6,'\\mu s'):'\\infty')];values.forEach((t,j)=>tex($('readouts').children[j],t));
+  const status=!config.B?'Magnetické pole je vypnuté. Částice se pohybuje přímo.':ended?'Částice opustila pole. Pokus skončil.':config.mode==='entry'?(s.center?'Částice se stáčí; magnetické pole nekoná práci.':i?'Mimo pole pokračuje částice přímo.':'Připraveno k vletu do magnetického pole.'):config.mode==='electric'?'Směr elektrického driftu nezávisí na náboji.':config.mode==='gradient'?'Změna znaménka náboje obrací směr driftu.':config.mode==='curvature'?'Drift směřuje kolmo k rovině kruhových siločar.':'Bez příčného driftu. Podélný pohyb se zachovává.';
   $('status').textContent=status;if($('status').scrollHeight>$('status').clientHeight||$('status').scrollWidth>$('status').clientWidth)$('status').textContent='';
  }
  function wrapGyration(c,state){
@@ -141,7 +145,7 @@
   const target=top+((xy[1]-top)%span+span)%span;state.r=[state.r[0],state.r[1],state.r[2]+(xy[1]-target)/(scale*up[2])];state.breakBefore=true;Object.assign(state,M.diagnostics(c,state));return true;
  }
  function advance(seconds){
-  const total=Math.min(config.period,...companions.map(item=>item.config.period))*seconds*animationRate()/2,steps=Math.max(1,Math.min(180,Math.ceil(seconds*90*animationRate()))),dt=total/steps;
+  const total=Math.min(config.timePeriod,...companions.map(item=>item.config.timePeriod))*seconds*animationRate()/2,steps=Math.max(1,Math.min(180,Math.ceil(seconds*90*animationRate()))),dt=total/steps;
   for(let k=0;k<steps;k++){const old=samples.at(-1);let state={r:old.r,v:old.v};if(config.mode==='gyration'){const exact={config,samples:[old]};advanceCompanion(exact,dt,old.t+dt);state=exact.samples.at(-1);}else{const n=Math.max(12,Math.ceil(dt*Math.abs(config.q)*M.norm(M.fields(config,state.r).B)/config.m/.025));for(let j=0;j<n;j++)state=M.step(config,state,dt/n);}let elapsed=dt;
    const wrapped=config.mode==='gyration'&&wrapGyration(config,state);if(config.mode==='electric')keepElectricVisible(state);const screen=project(state.r);
    let respawn=false;
@@ -171,7 +175,7 @@
   if(selected.includes('electron')!==hadElectron){$('speedNotice').textContent=selected.includes('electron')?'Zpomalení času pro elektron':'Obnovení času pro ionty';$('speedNotice').hidden=false;speedNoticeUntil=Date.now()+2400;}
   render();
  };
- $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncElectricLimits(true);prepare();};$('reverse').onclick=()=>{sign=-sign;liveChange();};$('vectors').onchange=render;$('centers').onchange=render;
+ $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncElectricLimits(true);prepare();};$('vectors').onchange=render;$('centers').onchange=render;
  $('help').onclick=()=>{playing=false;$('play').textContent='Spustit';$('guide').showModal();};$('closeHelp').onclick=()=>$('guide').close();
  const point=event=>{const r=canvas.getBoundingClientRect();return [(event.clientX-r.left)*width/r.width,(event.clientY-r.top)*height/r.height];};
  canvas.onwheel=event=>{if(drag)return;event.preventDefault();const p=point(event),{right,up,origin,scale}=projectionFrame(),old=extent,delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?height:1);extent=Math.max(.01,Math.min(40,extent*Math.exp(Math.max(-500,Math.min(500,delta))*.002)));const dx=(p[0]-origin[0])*config.length*(old-extent)/(scale*old),dy=(origin[1]-p[1])*config.length*(old-extent)/(scale*old);camera=camera.map((v,k)=>v+right[k]*dx+up[k]*dy);render();};

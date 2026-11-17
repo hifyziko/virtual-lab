@@ -4,7 +4,7 @@
  const add=(a,b)=>a.map((v,i)=>v+b[i]),mul=(a,s)=>a.map(v=>v*s),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),norm=a=>Math.hypot(...a);
  function setup(p={}){
   const c={mode:'entry',species:'deuteron',B:.05,energy:500,pitch:0,electric:1500,gradient:.12,radius:6,angle:0,start:[-3,0],...p};
-  Object.assign(c,species[c.species]);c.speed=Math.sqrt(2*c.energy*e/c.m);c.length=c.m*c.speed/(Math.abs(c.q)*.05);c.period=2*Math.PI*c.m/(Math.abs(c.q)*Math.abs(c.B));c.R=c.radius*c.length;
+  Object.assign(c,species[c.species]);c.speed=Math.sqrt(2*c.energy*e/c.m);c.length=c.m*c.speed/(Math.abs(c.q)*.05);c.period=2*Math.PI*c.m/(Math.abs(c.q)*Math.abs(c.B));c.timePeriod=2*Math.PI*c.m/(Math.abs(c.q)*Math.max(Math.abs(c.B),1));c.R=c.radius*c.length;
   const a=c.pitch*Math.PI/180,az=c.angle*Math.PI/180,vp=c.speed*Math.cos(a),vl=c.speed*Math.sin(a);
   c.initial={r:c.mode==='curvature'?[c.R,0,0]:c.mode==='entry'?[c.start[0]*c.length,c.start[1]*c.length,0]:[0,0,0],v:c.mode==='curvature'?[vp,vl,0]:[vp*Math.cos(az),vp*Math.sin(az),vl]};return c;
  }
@@ -19,7 +19,7 @@
   return {r:add(half,mul(v,dt/2)),v};
  }
  function diagnostics(c,s){
-  const {B,E}=fields(c,s.r),b=norm(B),energy=c.m*dot(s.v,s.v)/(2*e);if(!b)return {center:null,drift:[0,0,0],rho:0,energy,force:[0,0,0]};
+  const {B,E}=fields(c,s.r),b=norm(B),energy=c.m*dot(s.v,s.v)/(2*e);if(!b)return {center:null,drift:[0,0,0],rho:0,energy,force:mul(E,c.q)};
   const unit=mul(B,1/b),parallel=dot(s.v,unit),exb=mul(cross(E,B),1/(b*b)),w=add(s.v,mul(exb,-1)),perp=add(w,mul(unit,-dot(w,unit))),rho=c.m*norm(perp)/(Math.abs(c.q)*b);
   let drift=exb;
   if(c.mode==='gradient')drift=add(drift,mul(cross(B,[b*c.gradient/c.length,0,0]),c.m*dot(perp,perp)/(2*c.q*b*b*b)));
@@ -27,7 +27,7 @@
   return {center:add(s.r,mul(cross(w,B),c.m/(c.q*b*b))),drift,rho,energy,force:mul(add(E,cross(s.v,B)),c.q)};
  }
  function simulate(c,{frames=1440,turns=8,substeps=12}={}){
-  let s={r:[...c.initial.r],v:[...c.initial.v]},time=0;const samples=[],duration=turns*c.period,dt=duration/frames;
+  let s={r:[...c.initial.r],v:[...c.initial.v]},time=0;const samples=[],duration=turns*(Number.isFinite(c.period)?c.period:c.timePeriod),dt=duration/frames;
   for(let i=0;i<=frames;i++){
    samples.push({...s,t:time,...diagnostics(c,s)});
    if(i===frames)break;
