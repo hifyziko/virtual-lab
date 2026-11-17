@@ -1,5 +1,20 @@
 # Aktuální stav předání
 
+## Šipky podle velikosti oběhu — 17. listopadu 2026
+
+Ve společném E×B + Grad-B se šipky rychlosti a síly u hlavní částice
+zmenšují úměrně Larmorovu poloměru, s horním limitem dosavadní velikosti.
+Při promítnuté délce pod 4 px se šipka i popisek skryjí; při zvětšení
+oběhu se obnoví. Elektron při skutečném poměru hmotností proto ve scéně
+nemá velké rotující šipky. Změna se týká názorných šipek hlavní scény;
+Lorentzův piktogram dál ukazuje veličiny ve vlastních měřítkách. Pohyb,
+síla, kinetická energie, fyzikální čas a stav přehrávání se nemění.
+
+Test-drift ověřil plynulé zmenšování při interpolaci hmotností, skrytí
+nečitelných šipek i popisků a jejich návrat; zachování polohy i času.
+Navigace, progressive a audit veřejných souborů prošly. Obě aktuální
+dodávky sestaveny. Prohlížeč se automaticky nespouštěl.
+
 ## Plynulé nastavení společného driftu — 17. listopadu 2026
 
 U Grad-B odstraněn odklon: všechny rovinné drifty mají rychlost kolmou

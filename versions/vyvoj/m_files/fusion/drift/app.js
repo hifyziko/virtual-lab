@@ -206,8 +206,15 @@
   drawTail(i);
   const centerOn=$('centers').checked;if(centerOn)drawGyrationCircle(s);
   const p=project(s.r);if(centerOn&&s.center){const c=project(s.center);line(ctx,p,c,'rgba(22,125,115,.2)',.7,[3,6]);ctx.beginPath();ctx.arc(...c,3,0,2*Math.PI);ctx.strokeStyle='rgba(22,125,115,.5)';ctx.lineWidth=1;ctx.stroke();}
-  const velScale=config.length*.95/config.speed,tip=project(s.r.map((r,k)=>r+s.v[k]*velScale));
-  if($('vectors').checked){arrow(p,tip,'#b17b2c');label($('sceneMath'),'v','\\mathbf v',tip[0]+12,tip[1]-12);const f=M.norm(s.force);const old=$('sceneMath').querySelector('[data-key="f"]');if(f){const fp=project(s.r.map((r,k)=>r+s.force[k]/f*config.length*.7));arrow(p,fp,'#925daa');label($('sceneMath'),'f','\\mathbf F',fp[0]+12,fp[1]-10);}else old?.remove();}else{for(const key of ['v','f'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();}
+  // Scene arrows follow the orbit size during the model-to-electron transition.
+  const vectorSize=config.mode==='combined'?Math.min(1,s.rho/(config.length*.7)):1,velScale=config.length*.95*vectorSize/config.speed,tip=project(s.r.map((r,k)=>r+s.v[k]*velScale));
+  function sceneVector(key,end,color,symbol){
+   const old=$('sceneMath').querySelector('[data-key="'+key+'"]');
+   if(!$('vectors').checked||!end||Math.hypot(end[0]-p[0],end[1]-p[1])<4){if(old)old.hidden=true;return;}
+   arrow(p,end,color);label($('sceneMath'),key,symbol,end[0]+12,end[1]-12).hidden=false;
+  }
+  sceneVector('v',tip,'#b17b2c','\\mathbf v');const f=M.norm(s.force);
+  sceneVector('f',f?project(s.r.map((r,k)=>r+s.force[k]/f*config.length*.7*vectorSize)):null,'#925daa','\\mathbf F');
   const glyphs=[{id:config.species,x:p[0],y:p[1],radius:12,vibration:0}];
   for(let j=0;j<companions.length;j++){const item=companions[j],state=item.samples.at(-1),xy=project(state.r);drawTail(item.samples.length-1,item.samples,item.config.timePeriod);if(centerOn)drawGyrationCircle(state);if(!view){ctx.beginPath();ctx.fillStyle=item.config.q>0?'#d74732':'#126bc3';ctx.arc(...xy,7,0,2*Math.PI);ctx.fill();}glyphs.push({id:item.config.species,x:xy[0],y:xy[1],radius:12,vibration:0});label($('sceneMath'),'companion'+j,particleSymbol(item.config.species),xy[0],xy[1]-25);}
   const electron=config.species==='electron'?s:companions.find(item=>item.config.species==='electron')?.samples.at(-1);if(electron)electronDetail(electron,glyphs);else for(const key of ['electronZoomTitle','electronZoomRadius'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();
