@@ -1,5 +1,22 @@
 # Aktuální stav předání
 
+## Zřetelnější Grad-B drift — 17. listopadu 2026
+
+Na žádost uživatele trojnásobně zvýšen dostupný relativní gradient:
+limit pozvolnosti podle největšího referenčního oběhu z 8 na 24 procent,
+absolutní strop parametru z 0,2 na 0,6. Výchozí záporný parametr je -0,18
+(ovladač -18 procent), nadále se omezí podle B, energie a částice.
+Při běžném nastavení tak používá přibližně trojnásobek předchozího
+skutečného gradientu. Silnější pole zůstává vlevo. Jde o skutečné
+zesílení driftu integrací v poli, nikoli násobení nakresleného posunu.
+Hladký omezený profil B, bezpečné E, obálka oběhů, maximální oddálení
+a opakované vypouštění při velké separaci zůstávají.
+
+Test-drift prošel včetně trojnásobku příspěvku v referenčním místě,
+směru separace a zachování energie v silnějším gradientu, krajních
+hodnot a dlouhého běhu v okně. Navigace, progressive a audit prošly.
+Obě aktuální dodávky sestaveny; prohlížeč se automaticky nespouštěl.
+
 ## Bezpečné rozsahy a udržení oběhů v okně — 17. listopadu 2026
 
 Opravena příčina rozjíždění měřítka společného driftu: kamera již

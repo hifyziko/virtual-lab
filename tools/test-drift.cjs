@@ -318,7 +318,7 @@ for(const [id,value] of [['massBlend','0'],['massBlend','50'],['massBlend','100'
 for(const focus of ['electron','proton']){const time=nodes.get('timeValue').tex,before=lastItems.find(p=>p.id===focus);nodes.get('pairFocus').value=focus;nodes.get('pairFocus').onchange();assert.equal(nodes.get('timeValue').tex,time);assert.equal(nodes.get('play').textContent,'Pozastavit');assert.equal(lastItems[0].id,focus);relative(lastItems[0].x,before.x,1e-12,'Switching focus keeps its actual state');}
 for(const checked of [false,true]){const time=nodes.get('timeValue').tex,p={...lastItems[0]};nodes.get('showPair').checked=checked;nodes.get('showPair').onchange();assert.equal(nodes.get('timeValue').tex,time);assert.equal(nodes.get('play').textContent,'Pozastavit');assert.equal(lastItems.length,checked?2:1);assert.equal(lastItems[0].x,p.x);assert.equal(lastItems[0].y,p.y);}
 nodes.get('play').onclick();const pauseTime=nodes.get('timeValue').tex;nodes.get('massBlend').value='25';nodes.get('massBlend').oninput();assert.equal(nodes.get('timeValue').tex,pauseTime);assert.equal(nodes.get('play').textContent,'Spustit','Paused state also survives settings');
-assert(/id="gradient"[^>]*value="-12"/.test(html),'Default gradient is negative');
+assert(/id="gradient"[^>]*value="-18"/.test(html),'Default gradient is negative');
 for(const mode of ['gradient','combined']){const c=M.setup({mode});assert(M.norm(M.fields(c,[-c.length,0,0]).B)>M.norm(M.fields(c,[c.length,0,0]).B),'Default field is stronger on the left in '+mode);}
 
 
@@ -345,12 +345,21 @@ function assertPairInViewport(message){
 }
 for(const B of ['100','6000'])for(const blend of ['0','100'])for(const direction of [-1,1]){
  nodes.get('pairFocus').value='proton';nodes.get('showPair').checked=true;nodes.get('mode').value='combined';nodes.get('b').value=B;nodes.get('energy').value='1000';nodes.get('massBlend').value=blend;nodes.get('mode').onchange();nodes.get('gradient').value=String(direction*999);nodes.get('gradient').oninput();nodes.get('electric').value=String(direction*Number(nodes.get('electric').max));nodes.get('electric').oninput();
- const snap=env.__driftSnapshot(),proton=M.setup({...snap.config,species:'proton'});assert(Math.abs(snap.config.gradient)<=Number(nodes.get('gradient').max)/100);assert(Math.abs(snap.config.electric)<=.04*Math.abs(snap.config.B)*proton.speed);assert(Math.abs(snap.config.gradient)/snap.config.length*(2*proton.m*proton.speed/Math.abs(proton.q*proton.B))<=.08001,'Gradient remains adiabatic at permitted extremes');
+ const snap=env.__driftSnapshot(),proton=M.setup({...snap.config,species:'proton'});assert(Math.abs(snap.config.gradient)<=Number(nodes.get('gradient').max)/100);assert(Math.abs(snap.config.electric)<=.04*Math.abs(snap.config.B)*proton.speed);assert(Math.abs(snap.config.gradient)/snap.config.length*(2*proton.m*proton.speed/Math.abs(proton.q*proton.B))<=.24001,'Stronger gradient stays within its safe bound');
  nodes.get('rate').value=String(Math.log10(3));if(nodes.get('play').textContent==='Spustit')nodes.get('play').onclick();for(let j=0;j<10;j++){env.__driftAdvance(.08);assertPairInViewport('Extreme '+B+'/'+blend+'/'+direction);assert.equal(nodes.get('play').textContent,'Pozastavit');}
 }
 // Long runs continue by emitting a fresh pair before the view becomes tiny.
 nodes.get('b').value='500';nodes.get('massBlend').value='0';nodes.get('mode').onchange();nodes.get('gradient').value=nodes.get('gradient').max;nodes.get('gradient').oninput();nodes.get('electric').value='0';nodes.get('electric').oninput();nodes.get('rate').value=String(Math.log10(3));nodes.get('play').onclick();const renewalBefore=env.__driftRenewals||0,timeBeforeLong=env.__driftSnapshot().samples.at(-1).t;env.__driftAdvance(1000);assert((env.__driftRenewals||0)>renewalBefore,'Long separation renews the pair');assertPairInViewport('After renewed pair');assert(env.__driftSnapshot().samples.at(-1).t>timeBeforeLong);assert.equal(nodes.get('play').textContent,'Pozastavit','Renewal keeps playback running');
 const stableScale=env.__driftSnapshot().extent;for(let j=0;j<5;j++)nodes.get('rate').oninput();assert.equal(env.__driftSnapshot().extent,stableScale,'Repeated layout renders do not feed back into scale');
+
+
+// The useful gradient range is three times the former conservative limit.
+{
+nodes.get('pairFocus').value='proton';nodes.get('b').value='500';nodes.get('energy').value='500';nodes.get('massBlend').value='0';nodes.get('mode').value='combined';nodes.get('gradient').value='-18';nodes.get('mode').onchange();nodes.get('electric').value='0';nodes.get('electric').oninput();
+const strong=env.__driftSnapshot(),c=strong.config,oldLimit=.08*c.length/(2*c.m*c.speed/Math.abs(c.q*c.B));relative(Math.abs(c.gradient),oldLimit*3,.001,'Default gradient uses the stronger safe range');
+const origin={r:[0,0,0],v:[...c.initial.v]},weakConfig={...c,gradient:c.gradient/3},strongDrift=M.diagnostics(c,origin).drift[1],weakDrift=M.diagnostics(weakConfig,origin).drift[1];relative(strongDrift/weakDrift,3,1e-12,'Actual Grad-B contribution grows threefold');
+for(const species of ['proton','electron']){const sc=M.setup({...c,species});sc.length=c.length;const duration=4*M.setup({...c,species:'proton'}).period,initial=M.diagnostics(sc,sc.initial),end=M.advance(sc,sc.initial,duration),final=M.diagnostics(sc,end);assert(Math.sign(final.center[1]-initial.center[1])===Math.sign(initial.drift[1]),'Strong gradient retains the correct separation direction');relative(final.energy,sc.energy,1e-9,'Stronger B gradient does no work');}
+}
 
 env.HiFyzikoFusionDispose();assert(disposed,'GPU lifecycle');
 console.log('PASS: analytic gyration, entry/exit, energy/work, all drift signs and magnitudes, boundary convergence, controls, rendering math and disposal.');

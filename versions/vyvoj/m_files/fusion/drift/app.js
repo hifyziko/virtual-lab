@@ -30,7 +30,7 @@
  function syncGradientLimits(){
   if(!['gradient','combined'].includes($('mode').value))return;
   const c=M.setup({...parameters(),...($('mode').value==='combined'?{species:'proton'}:{})}),length=M.setup({species:c.species==='electron'?'electron':'deuteron',energy:500,B:.5}).length/10;
-  const worstRadius=2*c.m*c.speed/(Math.abs(c.q*c.B)),maximum=Math.max(.01,Math.floor(Math.min(.2,.08*length/worstRadius)*10000)/100),input=$('gradient');
+  const worstRadius=2*c.m*c.speed/(Math.abs(c.q*c.B)),maximum=Math.max(.01,Math.floor(Math.min(.6,.24*length/worstRadius)*10000)/100),input=$('gradient');
   input.min=String(-maximum);input.max=String(maximum);input.step='.01';input.value=String(Math.max(-maximum,Math.min(maximum,Number(input.value))));
  }
  function prepare(keepView=false){

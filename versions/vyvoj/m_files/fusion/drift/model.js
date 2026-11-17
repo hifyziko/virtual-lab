@@ -3,7 +3,7 @@
  const e=1.602176634e-19, species={electron:{m:9.1093837139e-31,q:-e},proton:{m:1.67262192595e-27,q:e},deuteron:{m:3.3435837768e-27,q:e},alpha:{m:6.644657345e-27,q:2*e}};
  const add=(a,b)=>a.map((v,i)=>v+b[i]),mul=(a,s)=>a.map(v=>v*s),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),norm=a=>Math.hypot(...a);
  function setup(p={}){
-  const c={mode:'entry',species:'deuteron',B:.05,energy:500,pitch:0,electric:1500,gradient:-.12,radius:6,angle:0,start:[-3,0],...p};
+  const c={mode:'entry',species:'deuteron',B:.05,energy:500,pitch:0,electric:1500,gradient:-.18,radius:6,angle:0,start:[-3,0],...p};
   Object.assign(c,species[c.species]);
   if(c.mode==='combined'&&c.species==='electron')c.m=species.proton.m*(species.electron.m/species.proton.m)**Math.max(0,Math.min(1,c.massBlend??1));
   c.speed=Math.sqrt(2*c.energy*e/c.m);c.length=c.m*c.speed/(Math.abs(c.q)*.05);c.period=2*Math.PI*c.m/(Math.abs(c.q)*Math.abs(c.B));c.timePeriod=2*Math.PI*c.m/(Math.abs(c.q)*Math.max(Math.abs(c.B),.1));c.R=c.radius*c.length;
