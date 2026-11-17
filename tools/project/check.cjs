@@ -6,6 +6,7 @@ const commands=[
  ['tools/test-module-guide.cjs'],
  ['tools/test-vehicle-art.cjs'],
  ['versions/vyvoj/m_files/Web/synchronous/test-synchronizing.cjs'],
+ ['versions/vyvoj/m_files/Web/synchronous/test-princip-sound.cjs'],
  ['versions/vyvoj/m_files/Web/synchronous/test-rotor-dq.cjs'],
  ['tools/test-commutation.cjs'],
  ['tools/test-particle-library.cjs'],

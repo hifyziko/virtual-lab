@@ -1,5 +1,32 @@
 # Aktuální stav předání
 
+## Názorný zvuk míjení synchronních polí — 17. listopadu 2026
+
+Princip synchronního stroje má volitelné tlačítko Zvuk míjení polí
+(výchozí stav vypnutý). Web Audio vytvoří krátké filtrované šustnutí
+s měkkou obálkou při průchodu relativního elektrického úhlu přes další
+násobek pi; počet pólových dvojic odpovídá vybranému rotoru. Rytmus
+sleduje relativní pohyb pole a rotoru, nikoli samotné mechanické otáčky.
+V synchronním běhu a bez aktivního rotorového buzení je zvuk tichý;
+permanentní magnety se posuzují jako stále přítomné rotorové pole.
+Malé odchylky rychlostí pod prahem nespouštějí zvuk při dokmitávání.
+Jde o názorné ozvučení, nikoli o model skutečného hluku stroje/turbíny.
+
+Zvuk vzniká v prohlížeči až po výslovném zapnutí, bez zvukových souborů,
+mikrofonu nebo sítě. Hlasitost a počet hlasů jsou omezené. Pauza a skrytí
+stránky pulzy ztiší, odstranění modulu zavře AudioContext a odpojí uzly.
+Nový pokus či změna typu přenastaví referenční fázi bez falešného pulzu.
+Nedostupné Web Audio neblokuje experiment. Tlačítko má aria-pressed
+a vysvětlení je ve společném výkladu. Model, síly ani čas se nemění.
+
+Přidán test-princip-sound.cjs do veřejného výběru a standardní kontroly:
+opt-in, směry průchodu, počet pólů, synchronismus, buzení, pauza, restart,
+vypnutí, fallback a uvolnění audio zdrojů. Prošel tento test, původní
+test-model i celé node tools/project/check.cjs. Provedeno plné sestavení
+node tools/build-release.cjs; obě aktuální dodávky včetně progressive
+payloadu sm01-princip obsahují zvuk. Prohlížeč se nespouštěl; poslech
+v prohlížeči nebyl ověřen (dřívější přístup UI nástroj zamítl).
+
 ## Kompaktní hlavička a kontrast siločar bariéry — 17. listopadu 2026
 
 Coulombova bariéra má místní silnější CSS pravidla vůči společné

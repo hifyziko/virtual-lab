@@ -1,4 +1,40 @@
 (()=>{'use strict';const $=id=>document.getElementById(id),M=window.SyncPrinciple,D=180/Math.PI;let s=M.create(),paused=false,last=0,lastDraw=0,drag=null,slipAt=-100,oldSlips=0;const fmt=(x,n=1)=>x.toLocaleString('cs-CZ',{minimumFractionDigits:n,maximumFractionDigits:n});
+
+// An illustrative blade-like whoosh at crossings of the relative electrical angle.
+function createFieldPassingSound(host){
+ let context=null,noise=null,master=null,enabled=false,unavailable=false,disposed=false,previous=null,gate=false,lastPulse=-Infinity;
+ const voices=new Set();
+ function setGate(on){if(!context||gate===on)return;gate=on;const now=context.currentTime;master.gain.cancelScheduledValues(now);master.gain.setTargetAtTime(on?.14:0,now,.012);}
+ function release(voice){for(const node of voice.nodes)try{node.disconnect();}catch{}voices.delete(voice);}
+ function silence(){previous=null;setGate(false);if(context)for(const voice of voices)try{voice.source.stop(context.currentTime+.04);}catch{release(voice);}}
+ async function setEnabled(on){
+  if(disposed)return false;enabled=!!on;previous=null;if(!enabled){silence();return false;}
+  try{
+   if(!context){const Audio=host.AudioContext||host.webkitAudioContext;if(!Audio)throw Error('Audio unavailable');context=new Audio();master=context.createGain();master.gain.value=0;master.connect(context.destination);noise=context.createBuffer(1,Math.ceil(context.sampleRate*.35),context.sampleRate);const samples=noise.getChannelData(0);for(let i=0;i<samples.length;i++)samples[i]=Math.random()*2-1;}
+   if(context.state==='suspended')await context.resume();if(context.state==='closed')throw Error('Audio closed');return enabled;
+  }catch{enabled=false;unavailable=true;silence();return false;}
+ }
+ function pulse(speed){
+  const now=context.currentTime;if(now-lastPulse<.045||voices.size>=4)return;lastPulse=now;
+  const source=context.createBufferSource(),filter=context.createBiquadFilter(),envelope=context.createGain(),duration=Math.max(.1,Math.min(.18,.24-Math.abs(speed)*.006));source.buffer=noise;filter.type='bandpass';filter.Q.value=.8;
+  filter.frequency.setValueAtTime(1250,now);filter.frequency.exponentialRampToValueAtTime(360,now+duration);envelope.gain.setValueAtTime(0,now);envelope.gain.linearRampToValueAtTime(.32,now+.014);envelope.gain.exponentialRampToValueAtTime(.0001,now+duration);
+  source.connect(filter);filter.connect(envelope);envelope.connect(master);const voice={source,nodes:[source,filter,envelope]};voices.add(voice);source.onended=()=>release(voice);source.start(now);source.stop(now+duration+.02);
+ }
+ function update(state,playing){
+  const poles=state.type==='ipm4'||state.type==='spm4'?2:1,phase=poles*(state.field-state.rotor),key=state.type,rotorField=state.type.startsWith('ipm')||state.type.startsWith('spm')||(state.excitation&&state.excitationLevel>1e-3),speed=poles*(state.fieldOmega-state.omega),current={phase,key,t:state.t};
+  const audible=enabled&&!disposed&&playing&&rotorField&&context?.state==='running'&&Number.isFinite(phase);
+  if(!audible){if(gate)silence();previous=current;return;}setGate(true);
+  if(previous&&previous.key===key&&state.t>=previous.t&&state.t-previous.t<.2&&Math.abs(speed)>.35){const crossed=Math.abs(Math.floor(phase/Math.PI)-Math.floor(previous.phase/Math.PI));if(crossed)pulse(speed);}
+  previous=current;
+ }
+ function dispose(){if(disposed)return;enabled=false;silence();disposed=true;for(const voice of [...voices])release(voice);context?.close()?.catch?.(()=>{});}
+ return {setEnabled,update,silence,dispose,get enabled(){return enabled;},get unavailable(){return unavailable;}};
+}
+const fieldPassingSound=createFieldPassingSound(window);
+$('fieldSound').onclick=async()=>{await fieldPassingSound.setEnabled(!fieldPassingSound.enabled);$('fieldSound').setAttribute('aria-pressed',String(fieldPassingSound.enabled));$('fieldSound').setAttribute('aria-label',(fieldPassingSound.enabled?'Vypnout':'Zapnout')+' zvuk míjení polí');if(fieldPassingSound.unavailable){$('fieldSound').disabled=true;$('fieldSound').title='Zvuk není v tomto prohlížeči dostupný.';}};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)fieldPassingSound.silence();});
+addEventListener('pagehide',event=>{if(event.persisted)fieldPassingSound.silence();else fieldPassingSound.dispose();});
+
 document.querySelector('.workspace').insertBefore(document.querySelector('.charts'),document.querySelector('.inspector'));
 function fitWorkspace(){if(!matchMedia('(min-width:1150px)').matches)return;const box=document.querySelector('.workspace');let height=innerHeight,top=box.getBoundingClientRect().top+scrollY;try{if(frameElement){const footerHeight=parseFloat(parent.getComputedStyle(parent.document.documentElement).getPropertyValue('--project-credit-space'))||0;height=parent.innerHeight-footerHeight;top+=frameElement.getBoundingClientRect().top+parent.scrollY;}}catch{}const main=box.closest('main');if(main.classList.contains('uniform-module-layout')){height=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--module-host-height'))||1000;top=box.getBoundingClientRect().top+scrollY;}
 // Count the actual following rows. The main's minimum height includes empty
@@ -22,7 +58,7 @@ $('constructionNote').textContent=s.type.startsWith('ipm')?'Vnořené PM: pevný
 function bar(id,value){$(id+'Value').textContent=(value>=0?'+':'')+fmt(value,2);const percent=Math.min(50,Math.abs(value)/2.4*50),el=$(id+'Bar');el.style.width=percent+'%';el.style.left=(value>=0?50:50-percent)+'%';}
 function draw(){const a=M.values(s),opts={axes:$('axes').checked,forces:$('forces').checked},field=window.SyncFieldLines(s,$('fieldSource').value);$('machine').innerHTML=window.SyncMachineArt(s,false,opts,field);$('beta').textContent=fmt(a.beta*D)+'°';$('betaNote').textContent=Math.abs(a.beta)<.01?'Osy jsou téměř souosé':a.beta<0?'Pole předbíhá osu rotoru':'Osa rotoru předbíhá pole';$('fieldSpeed').textContent=fmt(s.fieldOmega*D,0);$('rotorSpeed').textContent=fmt(s.omega*D,0);bar('exc',a.exc);bar('rel',a.rel);bar('damper',a.cage);$('totalValue').textContent=fmt(a.total,2);describe(a);const limits=M.loadLimits(s);$('loadLimit').textContent=s.drive==='auto'?'Synchronní mez Mz: '+fmt(limits.min,2)+' až '+fmt(limits.max,2)+' p. j.':'Zátěž se uplatní až po spuštění běhu.';$('loadLimit').classList.toggle('overload',s.drive==='auto'&&(s.load<limits.min||s.load>limits.max));window.SyncCharts(s);$('energyFlow').textContent=Math.abs(s.fieldOmega)<.02?'Stojaté pole · mechanický přechod':Math.abs(a.total*s.fieldOmega)<.015?'Bez významného přenosu výkonu':a.total*s.fieldOmega<0?'Generátorický režim · hřídel → pole':a.power>0?'Motorický režim · pole → hřídel':'Elektromagnetické brzdění';if(window.SyncMath)SyncMath.live(s);}
 function auto(speed){paused=false;s.drive='auto';s.autoSpeed=speed;syncControls();}
-$('angle').oninput=()=>setTarget(Number($('angle').value)/D);$('turnBack').onclick=()=>setTarget(s.target-2*Math.PI);$('turnNext').onclick=()=>setTarget(s.target+2*Math.PI);$('slow').onclick=()=>auto(.65);$('fast').onclick=()=>auto(7);$('stop').onclick=()=>{paused=false;s.target=s.field;s.drive='hand';s.fieldOmega=0;syncControls();draw();};$('pause').onclick=()=>{paused=!paused;syncControls();draw();};
+$('angle').oninput=()=>setTarget(Number($('angle').value)/D);$('turnBack').onclick=()=>setTarget(s.target-2*Math.PI);$('turnNext').onclick=()=>setTarget(s.target+2*Math.PI);$('slow').onclick=()=>auto(.65);$('fast').onclick=()=>auto(7);$('stop').onclick=()=>{paused=false;s.target=s.field;s.drive='hand';s.fieldOmega=0;syncControls();draw();};$('pause').onclick=()=>{paused=!paused;if(paused)fieldPassingSound.silence();syncControls();draw();};
 for(const id of ['type','inertia','excitationLevel','excitation','damper','load'])$(id).oninput=()=>{s[id]=$(id).type==='checkbox'?$(id).checked:id==='type'?$(id).value:Number($(id).value);if(id==='excitationLevel')s.excitation=s.excitationLevel>0;if(s.type.startsWith('ipm'))s.damper=false;const period=(s.type.startsWith('ipm')||s.excitation?2*Math.PI:Math.PI)/M.polePairs(s);s.lastWell=Math.floor((s.field-s.rotor+period/2)/period);syncControls();draw();};
 for(const id of ['fieldSource','axes','forces'])$(id).oninput=draw;
 const experiments={follow:{hint:'Posouvejte pole po malých krocích. Rotor se zpozdí, přeběhne a postupně se ustálí.'},pullout:{hint:'Pole náhle zrychlilo. Zkuste „Točit pomalu“ nebo zapněte klec a porovnejte zachycení.',speed:7},reluctance:{hint:'Buzení je vypnuté. Zkuste přejít přes 90° a všimněte si druhé stabilní polohy po 180°.',excitation:false},smooth:{hint:'Hladký rotor bez buzení a klece: pohybujte polem. Pak zapněte buzení a porovnejte reakci.',type:'smooth',excitation:false},damper:{hint:'Rotor roztáčí pouze klec. Až se přiblíží rychlosti pole, zapněte buzení a sledujte zachycení.',type:'smooth',excitation:false,damper:true,speed:1.2}};
@@ -30,6 +66,6 @@ document.querySelectorAll('[data-experiment]').forEach(b=>b.onclick=()=>{const p
 $('loadedRun').onclick=()=>{const settings={type:s.type,excitation:s.excitation,excitationLevel:s.excitationLevel,inertia:s.inertia,friction:s.friction};s=Object.assign(M.create(),settings);s.drive='auto';s.autoSpeed=.65;s.fieldOmega=.65;s.omega=.65;s.load=.55;s.damper=!s.type.startsWith('ipm');let lo=0,hi=0;const co=M.coefficients(s),required=s.load;for(let k=1;k<=1000;k++){hi=k*Math.PI/1000;if(co.A*Math.sin(hi)+co.B*Math.sin(2*hi)>=required)break;lo=hi;}for(let i=0;i<50;i++){let b=(lo+hi)/2;if(co.A*Math.sin(b)+co.B*Math.sin(2*b)<s.load)lo=b;else hi=b;}s.rotor=s.field-(lo+hi)/(2*M.polePairs(s));paused=false;slipAt=-100;oldSlips=0;$('experimentHint').textContent='Stroj již běží. Přibuďte nebo odbuďte; záporným momentem zátěže připojíte hnací stroj a přejdete do generátoru.';syncControls();draw();};$('traceType').onchange=draw;
 function pointerAngle(e){const p=$('machine').createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform($('machine').getScreenCTM().inverse());return Math.atan2(267-q.y,q.x-280);}
 $('machine').onpointerdown=e=>{if(e.button!==0)return;const angle=pointerAngle(e);drag={id:e.pointerId,last:angle};$('machine').setPointerCapture(e.pointerId);$('machine').classList.add('dragging');setTarget(s.field+M.wrap(angle-s.field));e.preventDefault();};$('machine').onpointermove=e=>{if(!drag||e.pointerId!==drag.id)return;const a=pointerAngle(e),delta=M.wrap(a-drag.last);drag.last=a;setTarget(s.target+delta);};function endDrag(){drag=null;$('machine').classList.remove('dragging');}$('machine').onpointerup=endDrag;$('machine').onpointercancel=endDrag;$('machine').onlostpointercapture=endDrag;
-function frame(t){if(last&&!paused){M.step(s,Math.min((t-last)/1000,.06));if(s.slips!==oldSlips){slipAt=s.t;oldSlips=s.slips;}}last=t;if(t-lastDraw>40){if(!drag)slider();draw();lastDraw=t;}requestAnimationFrame(frame);}syncControls();slider();draw();requestAnimationFrame(frame);
+function frame(t){if(last&&!paused){M.step(s,Math.min((t-last)/1000,.06));if(s.slips!==oldSlips){slipAt=s.t;oldSlips=s.slips;}}fieldPassingSound.update(s,!paused&&!document.hidden);last=t;if(t-lastDraw>40){if(!drag)slider();draw();lastDraw=t;}requestAnimationFrame(frame);}syncControls();slider();draw();requestAnimationFrame(frame);
 window.syncPrincipState=()=>({...s,...M.values(s),paused,history:undefined});
 })();
