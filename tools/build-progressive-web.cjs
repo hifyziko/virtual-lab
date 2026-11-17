@@ -93,7 +93,7 @@ function transform(original){
 function addFusionPages(output,web){
  const navigation=fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8');
  const pages=[...navigation.matchAll(/id:'(fu\d+-[a-z]+)'[^\n]+?page:'([^']+)'/g)];
- if(pages.length!==3)throw Error('Expected fusion, particle gallery and drift experiment');
+ if(pages.length!==6)throw Error('Expected six fusion modules');
  const published=new Set(require('./project/common.cjs').policy().webFiles);
  output.preserved=output.preserved.filter(item=>!item.key.startsWith('fusion-'));
  for(const key of Object.keys(output.assets))if(key.startsWith('fusion-'))delete output.assets[key];

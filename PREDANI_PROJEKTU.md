@@ -82,8 +82,8 @@ a spusťte `tools/test-progressive.cjs` nebo celé `tools/project/check.cjs`.
 
 ### Současný místní základ
 
-Aktivní je předání z 16. listopadu 2026, commit `7a9914e314a939d86f79a0b0a192e2a80d49734d`.
-Jediný uchovaný soukromý ZIP je v `handoffs/HiFyziko-predani-na-jiny-pocitac-2026-11-16.zip`.
+Aktivní je předání z 17. listopadu 2026; přesný commit uvádí `_handoff/state.json` v balíčku.
+Aktuální soukromý ZIP je `handoffs/HiFyziko-predani-2026-11-17-fuze-a-rovnovaha.zip`.
 Starší ZIPy a historické pracovní kopie byly na pokyn uživatele odstraněny.
 Aktuální uspořádání a úklid jsou popsány ve `VERZE.md`; podrobné změny modulů
 v `PREDANI-AKTUALNI.md`. Zdrojové cesty, literatura a chráněné zálohy zůstávají.

@@ -12,7 +12,7 @@ souhlasily s balíčkem. Žádné místní změny nebyly zahozeny.
 - **Upravitelné zdroje:** `versions/vyvoj/m_files/`.
 - **Společné nástroje:** `tools/` a `config/project-files.json`.
 - **Aktuální výuka:** `versions/aktualni/web/index.html`; spouštění také přes `SPUSTIT_VYUKU.cmd`.
-- **Jediný soukromý předávací ZIP:** `handoffs/HiFyziko-predani-na-jiny-pocitac-2026-11-16.zip` a sousední `.sha256`.
+- **Aktuální soukromý předávací ZIP:** `handoffs/HiFyziko-predani-2026-11-17-fuze-a-rovnovaha.zip` a sousední `.sha256`; po ověření nahrazuje předání z 16. listopadu.
 - **Literatura a malé modelové vstupy:** původní cesty; nikdy do veřejného webu ani Gitu.
 - **Chráněné zálohy:** `versions/1.0.0-pred-upravami` a `versions/1.5.8-pred-schematem`; zůstávají nedotčené.
 

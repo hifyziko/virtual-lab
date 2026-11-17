@@ -200,8 +200,19 @@
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
  add('fu03-drift','drift',
   ['Začněte vletem do magnetického pole: nastavte částici, energii a směr a spusťte pokus. Před spuštěním lze částici přetáhnout.','Přepněte na gyraci nebo jednotlivé drifty. Animaci pozastavíte tlačítkem, restart vrátí částici. Energii a indukci měňte i za běhu.'],
-  ['Mimo pole se částice pohybuje přímo; v čistě magnetickém poli mění směr, nikoli kinetickou energii.','E×B drift má pro oba náboje stejný směr. Grad-B drift a drift zakřivení obracejí směr se znaménkem náboje. Pole jsou předepsaná; model nepočítá vlastní pole plazmatu.'],String.raw`\boldsymbol v_E=\frac{\boldsymbol E\times\boldsymbol B}{B^2}`,['fu01-reakce','fu02-galerie','em03-silove-ucinky']);
+  ['Mimo pole se částice pohybuje přímo; v čistě magnetickém poli mění směr, nikoli kinetickou energii.','E×B drift má pro oba náboje stejný směr. Grad-B drift a drift zakřivení obracejí směr se znaménkem náboje. Pole jsou předepsaná; model nepočítá vlastní pole plazmatu.'],String.raw`\mathbf v_E=\frac{\mathbf E\times\mathbf B}{B^2}`,['fu01-reakce','fu02-galerie','em03-silove-ucinky']);
  // Historical deep links use the same gallery and the same guide.
+ sources.confinement='Entler, Kindl: Jaderná fúze a fúzní elektrárny, kap. 2.2, s. 32–35; kap. 7.5–7.6, s. 148–151 (šroubovitost, bezpečnostní faktor a magnetické zrcadlení).';
+ add('fu04-udrzeni','confinement',
+  ['Porovnejte únik ze solenoidu s odrazem ve zrcadle. Měňte zrcadlový poměr a úhel rychlosti deuteronu vůči poli.','Posuvníkem uzavřete solenoid a složte samostatná pole. Zapněte průsvitné magnetické plochy, vypněte siločáry a posouvejte jejich řez.'],
+  ['Odraz vzniká Lorentzovou integrací v poli konečných kruhových závitů odvozeném z vektorového potenciálu. Částice ve ztrátovém kuželu unikají.','Toroid odstraní otevřené konce, samotné toroidální pole však neodstraní drifty. Helicita magnetických siločar označuje lokální sklon; není to globální magnetická helicita.'],String.raw`\mathbf B=\mathbf B_{\mathrm T}+\mathbf B_{\mathrm P}`,['fu03-drift','fu01-reakce']);
+ sources.equilibrium='Entler, Kindl: Jaderná fúze a fúzní elektrárny, kap. 7.9, s. 154–156; kap. 7.11–7.12, s. 158–160. Numerický model: FreeGS 0.8.2.';
+ add('fu05-rovnovaha','equilibrium',
+  ['Přepněte pokus Tlak, Poloha nebo Tvar a měňte jediný posuvník. Sledujte magnetickou osu, plochy a proudy cívek.','Kliknutím v řezu vyberete plochu. Tažením otáčejte propojený prostorový pohled.'],
+  ['Tlaková a magnetická síla se v rovnováze vyvažují. Tlak je na magnetické ploše konstantní.','Proudy cívek jsou vypočtené pro požadovaný tvar. Posloupnost statických rovnováh není simulací stability ani časového regulátoru.'],String.raw`-\nabla p_{\mathrm{pl}}+\mathbf J\times\mathbf B=0`,['fu06-divertor','fu04-udrzeni']);
+ add('fu06-divertor','equilibrium',
+  ['Volte Uvnitř, Separatrix a K terčům. Posuvník prochází magnetickými plochami od osy do vrstvy SOL.','Porovnejte poloidální řez s prostorem. Mapa poloidálního pole ukazuje zeslabení u x-bodu.'],
+  ['Separatrix odděluje uzavřené plochy od otevřených siločar. V x-bodě zaniká pouze poloidální složka pole.','Otevřené siločáry vedou k divertorovým terčům. Směrové značky nejsou částice ani simulace tepelného toku.'],String.raw`\psi(r_{\mathrm c},z)=\mathrm{konst.}`,['fu05-rovnovaha','fu04-udrzeni']);
  const aliases={'fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
  window.ModuleGuideData={sources,entries,aliases};
 })();

@@ -1,5 +1,64 @@
 # Aktuální stav předání
 
+## Přesun na jiný počítač — 17. listopadu 2026
+
+Předávací ZIP: `HiFyziko-predani-2026-11-17-fuze-a-rovnovaha.zip`.
+Uživatel výslovně schválil push po úspěšné kontrole. Větev main, origin
+https://github.com/hifyziko/virtual-lab.git. Přesný commit, stav odeslání,
+manifest a LFS objekty uvádí `_handoff/` uvnitř soukromého balíčku.
+
+Hotovo: sjednocený dialog výkladu, magnetické udržení a helicita včetně
+předpočítaných stavů, dva nové GS moduly rovnováhy/divertoru, velké indikátory
+načítání a dřívější dnešní změny synchronního stroje. Neprobíhá další přepočet.
+Plné sestavení a všechny funkční kontroly prošly; audit veřejných souborů
+prošel samostatně mimo omezení sandboxu. Publikační výběr: 248 souborů,
+přibližně 609 MiB, bez knih/PDF, privátních podkladů a přihlašovacích údajů.
+Jediný veřejný zdroj nad 100 MiB je spravovaný přes Git LFS.
+
+Na novém počítači rozbalit do nové složky, spustit
+`node tools/project/restore.cjs`, přečíst pravidla a ověřit vzdálený stav.
+Výuka funguje z přibaleného webu; další sestavení potřebuje Node.js 24 a Git LFS,
+nikoli Python ani FreeGS. Ty jsou potřeba jen pro výslovně vyžádaný přepočet.
+Další krok je uživatelská vizuální kontrola nových modulů; nejde o rekonstrukci
+skutečného výboje ani o dynamický model stability plazmatu.
+
+## Dva nové moduly rovnováhy a divertoru — 17. listopadu 2026
+
+- Rozcestník: fu05-rovnovaha a fu06-divertor. Zdroj fusion/equilibrium,
+  výstup fuze-rovnovaha/index.html a divertor.html. Sdílejí data i renderer.
+- 27 skutečných volných GS rovnováh FreeGS 0.8.2, síť 129 × 129. Tři řady
+  po devíti stavech: tlak 1–17 kPa, požadovaná výška −4,8 až +4,8 cm,
+  změna protažení. Proud plazmatem 200 kA, vakuové RB_T = 0,89 T m.
+  Vlastní výukové uspořádání šesti kruhových cívek, nikoli skutečný COMPASS-U.
+  Proud cívek se hledá inverzně pro požadované izotokové body a dolní x-bod.
+- Křivky jsou hladiny vypočteného toku. Pole plyne z derivací stejného toku
+  a proudové funkce; tlak z profilu FreeGS. Obrazový přechod mezi stavy není
+  vydáván za dynamiku plazmatu. Offline řešení neběží při sestavení ani v UI.
+- Řez a otáčivý prostorový pohled, výběr kliknutím nebo posuvníkem,
+  zvýrazněná plocha/siločára, oddělené plochy a separatrix, poloidální mapa,
+  tlaková mapa, mapa B, křivka tlaku/B_P a graf proudů cívek. B modré,
+  povrchy růžové, společná kvantitativní barevná škála. Kovové cívky používají
+  existující confinement renderer. GPU fallback je canvas, bez nové knihovny.
+- Divertor: Uvnitř / Separatrix / K terčům s plynulým pohybem posuvníku.
+  Otevřené křivky vybíráme kolem hlavního plazmatu (nikoli kolem cívek).
+  Končí v rovině terčů. Pohyblivé trojúhelníky označují B, nejsou částice.
+- Výklad podle knihy Entler–Kindl, kap. 7.9 s. 154–156 a 7.11–7.12
+  s. 158–160, vizuálně ověřeny obr. 7.16 a 7.18. Značení r_c, p_pl, I_psi.
+  Inspirace: EPFL TCV a FreeGSNKE Pulse Design Tool; odkazy ve výkladu.
+- Přepočet explicitně: tools/precompute-tokamak-equilibrium.py --write;
+  závislosti tools/tokamak-requirements.txt. Lokálně instalovány v tmp,
+  do Gitu/webu se knihovny, PDF ani pomocné výstupy nedodávají.
+- Test tools/test-tokamak-equilibrium.cjs zahrnut do project/check.cjs.
+  Relativní reziduum GS v jádře 0,117–0,134 %, kontrola toku a tečnosti B,
+  reakce tlaku/polohy, 27 stavů, KaTeX, obě UI, reset a disposal.
+  Canvasové snímky kontrolovány bez spuštění prohlížeče.
+- Dokončeno plné sestavení a všechny funkční kontroly project/check.cjs.
+  Závěrečný audit Git v sandboxu narazil na EPERM; stejný audit spuštěný
+  samostatně s povoleným přístupem prošel (520 veřejných souborů, secretScan passed).
+  Ověřena také 3D tečnost siločáry k oběma složkám B a dopady celé nabízené
+  vrstvy SOL na skutečně vykreslené terče. Publikace ani push neprovedeny.
+
+
 ## Tišší zvuk pouze při rychlém otáčení — 17. listopadu 2026
 
 Nejnovější pokyn uživatele nahrazuje předchozí popis zvuku níže:
@@ -15,6 +74,7 @@ Fyzikální model a průchody polí se nemění. Rozšířené zvukové i původ
 modelové testy prošly. Plné sestavení aktualizováno a v obou dodaných
 lazy lekcích ověřeno omezení režimu, filtr, tón i nižší zesílení.
 Poslech v prohlížeči nebyl ověřen. Bez publikace a bez push.
+
 
 ## Výchozí zapnutý a výraznější zvuk polí — 17. listopadu 2026
 
@@ -47,6 +107,34 @@ jako DOM. Souběžná platná formule s &gt; dříve způsobovala falešnou chyb
 testu. Samotné výukové vztahy ani zobrazení se tím nemění; tento soubor
 zůstává s ostatní rozpracovanou částí confinement mimo zdejší commit.
 
+
+## Výklad magnetického udržení podle vlastní knihy — 17. listopadu 2026
+
+Po hlášené chybě NET::ERR_CERT_AUTHORITY_INVALID na farside.ph.utexas.edu
+odstraněno všech šest aktivních odkazů na tento server z výkladu udržení.
+Fitzpatrickovy citace zachovány jako text. Přidán ověřený veřejný odkaz
+MIT OCW, Introduction to Plasma Physics I (Fall 2006), kapitola 2,
+Motion of Charged Particles in Fields. Zabezpečení se neobchází ani
+nepřepíná na HTTP. Sestavení a kontrola fúzní navigace prošly.
+
+Následná úprava podle uživatele: nová část je zkrácena na přímý bodový výklad
+pro studenta (proč se částice odráží, magnetický moment, podmínka odrazu,
+elektrické pole a čtení mapy). Odstraněno redakční vysvětlování vztahu ke knize;
+citace zůstávají u zdrojů. V textu i tooltipu se používá banánová trajektorie.
+
+Výklad v fusion/confinement/index.html vychází primárně z knihy Entler–Kindl,
+Jaderná fúze a fúzní elektrárny, poskytnutý finální rukopis. Doplněny významy
+značek, magnetický moment, kinetická energie a lambda = E_k / mu podle
+kapitoly 7.6 a rámečku 7.7 (s. 150–151), podmínka odrazu a odvození vztahu
+s počátečním úhlem. Rozlišuje se magnetický moment a permeabilita vakua.
+Elektrické rozšíření je oddělené jako doplnění animace; uvedeny předpoklady,
+rozdíl adiabatické meze a Lorentzovy trajektorie i omezení modelu.
+Citace rozměrů COMPASS-U opravena na kap. 2.3.5, s. 48; helicita na rámeček
+7.6, s. 149–150. Bibliografie uvádí dostupnost rukopisu a doplňující veřejné
+univerzitní zdroje Fitzpatricka. Rukopis se do veřejné dodávky nepřidává.
+Vše je ve stávajícím dialogu Ovládání a výklad, bez zásahu do velikosti grafů.
+
+
 ## Názorný zvuk míjení synchronních polí — 17. listopadu 2026
 
 Princip synchronního stroje má volitelné tlačítko Zvuk míjení polí
@@ -74,6 +162,32 @@ node tools/build-release.cjs; obě aktuální dodávky včetně progressive
 payloadu sm01-princip obsahují zvuk. Prohlížeč se nespouštěl; poslech
 v prohlížeči nebyl ověřen (dřívější přístup UI nástroj zamítl).
 
+
+## Jednoznačné značení energie a magnetického momentu — 17. listopadu 2026
+
+Podmínka odrazu s elektrickým polem používá E_{k,0} pro počáteční
+kinetickou energii a mu_start pro počáteční magnetický moment.
+Rámeček ji uvádí ekvivalentně jako B ≈ (E_{k,0}+e Ez z)/mu_start,
+aby zůstala na jedné řádce s čitelným zlomkem. Výklad definuje
+počáteční energii 1 keV a odlišuje moment od permeability vakua.
+Značka mu0 ve vztahu pro vektorový potenciál cívek zůstává správně
+permeabilitou vakua. Fyzika, data a rozměry grafu jsou beze změny.
+
+## q přímo u volby plochy a čitelný zlomek — 17. listopadu 2026
+
+U banánové ukázky je r/a a skutečné q nyní přímo ve výstupu posuvníku
+Počáteční plocha. Při dekódování vybraného záznamu se q a příznak
+uzavření odvozují z jeho u a r; nezávisí na převzatém popisku původní
+plochy. Regresní test ověřuje skutečnou sekvenci pointerdown/input
+pro vnitřní, původní i vnější plochu: jiné q, jiné body siločáry,
+jinou trajektorii a shodu obou viditelných popisků. Pole zůstává pevné.
+Hodnoty: r/a=0,19 → q≈1,591; r/a=0,64 → q=2; r/a=1 → q≈3,275.
+
+Rovnice v rámečku používá dfrac, velikost 12 px a šířku 124 px.
+Zůstává na jedné řádce, čitatel a jmenovatel již nejsou zmenšené
+řádkovým stylem. Mění se pouze vodorovné rozdělení stávajícího bloku
+odečtů; velikost grafu ani výška panelu se nemění.
+
 ## Kompaktní hlavička a kontrast siločar bariéry — 17. listopadu 2026
 
 Coulombova bariéra má místní silnější CSS pravidla vůči společné
@@ -94,6 +208,661 @@ stabilní přizpůsobení, oba styly, zachování mapy a konečné siločáry).
 Navigace, progressive a audit prošly. Obě aktuální dodávky sestaveny.
 Vizuální kontrola nebyla provedena; předchozí přístup k otevřenému
 prohlížeči nástroj zamítl a nový se podle pravidla projektu nespouští.
+
+
+## Náhled rozměrů před načítáním — 17. 11. 2026
+
+Od solenoidu k toroidu (režim bend): posuvníky major/minor při input
+aktualizují geometrii a hodnoty bez přípravy atlasu či výpočtu pole.
+Předchozí příprava se při začátku změny zruší, staré siločáry se odstraní.
+Zjednodušený geometrický náhled zůstává aktivní po celou dobu tažení;
+change po uvolnění spustí jedinou přípravu pro konečné rozměry.
+Ostatní režimy zachovávají dosavadní chování. Test confinement prošel,
+včetně nové regrese více input událostí bez výpočtu a jediného commit.
+
+
+## Značka D a místní q — 17. listopadu 2026
+
+Značka D+ je ukotvená do gyračního středu v helikálním/banánovém
+přehrávání, v solenoidu a magnetickém zrcadle i v driftovém modulu
+(včetně D jako porovnávané částice). Samotná částice a její dráha se
+nemění; mimo platnou oblast gyrace zůstává popisek u částice.
+
+Pro banán uživatel zvolil typické řešení: zachovat pevné pole se střihem,
+tedy nevnucovat q=2 každému poloměru změnou poměru polí. Původní
+r/a=0,64, q=2, úhel 70 stupňů zůstává výchozí ukázkou. Řádek uzavření
+nově ukazuje skutečné místní q a rozlišuje uzavřenou siločáru od
+zobrazeného neuzavřeného úseku. Siločára už v atlasech odpovídala
+každé ploše; problém nebyl v cache, ale v neviditelném q a očekávání,
+že musí být uzavřená všude. Banánový oběh gyračního středu je jiná
+věc než uzavření magnetické siločáry.
+
+## Velké načítání a jemnější volby — 17. listopadu 2026
+
+Načítání fúzních atlasů je přesunuto z ovládání do překryvu hlavní
+scény (hLoad a atlasStatus). Helikální atlas ukazuje skutečný počet
+připravených částí; vlastní výpočet toroidu svůj průběh, ostatní stahování
+neurčitý pruh. Chyba nabídne opakování. Sdílený loader modulů má větší
+pruh i panel. Šest FEM prohlížečů včetně canvas fallbacků dostává stejný
+překryv přes hlavní obrazy; stav zůstává řízen původním #status.
+Při bufferování se čeká 200 ms, opakované zprávy časovač neodkládají.
+Nový společný tools/scene-loading.js vkládá build-compact-delivery.cjs;
+test-scene-loading ověřuje načtení, buffer, chybu, retry a disposal.
+
+Rovnice odrazu je v rámečku na jedné řádce. Šipka v_parallel je
+ukotvena do zaznamenaného gyračního středu, nikoli do polohy gyrace D+.
+Úhel nyní nabízí deset voleb 35–80 stupňů po 5; počáteční plocha deset
+poloměrů r/a=0,19–1 po 0,09. Všech 200 kombinací s E i bez E je offline
+připraveno v atlasech 14–17 (po 50). Loader čeká na všech 18 částí.
+Pevné pole, čas do skutečného oběhu/úniku i dvojitá rychlost zůstávají.
+
+## Podmínka odrazu vedle odečtů — 17. listopadu 2026
+
+Rovnice přesunuta do malého rámečku vpravo vedle stávajících tří
+odečtů B, v_parallel, v_perp. Je absolutně umístěná v jejich bloku;
+odečty mají vyhrazenou levou část a rámeček nepřidává žádnou výšku.
+Zlomkový vztah je rozdělen do dvou řádků, s E se obdobně ukazuje
+mu0 B ≈ K0+eEz(z−z0). Graf má původní nadpis, jeho kreslicí oblast
+nemá žádný nový překryv. Svislá osa končí nejméně 8 px nad barevnou
+legendou a už ji neprotíná.
+
+## Vztah pod Resetem a rychlejší přehrávání — 17. listopadu 2026
+
+Vztah pro odraz je přesunut přímo pod řádek Spustit/Reset, mimo graf.
+Původní nadpis průmětu je opět viditelný. Při zobrazení vztahu se
+nevyhrazuje původní 32px stavový řádek; vztah používá 24px, takže se
+graf nezmenšuje a zbývající místo dostává jeho flex kontejner.
+Přehrávání helicity/gyrující částice je zrychleno z 2 na 4 us fyzikálního
+času za sekundu. Energie, atlasy, trajektorie i konec oběhu jsou stejné.
+
+## Viditelná podmínka odrazu a celý oběh — 17. listopadu 2026
+
+Mapa zachycené částice nově zobrazuje velikost B, nikoli gradient,
+ve stejné šestibarevné škále jako ostatní mapy modulu. Pevné krajní
+hodnoty v teslech jsou pod průmětem. Černá mez a šrafa dál značí
+adiabatickou energetickou dostupnost. Vztah B_odraz ≈ B_start/sin²(alpha0)
+je v absolutně umístěném popisku přes původní záhlaví grafu;
+původní nadpis pouze visibility:hidden. Žádné změny velikosti canvasu,
+měřítka, výšky grafu ani nová řádka. Při E se vztah přepíná na
+K0+e Ez(z−z0)−mu0 B ≈ 0. Číselná mez B_odraz je v existujícím řádku panelu.
+
+Atlas 14 má délku individuální pro každý z 50 pokusů. Offline příprava
+integruje až 400 us a hledá návrat gyračního středu do počáteční
+poloidální fáze (vnější průchod z=0 směrem nahoru, kladné v_parallel,
+oba odrazy nebo celý průběžný oběh). Konec interpoluje mezi vzorky;
+trajektorii nijak nenatahuje ani nespojuje úsečkou. Únik dostane skutečný
+odlet dalších 24 us. Všech 50 stavů skončilo návratem nebo únikem,
+žádný limitem. Celý prostorový návrat deuteronu se neslibuje kvůli gyraci
+a toroidální precesi. Regenerované elektrické atlasy mají aktuální hash.
+
+## Pevné popisky detailu gyrace — 17. listopadu 2026
+
+Popisek zpomalení i r_L rozděleny na samostatný pevný sloupec názvu
+a pravostranně zarovnanou hodnotu. Oba mají rezervovanou šířku i výšku,
+nemění se jejich poloha podle počtu číslic. Číselné hodnoty používají
+stále jedno desetinné místo a sazbu KaTeX, jednotky zůstávají u pravého
+okraje. Jde jen o úpravu sazby; hodnoty ani přehrávání se nemění.
+
+Test-confinement, navigace, progressive a audit prošly. Obě aktuální
+dodávky sestaveny. Vizuální kontrola v prohlížeči neproběhla, předchozí
+přístup byl nástrojem zamítnut. Úprava je součástí nadále netrackovaného
+sdíleného confinement modulu, bez přibrání jeho ostatních částí do commitu.
+
+
+## Čitelný detail gyrace otevřených geometrií — 17. listopadu 2026
+
+U solenoidu a magnetického zrcadla má detail vlastní názornou fázi:
+nejvýše 0,45 oběhu za sekundu přehrávání. Zpomalení je adaptivní podle
+místní cyklotronní frekvence a vybrané rychlosti hlavní animace. Pomalý
+skutečný oběh se nezrychluje. Násobek zpomalení se sází v detailu přes
+KaTeX; nadpis uvádí Názorný detail gyrace. Krátký průsvitný barevný oblouk
+ukazuje směr otáčení. Pauza zastavuje také detail, změna B v pauze nehýbe
+jeho fází. Reset připraví fázi podle nového počátečního stavu.
+
+Detail není okamžitou fází skutečné částice v hlavní scéně; je to výslovně
+označená zpomalená ilustrace. Jeho hodnota Larmorova poloměru odpovídá
+aktuálnímu fyzikálnímu stavu. Hlavní čas, integrace, rychlost částice
+a její odrazy/únik se nemění. Výklad rozlišení obou časových měřítek uvádí.
+Helikální pokus zůstává beze změny.
+
+Test-confinement prošel pro oba otevřené pokusy, krajní B a rychlosti:
+směr a horní mez úhlového posunu detailu, popisek zpomalení, pauza,
+změna B v pauze a přesný nezměněný fyzikální čas hlavní animace.
+Navigace, progressive a audit prošly; obě aktuální dodávky sestaveny.
+Vizuální kontrola nebyla provedena (přístup do již otevřeného prohlížeče
+byl v předchozím pokusu nástrojem zamítnut); nový se nespouštěl.
+Confinement je stále sdílený rozpracovaný modul mimo index; samostatný
+commit by přibral cizí práci, proto úprava zůstává ve zdrojích a sestavení.
+
+
+## Gradient podél pole a volitelná počáteční plocha — 17. listopadu 2026
+
+Ukázka Zachycená nyní dovoluje pět počátečních ploch r/a =
+0,28 / 0,46 / 0,64 / 0,82 / 1 a pět úhlů rychlosti vůči B
+40 / 50 / 60 / 70 / 80 stupňů. Pole je při změně plochy stejné,
+q=2 platí jen pro původní r/a=0,64. Energie zůstává 1 keV.
+Úhel nahrazuje v této ukázce ovladač složení pole a tlačítka q,
+tedy nezmenšuje průmět. Počáteční plocha není vazba částice na povrch.
+
+Atlas 14 obsahuje všech 50 kombinací včetně E=0 a Ez=-500 V/m;
+dráhy, rychlosti, odrazy a únik jsou výsledkem stejné plné Borisovy
+integrace. Všechny elektrické atlasy regenerované se shodným fingerprintem.
+Na výchozí ploše 40 stupňů probíhá, 70 stupňů se odráží. Na okraji
+může gyrace okamžitě opustit objem; zachováno zrychlené přehrání úniku.
+
+Mapa zobrazuje podepsaný G_parallel = (B/B) dot grad |B| v T/m,
+modrá pokles a červená růst v kladném směru siločáry. Pevná symetrická
+škála platí pro všechny plochy a úhly. Tmavá mez a šrafa zachovávají
+adiabatickou podmínku K_parallel=0 včetně elektrické práce.
+Použitý analytický vztah G_parallel=B_theta*z/(r*R) ověřen směrovou
+konečnou diferencí v obou polorovinách. Společná mřížka i všech 50 map
+se připraví při načtení; přepínání a přehrávání pole nepočítá.
+Výklad rozlišuje zrcadlovou sílu od gradientového driftu a vysvětluje,
+proč samotná rychlost při pevném úhlu nemění čistě magnetickou mez.
+Zdroj: Fitzpatrick, Trapped and Passing Particles (UT Austin).
+
+## Mapa podmínky odrazu — 17. listopadu 2026
+
+V poloidálním průmětu zachycené částice nahrazuje orientační modrou
+polovinu mapa K_parallel/K0. Modrá je adiabaticky dostupná oblast,
+šedá se šrafou nepřístupná; tmavá vrstevnice značí K_parallel = 0.
+Zahrnuje práci předepsaného Ez: K0 + e Ez z − mu0 B, start z0=0.
+Jde o přibližnou podmínku pro daný magnetický moment, nikoli stěnu
+nebo přesnou předpověď celé Borisovy orbity. Výklad uvádí omezení,
+čistě magnetickou mez Bstart/sin²(alpha0) i zdroj UT Austin.
+Obě bitmapy se připraví při načtení atlasu, animace již nevyhodnocuje
+pole ani kontury. Rozměry grafu a trajektorie se nemění.
+
+## Sloučené ukázky a větší průmět — 17. listopadu 2026
+
+Oběh a Plochy sloučeny do tlačítka Helikální: stejný pokus umožňuje
+sledování oběhu i průzkum poloměru. Zůstávají tři kompaktní tlačítka
+Drift, Helikální, Zachycená. Poslední ukázka se ve scéně nazývá
+Magneticky zachycená částice; odborný pojem banánová orbita zůstává
+ve výkladu. Menší svislé výplně tlačítek, mezery a jednorádkové nastavení
+E uvolňují místo přímo flex grafu. Průmět si zachovává shodné metrické
+měřítko os a prostor pro popisky, nic se nenatahuje anizotropně.
+
+## Proč vzniká banánový odraz — 17. listopadu 2026
+
+Banánová předvolba nyní čte předpočítanou místní indukci, obě složky
+rychlosti a směr B přímo z Borisova výpočtu (detail v atlasu 14).
+V existujících třech řádcích panelu se zobrazují B, v_parallel a v_perp,
+bez rozšíření ovládání. Černá šipka u částice ukazuje její rychlost podél
+pole; v odrazu se zkrátí a obrátí. První dva body odrazu jsou označené
+v prostoru a při dosažení zvýrazněné. Vnitřní polovina poloidálního
+průmětu má jemný modrý podklad jako označení strany silnějšího pole.
+Nejde o kvantitativní barevnou mapu ani automatický překryvný výklad.
+
+Výklad doplněn o přibližné zachování magnetického momentu, přerozdělení
+rovnoběžné a kolmé energie a zrcadlovou sílu −mu dB/ds. S elektrickým
+polem výslovně zahrnuje e E_parallel, nikoli tvrzení o konstantní kinetické
+energii. Odrazy zůstávají výsledkem integrace, nikoli zásahu do rychlosti.
+Nový test ověřuje změnu znaménka v_parallel, vyšší B a v_perp v odrazech,
+zachování součtu energií bez E a skutečné matematické popisky. Záznamy
+jsou znovu reprodukovatelně vygenerované aktuálním nástrojem.
+
+Ukázky helicity jsou nyní čtyři přímo dostupná tlačítka v jediném kompaktním
+řádku: Drift, Oběh, Plochy, Banán. Nahrazují popisek a rozbalovací nabídku,
+tedy ovládání nezvyšují; plné názvy jsou v title, aktivní stav přes aria-pressed.
+Plynulé přejezdy, elektrické pole a předpočítané trajektorie se nemění.
+
+## Nezávislé elektrické pole a banánová orbita — 17. listopadu 2026
+
+Přepínač předepsaného Ez=−500 V/m je nezávislý na magnetických složkách:
+nemění u, plochu ani předvolbu a zůstává aktivní při přejezdech posuvníků.
+Všechny kombinace mají předpočítané dráhy: helicity-data/7.js až 13.js,
+3045 elektrických stavů se stejnými 21 poloměry a 145 poměry jako bez E.
+Integrátor v tools/precompute-helicity-electric.cjs používá celé prostorové
+B včetně poloidální složky a plnou elektrickou sílu, včetně případného
+rovnoběžného zrychlení. Elektrické pole zůstává předepsané, ne samokonzistentní.
+Ve všech stavech ověřena bilance K−e Ez z, relativní chyba <1e−9; nulové E
+obnovuje původní magnetické dráhy i pro smíšené a čistě poloidální pole.
+
+Nová předvolba Banánová orbita: geometrie COMPASS-U, r/a=0,64, q=2,
+B0=1 T, energie 1 keV, počáteční úhel 70°. Tyto parametry jsou pevné;
+ovladače magnetického poměru a plochy jsou v předvolbě neaktivní. E lze
+nezávisle přepínat. Dva záznamy v helicity-data/14.js trvají 160 μs,
+obsahují skutečné změny znaménka paralelní rychlosti a zůstávají uvnitř
+objemu. Bez E jsou během záznamu dva odrazy, s E tři. Průmět zvýrazňuje
+zelenou dráhu gyračního středu a dosažené body odrazu. Oranžová gyrace
+a modrá siločára jsou zachovány. B0 a počáteční úhel jsou viditelné v panelu,
+rozdíl vůči ostatním předvolbám je také výslovně ve výkladu.
+
+Tvar obou orbit ověřen i offline vykreslením skutečných souřadnic
+gyračního středu (tmp/banana-check.png, pomocný neveřejný soubor).
+Testy ověřují atlasové hashe a bilanci, zachování nastavení při změně E,
+elektrické pole během přechodů, banánovou předvolbu, odrazy, celý delší
+záznam a návrat do ostatních pokusů. Nové atlasové soubory jsou v allowlistu;
+načítají se až uvnitř helikálního modulu. Browser nebyl automaticky otevřen.
+
+Přepínač elektrického pole už není blokovaný nenulovou poloidální složkou.
+Zapnutí z helikální konfigurace plynule nastaví toroidální pokus, zachová
+vybraný poloměr a poté použije předpočítanou dráhu s E. Požadavek zapnutí
+se během přejezdu neztrácí. Ruční přidání poloidální složky nebo volba
+helikální předvolby srovnávací E vypíná. Test zahrnuje zapnutí, celý přejezd
+i vypnutí bez změny vybraného poloměru.
+
+## Zklidnění kresby a velikosti E — 17. listopadu 2026
+
+Elektrické pole je nyní znázorněno jedinou jantarovou směrovou šipkou
+v otvoru toroidu a jednou mimo kružnici poloidálního průmětu. Nezakrývá
+trajektorii, osy ani průřez. Homogenní pole působí v celém modelu, nikoli
+jen v místě symbolu; velikost šipky není kvantitativní škála.
+Předepsané Ez sníženo z −1500 na −500 V/m pro mírnější výukový účinek;
+21 trajektorií znovu předpočítáno. Při B0=0,5 T je E/B0=1 km/s a rozdíl
+potenciálů přes 2a=0,54 m je 270 V. Ani tato hodnota není odvozena ze
+samokonzistentní separace náboje či měření konkrétního režimu COMPASS-U.
+Výklad toto omezení výslovně uvádí. Energetické, UI a atlasové testy prošly;
+kontrolují také jedinou šipku v každém pohledu a umístění mimo křivky.
+
+## Předepsané elektrické pole a odlišení hranic — 17. listopadu 2026
+
+V čistě toroidálním režimu přidán přepínač Započítat elektrické pole.
+Používá homogenní statické Ez=−1,5 kV/m jako názornou aproximaci účinku
+separace náboje, nikoli samokonzistentní výpočet plazmatu. Jantarové vektory
+E jsou ve 3D i poloidálním průmětu a odpovídají poli v Lorentzově integraci.
+Při přidání poloidální složky se srovnávací elektrický pokus vypne.
+Změna přepínače resetuje částici. Další atlas helicity-data/7.js obsahuje
+21 předpočítaných drah pro všechny volitelné poloměry; generuje ho
+tools/precompute-helicity-electric.cjs. Základní magnetické atlasy nezměněny.
+Kontrola nulového E dává identickou původní dráhu; celková energie
+K−e Ez z je zachována s relativní odchylkou <1e−9. Gyrační střed odečítá
+lokální E×B rychlost. Za okrajem zůstává toto předepsané pole zapnuté.
+
+Hranice vybraných magnetických ploch v prostoru i průmětu jsou čárkované
+antracitové, ostatní obrysy šedé, siločáry modré. Hrot svislé osy má odstup
+nad kružnicí; vyhrazený prostor zůstává při animaci a změně plochy pevný.
+Regresní kontroly zahrnují obě zobrazení E, přepínač, vypnutí při helikálním
+poli, energetickou bilanci, atlas a zachování nulového-E řešení.
+
+Popisek z [m] v poloidálním průmětu je nyní vystředěný přímo nad hrotem
+svislé osy. Horní prostor je rezervovaný pro popisek a hrot, aby nekolidovaly
+s kružnicí ani nadpisem; shodné pevné měřítko obou os zůstává zachováno.
+
+## Stabilní čas a rychlý odlet — 17. listopadu 2026
+
+Časový údaj má jednotné dvě desetinné pozice a pevný KaTeX prostor
+pomocí hphantom/mathllap, takže ani změna počtu číslic nepohybuje značkou
+t, desetinnou pozicí či jednotkou. Platí napříč režimy udržení.
+Helikální přehrávání po prvním překročení plazmatického profilu plynule
+zrychlí z běžné rychlosti až na osminásobek, po stejné předpočítané dráze.
+Zrychlení je uvedeno ve stavu a výkladu; čas ukazuje odpovídající fyzikální
+čas. Konec uloženého záznamu se neprodlužuje ani nenahrazuje přímkou.
+Regresní kontroly pokrývají číselný formát i zrychlení a reset.
+
+Číselná hodnota Ip je na pokyn uživatele pouze v levém panelu. Ve scéně
+zůstává KaTeX značka Ip a šipka s velikostí závislou na proudu.
+
+## Opačná strana řezu a odstupy os — 17. listopadu 2026
+
+Na další pokyn uživatele je šrafovaný prostorový průřez na opačné,
+pravé straně pohledu (při řezu pravá hrana). Popisek R−R0 je pod kružnicí,
+z vpravo od horního hrotu s dostatečným odstupem od vnějšího obrysu.
+Pevné měřítko a maximální velikost kružnice se nemění. Regresní test
+ověřuje odstup obdélníků obou popisků od vnější kružnice a stranu průřezu
+s řezem i bez něj.
+
+## Čisté poloidální pole a oprava matematických popisků — 17. listopadu 2026
+
+Čistě poloidální režim už nekreslí dvanáct dvojic překrývajících se
+kružnic: zachovává vybranou siločáru a pět dalších rovin, vnější pole
+naznačuje jedinou smyčkou. Šrafovaný průřez je na levé straně pohledu;
+u řezu vybírá levou hranu. Poloidální graf nemá číselné značky, pouze
+výrazné tmavé osy se šipkami a KaTeX názvy/jednotkami; pevné izotropní
+měřítko zachováno. Poloha popisků nyní zahrnuje odsazení grafu pod nadpisem.
+
+Opraveny ztracené zpětné lomítka v dynamických textech Ip, approx, mathrm
+a jednotkách os. Tyto řetězce používají String.raw. Regrese nově kontroluje
+skutečné předané řetězce včetně příkazů, ne pouze syntaktické přijetí KaTeXem
+(zkomolené příkazy dříve prošly jako běžná matematická písmena). Test nového
+controlleru i integrační test app.js prošly. Fyzika ani atlas se nemění.
+
+## Průřez plochami, proud a stabilní ovládání — 17. listopadu 2026
+
+Popisky uzavření a počtů oběhů mají rezervovanou výšku; neaktivní údaj
+oběhů používá visibility:hidden, takže posuvník ani tlačítka neposkakují.
+Na jedné straně prostorové scény je při zapnutých plochách slabě šrafovaný
+poloidální průřez s pěti vnořenými obrysy a modře zvýrazněným vybraným
+poloměrem. Při řezu sleduje jeho hranu. Nevrací se kružnice kolem celého
+toroidu. Velikost šipky Ip roste podle odmocniny amplitudy proudu, v nule
+zmizí a popisek uvádí skutečnou modelovou velikost v kA.
+
+Poloidální průmět využívá největší izotropní měřítko dostupného panelu
+pro pevný vnější poloměr a. Výběr plochy, čas ani únik částice ho nemění;
+pouze změna rozměru panelu přizpůsobí kresbu. Osy mají jednotky a číselné
+značky. Stopu i značku částice řídí stejná interpolace. Pokračování mimo
+vyznačený objem zůstává fyzikální Lorentzovou trajektorií v nenulovém poli,
+nikoli uměle přímým odletem či připoutáním k magnetické ploše.
+Testy kontrolují stálý řádek, jedinou rovinu rastru, růst proudové šipky,
+pevné maximální měřítko grafu a integraci nového controlleru s app.js.
+
+## Hladká trajektorie D⁺ a kontrola driftů — 17. listopadu 2026
+
+Příčinou kostrbaté stopy bylo vynechávání dvou ze tří starších vzorků
+gyrace v rendereru. Nově se používají všechny uložené body a kubická
+Hermitova interpolace s derivacemi z uložených vzorků. Stejná interpolace
+řídí značku částice i konec její stopy; žádná část dráhy se nenarovnává
+ani nepřilepuje k siločáře. Přehrávání zpomaleno z 8 na 2 μs/s. Model
+a předpočítané atlasy beze změny; nevzniká výpočet pole při přehrávání.
+
+Test porovnává hladkou dráhu q=2 s dvojnásobně hustým Borisovým záznamem
+(odchylka <0,25 mm), kontroluje všechny segmenty i konec stopy. Nezávislý
+adiabatický odhad součtu gradientového driftu a driftu zakřivení pro čistě
+toroidální pole dává 3,93 km/s, Borisův gyrační střed přibližně 3,96 km/s.
+Oba magnetické drifty tedy vznikají správně integrací Lorentzovy rovnice.
+Start na vnější ploše překračuje vyznačený objem už přibližně za 0,68 μs;
+nejde o simulaci kontaktu s materiálovou stěnou. Předvolba driftu startuje
+uvnitř. Výklad uvádí, že E×B a polarizační drift zde nejsou (E=0), stejně
+jako srážky, turbulence a kolektivní transport. Zdroj: Fitzpatrick,
+UT Austin, https://farside.ph.utexas.edu/teaching/plasma/lectures1/node19.html.
+
+## Čitelnost helikální siločáry — 17. listopadu 2026
+
+Vybraná siločára se kreslí celá i při řezu magnetickou plochou, modrým
+tahem 2,6 px s jemným světlým oddělením od podkladu. Samostatná Canvas
+vrstva řeší také omezení WebGL čar na jeden pixel. Směrové značky ani
+počátek uzavřeného oběhu se řezem neskryjí. Pomocné soustředné prostorové
+kružnice odstraněny; hrany řezu mají slabou neutrální barvu. Výchozí
+zobrazená plocha je nejvyšší povolený poloměr r/a=1. Připravené částicové
+pokusy zachovávají své ověřené počáteční podmínky a plynulý přejezd.
+Fyzikální model ani předpočítaná data se nemění. Test ověřuje všech 769
+bodů celé vybrané siločáry shodně s řezem i bez něj a spojení uzavřeného
+oběhu bez mezery; obecný poměr se uměle neuzavírá.
+
+## Helikální pole — připravené pokusy a plynulé ovládání, 17. listopadu 2026
+
+Poslední režim magnetického udržení má tři předvolby: toroidální drift a únik,
+helikální oběh q=2 a průzkum ploch q=3. Přepnutí přesune ovladače plynule
+za 1,1 s; částice se zastaví a ruční zásah přejezd přeruší. Jeden posuvník
+mění poměr toroidální/poloidální složky, druhý vybírá plochu bez změny pole.
+Přichycení a přímá tlačítka q=1,3/2,2,3 nastavují skutečné uzavřené oběhy.
+Řez, směrové značky, šipka konvenčního proudu, D⁺ a gyrační střed zůstávají.
+Vybraná plocha je matně růžová, okolní plochy jsou šedé obrysové kontury.
+
+Geometrie COMPASS-U R0=0,89 m, a=0,27 m je kruhová aproximace. Pevné
+výukové B0=0,5 T, energie 1000 eV a počáteční úhel 30° nejsou parametry
+skutečného výboje. Divergence-free pole má profil f(s)=2s-s³ uvnitř a 1/s
+vně; proudový profil se při výběru plochy nemění. Toroidální proud má
+správnou orientaci vůči poloidálnímu poli. Racionální q se označuje jako
+rezonanční plocha, nikoli důkaz stability. Výklad rozlišuje q(r), q(a), q95
+a konečnou částicovou orbitu; graf je poloidální průmět, ne Poincarého mapa.
+Literatura: kniha Entler–Kindl, rámeček 7.6; CEA/IRFM Magnetic confinement;
+Kikuchi, Energies 2010, 3, 1741. MHD rovnováha ani nestability se neřeší.
+
+Nové helicity-model.js a tools/precompute-helicity.cjs připravují 3045 stavů
+(21 poloměrů, společná množina 145 poměrů). Sedm helicity-data/*.js se načte
+až při vstupu do helikálního režimu, s průběhem a opakováním při chybě.
+Pohyb posuvníků ani přehrávání pak neintegrují pole. Borisův záznam trvá
+76,8 μs, krok 40 ns se 64 podkroky; souřadnice mají kvantizaci <0,1 mm.
+Po úniku se trajektorie dál přehrává do konce záznamu; automatický reset není.
+tools/test-helicity.cjs ověřuje curl(A), nulovou divergenci, tečny siločar,
+počty oběhů, energii, konvergenci kroku, všechna data a ovládání včetně
+přerušení přejezdu a přehrávání bez výpočtu pole. Je zapojen do project/check.
+Nové zdroje a veřejná data jsou výslovně v allowlistu; knihy zůstávají soukromé.
+Prohlížeč se automaticky neotevírá; skutečný vzhled WebGL je třeba posoudit
+v otevřené aplikaci. Neproveden commit ani push.
+
+Sestavení tools/build-release.cjs dokončeno; následná jazyková korektura
+promítnuta build-particle-library.cjs do obou aktuálních dodávek. Všechny
+funkční testy v tools/project/check.cjs prošly včetně skutečné přípravy
+vlastního atlasu; samostatný integrační smoke test spustil nový controller
+přímo s app.js. Závěrečný audit ve společném příkazu narazil na sandboxový
+spawnSync git EPERM; samostatně s povolením prošel. Navigační test nyní
+odlišuje externí HTTPS zdroje od místních souborových závislostí.
+
+## Prostorové zakrývání vinutí a toru — 17. listopadu 2026
+
+Opravena chyba materiálu ohýbaných cívek: bendBand používal alpha=0,9,
+takže měděný batch byl transparentní a nezapisoval hloubku. Plášť a
+vinutí se proto neskládaly jako skutečné prostorové přední/zadní části.
+Bendy nyní vytvářejí neprůhledné měděné plochy i v záložním Canvasu.
+GPU renderer navíc všechny měděné materiály vždy vykresluje neprůhledně,
+s opacity=1, depthTest=true a depthWrite=true, i pokud by starší volající
+předal nižší alpha. Průhledný plášť má depthTest=true a respektuje přední
+vinutí; zadní měď může být dál vidět skrz průhledný plášť. Nejde o
+vynucení kreslení všech cívek přes torus; rozhoduje skutečná hloubka.
+Model pole, geometrie závitů, směrové značky a fade se nemění.
+
+Test-confinement prošel včetně skutečných Three materiálů pro měď
+a plášť a jejich nastavení v uzavřené ohýbané scéně. Navigace, progressive
+a audit prošly. Obě aktuální dodávky aktualizovány. Pokus o vizuální
+kontrolu již otevřeného Chrome byl nástrojem Computer Use zamítnut
+(Computer Use is not allowed on this app by policy). Nový prohlížeč se
+nespouštěl; vizuální potvrzení překryvů proto zatím chybí. Změny jsou
+ve stále rozpracovaném, dosud netrackovaném confinement modulu; nebyl
+vytvořen samostatný commit, který by přibral jeho cizí rozpracované části.
+
+
+## Fade směrových značek při uzavření — 17. listopadu 2026
+
+Trojúhelníčky při dosažení úplného uzavření toroidu plynule mizí
+(fade-out 1200 ms); při opětovném rozpojování se plynule vracejí
+(fade-in 700 ms). Přechody používají smoothstep a při obrácení směru
+navazují na právě vykreslenou průhlednost. Ostatní geometrie zůstávají
+beze změny. Fade neovlivňuje průhlednost siločar ani povrchu, model pole
+nebo částici. Po úplném zmizení se neměnná scéna již nepřekresluje
+kvůli neviditelným značkám. Statický obraz GPU se během fade nemění.
+
+Test-confinement prošel pro oba modely pole včetně obou přechodů,
+obrácení během fade a cache hotového obrazu. Navigace, progressive
+a audit prošly. Obě aktuální dodávky aktualizovány. Zdrojový confinement
+je stále součástí souběžně rozpracovaného nového modulu; samostatný
+commit by zahrnul i jeho ostatní nové soubory, proto se zde nevytváří.
+Prohlížeč se automaticky nespouštěl.
+
+
+## Pohyblivé směrové značky při ohýbání — 17. listopadu 2026
+
+V pokusu Od solenoidu k toroidu přidány stejné pohyblivé vyplněné
+trojúhelníčky jako v otevřených geometriích. Používají stávající flowHeads
+a obloukovou délku vypočtených siločar, ve směru jejich trasování.
+Fungují pro ideální pole i pole konečných cívek v přímém, částečně
+ohnutém i uzavřeném stavu. Vypnutí siločar je skryje. Pohyb značek
+nepředstavuje rychlost částic; výklad již netvrdí, že zde značky nejsou.
+
+Animace překresluje pohyblivou vrstvu také při neměnné geometrii bend,
+ale zachovává cache statického obrazu GPU, geometrii a připravené atlasové
+siločáry. Neprovádí nové trasování ani nepouští částici v tomto pokusu.
+Test-confinement ověřil pohyb při nezměněné scéně pro oba modely a tři
+polohy ohnutí, nezměněný počet statických GPU renderů, nulové nové
+trasování, skrytí značek se siločarami a nezměněný čas částice.
+Navigace, progressive a audit prošly. Obě aktuální dodávky sestaveny.
+Prohlížeč se automaticky nespouštěl; vizuální kontrola zatím neproběhla.
+
+Poznámka ke sdílenému stromu: confinement a jeho test jsou nyní součástí
+další rozpracované nové dodávky a dosud nejsou trackované. Tato úprava
+je proto zachována ve zdrojích a sestavení, bez samostatného commitu,
+který by musel přibrat celý cizí rozpracovaný modul.
+
+
+## Ověření helicity a interpretace poměrů (17. listopadu 2026)
+
+Podklad pro plánovanou úpravu helikálního pokusu; nová interakce ještě není implementována. Zadání: jediný tokamak, plynulý poměr od čistě toroidálního po čistě poloidální pole, výběr magnetické plochy, zachovaný řez a skutečný deuteron D⁺. Používat terminologii knihy Entler–Kindl, kap. 7.5 / rámeček 7.6, s. 149–150, a kap. 7.6 o banánových trajektoriích.
+
+- Kniha: q je počet toroidálních oběhů na poloidální oběh; vztah q ≈ r*BT/(R*BP) je kruhová aproximace. Mez q(a)>1 uvedená v knize nesmí být prezentována jako postačující podmínka stability. Rozlišovat q konkrétní plochy, q(0), q(a) a q95; zejména q95 není q všude v objemu.
+- CEA/IRFM: čistě toroidální pole má driftové ztráty; poloidální složka vede k helikálním drahám na magnetických plochách. Racionální q znamená uzavření siločáry, nikoli automatickou stabilitu. https://irfm.cea.fr/en/physics-of-fusion/magnetic-confinement/
+- JET R(99)13 (indexovaný text části o bezpečnostním faktoru): pro q=m/n návrat po m toroidálních a n poloidálních obězích. Nízké řády jsou rezonančně významné. Lokální sklon není globální magnetická helicita. https://scipub.euro-fusion.org/wp-content/uploads/2014/11/JETR99013.pdf
+- Kikuchi, JAEA, Energies 3 (2010), DOI 10.3390/en3111741, oddíly 3.2–3.4 a 5: stabilita závisí také na profilu proudu, tlaku a magnetickém střihu. Významné rezonance zahrnují 2/1 a 3/2. Existují různé provozní scénáře; neexistuje univerzálně nejlepší r/a nebo univerzální poměr BT/BP. https://www.mdpi.com/1996-1073/3/11/1741
+- ITER-FEAT Outline Design Report (IAEA, 2000, indexovaný odstavec o omezeních MHD): q95 kolem 3 je kompromis konkrétního referenčního scénáře, ne obecná záruka stability. https://www-pub.iaea.org/MTCD/Publications/PDF/ITER-EDA-DS-20.pdf
+
+Důsledky pro modul: přichycení pouze k vybraným nízkým racionálním q (např. 1, 3/2, 2, 3), označeným jako uzavření/rezonance, nikoli zelené optimum. Ostatní iracionální q neoznačovat automaticky jako bezpečná. Podmínky provozu uvádět u konkrétního profilu a geometrie; samotná kresba siločar ani Borisova dráha jedné částice neřeší MHD stabilitu. Čistě poloidální konec je názorný mezní stav, ne doporučený tokamakový režim. Výběr r/a musí pouze vzorkovat pevné pole/profil proudu (současné přepočítávání koeficientu podle vybrané plochy je nutné při nové úpravě odstranit). Nevyvozovat výhodný poměr COMPASS-U pouze z jeho rozměrů. V řezu rozlišit značku vedenou po siločáře a skutečný deuteron s konečným Larmorovým poloměrem a drifty.
+
+
+## Předpočítané zavírání toroidu (17. listopadu 2026)
+
+- Schválená změna: pole cívek používá celou sadu 201 hotových stavů (krok uzavření 0,005), ne přepočet po puštění posuvníku. Ukládá přesné trasované siločáry, radiální profil a mapu uzavřeného toroidu ve Float32. Žádná interpolace mezi různě topologickými křivkami. Test porovnává polohy a profil s původním solverem.
+- Předvolby COMPASS-U, ITER, JET, SPARC a původní poměr 0,65/0,18 mají generovaná data v confinement/atlases/. Generátor tools/precompute-confinement.cjs se spouští výslovně, nikoli při běžném sestavení. Potřebné kompaktní numerické báze jsou výslovně v sourceFiles/webFiles. Každá má asi 26 MiB binárních hodnot, v samostatném Base64 JS kvůli offline file:// načtení; hlavní rozcestník ani vložený modul je neobsahují. Načte se pouze zvolená geometrie. Paměťová cache drží dvě sady a tři rozbalené snímky.
+- Vlastní rozměry připraví všech 201 stavů jednou ve workeru s průběhem. Po dobu přípravy neaktivní pouze posuvník uzavření; ostatní volby umožňují přepnutí/zrušení. Změna indukce pouze násobí hodnoty, shodný poměr a/R0 používá stejnou bázi s přesným škálováním délek. Posuvník hotové animace již nevolá výpočet pole.
+- Výchozí rozměry COMPASS-U: R0=0,89 m, a=0,27 m; výchozí model Pole cívek. Solenoid a zavírání nadále oddělené. Pohyblivé trojúhelníčky v zavírání zůstávají vypnuté; možnost Směr pole zatím jen návrh v reakci na dotaz uživatele.
+- Odstraněn řádek HiFyziko / Virtuální laboratoř / Verze 1.0 ze spodní části tohoto modulu; flex layout přiděluje uvolněné místo scéně a grafu. Označení aplikace jinde zůstává 1.0.
+- Ověření: test-confinement, test-confinement-atlas (všech pět sad, načítání, cache, škálování), fusion-navigation, progressive. Samostatně prošel i test-confinement-custom: přesný zdroj browser workeru spuštěný v samostatném Node workeru, všech 201 vlastních stavů, průběh, přenos bufferu a kontrola profilu. Skutečný prohlížeč nebyl automaticky otevřen.
+
+
+- Výkon pole cívek: skalární superpozice odstraňuje dočasná vektorová pole uvnitř smyčky závitů. Kontrola 60 bodů pole i potenciálu proti původnímu výpočtu s odchylkou pod 1e-12. Místní Node benchmark bendData pro uzavření 0,5/1: původně 1004/901 ms, nově 224/182 ms (nejde o měření FPS prohlížeče). Worker nyní jako soběstačný Blob včetně modelu, bez importScripts při načítání aplikace; použitelný také z file://, kde externí worker mohl selhat. Samostatný field-worker.js zachován. Regrese provádí výpočet z přesného zdroje Blob workeru. Při návratu do cache se ruší čekající zastaralý požadavek.
+
+- Ohýbání: zapnutí cívek přepíná na skutečné pole cívek, vypnutí na ideální pole; výběr modelu synchronizuje viditelnost cívek obousměrně. U ostatních pokusů zůstává přepínač cívek pouze zobrazením.
+
+- Od solenoidu k toroidu: při vstupu do pokusu jsou siločáry vždy zapnuté (i pokud byly vypnuté v předchozím pokusu). Ideální siločáry se zobrazí ihned i během přípravy mapy/profilu workerem; vypnuté zůstávají pouze pohyblivé trojúhelníčky.
+
+- Toroid (17. 11. 2026): přepínač Ideální pole / Pole cívek v pokusu ohýbání, výchozí ideální. Analytické spojité pole B0/(1+k*x), po uzavření B0*R0/R; otevřený ideální model platí lokálně uvnitř trubice a nepopisuje rozptyl konců. Konečné cívky zůstávají volitelné. Test curl(A), zákona zakřivení a absence azimutálního zvlnění.
+- Worker předpočítá výchozí přímé/uzavřené geometrie obou modelů při načtení (pokud jsou workery podporované); další stavy na požádání. Ukládá normalizované siločáry, profil i vrcholové hodnoty mapy, nejvýše 12 stavů v každé cache. B pouze škáluje data. Žádný předstíraný předvýpočet všech kombinací posuvníků.
+- V ohýbání/toroidu odstraněné pohyblivé směrové značky; nepřekresluje se nezměněná scéna. Zrcadlo a solenoid je zachovávají. Tlačítko Nový výstřel přejmenované na Reset.
+- Rozlišení obou canvas rendererů zohledňuje skutečné CSS zvětšení modulu a DPR (limit 4). Odstraněn CSS filtr scény, jemnější sítě všech magnetických ploch (uzavřená mapa 192 × 64, helikální plochy 160 × 64). Barvy mapy z hodnot ve vrcholech, ne z průměrů buněk; fyzikální zvlnění pole cívek zůstává skutečné. Skutečný GPU obraz v prohlížeči se automaticky neotevíral.
+
+
+- Úprava zrcadla/solenoidu (17. 11. 2026): magnetické plochy bez lesku a s jemnější průsvitností (matný neosvětlený materiál, alpha 0,055 při výchozím ovladači). Směrové trojúhelníčky nyní na všech siločarách; zrcadlené dvojice mají společnou fázi, takže značky nechybějí na spodní polovině. Toroidální plášť a kvantitativní mapa zachovány. Regrese kontroluje značky na každé křivce a matné plochy.
+
+## Magnetické udržení — hladká grafika a terminologie knihy (17. listopadu 2026)
+
+- Nový renderer.js používá stávající lokální Three.js: sdílené vrcholy, hladké normály, šedý poloprůhledný plášť při zavírání, jemně růžový po uzavření, nasvícená měděná vinutí a kovové objímky. Model fyziky zůstává beze změny. Při nedostupném WebGL zůstává Canvas fallback.
+- Statická scéna se uchovává mezi snímky; GPU vykresluje dávky geometrií místo každého úseku zvlášť. Výpočet 24 siločar ohýbaného pole běží ve field-worker.js, kde prostředí dovoluje Worker; při chybě se použije synchronní výpočet. Profil zrcadla je cachovaný. Nejde o změřený příslib konkrétního FPS.
+- Hustší ostré siločáry a pohyblivé trojúhelníčky bez dříku; rychlost značek jen ilustruje směr pole. Samostatné složky lze stále zobrazit, při skládání s výslednicí zeslábnou. Opravené znaménko vodorovného tažení kamery.
+- Kvantitativní mapa až po úplném uzavření, Rainbow podle ANSYS (modrá–azurová–zelená–žlutá–oranžová–červená). Mapa bez osvětlení, aby lesk neměnil její význam; legenda v teslech. Barva magnetických siločar zůstává #356ac3.
+- Terminologie fúzních modulů kontrolována proti knize, zejména kap. 2.2 a 7.3–7.6: helikální magnetické pole, toroidální/poloidální pole, hlavní/vedlejší poloměr, gyrační střed, Larmorův poloměr, grad-B drift, drift zakřivení, E×B drift. Opravené názvy v ovládání/výkladu/rozcestníku; interní ID a odkazy zachovány. Lokální helicita siločar není globální magnetická helicita.
+- Ověřené R0/a z knihy (m): COMPASS-U 0,89/0,27; ITER 6,2/2; JET 2,95/1,25; SPARC 1,85/0,57. Předvolby i výklad mají tyto hodnoty; stále kruhová aproximace, bez D-tvaru a vertikálního protažení skutečných zařízení.
+- Testy: fyzika a UI confinement, skutečná tvorba Three geometrií/normálů všech tří scén s náhradou GL kontextu, worker, cache, směr myši; navigace/progressive/module-guide. Prohlížeč nebyl automaticky otevřen; skutečný GPU obraz v prohlížeči zatím není vizuálně ověřen.
+
+
+## Magnetické udržení — živá geometrie a profily (17. listopadu 2026)
+
+Zrcadlo/solenoid: graf v nativních pixelových souřadnicích, z v metrech
+a B na ose v teslech, číselné dílky, rozsah i za koncovými cívkami.
+Marker není natažený a mimo rozsah zmizí. Řez zrcadla skrytý; částice
+pokračuje v reálném poli i za původní hranicí a mimo obraz. Žádný
+automatický reset nebo stop; nový výstřel pouze ovladačem. Siločáry
+mají jemnější krok a startují po stejných přírůstcích toku rho*A_phi.
+
+Ohýbání nyní skutečně počítá pole dvaceti natočených kruhových závitů
+v každém mezistavu, součet analytických rotací jejich potenciálů.
+Vektorový potenciál je také dostupný pro nezávislou kontrolu rotace.
+Normalizace proudu zachovává zvolené B0 ve středu délky osy. Skutečné
+siločáry jsou integrovány v tomto poli; mapa povrchu je magnetostatický
+výsledek po úplném uzavření; během ohýbání se kreslí jen geometrický šedý plášť.
+Výpočet mapy se uchovává do změny geometrie. Model nemá indukované E
+a vodiče jsou ideálně tenké. V samostatném helikálním pokusu zůstává
+osově symetrický ideální model kruhových ploch.
+
+Rozměry R0 a a jsou skutečné vstupy pole, geometrií a trajektorií;
+rozsahy 0,4–8 m a 0,08–2,5 m s omezením a<=0,48 R0. Předvolby
+z místní knihy: COMPASS-U 0,89/0,27 m (s.48), ITER 6,2/2 m (s.45),
+JET 2,95/1,25 m (s.41), SPARC 1,85/0,57 m (s.48). Kromě COMPASS-U
+jsou poloměry polovinou průměru toroidu a šířky plazmatu v tabulkách.
+Jde výslovně o kruhová přiblížení, ne D-tvar/protažení skutečných strojů;
+předvolby nemění B. Kamera se přizpůsobí, fyzikální rozměry se nezaměňují
+za pouhé měřítko kresby.
+
+Původní graf uzavírání nahrazen na poslední pokyn profilem B přes celý
+malý průměr v polovině délky: x=-a vnitřní, x=0 osa, x=+a vnější strana.
+Mapa i profil reagují na geometrii. Barevná škála sytě modrá až sytě
+červená; vektory zůstávají modré. Plynulý ovladač průhlednosti, vinutí
+lze vypnout (v ohýbání výchozí vypnuté). Odstraněna časová lišta,
+částicové legendy a neaktivní ovladače v ohýbání. Automatický záběr
+vychází z aktuálního natočeného povrchu a využije spodní volnou plochu.
+
+Test modulu: rotace potenciálu pro natočené závity v mezistavech i pro
+velké rozměry, tečnost siločar, kalibrace, q a rozměrové předvolby,
+útěk bez zastavení, fyzikální čas a B, grafy s jednotkami, mapa za
+ohýbání a ovladače. Navigace/progressive/výklad prošly, dodávka
+aktualizována. Scéna kontrolována ze záznamu canvas; prohlížeč neotevřen.
+Bez pushe. Novější pokyny této sekce nahrazují starší omezení mapy,
+řezu zrcadla a původní geometrické ukázky níže.
+
+
+## Magnetické udržení — tempo, indukce a materiály (17. listopadu 2026)
+
+Přehrávání má pevnou fyzikální stupnici 2 mikrosekundy za sekundu při
+rychlosti 1×; posuvník 0,02× až 4×. Nahrazuje původní počet gyrokroků
+za snímek, takže samotná změna B již nemění časovou stupnici. Integrační
+krok zůstává omezen lokálním cyklotronním úhlem. Nový ovladač B0
+0,1–2 T zachová částici, čas i energii; pole cívek se přepočte při
+stejném zrcadlovém poměru.
+
+Cívky mají prostorové měděné vinutí a koncové svazky s kovovými
+okraji, při bočním pohledu podélný řez. Rozměry povrchové kresby jsou
+názorné; proudový model zůstává tvořen původními závity. Ohýbání má
+průsvitný nasvícený povrch a měděné pásy, po uzavření větší záběr.
+Mapa B se u ohýbání zapne až pro úplný toroid, podle B0 R0/R, nikoli
+podle neexistující simulace deformovaných cívek. V ostatních pokusech
+mapa vychází ze skutečného pole modelu. Samostatná škála v T; počet
+nakreslených siločar není kvantitativní mapa toku. Modré vektory
+a růžový povrch bez mapy zachovány. Mírné odlesky jsou dekorativní.
+
+Vizuální inspirace: Princeton Research Computing, Flux Surfaces within
+Plasma from Tokamak Simulation (průsvitné plochy a řez), a COMSOL,
+Magnetic Field of a Helmholtz Coil (geometrie a mapa velikosti pole).
+Nejsou přebírány jejich obrázky ani výpočetní výsledky. Kresba scény
+zkontrolována pomocí záznamu skutečných canvas příkazů do statických
+náhledů; nejde o kontrolu HTML rozložení v prohlížeči.
+Test modulu (včetně živého B, pomalého času a podmínky mapy), navigace,
+progressive a výklad prošly; aktuální dodávka přestavěna. Bez pushe.
+
+
+## Magnetické udržení — pole závitů, plochy a řezy (17. listopadu 2026)
+
+Nahrazuje původní kvadratické pole zrcadla: konečné kruhové závity,
+vektorový potenciál A_phi a jeho analytická rotace přes úplné eliptické
+integrály (AGM). Základní solenoid má 16 závitů s poloměrem 0,24 m,
+zrcadlo dvě silnější koncové cívky. Centrální B a zrcadlový poměr se
+kalibrují proudy podle skutečného pole na ose. Siločáry se trasují
+obloukovou délkou i mimo cívky, včetně rozptylového a vratného pole.
+Singulární okolí ideálně tenkých vodičů je z trasování vynecháno.
+Výchozí pohled zrcadla a solenoidu je vodorovný boční řez; proudové
+závity jsou označeny tečkami/křížky. Tažení otáčí kamerou; tlačítko
+a dvojklik obnoví boční pohled.
+
+Toroid zůstává explicitně idealizovaný osově symetrický model kruhových
+ploch, nikoli výpočet diskrétních cívek či MHD rovnováhy. Má nyní
+explicitní potenciál A_phi=C r²/(2R), A_z=-B0 R0 ln(R/R0). Skládání
+plynule přisouvá samostatné toroidální a poloidální pole; poměr složek
+ovládá skutečné pole. Změny poměru polí/zrcadla zachovají částici a čas,
+bez zahrnutí indukovaného E. Trasování se sdružuje do nejbližšího snímku.
+
+Samostatné přepínače siločar, magnetických ploch a řezu. U toroidu jsou
+plochy světle růžové a průsvitné; magnetické značky zůstávají modré.
+U zrcadla vznikají plochy rotací vypočtených siločar. Řez zrcadlem se
+posouvá podélně, toroidální poloidální řez se otáčí; zobrazí se polovina
+plochy a zvýrazněná průsečnice. Levý graf při zapnutí řezu ukazuje
+průřez plochami ve správném poměru stran. Poloměry zrcadlového řezu
+se určují zachováním toku rho*A_phi.
+
+Ověření: test modulu včetně rotace potenciálu uvnitř i vně cívek,
+nezávislé Biotovy–Savartovy kvadratury, kalibrace zrcadlového poměru,
+toku v řezu, zachování energie, odrazů a úniku, ovladačů ploch/řezů
+a plynulého skládání. Navigace, progressive a výklad prošly.
+Aktuální dodávka přestavěna. Prohlížeč neotevřen; bez pushe.
+Zdroj vztahů kruhového závitu: NASA, Simpson a kol., Simple Analytic
+Expressions for the Magnetic Field of a Circular Current Loop,
+https://ntrs.nasa.gov/citations/20140002333 .
+
+
+## Magnetické udržení — 17. listopadu 2026
+
+Nový modul fu04-udrzeni, třetí karta skupiny Plazma a fúze; galerie je čtvrtá.
+Zdroj versions/vyvoj/m_files/fusion/confinement, výstup fuze-udrzeni.
+Čtyři pokusy: homogenní solenoid, prostorové magnetické zrcadlo, geometrické
+ohýbání solenoidu s konstantní délkou osy a toroidální + poloidální pole.
+Otočná canvas scéna, kompaktní ovládání, skutečný deuteron s Borisovou
+integrací, stopa a gyrační střed, detail gyrace, rozvinutá magnetická plocha,
+poměr složek obou znamének, délka a počáteční poloidální úhel siločáry.
+Zrcadlo používá analytické vakuové přiblížení u osy (nulová divergence
+i rotace), nikoli přesné pole nakreslených cívek. Toroid má kruhové
+magnetické plochy, B_phi=B0 R0/R a B_theta=C r/R, nulovou divergenci.
+Bez MHD rovnováhy, srážek a vlastních polí plazmatu. Ohýbání je výslovně
+geometrické, částice v něm neběží. Změna fyzikálních parametrů připraví
+nový výstřel; kamera, viditelnost a rychlost přehrávání stav nemění.
+Kniha ověřena na str. 32–35 a 148–151, lokální PDF zůstává soukromé.
+
+Test tools/test-confinement.cjs ověřuje odrazy a ztrátový kužel, únik
+solenoidem, energii, divergenci, tečnost siločar k poli, q z oběhů,
+spojení konců, skutečné ovladače v DOM/canvas adaptéru, KaTeX a disposal.
+Modul zařazen do postupného načítání, publikačního seznamu a společného
+výkladu. Sestavení aktualni proběhlo. Prohlížeč se neotevíral; vizuální
+kontrola v prohlížeči není provedena. Všechny funkční testy z project/check
+prošly; závěrečný audit byl dokončen samostatně mimo sandbox, který blokoval
+spuštění čtecího git ls-files z Node. Audit: 473 veřejných souborů, bez nálezů.
+Po poslední úpravě znovu prošly test modulu, navigace a progressive. Bez pushe.
+
 
 ## Údaje obou nábojů a didaktika zakřivení — 17. listopadu 2026
 
@@ -129,6 +898,7 @@ změny R a aktualizovaného počátku. Navigace, progressive a audit prošly;
 obě aktuální dodávky sestaveny. Prohlížeč se automaticky nespouštěl;
 vizuální kontrola v prohlížeči zatím neproběhla.
 
+
 ## Zřetelnější Grad-B drift — 17. listopadu 2026
 
 Na žádost uživatele trojnásobně zvýšen dostupný relativní gradient:
@@ -145,6 +915,7 @@ Test-drift prošel včetně trojnásobku příspěvku v referenčním místě,
 směru separace a zachování energie v silnějším gradientu, krajních
 hodnot a dlouhého běhu v okně. Navigace, progressive a audit prošly.
 Obě aktuální dodávky sestaveny; prohlížeč se automaticky nespouštěl.
+
 
 ## Bezpečné rozsahy a udržení oběhů v okně — 17. listopadu 2026
 
@@ -177,6 +948,7 @@ a zachovaným časem i přehráváním, opakované vykreslení bez změny měř�
 Navigace, progressive a audit prošly; obě aktuální dodávky sestaveny.
 Prohlížeč se automaticky nespouštěl, vizuální kontrola zatím neproběhla.
 
+
 ## Šipky podle velikosti oběhu — 17. listopadu 2026
 
 Ve společném E×B + Grad-B se šipky rychlosti a síly u hlavní částice
@@ -191,6 +963,7 @@ Test-drift ověřil plynulé zmenšování při interpolaci hmotností, skrytí
 nečitelných šipek i popisků a jejich návrat; zachování polohy i času.
 Navigace, progressive a audit veřejných souborů prošly. Obě aktuální
 dodávky sestaveny. Prohlížeč se automaticky nespouštěl.
+
 
 ## Plynulé nastavení společného driftu — 17. listopadu 2026
 
@@ -213,6 +986,7 @@ Ověřeno test-drift (včetně změn za běhu, zachování polohy a času,
 obou odstínů ve všech šesti pokusech, skrytého grafu a směru gradientu),
 navigace a progressive. Obě aktuální dodávky aktualizovány. Vizuální
 kontrola v prohlížeči neproběhla; prohlížeč se automaticky nespouštěl.
+
 
 ## Společný drift a přechod hmotností — 17. listopadu 2026
 
@@ -242,6 +1016,7 @@ souborů a kontrola citlivých dat prošly. Obě aktuální dodávky sestaveny.
 Prohlížeč se podle pravidla projektu nespouštěl; vizuální kontrola
 rozložení tohoto doplnění v prohlížeči zatím neproběhla.
 
+
 17. 11. 2026 — Podle dalšího upřesnění obráceno pouze svislé otáčení
 piktogramu (nahoru/dolů); vodorovný směr zůstává. Test driftu, navigace
 a progressive obou aktualizovaných dodávek prošly.
@@ -270,6 +1045,13 @@ Test ověřil společný počátek všech vektorů a přesný součet sil v obou
 směrech B pro proton, elektron i alfa částici. Ověřena stabilita F_B při
 změně E; test-drift, navigace a progressive obou dodávek prošly.
 
+## Společná šířka textu a rovnic — 17. 11. 2026
+
+Na uživatelský pokyn odstraněn limit 74ch u odstavců a položek výkladu.
+Text nyní využívá stejnou dostupnou šířku jako bloky rovnic a při změně
+velikosti okna se přirozeně přezalamuje. Velikost písma zůstává čitelná.
+
+
 ## Propojené velikosti šipek a náhled v poli — 17. listopadu 2026
 
 Předchozí šipky piktogramu byly normalizované a u čekající částice mimo
@@ -285,6 +1067,32 @@ Test-drift ověřil růst šipek při změně B, E i energie, výslednou sílu
 a oddělení náhledu od skutečné síly mimo pole. Navigace a progressive
 pro obě aktualizované dodávky prošly.
 
+## Čitelnost rovnic ve výkladech — 17. 11. 2026
+
+Na další uživatelský pokyn zvětšena matematika v celé studijní šabloně.
+Samostatné vztahy používají přibližně 23 px (na úzkém okně 21 px),
+větší odstupy, jemné zelené pozadí a levý zvýrazňující okraj. Vložené
+veličiny zůstávají součástí vět, mírně zvětšené na přibližně 18 px.
+Rozlišení vychází z umístění vztahu v dokumentu; rovnice uvnitř odstavců,
+seznamů a tabulek se nerozdělují do bloků. Sazba ve schématech SVG se nemění.
+
+
+## Studijní šablona výkladů — 17. 11. 2026
+
+Po uživatelské připomínce k rozpadlé sazbě napříč moduly výklad už nepřebírá
+CSS třídy ani inline rozložení původních scén. Typický p.explain přebíral
+dvousloupcovou mřížku hostitele; ta rozdělila věty a vložené veličiny do buněk.
+HTML próza nyní používá vlastní izolovanou sazbu, značky v řádku, odstavce
+s omezenou délkou řádku a oddělené blokové rovnice. KaTeX a SVG zůstávají
+zachované. Společná studijní šablona přidává obsah s přechodem na kapitoly,
+sjednocené nadpisy a zdroje s navazujícím studiem až na konci. Obsah neposílá
+hash navigaci a neopouští pokus. Konkrétní vztahy a odstavec o proudových
+šipkách TR01 převedeny z ručního HTML na souvislé výrazy KaTeXu.
+Aktuální dodávka sestavena; testy module-guide (včetně regrese tříd explain /
+formula a obsahu kapitol) a progressive prošly. Přísný KaTeX: 117 rovnic.
+Skutečný vzhled v prohlížeči zatím neověřen; čeká na uživatelské posouzení.
+
+
 ## Stručný a otočný piktogram bez překrytí — 17. listopadu 2026
 
 Podle snímku uživatele odstraněny nulové hodnoty a dlouhé názvy z nákresu.
@@ -298,6 +1106,64 @@ ho natáčet tažením; dvojklik ho obnoví. Pohyb částice, čas a hlavní kam
 se přitom nemění. Zachována stojatá vektorová sazba dle AGENTS.md.
 Test-drift včetně nezávislého otáčení a nulového stavu ze snímku prošel.
 Ověřeny obě dodávky test-fusion-navigation a test-progressive.
+
+## Společný výklad v celém katalogu — 17. 11. 2026
+
+Uživatel schválil pilot AM a požádal o stejný přesun všude. Všech 58
+modulů nyní používá společný vstup Ovládání a výklad před celou obrazovkou;
+fúzní moduly jej dostávají ve své vlastní hlavičce. Plovoucí otazník skrytý.
+Průvodce sdružuje existující návody pro celý katalog a původní odborné
+details/dialogy, včetně nativních modulů, PMSM, energetických pokusů a driftu.
+Obsah zůstává v původních uzlech kvůli výpočtům a ID, ale mimo tok rozložení;
+otevření pořizuje aktuální kopii. SVG zachovává styl a dostává unikátní ID.
+Vzorce data-tex i data-math a textové veličiny/jednotky používají KaTeX.
+Pokus se při otevření ani zavření neresetuje; dialog funguje také v celé
+obrazovce fúzního iframe. Rozbalovací nastavení, polohy vodičů, živá Lorentzova
+síla a nastavení PMSM zůstávají u pokusu. Volba vypočteného pole principu AM
+zůstává dostupná mimo přesunutý výklad. U rotorové transformace se uvolňuje
+pevná spodní řádka pro grafy. Ostatní přesuny hlavních ovladačů zatím neprobíhají.
+Vizuální posouzení aktuálních oken čeká na uživatele; prohlížeč neotevřen.
+Sestavení dokončeno. Test průvodců pokrývá všech 58 modulů a tři historické
+adresy, oddělení nastavení od výkladu, aktuální kopie hodnot, přepnutí modulu,
+jediné tlačítko a dialog v celé obrazovce iframe. Všech 110 původních rovnic
+v přesouvaných details/dialogách vložených lekcí prošlo přísným KaTeXem.
+Testy škálování (mock DOM), navigace, progressive i všechny funkční části
+project/check prošly. Pouze závěrečný Git audit nedoběhl: spawnSync git EPERM.
+Kontrola whitespace změněných běžných souborů prošla. Nic nepushnuto.
+
+
+## Tučné stojaté vektory — 17. 11. 2026
+
+Sjednocena vektorová sazba na KaTeX \mathbf ve všech dosud odlišných
+rovnicích a živých popiscích driftu, jeho průvodci a výkladu odporu rotoru.
+V H7 sjednocen vektor délkového elementu; v H6 označen popisek vnějšího
+pole jako vektor, u magnetizace zachováno stávající data-vector.
+Skalární velikosti a složky ani komplexní fázory se nemění. Pravidlo
+je v AGENTS.md a versions/vyvoj/AGENTS.md. Aktuální dodávka přestavěna.
+Test driftu a přímé vykreslení upravených rovnic skutečným KaTeX prošly.
+Kontroly navigace a progressive prošly; celkový project/check se zastavil
+na samostatné kontrole průvodce (guide must not manipulate measured lesson
+or lifecycle), jehož rozpracované úpravy byly přítomné už před touto prací.
+Prohlížeč neotevřen, nic nepushnuto.
+
+
+## Pilot společného výkladu — 17. 11. 2026
+
+Momentová charakteristika AM: v aktuální integrované výuce má tlačítko
+Ovládání a výklad vlevo vedle celé obrazovky. Jeden společný dialog
+obsahuje konkrétní návod, tři pokusy a oba původní odborné texty se zdroji.
+Spodní dva details se při integraci přesouvají do inertního template;
+samostatný zdrojový dokument si původní details zachovává. Volná výška
+připadá stávajícímu pružnému grafu a schématu. U pilotu skrytý duplicitní
+plovoucí otazník. Ostatní moduly zatím používají dosavadní průvodce.
+Sdílené API ModuleGuide.open(content) nemění stav ani životní cyklus lekce.
+Test module-guide doplněn o zachování teorie, zdrojů, KaTeX a otevření/zavření.
+Sestavení a testy module-guide, progressive a module-window-fit prošly.
+Celkový project/check prošel funkčními kontrolami, závěrečný audit souborů
+nedoběhl kvůli spawnSync git EPERM v tomto prostředí. Geometrie ověřena
+automatickými mock testy, nikoli novým snímkem skutečného prohlížeče.
+Vizuální posouzení pilotu čeká na uživatele, další přesuny tlačítek pozastaveny.
+
 
 ## Sbalitelný kartézský piktogram Lorentzovy síly — 17. listopadu 2026
 
@@ -329,6 +1195,26 @@ Prostorové šipky mají měkký modrý stín. Výrazné velikosti značek zůst
 Ověřeno test-drift.cjs, test-fusion-navigation.cjs a test-progressive.cjs.
 Obě aktuální dodávky byly aktualizovány, prohlížeč nebyl otevřen.
 
+## Sjednocení principu AM — 17. 11. 2026
+
+Doplnění: tlačítko spuštění/pauzy má společnou zelenou #007e6c, bílý
+text a tmavší hover. Obnovení zůstává sekundární bílé. Rozměry nezměněny.
+
+Vířivé proudy uživatel přijal. V Principu asynchronního motoru jsou
+tlačítka Pozastavit/Spustit a Obnovit před oběma parametry. Upraven
+princip-template.html, sloupce auto/1fr/1fr zachovávají původní šířky
+skupin. Rozměry obou pohledů a fyzika beze změny. Vizuální posouzení
+čeká na uživatele; prohlížečový test nebyl dostupný. Drifty nedotčeny.
+
+
+## Sjednocení ovládání vířivých proudů — 17. 11. 2026
+
+Ztráty vířivými proudy: skupina spuštění/pauzy, obrácení proudu a obnovení
+přesunuta před parametry. Přesunuty i šířky sloupců v obou pravidlech
+rozložení; mezery, padding, grafy a skripty beze změny. Výsledek určen
+k postupnému uživatelskému posouzení. Drifty v této úpravě nedotčeny.
+
+
 ## Výraznější velikost značek a podtón B — 17. listopadu 2026
 
 Na další žádost uživatele je rozdíl velikosti značek mezi slabým a silným
@@ -339,6 +1225,15 @@ při B=0 chybí. U Grad-B používá plynulý přechod podle skutečné místní
 velikosti pole. Znaménko sytost ani podtón nemění, model pohybu zůstává stejný.
 Ověřeno test-drift.cjs, test-fusion-navigation.cjs a test-progressive.cjs;
 obě dodávky obsahují shodný aktuální zdroj modulu. Prohlížeč nebyl otevřen.
+
+## Postupné sjednocení — hystereze (17. 11. 2026)
+
+Skupina přehrávání, odmagnetování, nasycení a vymazání stopy je před
+buzením. Prohozeny i odpovídající šířky sloupců ve zdroji a společném
+stylu; pevná výška ovládání a geometrie tří panelů zachovány. Sestavení
+a test fyzikálního modelu prošly. Vizuální posouzení čeká na uživatele.
+Drifty v rámci této úpravy nedotčeny; jejich souběžné změny zachovány.
+
 
 ## Drifty: tlačítko směru a síla B — 17. listopadu 2026
 
@@ -356,6 +1251,23 @@ limity a nulový vlet, barevnost/velikost při slabém a silném poli, prostorov
 vykreslení a místní rozdíly Grad-B.
 Obě dodávky byly aktualizovány; tools/project/check.cjs i samostatné testy
 driftu, navigace a progresivního načítání prošly. Prohlížeč nebyl otevřen.
+
+Magnetizace (17. 11. 2026): oprava výkladu požadavku — oba hlavní panely
+mají původní bílou výplň a rámeček. Průhledný je pouze společný kontejner
+main > .stage, který přebíral světlé pozadí ze sdíleného stylu. Geometrie zachována.
+
+
+## Zkušební sjednocení ovládání — 17. listopadu 2026
+
+Na pokyn uživatele upraveny první dva moduly k vizuálnímu posouzení:
+Magnetizace má skupinu Přehrát cyklus / Odmagnetovat jako první sloupec
+se zachováním šířek přesunutých sloupců. Magnetizační proud má přehrávání
+a obnovení na začátku stejného časového řádku. Geometrie grafů, fyzika
+a obsluha událostí nebyly upraveny. Kontroly společného škálování prošly.
+Vizuální kontrola aktuálního výsledku čeká na uživatele; dostupné uložené
+snímky jsou starší. Pokud proporce či přehlednost nevyhoví a nepůjdou
+opravit, vrátit konkrétní modul. Změny dalších modulů zatím neprovedeny.
+
 
 ## Podepsané B přes nulu ve všech pokusech — 17. listopadu 2026
 
@@ -1477,3 +2389,7 @@ iontu s elektronem. Drift/navigace prošly, obě dodávky aktualizované.
 - Gyrace, natočené pole: rozšířena matice z 3 × 3 na 7 × 7 siločar, příčný rozsah z 6 na 9 referenčních délek, podélná délka zkrácena z 8 na 5. Širší a kratší prostor pro posouzení čitelnosti při rotaci.
 
 - Oprava návratu gyrace: hranice se kontroluje podle gyračního středu a pouze při viditelném podélném pohybu. Přesun probíhá výhradně podél B (osy z), bez posunutí příčného středu kružnice. Samotné kroužení už nespouští teleport. Stopa se kreslí až od posledního přerušení, takže po návratu nezůstává oddělený oblouk na opačném konci. Regresní test kružnice u horního okraje prošel.
+
+- Magnetické udržení: značka deuteronu sjednocena na D⁺ místo ²H⁺, v popisku přes KaTeX.
+
+- Plynulejší ohýbání: krok posuvníku 0,001; při tažení plášť 96 × 32, po 140 ms klidu návrat na 192 × 64. GPU cesta nepočítá zbytečně CPU osvětlení každé plošky, sdílí převody barev a nemění rozměry framebufferu při každém snímku. Projekce bodů siločar jen jednou. Ideální geometrie bez čekání na worker. Návrh uživatele: propojit solenoid a uzavírání do navazujícího pokusu s únikem částice; zatím diskuse, neimplementováno.

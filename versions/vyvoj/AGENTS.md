@@ -2,6 +2,8 @@
 
 Pravidla Gitu, publikace a přesunu mezi počítači z 15. 11. 2026 jsou v `../../AGENTS.md` a `../../PREDANI_PROJEKTU.md`. Jsou závazná i zde. Veřejný výběr zdrojů řídí `../../config/project-files.json`; knihy a výpočetní mezivýsledky do Gitu nepatří.
 
+- Prostorové vektory polí a souvisejících veličin sázet tučně stojatě v KaTeXu (`\mathbf{E}`, `\mathbf{B}`, `\mathbf{H}`, `\mathbf{J}`, obdobně síla a rychlost), včetně rovnic, výkladu a popisků scén. Nepoužívat pro ně kurzivní `\boldsymbol` ani šipku nad značkou. Skalární velikosti a složky zůstávají běžnou matematickou kurzivou; komplexní fázory zachovávají pruh nahoře.
+
 - Komplexní veličiny sázet v KaTeXu s pruhem nahoře (`\overline{...}`), nikoli podtržením. Skalární velikosti nemají pruh.
 - Ve fázorových diagramech je reálná osa svislá, imaginární vodorovná. Zachovat orientaci násobení j; v aktuálním modulu je kladná reálná osa nahoru a kladná imaginární doleva.
 - Ve fázorovém diagramu náhradního schématu synchronního stroje leží na kladné reálné ose svorkové napětí Ua (výslovná úprava uživatele). Vnitřní napětí Ui odpovídá uzlu mezi reakcí kotvy a rozptylovou reaktancí s odporem; obecně neleží na reálné ose. Budicí napětí značit Uib, ne Ef. Rozlišovat svorkové U a vnitřní Ui.

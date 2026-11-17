@@ -59,3 +59,11 @@ Přesná mapa zdrojů, postupů a návazností je uložena u každého ID v `too
 | dc16, dc15 | Mechanická versus elektronická komutace, snímač/odhad, PWM | Chmelík 22; vlastní model řízení BLDC |
 | 08-vozidla | Síla versus výkon a hranice energetické bilance | Vlastní model jízdních odporů |
 | fu01, fu02 a historické odkazy galerie | Ruční řízení přehrávání, fyzikální hodnoty a názornost | Vlastní metodika fúze a galerie |
+| fu05-rovnovaha | Rovnováha sil, tlak na magnetických plochách, Gradova–Šafranovova rovnice | Entler–Kindl, Jaderná fúze a fúzní elektrárny, kap. 7.9, s. 154–156, obr. 7.16 |
+| fu06-divertor | Separatrix, x-bod, vrstva SOL a divertorové terče | Entler–Kindl, kap. 7.11–7.12, s. 158–160, obr. 7.18 |
+
+Numerické rovnováhy nových modulů připravuje [FreeGS 0.8.2](https://freegs.readthedocs.io/en/stable/creating_equilibria.html).
+Jde o vlastní výukovou geometrii šesti cívek, nikoli o rekonstrukci výboje konkrétního zařízení.
+Vizuální inspirace: propojení cívek a tvaru plazmatu v [ukázce řízení TCV od EPFL](https://news.epfl.ch/news/epfl-and-deepmind-use-ai-to-control-plasmas-for-nu/)
+a posloupnost rovnováh ve [FreeGSNKE Pulse Design Tool](https://docs.freegsnke.com/notebooks/example11%20-%20pulse_design_tool.html).
+Obrázky ani programový kód těchto demonstrací se do aplikace nepřebírají.

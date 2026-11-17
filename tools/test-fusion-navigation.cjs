@@ -15,10 +15,12 @@ class Element{
 const Lab={catalog:[{id:'existing',group:'sync'}],modules:new Map(),home(){},route(){},register(module){this.modules.set(module.id,module);}};
 const c={Lab,LabProgress:{value:key=>'<html>'+key+'</html>'},document:{readyState:'loading',createElement:tag=>new Element(tag)},location:{hash:''},setTimeout:fn=>{timers.add(fn);return fn;},clearTimeout:fn=>timers.delete(fn),addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);}};c.window=c;vm.createContext(c);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8'),c);
-assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,6);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,4,'Fusion, gallery and drift are listed');
-assert.equal(Lab.catalog.at(-1).id,'fu02-galerie','Gallery is last');assert.equal(Lab.catalog.find(e=>e.id==='fu03-drift').num,'02');assert.equal(Lab.catalog.at(-1).num,'03');
+assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,9);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,7,'Six fusion modules are listed');
+assert.equal(Lab.catalog.at(-1).id,'fu02-galerie','Gallery is last');assert.equal(Lab.catalog.find(e=>e.id==='fu03-drift').num,'02');assert.equal(Lab.catalog.at(-1).num,'06');
 for(const alias of ['fu02-jadra','fu03-atomy','fu04-castice'])assert.equal(Lab.modules.get(alias).sourceId,'fu02-galerie','Historical aliases keep the gallery');
-const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html']);
+const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html','fuze-udrzeni/index.html','fuze-rovnovaha/index.html','fuze-rovnovaha/divertor.html']);
+let guideRoot,guideHeading;
+c.ModuleGuide={collect(root){guideRoot=root;},prepareHeading(heading,full){guideHeading=heading;assert.equal(full.parentElement,heading);}};
 const windowFit=fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/module-window-fit.js'),'utf8');
 function checkViewport(app,shell,id){
  const noop=()=>{},f={Lab,location:{hash:'#'+id},document:{body:{},getElementById:name=>name==='app'?app:null,addEventListener:noop},
@@ -32,11 +34,13 @@ function checkViewport(app,shell,id){
 for(const entry of Lab.modules.values()){
  if(!entry.sourceId)assert(expectedPages.delete(entry.page));assert.equal(entry.group,'fusion');
  const app=new Element('main');entry.mount(app);const shell=app.children[0],frame=shell.children[1],loading=shell.children[0];
+ const header={},full={parentElement:header},body={};frame.contentDocument={body,querySelector:selector=>selector==='[data-fusion-full]'?full:null};
  checkViewport(app,shell,entry.id);
  assert.equal(frame.src,undefined,'Embedded fusion must not navigate to a local file');assert.equal(frame.srcdoc,c.LabProgress.value('fusion-'+(entry.sourceId||entry.id)));assert.equal(frame.title,entry.title);assert.equal(frame.attributes.allow,'fullscreen');
  assert.equal(frame.onload,undefined,'An empty frame load must not hide the loading indicator');
  listeners.get('message')({source:{},data:{type:'virtual-lab:fusion-ready',id:entry.id}});assert(!loading.removed,'Unrelated frame must not mark the lesson ready');
  listeners.get('message')({source:frame.contentWindow,data:{type:'virtual-lab:fusion-ready',id:entry.id}});assert(loading.removed);assert(frame.classList.contains('is-ready'));
+ assert.equal(guideRoot,body);assert.equal(guideHeading,header,'guide is installed in every fusion header, including aliases');
  let released=false;frame.contentWindow.HiFyzikoFusionDispose=()=>released=true;
  Lab.dispose();assert(released,'Release the child GPU resources before detaching it');assert(frame.removed);assert.equal(listeners.size,0);assert.equal(timers.size,0);assert(!app.classList.contains('fusion-module-host'));
  entry.mount(app);const lateMessage=listeners.get('message'),lateFrame=app.children[0].children[1];Lab.dispose();lateMessage({source:lateFrame.contentWindow,data:{type:'virtual-lab:fusion-ready',id:entry.id}});assert.equal(timers.size,0);
@@ -50,6 +54,7 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
   const file=path.join(web,entry.page),html=fs.readFileSync(file,'utf8');assert(html.includes('data-fusion-page="'+entry.id+'"'));assert(html.includes(entry.id==='fu03-drift'?'aria-label="Zpět do skupiny Plazma a fúze">← Zpět':'target="_top">← Plazma a fúze'));
   for(const [,ref] of html.matchAll(/(?:src|href)="([^"]+)"/g)){
    const url=new URL(ref,'https://lab.invalid/'+entry.page),rel=decodeURIComponent(url.pathname.slice(1));
+   if(url.origin!=='https://lab.invalid'){assert.equal(url.protocol,'https:','External references must use HTTPS');continue;}
    assert(published.has(rel),'Runtime dependency missing from public list: '+rel);assert(fs.existsSync(path.join(web,rel)),rel);
    if(url.hash)assert(url.hash==='#group-area-plasma'||ids.has(url.hash.slice(1)),'Unknown parent route: '+url.hash);
   }

@@ -56,7 +56,7 @@ function rich(text,plainMMF=false,vector=false){
  return document.querySelector('main[data-transformer-lesson],.gridplots.transformer')?transformerRich(text,plainMMF,vector):richSymbols(text,plainMMF,vector);
 }
 
-window.PowerLabMath={rich,latex};
+window.PowerLabMath={rich,latex,richQuantities:transformerRich};
 const excluded='[data-plain-text],[data-plain-svg],script,style,textarea,input,select,option,code,pre,.katex,.pl-math,[data-tex],.pl-svg-math,.pl-canvas-math';
 const svgPairs=new WeakMap(),svgFontSizes=new WeakMap(),measureCache=new Map();let measure;
 function dimensions(html,size){const key=size+html;if(measureCache.has(key))return measureCache.get(key);if(!measure){measure=document.createElement('span');measure.className='pl-canvas-math';measure.style.cssText='position:fixed;left:-10000px;top:0;white-space:nowrap;visibility:hidden;pointer-events:none';document.body.appendChild(measure);}measure.style.fontSize=size+'px';measure.innerHTML=html;const r=measure.getBoundingClientRect(),v={w:r.width,h:r.height};measureCache.set(key,v);if(measureCache.size>1500)measureCache.delete(measureCache.keys().next().value);return v;}

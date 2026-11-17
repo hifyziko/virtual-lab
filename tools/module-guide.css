@@ -19,3 +19,56 @@
 @media(min-width:1400px){#module-guide-launch{width:auto;height:30px;padding:0 12px;border-radius:7px;font-size:12px}#module-guide-launch .module-guide-launch-label{display:inline}}
 @media(max-width:600px){#module-guide-dialog{padding:16px}#module-guide-dialog h2{font-size:19px}#module-guide-dialog .module-guide-equation{font-size:12px}}
 @media print{#module-guide-launch,#module-guide-dialog{display:none!important}}
+
+/* One header entry per lesson, outside the measured scene. */
+html:has(#import-guide) #module-guide-launch{display:none}
+#module-guide-dialog{width:min(880px,calc(100vw - 24px))}
+#module-guide-dialog section+section{border-top:1px solid #d9e0df;margin-top:20px;padding-top:2px}
+#module-guide-dialog .equation-content{display:grid;gap:12px;padding:14px;background:#f0f8f4;border-radius:8px}
+#module-guide-dialog .equation-content>[data-tex]{display:block;text-align:center}
+#module-guide-dialog .detail-grid h2{font-size:17px;margin-top:12px}
+#module-guide-dialog .detail-grid>div[data-tex]{display:block;margin:12px 0;text-align:center}
+#module-guide-dialog .sources{font-size:12px;line-height:1.6}
+#module-guide-dialog .katex{font-size:1.05em}
+#module-guide-dialog .module-guide-theory{min-width:0}
+#module-guide-dialog .module-guide-theory h2{font-size:18px;margin:16px 0 8px}
+#module-guide-dialog .module-guide-theory h3{font-size:16px}
+#module-guide-dialog .module-guide-theory p{margin:10px 0;line-height:1.65}
+#module-guide-dialog .module-guide-theory :is(.theory-grid,.explain-grid,.detail-grid){display:grid;grid-template-columns:1fr;gap:14px}
+#module-guide-dialog .module-guide-theory :is(.card,.panel,.note,.formula,.omega-card){background:transparent;border:0;box-shadow:none;min-width:0;padding:0;margin:12px 0;color:inherit;font-size:inherit}
+#module-guide-dialog .module-guide-theory svg{display:block;max-width:100%;height:auto;max-height:360px;margin:12px auto}
+#module-guide-dialog .module-guide-theory table{width:100%;border-collapse:collapse;font-size:14px}
+#module-guide-dialog .module-guide-theory :is(th,td){padding:7px 10px;border-bottom:1px solid #d9e0df;text-align:left}
+#module-guide-dialog .module-guide-theory a{color:#006c5b;overflow-wrap:anywhere}
+#module-guide-dialog .module-guide-theory [data-tex]{max-width:100%}
+#module-guide-dialog #module-guide-content [data-guide-prose]{all:revert;font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;box-sizing:border-box}
+#module-guide-dialog #module-guide-content :is(p,div,section,article,aside,footer)[data-guide-prose]{display:block;position:static;float:none;width:auto;min-width:0;max-width:100%;height:auto;min-height:0;margin:10px 0;padding:0;border:0;background:transparent;text-align:left}
+#module-guide-dialog #module-guide-content :is(span,b,strong,i,em,a)[data-guide-prose]{display:inline;position:static;float:none;margin:0;padding:0}
+#module-guide-dialog #module-guide-content :is(h2,h3,h4)[data-guide-prose]{display:block;font-weight:700;line-height:1.3;margin:20px 0 8px;font-size:17px}
+#module-guide-dialog #module-guide-content :is(ul,ol)[data-guide-prose]{padding-left:24px;margin:10px 0}
+#module-guide-dialog #module-guide-content li[data-guide-prose]{margin:6px 0}
+#module-guide-dialog #module-guide-content a[data-guide-prose]{color:#006c5b;text-decoration:underline;overflow-wrap:anywhere}
+#module-guide-dialog #module-guide-content :is(div,p)[data-tex][data-guide-prose],#module-guide-dialog #module-guide-content :is(div,p)[data-math][data-guide-prose]{margin:14px 0;text-align:center}
+#module-guide-dialog #module-guide-content section[data-guide-prose]+section[data-guide-prose]{border-top:1px solid #d9e0df;padding-top:12px;margin-top:20px}
+#module-guide-dialog #module-guide-content{font-size:16px;line-height:1.7}
+#module-guide-dialog #module-guide-content :is(p,li)[data-guide-prose]{max-width:100%;text-align:left}
+#module-guide-dialog #module-guide-content .module-guide-chapter[data-guide-prose]{font-size:20px;color:#006c5b;margin:24px 0 12px;scroll-margin-top:16px}
+#module-guide-dialog .module-guide-contents{margin:20px 0 28px;padding:16px 20px;border:1px solid #d9e0df;border-radius:8px;background:#f4f8f6}
+#module-guide-dialog .module-guide-contents strong{display:block;font-size:14px;color:#52666c}
+#module-guide-dialog .module-guide-contents ol{margin:8px 0 0;padding-left:24px}
+#module-guide-dialog .module-guide-contents li{margin:3px 0}
+#module-guide-dialog .module-guide-contents button{display:inline;padding:0;border:0;border-radius:0;background:transparent;color:#006c5b;font:inherit;text-align:left;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+#module-guide-dialog #module-guide-content .module-guide-equation[data-guide-prose]{padding:14px 18px;background:#f4f8f6;border-left:3px solid #88b6a8;border-radius:4px}
+#module-guide-dialog #module-guide-content :is(table,th,td)[data-guide-prose]{border-collapse:collapse;text-align:left}
+#module-guide-dialog #module-guide-content :is(th,td)[data-guide-prose]{padding:8px 12px;border-bottom:1px solid #d9e0df}
+#module-guide-dialog #module-guide-content :is(.module-guide-source,.module-guide-footnote)[data-guide-prose]{font-size:14px;color:#52666c}
+#module-guide-dialog #module-guide-content .module-guide-related[data-guide-prose] a{display:block;margin:6px 0}
+@media(max-width:600px){#module-guide-dialog .equation-content{padding:8px}#module-guide-dialog .equation-content .katex,#module-guide-dialog .detail-grid .katex{font-size:.85em}}
+
+/* Study typography: inline symbols stay with prose; standalone relations stand out. */
+#module-guide-dialog #module-guide-content .katex{font-size:1.12em;color:#142b35}
+#module-guide-dialog #module-guide-content [data-guide-equation][data-guide-prose],
+#module-guide-dialog #module-guide-content div[data-guide-prose]:has(>.katex){display:block;font-size:20px;line-height:1.65;text-align:center;margin:20px 0;padding:16px 20px;background:#f0f7f4;border:1px solid #d5e5de;border-left:3px solid #78a996;border-radius:6px;max-width:100%;box-sizing:border-box}
+#module-guide-dialog #module-guide-content [data-guide-equation] .katex{font-size:1.15em}
+#module-guide-dialog #module-guide-content svg .katex{font-size:1.05em;color:inherit}
+@media(max-width:600px){#module-guide-dialog #module-guide-content [data-guide-equation][data-guide-prose],#module-guide-dialog #module-guide-content div[data-guide-prose]:has(>.katex){font-size:18px;padding:12px 10px;margin:16px 0}}

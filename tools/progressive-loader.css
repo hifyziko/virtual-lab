@@ -2,7 +2,13 @@
 .lab-loading h1{font-size:clamp(22px,4vw,30px);line-height:1.3;margin:24px 0 20px}
 .lab-loading p{line-height:1.6}
 .lab-loading .back{display:inline-block;color:#007c69;text-decoration:none}
-.lab-loading progress{display:block;width:100%;height:12px;accent-color:#007c69;margin:22px 0}
+.lab-loading progress{display:block;width:100%;height:30px;accent-color:#007c69;margin:24px 0}
 .lab-loading .lab-loading-note{color:#5b716c;font-size:14px}
 .lab-loading button{padding:10px 18px;border:1px solid #007c69;border-radius:8px;background:#007c69;color:white;font:inherit;cursor:pointer}
 .lab-loading [hidden]{display:none}
+.lab-loading{width:min(900px,calc(100% - 40px));padding:clamp(28px,5vw,64px)}
+.lab-loading p[role="status"]{font-size:clamp(18px,2.4vw,24px)}
+.lab-scene-loading{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:#f4f8f6eb;padding:24px}
+.lab-scene-loading[hidden]{display:none}
+.lab-scene-loading .lab-loading{width:85%;margin:0;max-width:900px}
+.lab-scene-loading p{font-size:clamp(18px,2.4vw,24px);margin:0}

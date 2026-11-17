@@ -60,7 +60,9 @@
     saved.summary.focus({preventScroll:true});
   }
   function prepareExplanations(content){
+    window.ModuleGuide?.collect(content);
     for(const details of content.querySelectorAll('details:not([data-window-placeholder])')){
+      if(details.hasAttribute?.('data-guide-source'))continue;
       if(preparedDetails.has(details))continue;
       const summary=details.querySelector(':scope > summary');
       if(!summary)continue;
@@ -107,6 +109,7 @@
       actions.append(button);
     }
     button.dataset.moduleFullscreen='true';
+    window.ModuleGuide?.prepareHeading(heading,button);
     if(!fullscreenButtons.has(button)){
       fullscreenButtons.add(button);
       button.addEventListener('click',event=>{

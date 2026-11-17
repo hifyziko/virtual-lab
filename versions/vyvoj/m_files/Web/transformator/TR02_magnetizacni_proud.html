@@ -14,7 +14,7 @@ h2{font-size:13px;margin:0 0 6px}button{border:1px solid var(--line);border-radi
 .controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) 190px;column-gap:15px;row-gap:5px;align-items:center}
 .control label{display:flex;gap:5px;justify-content:space-between;font-size:10px;color:var(--muted)}.control output{font-weight:750;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}.control input[type="range"]{width:100%;height:15px;margin:1px 0;accent-color:var(--green);cursor:pointer}
 .switches{display:flex;gap:4px}.switches button{font-size:10px;padding:6px 7px;flex:1}.switches button.selected{background:#e1f3ed;color:#006c5a;border-color:#87c6b9}
-.mini-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;border-top:1px solid #edf1f0;margin-top:5px;padding-top:6px}
+.mini-controls{display:flex;align-items:center;justify-content:flex-start;gap:8px;border-top:1px solid #edf1f0;margin-top:5px;padding-top:6px}
 .mini-controls label{color:var(--muted);font-size:10px}.mini-controls input{max-width:160px;flex:1;accent-color:var(--green)}.mini-controls .phase{font-variant-numeric:tabular-nums;min-width:37px}
 .lab{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,1fr);gap:10px;margin-top:9px;align-items:start}
 .left{display:flex;flex-direction:column;gap:5px}.stage{background:#f8faf9;border:1px solid #e7eeeb;border-radius:8px;padding:3px}.stage svg{display:block;height:min(32vh,244px);min-height:190px;width:100%}.side-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.metric{background:#fafcfb;border:1px solid #e3ebe8;padding:5px;border-radius:8px;min-width:0}.metric small{font-size:10px;color:var(--muted);display:block;white-space:nowrap}.metric strong{font-size:clamp(12px,1.1vw,16px);display:block;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -134,7 +134,7 @@ h2{font-size:13px;margin:0 0 6px}button{border:1px solid var(--line);border-radi
  <div class="control"><label for="gap">Mezera g <output id="outG">0,15 mm</output></label><input id="gap" type="range" min="0" max="1.5" step="0.005" value=".15"></div>
  <div class="control"><label>Magnetizace železa</label><div class="switches"><button class="selected" type="button" id="nonlinear" aria-pressed="true">Nelineární</button><button type="button" id="linear" aria-pressed="false">Lineární</button></div></div>
 </div>
-<div class="mini-controls"><label for="phase">Okamžik ωt</label><input id="phase" type="range" min="0" max="360" step="0.1" value="0"><output class="phase" id="outPhase">0°</output><button type="button" class="primary" id="play">Ⅱ Pozastavit</button><button type="button" id="reset">Obnovit</button></div>
+<div class="mini-controls"><button type="button" class="primary" id="play">Ⅱ Pozastavit</button><button type="button" id="reset">Obnovit</button><label for="phase">Okamžik ωt</label><input id="phase" type="range" min="0" max="360" step="0.1" value="0"><output class="phase" id="outPhase">0°</output></div>
 </section>
 <div class="lab">
  <section class="card left" aria-label="Magnetický obvod a příčiny magnetizačního proudu">

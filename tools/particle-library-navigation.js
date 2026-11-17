@@ -2,8 +2,11 @@
 (()=>{'use strict';
  const entries=[
   {id:'fu01-reakce',group:'fusion',num:'01',title:'Fúzní reakce a Coulombova bariéra',description:'Přibližování jader, průchod bariérou a názorné ukázky jaderných reakcí.',page:'fuze-bariera/index.html',kind:'Interaktivní experiment'},
-  {id:'fu03-drift',group:'fusion',num:'02',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a E×B drift, Grad-B drift i drift zakřivení.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'},
-  {id:'fu02-galerie',group:'fusion',num:'03',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
+  {id:'fu03-drift',group:'fusion',num:'02',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a E×B drift, grad-B drift i drift zakřivení.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'},
+  {id:'fu04-udrzeni',group:'fusion',num:'03',title:'Magnetické udržení',description:'Solenoid, magnetické zrcadlo, uzavření do toroidu a skládání helikálního magnetického pole.',page:'fuze-udrzeni/index.html',kind:'Interaktivní experiment'},
+  {id:'fu05-rovnovaha',group:'fusion',num:'04',title:'Rovnováha tokamaku',description:'Tlak, poloha a tvar plazmatu. Numerické rovnováhy, magnetické plochy a proudy řídicích cívek.',page:'fuze-rovnovaha/index.html',kind:'Interaktivní experiment'},
+  {id:'fu06-divertor',group:'fusion',num:'05',title:'Magnetické plochy a divertor',description:'Od magnetické osy přes separatrix a x-bod až k otevřeným siločarám a divertorovým terčům.',page:'fuze-rovnovaha/divertor.html',kind:'Interaktivní experiment'},
+  {id:'fu02-galerie',group:'fusion',num:'06',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
  ];
  const aliases={"fu02-jadra":"nuclei","fu03-atomy":"atoms","fu04-castice":"particles"};
  const routes=[...entries,...Object.entries(aliases).map(([id,mode])=>({...entries.find(entry=>entry.id==='fu02-galerie'),id,mode,sourceId:'fu02-galerie'}))];
@@ -16,7 +19,10 @@
   const frame=document.createElement('iframe');frame.className='fusion-module-frame';frame.title=entry.title;frame.setAttribute('allow','fullscreen');frame.setAttribute('allowfullscreen','');
   shell.append(loading,frame);app.classList.add('fusion-module-host');app.replaceChildren(shell);
   let disposed=false,loaded=false;
-  const finish=()=>{if(disposed||loaded)return;loaded=true;clearTimeout(timer);loading.remove();frame.classList.add('is-ready');};
+  const finish=()=>{if(disposed||loaded)return;loaded=true;clearTimeout(timer);loading.remove();frame.classList.add('is-ready');
+   const doc=frame.contentDocument,full=doc?.querySelector('[data-fusion-full]');
+   if(full&&window.ModuleGuide){window.ModuleGuide.collect(doc.body);window.ModuleGuide.prepareHeading(full.parentElement,full);}
+  };
   const failed=()=>{
    if(disposed||loaded)return;
    loading.querySelector('p').textContent='Modul se nepodařilo načíst. Zkontrolujte připojení a zkuste to znovu.';loading.querySelector('progress')?.remove();

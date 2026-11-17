@@ -1,9 +1,19 @@
 # Uživatelské konvence pro výukovou grafiku
 
+- V uživatelském výkladu a citacích knihy neuvádět „poskytnutá finální verze rukopisu“ ani obdobné poznámky o stavu či předání rukopisu. Uvádět autory, název knihy a konkrétní kapitoly/strany.
+
+- Výklad psát přímo pro studenta, stručně a případně bodově: význam veličin, jev a co sledovat v pokusu. Nepoužívat redakční nadpisy typu „Jak souvisí rovnice v rámečku s knihou“. Citace patří ke zdrojům. Dodržovat české vyjadřování knihy, zejména „banánová trajektorie“, nikoli „banánová orbita“.
+
+- Výklady fúzních modulů čerpat primárně z uživatelovy knihy Entler–Kindl, Jaderná fúze a fúzní elektrárny (poskytnutý finální rukopis). Respektovat její terminologii a uvádět kapitoly, rámečky a strany. Ve společném výkladu vysvětlit všechny použité značky, vztahy a omezení modelu. Veřejné odborné zdroje používat jako doplněk s odkazy; neveřejné podklady přesně citovat. Vlastní rozšíření modelu zřetelně odlišit od výkladu knihy. Soukromý rukopis nepublikovat.
+
 - Vektorové šipky kreslit tak, aby dřík končil u základny trojúhelníkového hrotu a nevyčníval z něj. Upřednostnit společnou vyplněnou siluetu dříku a hrotu; zohlednit i krátké šipky.
 - Ovládání má být vždy malé a kompaktní při zachování čitelnosti; většinu dostupné plochy věnovat větším grafům a scéně. Uvolněné místo po zmenšení ovládání přidělit grafům, nikoli výplním panelu.
 
+- Načítání a blokující přípravu dat zobrazovat velkým pruhem uprostřed hlavního okna/scény, nikoli drobným ukazatelem v ovládání. Známý průběh zobrazit skutečným naplněním; při neznámém použít neurčitý pohyblivý pruh bez smyšlených procent. Po dokončení překryv zmizí; chyba nabídne opakování. Krátké čekání mezi snímky potlačit malou prodlevou, aby překryv neblikal.
+
 - Automatická vyskakovací hlášení používat jen pro blokace, o kterých student musí vědět, aby mohl pokračovat. Běžné stavové a výukové zprávy nepřekrývají scénu. Pokud se celá zpráva nevejde do stávajícího místa v levém panelu, vůbec ji tam nezobrazovat; nepřidávat posuvník, zkrácenou náhradu ani nezvětšovat panel. Výslovně otevřený výklad není automatické stavové hlášení.
+
+- Prostorové vektory polí a souvisejících veličin sázet tučně stojatě v KaTeXu (`\mathbf{E}`, `\mathbf{B}`, `\mathbf{H}`, `\mathbf{J}`, obdobně síla a rychlost), včetně rovnic, výkladu a popisků scén. Nepoužívat pro ně kurzivní `\boldsymbol` ani šipku nad značkou. Skalární velikosti a složky zůstávají běžnou matematickou kurzivou; komplexní fázory zachovávají pruh nahoře.
 
 - Komplexní veličiny sázet v KaTeXu s pruhem nahoře (`\overline{...}`), nikoli podtržením. Skalární velikosti nemají pruh.
 - Ve fázorových diagramech je reálná osa svislá, imaginární vodorovná. Zachovat orientaci násobení j; v aktuálním modulu je kladná reálná osa nahoru a kladná imaginární doleva.
@@ -37,3 +47,5 @@
 - Fúzní balíčky: elektrické pole má barvu jantarovou `#b57825`, magnetické modrou `#356ac3` (sdílené `HiFyzikoParticleStyle.fields`). Platí pro vektory, siločáry, značky a jejich popisky. Barevná mapa velikosti pole má samostatnou kvantitativní škálu. Podklady matematických popisků v driftovém modulu jsou průhledné.
 
 - Úklid schválený 17. 11. 2026: jediný aktivní strom je `versions/vyvoj/m_files` a jediný uživatelský výstup `versions/aktualni/web`. V `handoffs/` ponechávat jen poslední ověřený předávací ZIP se SHA-256, nevytvářet další archivní kopie úklidu. Staré předávky a regenerovatelné výstupy po ověření odstranit; literaturu, malé modelové vstupy, historii Git a dvě chráněné zálohy zachovat. Podrobnosti v `VERZE.md`.
+
+- Sjednocení výkladu (17. 11. 2026): uživatel schválil pilot Momentové charakteristiky AM a rozšíření na celý projekt. Společný vzor je jedno tlačítko „Ovládání a výklad“ vlevo vedle „Celá obrazovka“. Sdružovat návod k ovládání, doporučený pokus a teorii/model do společného dialogu, zachovat vztahy a zdroje. Matematiku i čísla s jednotkami sázet KaTeXem, české slovní indexy přes \text. Otevření nemění stav pokusu ani rozměry modulu. Uvolněnou plochu po výkladových pruzích přidělit grafům. Rozbalovací nastavení a živé popisky grafů nejsou výklad; zachovat jejich funkci u pokusu.

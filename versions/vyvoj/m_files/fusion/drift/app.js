@@ -1,6 +1,6 @@
 (()=>{'use strict';
  const M=DriftModel,$=id=>document.getElementById(id),canvas=$('scene'),graph=$('graph'),ctx=canvas.getContext('2d'),gc=graph.getContext('2d');
- const names={entry:'Z přímky na kružnici',gyration:'Kroužení kolem siločáry',electric:'E×B drift',gradient:'Grad-B drift',combined:'E×B + Grad-B drift',curvature:'Drift zakřivení'};
+ const names={entry:'Z přímky na kružnici',gyration:'Kroužení kolem siločáry',electric:'E×B drift',gradient:'Grad-B drift',combined:'E×B + grad-B drift',curvature:'Drift zakřivení'};
  const electricMode=()=>['electric','combined'].includes($('mode').value);
  const planarDrift=()=>['electric','gradient','combined'].includes($('mode').value);
  const tex=(el,s)=>{if(el.dataset.texValue===s)return;el.dataset.texValue=s;katex.render(s,el,{throwOnError:false});};
@@ -266,10 +266,10 @@
   sceneVector('f',config.mode!=='curvature'&&f?project(s.r.map((r,k)=>r+s.force[k]/f*config.length*.7*vectorSize)):null,'#925daa','\\mathbf F');
   if(config.mode==='curvature')drawCurvatureLesson(s,i);
   const glyphs=[{id:config.species,x:p[0],y:p[1],radius:12,vibration:0}];
-  for(let j=0;j<companions.length;j++){const item=companions[j],state=item.samples.at(-1),xy=project(state.r);drawTail(item.samples.length-1,item.samples,item.config.timePeriod);if(centerOn)drawGyrationCircle(state);if(!view){ctx.beginPath();ctx.fillStyle=item.config.q>0?'#d74732':'#126bc3';ctx.arc(...xy,7,0,2*Math.PI);ctx.fill();}glyphs.push({id:item.config.species,x:xy[0],y:xy[1],radius:12,vibration:0});label($('sceneMath'),'companion'+j,particleSymbol(item.config.species),xy[0],xy[1]-25);}
+  for(let j=0;j<companions.length;j++){const item=companions[j],state=item.samples.at(-1),xy=project(state.r);drawTail(item.samples.length-1,item.samples,item.config.timePeriod);if(centerOn)drawGyrationCircle(state);if(!view){ctx.beginPath();ctx.fillStyle=item.config.q>0?'#d74732':'#126bc3';ctx.arc(...xy,7,0,2*Math.PI);ctx.fill();}glyphs.push({id:item.config.species,x:xy[0],y:xy[1],radius:12,vibration:0});const anchor=item.config.species==='deuteron'&&state.center?project(state.center):xy;label($('sceneMath'),'companion'+j,particleSymbol(item.config.species),anchor[0],anchor[1]-25);}
   const electron=config.species==='electron'?s:companions.find(item=>item.config.species==='electron')?.samples.at(-1);if(electron)electronDetail(electron,glyphs);else for(const key of ['electronZoomTitle','electronZoomRadius'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();
   if(view)view.draw(width,height,s.t/config.timePeriod,glyphs);else{ctx.beginPath();ctx.fillStyle=config.q>0?'#d74732':'#126bc3';ctx.arc(...p,7,0,2*Math.PI);ctx.fill();}
-  label($('sceneMath'),'particle',particleSymbol(config.species),p[0],p[1]-25);
+  const anchor=config.species==='deuteron'&&s.center?project(s.center):p;label($('sceneMath'),'particle',particleSymbol(config.species),anchor[0],anchor[1]-25);
   const comparing=config.mode==='gyration';$('plotArea').hidden=$('graphTitle').hidden=config.mode==='combined';$('comparison').hidden=!comparing;graph.hidden=comparing||config.mode==='combined';$('graphMath').hidden=comparing||config.mode==='combined';$('graphLegend').hidden=comparing||config.mode==='combined';$('graphTitle').textContent=comparing?'Porovnání částic':config.mode==='combined'?'Separace nábojů':config.mode==='curvature'?'Posun mimo rovinu siločáry':'Příčný pohyb';if(comparing){$('axisNotice').hidden=true;drawComparison();}else if(config.mode!=='combined')drawGraph(i);else $('axisNotice').hidden=true;tex($('timeValue'),quantity(s.t*1e6,'\\mu s'));tex($('rateValue'),num(animationRate())+'\\times');
   $('readoutsTitle').hidden=!['combined','curvature'].includes(config.mode);$('readoutsTitle').textContent=readoutName(config);$('readoutsTitle').style.color=config.q>0?'#d74732':'#126bc3';
   fillReadouts($('readouts'),config,s);

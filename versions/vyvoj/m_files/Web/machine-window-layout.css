@@ -233,3 +233,5 @@ main[data-machine-viewport="sm08-rotor-dq"] .transform-guide .insight p{font-siz
 main[data-machine-viewport="sm08-rotor-dq"] .transform-guide .numbers{min-width:0;width:100%;gap:6px}
 main[data-machine-viewport="sm08-rotor-dq"] .transform-guide .numbers>div{min-width:0;padding:7px}
 main[data-machine-viewport="sm08-rotor-dq"] .transform-guide .numbers strong{font-size:21px}
+/* The consolidated guide releases the former bottom explanation row. */
+main.uniform-module-layout[data-machine-viewport="sm08-rotor-dq"]:has(>.theory[data-guide-source]){grid-template-rows:auto minmax(0,1fr)}
