@@ -146,3 +146,10 @@ body[data-fusion-page="fu01-reakce"] .statusRow #status{min-width:0;min-height:0
 /* The guide scrolls within the fitted 1360 x 820 laboratory surface. */
 body[data-fusion-page="fu01-reakce"] .settingsPanel{width:480px;max-height:680px;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-gutter:stable;align-content:start}
 body[data-fusion-page="fu01-reakce"] .settingsPanel:focus-visible{outline:3px solid #725198;outline-offset:2px}
+
+/* This fitted module keeps its complete header on one compact row. */
+body[data-fusion-page="fu01-reakce"] main>header.modulehead{flex-wrap:nowrap;gap:8px;height:44px;min-height:44px;max-height:44px;padding:4px 0 6px}
+body[data-fusion-page="fu01-reakce"] main>header.modulehead h1{flex:1 1 auto;min-width:0;font-size:19px;line-height:1.2;white-space:nowrap;letter-spacing:-.25px}
+body[data-fusion-page="fu01-reakce"] main>header.modulehead button,body[data-fusion-page="fu01-reakce"] main>header.modulehead summary,body[data-fusion-page="fu01-reakce"] main>header.modulehead .back{flex:0 0 auto;height:32px;min-height:32px;padding:5px 8px;font-size:13px;line-height:20px;white-space:nowrap;border-radius:7px}
+body[data-fusion-page="fu01-reakce"] main>header.modulehead .headerOption{flex:0 0 auto;font-size:13px;gap:4px;white-space:nowrap}
+body[data-fusion-page="fu01-reakce"] main>header.modulehead .settings{flex:0 0 auto}

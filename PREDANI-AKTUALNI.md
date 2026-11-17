@@ -1,5 +1,26 @@
 # Aktuální stav předání
 
+## Kompaktní hlavička a kontrast siločar bariéry — 17. listopadu 2026
+
+Coulombova bariéra má místní silnější CSS pravidla vůči společné
+navigaci: jediný řádek hlavičky (44 px), nadpis 19 px bez zalamování,
+tlačítka a návrat 32 px vysoké s písmem 13 px. Text názvu i dostupné
+ovladače zůstávají celé. Pevná plocha modulu a automatické škálování
+se nemění; menší hlavička ponechá více místa scéně.
+
+Na výslovnou žádost uživatele změněna pouze zde barva siločar z jantarové
+na teple bílou s tenkým tmavým lemem, včetně směrových trojúhelníků.
+Dvojitý tah zachovává kontrast přes světlé i tmavé odstíny mapy pole.
+Platí pro oba styly siločar, worker i synchronní záložní kreslení.
+Původní kvantitativní barevná mapa, data siločar a fyzika se nemění;
+sdílené barevné značení ostatních modulů zůstává stejné.
+
+Test-fusion-controls a test-fusion-field-worker prošly (ovládání,
+stabilní přizpůsobení, oba styly, zachování mapy a konečné siločáry).
+Navigace, progressive a audit prošly. Obě aktuální dodávky sestaveny.
+Vizuální kontrola nebyla provedena; předchozí přístup k otevřenému
+prohlížeči nástroj zamítl a nový se podle pravidla projektu nespouští.
+
 ## Údaje obou nábojů a didaktika zakřivení — 17. listopadu 2026
 
 Ve společném driftu mají obě vybrané částice vlastní pojmenovanou sadu
