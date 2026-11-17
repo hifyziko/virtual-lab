@@ -21,14 +21,20 @@
  }
  function syncElectricLimits(keepFraction=false){
   if(!electricMode())return;
-  const c=M.setup({...parameters(),...($('mode').value==='combined'?{species:'proton'}:{})}),input=$('electric'),previous=Number(input.max),limit=.08*Math.abs(c.B)*c.speed;
+  const c=M.setup({...parameters(),...($('mode').value==='combined'?{species:'proton'}:{})}),input=$('electric'),previous=Number(input.max),limit=($('mode').value==='combined'?.04:.08)*Math.abs(c.B)*c.speed;
   if(previous>0&&!input.disabled)electricFraction=Math.max(-1,Math.min(1,Number(input.value)/previous));
   if(!limit){input.min='0';input.max='0';input.step='1';input.value='0';input.disabled=true;return;}
   const step=10**(Math.floor(Math.log10(limit))-3),maximum=Math.floor(limit/step)*step,value=keepFraction||previous===0||Math.abs(c.B)!==Math.abs(config?.B??c.B)?electricFraction*maximum:Number(input.value);
   input.disabled=false;input.min=String(-maximum);input.max=String(maximum);input.step=String(step);input.value=String(Math.max(-maximum,Math.min(maximum,Math.round(value/step)*step)));
  }
+ function syncGradientLimits(){
+  if(!['gradient','combined'].includes($('mode').value))return;
+  const c=M.setup({...parameters(),...($('mode').value==='combined'?{species:'proton'}:{})}),length=M.setup({species:c.species==='electron'?'electron':'deuteron',energy:500,B:.5}).length/10;
+  const worstRadius=2*c.m*c.speed/(Math.abs(c.q*c.B)),maximum=Math.max(.01,Math.floor(Math.min(.2,.08*length/worstRadius)*10000)/100),input=$('gradient');
+  input.min=String(-maximum);input.max=String(maximum);input.step='.01';input.value=String(Math.max(-maximum,Math.min(maximum,Number(input.value))));
+ }
  function prepare(keepView=false){
-  const savedView={extent,camera:[...camera]};syncMagneticRange();syncElectricLimits();
+  const savedView={extent,camera:[...camera]};syncMagneticRange();syncElectricLimits();syncGradientLimits();
   playing=false;ended=false;entered=false;$('play').disabled=false;$('play').textContent='Spustit';config=M.setup(parameters());config.length=M.setup({species:!['gyration','combined'].includes(config.mode)&&config.species==='electron'?'electron':'deuteron',energy:500,B:.5}).length/10;config.R=config.radius*config.length;config.initial.r=config.mode==='curvature'?[config.R,0,0]:[config.start[0]*config.length,config.start[1]*config.length,(config.start[2]||0)*config.length];samples=[{r:[...config.initial.r],v:[...config.initial.v],t:0,...M.diagnostics(config,config.initial)}];camera=[0,0,0];
   extent=keepView?savedView.extent:1;if(keepView)camera=savedView.camera;
   graphMin=-4*config.length;graphMax=4*config.length;axisNoticeUntil=0;$('axisNotice').hidden=true;
@@ -44,14 +50,34 @@
  function viewBasis(){return {right:[Math.cos(gyaw),-Math.sin(gyaw),0],up:[Math.sin(gyaw)*Math.cos(gtilt),Math.cos(gyaw)*Math.cos(gtilt),Math.sin(gtilt)]};}
  function projectionFrame(){
   const curved=config.mode==='curvature',basis=curved?{right:[Math.cos(yaw),-Math.sin(yaw),0],up:[-Math.sin(yaw)*Math.sin(tilt),-Math.cos(yaw)*Math.sin(tilt),Math.cos(tilt)]}:config.mode==='gyration'?viewBasis():{right:[1,0,0],up:[0,1,0]};
-  return {...basis,origin:[config.mode==='entry'?width*.27:width/2,height/2+(curved?25:18)],scale:(curved?Math.min(width-110,height-150)/(2.8*6):Math.min((width-90)/12,(height-135)/10))/extent};
+  return {...basis,origin:config.mode==='combined'?combinedViewport().origin:[config.mode==='entry'?width*.27:width/2,height/2+(curved?25:18)],scale:(curved?Math.min(width-110,height-150)/(2.8*6):Math.min((width-90)/12,(height-135)/10))/extent};
  }
  function project(r){
   const {right,up,origin,scale}=projectionFrame(),v=r.map((a,k)=>a-camera[k]);return [origin[0]+M.dot(v,right)/config.length*scale,origin[1]-M.dot(v,up)/config.length*scale];
  }
+ function combinedViewport(){
+  // Leave the electron detail and force card outside the orbit viewport.
+  const left=215,right=$('lorentzPanel').open?width-395:width-35,top=108,bottom=height-120;
+  return {left,right,top,bottom,origin:[(left+right)/2,(top+bottom)/2]};
+ }
+ function pairBounds(state){
+  const states=[{...state,...M.diagnostics(config,state)},...companions.map(item=>item.samples.at(-1))],low=[Infinity,Infinity],high=[-Infinity,-Infinity];
+  for(const s of states){const c=s.center||s.r,radius=s.center?s.rho:0;for(let k=0;k<2;k++){low[k]=Math.min(low[k],s.r[k],c[k]-radius);high[k]=Math.max(high[k],s.r[k],c[k]+radius);}}
+  return {low,high};
+ }
  function keepPairVisible(state){
-  const points=[state.r,...companions.map(item=>item.samples.at(-1).r)],low=[0,1].map(k=>Math.min(...points.map(r=>r[k]))),high=[0,1].map(k=>Math.max(...points.map(r=>r[k]))),baseScale=Math.min((width-90)/12,(height-135)/10);
-  camera=[(low[0]+high[0])/2,(low[1]+high[1])/2,0];extent=Math.max(extent,(high[0]-low[0])*baseScale/(config.length*(width-160)),(high[1]-low[1])*baseScale/(config.length*(height-300)));
+  const {low,high}=pairBounds(state),viewport=combinedViewport(),baseScale=Math.min((width-90)/12,(height-135)/10),available=[viewport.right-viewport.left-36,viewport.bottom-viewport.top-36];
+  const required=Math.max(...low.map((v,k)=>(high[k]-v)*baseScale/(config.length*available[k])));
+  if(required>Math.max(8,extent))return false;
+  // Discrete expansion with a margin; never chase instantaneous gyro phase.
+  if(required>extent)extent=Math.min(Math.max(8,extent),2**(Math.ceil(Math.log2(required*1.12)*4)/4));
+  for(let k=0;k<2;k++){const half=available[k]*config.length*extent/(2*baseScale),minimum=high[k]-half,maximum=low[k]+half;camera[k]=Math.max(minimum,Math.min(maximum,camera[k]));}
+  return true;
+ }
+ function renewPair(state){
+  const fresh=M.setup(parameters()).initial;state={r:[...config.initial.r],v:[...fresh.v]};camera=[0,0,0];extent=1;
+  for(const item of companions){const initial=M.setup({...parameters(),species:item.config.species}).initial,current={r:[...config.initial.r],v:[...initial.v]},time=item.samples.at(-1).t;item.samples.push({...current,t:time,breakBefore:true,...M.diagnostics(item.config,current)});}
+  keepPairVisible(state);return state;
  }
  function keepElectricVisible(state){
   const p=project(state.r),scale=projectionFrame().scale,dx=p[0]-Math.max(60,Math.min(width-60,p[0])),dy=p[1]-Math.max(165,Math.min(height-125,p[1]));
@@ -202,7 +228,7 @@
  }
  function particleSymbol(id){return id==='electron'&&config.mode==='combined'&&config.massBlend<1?'q=-e':{electron:'\\mathrm e^-',proton:'\\mathrm p^+',deuteron:'\\mathrm D^+',alpha:'{}^4\\mathrm{He}^{2+}'}[id];}
  function render(){
-  if(disposed||!config)return;[width,height]=size(canvas);const i=Math.min(samples.length-1,Math.max(0,Math.floor(frame))),s=samples[i];drawField();
+  if(disposed||!config)return;[width,height]=size(canvas);const i=Math.min(samples.length-1,Math.max(0,Math.floor(frame))),s=samples[i];if(config.mode==='combined'&&!keepPairVisible(s)){const fresh=renewPair(s);Object.assign(s,fresh,M.diagnostics(config,fresh));s.breakBefore=true;}drawField();
   drawTail(i);
   const centerOn=$('centers').checked;if(centerOn)drawGyrationCircle(s);
   const p=project(s.r);if(centerOn&&s.center){const c=project(s.center);line(ctx,p,c,'rgba(22,125,115,.2)',.7,[3,6]);ctx.beginPath();ctx.arc(...c,3,0,2*Math.PI);ctx.strokeStyle='rgba(22,125,115,.5)';ctx.lineWidth=1;ctx.stroke();}
@@ -240,7 +266,7 @@
    let respawn=false;
    if(!['gyration','combined'].includes(config.mode)&&(screen[0]<-16||screen[0]>width+16||screen[1]<58||screen[1]>height-24)){const initial=M.setup(parameters()).initial;state={r:[...config.initial.r],v:[...initial.v]};respawn=true;entered=false;playing=false;$('play').textContent='Spustit';}
    for(const item of companions){advanceCompanion(item,elapsed,old.t+elapsed);if(config.mode==='gyration')wrapGyration(item.config,item.samples.at(-1));}
-   if(config.mode==='combined')keepPairVisible(state);samples.push({...state,t:old.t+elapsed,breakBefore:respawn||wrapped,...M.diagnostics(config,state)});if(ended||respawn)break;}
+   if(config.mode==='combined'&&!keepPairVisible(state)){state=renewPair(state);respawn=true;}samples.push({...state,t:old.t+elapsed,breakBefore:respawn||wrapped,...M.diagnostics(config,state)});if(ended||(respawn&&config.mode!=='combined'))break;}
   if(config.mode==='gyration'){if(samples.length>1440)samples.splice(0,samples.length-1440);}else{const cutoff=samples.at(-1).t-graphWindow();let first=0;while(first+1<samples.length&&samples[first+1].t<cutoff)first++;if(first)samples.splice(0,first);}frame=samples.length-1;
  }
  function tick(now){if(disposed)return;if(speedNoticeUntil&&Date.now()>speedNoticeUntil){$('speedNotice').hidden=true;speedNoticeUntil=0;}if(axisNoticeUntil&&Date.now()>axisNoticeUntil){$('axisNotice').hidden=true;axisNoticeUntil=0;}const dt=Math.min((now-last)/1000,.08);last=now;if(playing){advance(dt);render();}raf=requestAnimationFrame(tick);}
@@ -250,7 +276,7 @@
   const factor=Math.sqrt(next.energy*old.m/(old.energy*next.m));if(next.pitch===old.pitch&&next.angle===old.angle)return v.map(x=>x*factor);
   const speed=M.norm(v)*factor,pitch=next.pitch*Math.PI/180,phase=next.angle!==old.angle?next.angle*Math.PI/180:Math.atan2(v[1],v[0]);return [speed*Math.cos(pitch)*Math.cos(phase),speed*Math.cos(pitch)*Math.sin(phase),speed*Math.sin(pitch)];
  }
- function liveChange(){syncMagneticRange();syncElectricLimits();for(const item of companions){const old=item.config,state=item.samples.at(-1),next=M.setup({...parameters(),species:old.species});next.length=old.length;next.R=next.radius*next.length;state.v=liveVelocity(state.v,old,next);item.config=next;Object.assign(state,M.diagnostics(next,state));}const wasPlaying=playing,old=config,next=M.setup(parameters()),state=samples.at(-1),factor=Math.sqrt(next.energy*old.m/(old.energy*next.m));next.length=old.length;const entryScaleChange=next.mode==='entry'&&next.species!==old.species&&(next.species==='electron'||old.species==='electron');if(entryScaleChange)next.length=M.setup({species:next.species==='electron'?'electron':'deuteron',energy:500,B:.5}).length/10;const positionScale=next.length/old.length;next.R=next.radius*next.length;next.initial.r=old.initial.r.map(v=>v*positionScale);config=next;const current={r:state.r.map(v=>v*positionScale),v:liveVelocity(state.v,old,next)};samples.push({...current,t:state.t,breakBefore:entryScaleChange,...M.diagnostics(config,current)});frame=samples.length-1;tex($('bValue'),quantity(config.B,'T'));tex($('energyValue'),quantity(config.energy,'eV'));tex($('pitchValue'),num(config.pitch,0)+'^\\circ');tex($('angleValue'),num(config.angle,0)+'^\\circ');tex($('electricValue'),quantity(config.electric,'V\\,m^{-1}'));tex($('gradientValue'),quantity(config.gradient/config.length,'m^{-1}'));tex($('radiusValue'),quantity(config.R,'m'));playing=wasPlaying;render();}
+ function liveChange(){syncMagneticRange();syncElectricLimits();syncGradientLimits();for(const item of companions){const old=item.config,state=item.samples.at(-1),next=M.setup({...parameters(),species:old.species});next.length=old.length;next.R=next.radius*next.length;state.v=liveVelocity(state.v,old,next);item.config=next;Object.assign(state,M.diagnostics(next,state));}const wasPlaying=playing,old=config,next=M.setup(parameters()),state=samples.at(-1),factor=Math.sqrt(next.energy*old.m/(old.energy*next.m));next.length=old.length;const entryScaleChange=next.mode==='entry'&&next.species!==old.species&&(next.species==='electron'||old.species==='electron');if(entryScaleChange)next.length=M.setup({species:next.species==='electron'?'electron':'deuteron',energy:500,B:.5}).length/10;const positionScale=next.length/old.length;next.R=next.radius*next.length;next.initial.r=old.initial.r.map(v=>v*positionScale);config=next;const current={r:state.r.map(v=>v*positionScale),v:liveVelocity(state.v,old,next)};samples.push({...current,t:state.t,breakBefore:entryScaleChange,...M.diagnostics(config,current)});frame=samples.length-1;tex($('bValue'),quantity(config.B,'T'));tex($('energyValue'),quantity(config.energy,'eV'));tex($('pitchValue'),num(config.pitch,0)+'^\\circ');tex($('angleValue'),num(config.angle,0)+'^\\circ');tex($('electricValue'),quantity(config.electric,'V\\,m^{-1}'));tex($('gradientValue'),quantity(config.gradient/config.length,'m^{-1}'));tex($('radiusValue'),quantity(config.R,'m'));playing=wasPlaying;render();}
  for(const id of ['pitch','electric','gradient','radius','angle','b','energy'])$(id).oninput=liveChange;
  const particleChoices=[['proton','showProton'],['deuteron','showDeuteron'],['alpha','showAlpha'],['electron','showElectron']];
  for(const [id,node]of particleChoices)$(node).onchange=()=>{
@@ -282,14 +308,14 @@
  forceCanvas.onpointermove=event=>{if(!lorentzDrag)return;const scale=forceCanvas.clientWidth/forceCanvas.getBoundingClientRect().width;lorentzYaw=lorentzDrag.yaw-(event.clientX-lorentzDrag.x)*scale*.008;lorentzTilt=Math.max(.18,Math.min(1.25,lorentzDrag.tilt+(event.clientY-lorentzDrag.y)*scale*.006));render();};
  forceCanvas.onpointerup=forceCanvas.onpointercancel=()=>{lorentzDrag=null;};
  forceCanvas.ondblclick=()=>{lorentzYaw=.7;lorentzTilt=.55;render();};
- $('lorentzPanel').ontoggle=()=>{if($('lorentzPanel').open)render();};
+ $('lorentzPanel').ontoggle=()=>render();
  $('help').onclick=()=>{playing=false;$('play').textContent='Spustit';$('guide').showModal();};$('closeHelp').onclick=()=>$('guide').close();
  const point=event=>{const r=canvas.getBoundingClientRect();return [(event.clientX-r.left)*width/r.width,(event.clientY-r.top)*height/r.height];};
- canvas.onwheel=event=>{if(drag)return;event.preventDefault();const p=point(event),{right,up,origin,scale}=projectionFrame(),old=extent,delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?height:1);extent=Math.max(.01,Math.min(40,extent*Math.exp(Math.max(-500,Math.min(500,delta))*.002)));const dx=(p[0]-origin[0])*config.length*(old-extent)/(scale*old),dy=(origin[1]-p[1])*config.length*(old-extent)/(scale*old);camera=camera.map((v,k)=>v+right[k]*dx+up[k]*dy);render();};
+ canvas.onwheel=event=>{if(drag)return;event.preventDefault();const p=point(event),{right,up,origin,scale}=projectionFrame(),old=extent,delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?height:1);extent=Math.max(.01,Math.min(config.mode==='combined'?8:40,extent*Math.exp(Math.max(-500,Math.min(500,delta))*.002)));const dx=(p[0]-origin[0])*config.length*(old-extent)/(scale*old),dy=(origin[1]-p[1])*config.length*(old-extent)/(scale*old);camera=camera.map((v,k)=>v+right[k]*dx+up[k]*dy);render();};
  canvas.ondblclick=()=>{extent=1;camera=electricMode()?[...samples.at(-1).r]:[0,0,0];if(config.mode==='gyration'){gyaw=0;gtilt=0;}if(config.mode==='curvature'){yaw=-.65;tilt=.65;}render();};
  canvas.onpointerdown=event=>{const p=point(event);if(config.mode==='gyration'){if(!playing){const states=[samples.at(-1),...companions.map(item=>item.samples.at(-1))];for(let j=states.length-1;j>=0;j--){const xy=project(states[j].r);if(Math.hypot(p[0]-xy[0],p[1]-xy[1])<25){drag={type:'arrange',index:j-1};break;}}}if(!drag)drag={type:'orbitView',p,gyaw,gtilt};}else if(config.mode==='curvature'){drag={type:'view',p,yaw,tilt};}else if(config.mode!=='curvature'&&(!playing||(config.mode==='entry'&&samples.at(-1).r[0]<0))){const state=samples.at(-1),c=project(state.r),tip=project(state.r.map((r,k)=>r+state.v[k]*config.length*.95/config.speed));if(Math.hypot(p[0]-c[0],p[1]-c[1])<25)drag={type:'position'};else if(Math.hypot(p[0]-tip[0],p[1]-tip[1])<25)drag={type:'angle'};}if(drag){if(drag.type!=='view'&&drag.type!=='orbitView'){playing=false;$('play').textContent='Spustit';}canvas.setPointerCapture(event.pointerId);}};
  canvas.onpointermove=event=>{if(!drag)return;const p=point(event);if(drag.type==='orbitView'){gyaw=drag.gyaw+(p[0]-drag.p[0])*.008;gtilt=Math.max(-Math.PI/2,Math.min(Math.PI/2,drag.gtilt+(p[1]-drag.p[1])*.008));render();return;}if(drag.type==='arrange'){const scale=Math.min((width-90)/12,(height-135)/10)/extent,item=drag.index<0?null:companions[drag.index],history=item?item.samples:samples,c=item?item.config:config,old=history.at(-1),xy=project(old.r),{right,up}=viewBasis(),dx=(Math.max(20,Math.min(width-20,p[0]))-xy[0])*config.length/scale,dy=(xy[1]-Math.max(80,Math.min(height-100,p[1])))*config.length/scale,r=old.r.map((v,k)=>v+right[k]*dx+up[k]*dy),state={r,v:[...old.v]};history.push({...state,t:old.t,breakBefore:true,...M.diagnostics(c,state)});if(item){item.initial.r=[...r];companionStarts[item.config.species]=[...r];}else{config.initial.r=[...r];config.start=r.map(v=>v/config.length);frame=samples.length-1;}render();return;}if(drag.type==='view'){yaw=drag.yaw+(p[0]-drag.p[0])*.008;tilt=Math.max(.1,Math.min(1.4,drag.tilt+(p[1]-drag.p[1])*.006));render();return;}
-  const scale=Math.min((width-90)/12,(height-135)/10)/extent;if(drag.type==='position'){const x=camera[0]/config.length+(p[0]-(config.mode==='entry'?width*.27:width/2))/scale,y=camera[1]/config.length+(height/2+18-p[1])/scale;config.start=electricMode()?[x,y]:[Math.max(-3.8,Math.min(config.mode==='entry'?7:4.7,x)),Math.max(-2.5,Math.min(2.5,y))];}else{const c=project(config.initial.r);$('angle').value=String(Math.max(-65,Math.min(65,Math.atan2(c[1]-p[1],p[0]-c[0])*180/Math.PI)));}prepare(true);};
+  const scale=Math.min((width-90)/12,(height-135)/10)/extent;if(drag.type==='position'){const origin=projectionFrame().origin,x=camera[0]/config.length+(p[0]-origin[0])/scale,y=camera[1]/config.length+(origin[1]-p[1])/scale;config.start=electricMode()?[x,y]:[Math.max(-3.8,Math.min(config.mode==='entry'?7:4.7,x)),Math.max(-2.5,Math.min(2.5,y))];}else{const c=project(config.initial.r);$('angle').value=String(Math.max(-65,Math.min(65,Math.atan2(c[1]-p[1],p[0]-c[0])*180/Math.PI)));}prepare(true);};
  canvas.onpointerup=canvas.onpointercancel=()=>{const placed=drag&&drag.type!=='view'&&drag.type!=='orbitView'&&drag.type!=='arrange';drag=null;if(placed)prepare(true);};
  const resize=()=>render();addEventListener('resize',resize);const observer=new ResizeObserver(resize);observer.observe(canvas);
  window.HiFyzikoFusionDispose=()=>{disposed=true;cancelAnimationFrame(raf);observer.disconnect();removeEventListener('resize',resize);view?.dispose();};

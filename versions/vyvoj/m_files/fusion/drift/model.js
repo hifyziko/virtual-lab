@@ -10,10 +10,13 @@
   const a=c.pitch*Math.PI/180,az=c.angle*Math.PI/180,vp=c.speed*Math.cos(a),vl=c.speed*Math.sin(a);
   c.initial={r:c.mode==='curvature'?[c.R,0,0]:c.mode==='entry'?[c.start[0]*c.length,c.start[1]*c.length,0]:[0,0,0],v:c.mode==='curvature'?[vp,vl,0]:[vp*Math.cos(az),vp*Math.sin(az),vl]};return c;
  }
+ // B is bounded between half and twice its central value; the requested
+ // logarithmic gradient is retained at x=0 and fades smoothly at the edges.
+ function magneticProfile(c,x){const span=Math.log(2),t=Math.tanh(c.gradient*x/(c.length*span));return {factor:Math.exp(span*t),slope:c.gradient/c.length*(1-t*t)};}
  function fields(c,r){
   if(c.mode==='entry'&&r[0]<0)return {B:[0,0,0],E:[0,0,0]};
   if(c.mode==='curvature'){const R=Math.hypot(r[0],r[1]);return {B:[-c.B*r[1]/R,c.B*r[0]/R,0],E:[0,0,0]};}
-  return {B:[0,0,c.B*(['gradient','combined'].includes(c.mode)?Math.exp(c.gradient*r[0]/c.length):1)],E:[0,['electric','combined'].includes(c.mode)?-c.electric:0,0]};
+  return {B:[0,0,c.B*(['gradient','combined'].includes(c.mode)?magneticProfile(c,r[0]).factor:1)],E:[0,['electric','combined'].includes(c.mode)?-c.electric:0,0]};
  }
  // Symmetric drift-kick-rotate-kick-drift Boris step; midpoint field sample.
  function step(c,s,dt){
@@ -24,7 +27,7 @@
   const {B,E}=fields(c,s.r),b=norm(B),energy=c.m*dot(s.v,s.v)/(2*e);if(!b)return {center:null,drift:[0,0,0],rho:0,energy,force:mul(E,c.q)};
   const unit=mul(B,1/b),parallel=dot(s.v,unit),exb=mul(cross(E,B),1/(b*b)),w=add(s.v,mul(exb,-1)),perp=add(w,mul(unit,-dot(w,unit))),rho=c.m*norm(perp)/(Math.abs(c.q)*b);
   let drift=exb;
-  if(['gradient','combined'].includes(c.mode))drift=add(drift,mul(cross(B,[b*c.gradient/c.length,0,0]),c.m*dot(perp,perp)/(2*c.q*b*b*b)));
+  if(['gradient','combined'].includes(c.mode))drift=add(drift,mul(cross(B,[b*magneticProfile(c,s.r[0]).slope,0,0]),c.m*dot(perp,perp)/(2*c.q*b*b*b)));
   if(c.mode==='curvature'){const R=Math.hypot(s.r[0],s.r[1]),out=[s.r[0]/R,s.r[1]/R,0];drift=add(drift,mul(cross(out,B),c.m*parallel*parallel/(c.q*b*b*R)));}
   return {center:add(s.r,mul(cross(w,B),c.m/(c.q*b*b))),drift,rho,energy,force:mul(add(E,cross(s.v,B)),c.q)};
  }

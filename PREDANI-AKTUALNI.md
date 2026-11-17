@@ -1,5 +1,36 @@
 # Aktuální stav předání
 
+## Bezpečné rozsahy a udržení oběhů v okně — 17. listopadu 2026
+
+Opravena příčina rozjíždění měřítka společného driftu: kamera již
+nesleduje okamžité polohy s neomezeným oddalováním. Počítá obálku celých
+oběhů (střed i poloměr), rezervuje místo pro detail elektronu a kartu
+Lorentzovy síly, posouvá se až při nedostatku místa a měřítko rozšiřuje
+po odstupňovaných krocích s rezervou. Automatické i ruční oddálení je
+ve společném pokusu omezeno na osminásobek výchozího rozsahu. Pokud by
+se dvojice dál rozešla mimo tento rozsah, pokračuje pokus novým vypuštěním
+ve výchozím místě; běh ani fyzikální čas se nezastaví. Přerušení stopy
+označí nový začátek; nejde o fyzikální skok jedné souvislé trajektorie.
+
+Pole Grad-B a společného driftu již neklesá exponenciálně až k nule.
+Používá hladký omezený profil Bz=B0*exp(a*tanh(k*x/a)), a=ln(2),
+k=gradient/length. Lokálně zůstává mezi polovinou a dvojnásobkem
+centrální hodnoty B0, směr zachovává. Diagnostika používá skutečný místní
+derivační člen k*(1-tanh(k*x/a)^2). Vztah pro drift je stále adiabatický.
+Ovladač gradientu je navíc omezen podle největšího očekávaného oběhu
+tak, aby změna pole přes tento poloměr nepřekročila přibližně 8 procent.
+Společné E je omezeno na 4 procenta referenčního B0*v_proton, tedy na
+nejvýše 8 procent rychlosti při nejnižším místním poli. Ostatní režimy
+E×B zachovávají dosavadní limit. Výklad popisuje omezený model pole,
+automatický pohled a opakované vypouštění.
+
+Ověřeno test-drift: globální meze pole, skutečná místní derivace,
+adiabatický limit, oba směry E/gradientu, krajní B a hmotnosti, celé
+oběhy mimo překryvné karty, strop měřítka, dlouhý běh s novou dvojicí
+a zachovaným časem i přehráváním, opakované vykreslení bez změny měřítka.
+Navigace, progressive a audit prošly; obě aktuální dodávky sestaveny.
+Prohlížeč se automaticky nespouštěl, vizuální kontrola zatím neproběhla.
+
 ## Šipky podle velikosti oběhu — 17. listopadu 2026
 
 Ve společném E×B + Grad-B se šipky rychlosti a síly u hlavní částice
