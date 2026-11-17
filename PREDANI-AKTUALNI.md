@@ -1,5 +1,33 @@
 # Aktuální stav předání
 
+## Společný drift a přechod hmotností — 17. listopadu 2026
+
+Drift má nový pokus E×B + Grad-B. E a gradient se ovládají nezávisle;
+hlavní částicí může být kladný nebo záporný náboj, přepínač přidá druhý.
+Posuvník logaritmicky převádí stejnou hmotnost protonu pro oba náboje na
+skutečný poměr proton/elektron (asi 1836,2). Mezilehlý záporný náboj je
+označen jako modelový; změna hmotností připraví nový pokus. Kinetické
+energie jsou společné, časy fyzikálně shodné, lokální Borisovy kroky
+každé částice respektují její vlastní periodu (úhel nejvýše 0,025 rad).
+Společné prostorové měřítko zůstává při přechodu hmotností stejné, pohled
+udržuje oba náboje v záběru. Elektron má zvětšený detail. Graf sleduje
+příčné rozcházení obou gyračních středů, případně polohy při vypnutých
+středech. E je omezeno podle pomalejšího protonu. Vlastní pole separace
+se nepočítá; částice jsou testovací a navzájem se neovlivňují.
+
+U E×B a společného driftu je odklon skrytý a rychlost kolmá k B.
+Piktogram má pětinásobně zvýrazněný elektrický příspěvek: legenda uvádí
+5F_E a názornou F*=F_B+5F_E. Skutečná Lorentzova síla a integrace se
+nemění; součet zobrazených šipek je přesný. Výklad obsahuje rozlišení
+názorné výslednice. Piktogram zůstává bez vysvětlujících odstavců.
+
+Ověření: test-drift (včetně skutečných hmotností, společného časového
+okna, naměřeného Grad-B driftu obou znamének B, energie, interpolace,
+ovládání a KaTeXu), navigace a progressive prošly. Výběr veřejných
+souborů a kontrola citlivých dat prošly. Obě aktuální dodávky sestaveny.
+Prohlížeč se podle pravidla projektu nespouštěl; vizuální kontrola
+rozložení tohoto doplnění v prohlížeči zatím neproběhla.
+
 17. 11. 2026 — Podle dalšího upřesnění obráceno pouze svislé otáčení
 piktogramu (nahoru/dolů); vodorovný směr zůstává. Test driftu, navigace
 a progressive obou aktualizovaných dodávek prošly.

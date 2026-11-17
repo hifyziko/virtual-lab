@@ -4,14 +4,16 @@
  const add=(a,b)=>a.map((v,i)=>v+b[i]),mul=(a,s)=>a.map(v=>v*s),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),norm=a=>Math.hypot(...a);
  function setup(p={}){
   const c={mode:'entry',species:'deuteron',B:.05,energy:500,pitch:0,electric:1500,gradient:.12,radius:6,angle:0,start:[-3,0],...p};
-  Object.assign(c,species[c.species]);c.speed=Math.sqrt(2*c.energy*e/c.m);c.length=c.m*c.speed/(Math.abs(c.q)*.05);c.period=2*Math.PI*c.m/(Math.abs(c.q)*Math.abs(c.B));c.timePeriod=2*Math.PI*c.m/(Math.abs(c.q)*Math.max(Math.abs(c.B),.1));c.R=c.radius*c.length;
+  Object.assign(c,species[c.species]);
+  if(c.mode==='combined'&&c.species==='electron')c.m=species.proton.m*(species.electron.m/species.proton.m)**Math.max(0,Math.min(1,c.massBlend??1));
+  c.speed=Math.sqrt(2*c.energy*e/c.m);c.length=c.m*c.speed/(Math.abs(c.q)*.05);c.period=2*Math.PI*c.m/(Math.abs(c.q)*Math.abs(c.B));c.timePeriod=2*Math.PI*c.m/(Math.abs(c.q)*Math.max(Math.abs(c.B),.1));c.R=c.radius*c.length;
   const a=c.pitch*Math.PI/180,az=c.angle*Math.PI/180,vp=c.speed*Math.cos(a),vl=c.speed*Math.sin(a);
   c.initial={r:c.mode==='curvature'?[c.R,0,0]:c.mode==='entry'?[c.start[0]*c.length,c.start[1]*c.length,0]:[0,0,0],v:c.mode==='curvature'?[vp,vl,0]:[vp*Math.cos(az),vp*Math.sin(az),vl]};return c;
  }
  function fields(c,r){
   if(c.mode==='entry'&&r[0]<0)return {B:[0,0,0],E:[0,0,0]};
   if(c.mode==='curvature'){const R=Math.hypot(r[0],r[1]);return {B:[-c.B*r[1]/R,c.B*r[0]/R,0],E:[0,0,0]};}
-  return {B:[0,0,c.B*(c.mode==='gradient'?Math.exp(c.gradient*r[0]/c.length):1)],E:[0,c.mode==='electric'?-c.electric:0,0]};
+  return {B:[0,0,c.B*(['gradient','combined'].includes(c.mode)?Math.exp(c.gradient*r[0]/c.length):1)],E:[0,['electric','combined'].includes(c.mode)?-c.electric:0,0]};
  }
  // Symmetric drift-kick-rotate-kick-drift Boris step; midpoint field sample.
  function step(c,s,dt){
@@ -22,7 +24,7 @@
   const {B,E}=fields(c,s.r),b=norm(B),energy=c.m*dot(s.v,s.v)/(2*e);if(!b)return {center:null,drift:[0,0,0],rho:0,energy,force:mul(E,c.q)};
   const unit=mul(B,1/b),parallel=dot(s.v,unit),exb=mul(cross(E,B),1/(b*b)),w=add(s.v,mul(exb,-1)),perp=add(w,mul(unit,-dot(w,unit))),rho=c.m*norm(perp)/(Math.abs(c.q)*b);
   let drift=exb;
-  if(c.mode==='gradient')drift=add(drift,mul(cross(B,[b*c.gradient/c.length,0,0]),c.m*dot(perp,perp)/(2*c.q*b*b*b)));
+  if(['gradient','combined'].includes(c.mode))drift=add(drift,mul(cross(B,[b*c.gradient/c.length,0,0]),c.m*dot(perp,perp)/(2*c.q*b*b*b)));
   if(c.mode==='curvature'){const R=Math.hypot(s.r[0],s.r[1]),out=[s.r[0]/R,s.r[1]/R,0];drift=add(drift,mul(cross(out,B),c.m*parallel*parallel/(c.q*b*b*R)));}
   return {center:add(s.r,mul(cross(w,B),c.m/(c.q*b*b))),drift,rho,energy,force:mul(add(E,cross(s.v,B)),c.q)};
  }
@@ -38,5 +40,15 @@
   }
   return samples;
  }
- const api={e,species,setup,fields,step,diagnostics,simulate,cross,norm,dot};root.DriftModel=api;if(typeof module!=='undefined')module.exports=api;
+ // Separate local cyclotron steps, but an identical physical end time for each species.
+ function advance(c,state,duration){
+  let remaining=duration;
+  while(remaining>0){
+   const b=norm(fields(c,state.r).B),dt=Math.min(remaining,b>0 ? .025*c.m/(Math.abs(c.q)*b):remaining);
+   state=step(c,state,dt);remaining-=dt;
+   if(remaining<duration*1e-14)break;
+  }
+  return state;
+ }
+ const api={e,species,setup,fields,step,advance,diagnostics,simulate,cross,norm,dot};root.DriftModel=api;if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

@@ -37,6 +37,37 @@ for(const mode of ['entry','gyration','electric','gradient','curvature'])for(con
  for(const state of history){assert(state.r.every(Number.isFinite)&&state.v.every(Number.isFinite));relative(state.energy,c.energy,1e-12,'Zero field preserves energy');assert.equal(state.center,null);for(let k=0;k<3;k++)assert(Math.abs(state.r[k]-c.initial.r[k]-c.initial.v[k]*state.t)<c.length*1e-9,'Zero field gives straight motion');}
 }
 
+
+// Combined prescribed fields, logarithmic mass transition and local integration.
+const commonLength=M.setup({species:'deuteron',energy:500,B:.5}).length/10;
+for(const blend of [0,.25,.5,.75,1]){
+ const p=M.setup({mode:'combined',species:'proton',B:.5,energy:500,massBlend:blend,electric:100,gradient:.02}),n=M.setup({...p,species:'electron',massBlend:blend});
+ p.length=n.length=commonLength;
+ relative(n.m,M.species.proton.m*(M.species.electron.m/M.species.proton.m)**blend,1e-14,'Logarithmic mass interpolation');
+ assert.equal(p.m,M.species.proton.m);assert.equal(n.q,-M.e);
+ const r=[commonLength,0,0];assert.deepEqual(M.fields(p,r),M.fields(n,r),'Both particles experience the same physical field');
+ const pd=M.diagnostics(p,p.initial),nd=M.diagnostics(n,n.initial);
+ relative(pd.drift[0],-p.electric/p.B,1e-12,'Positive ExB drift');relative(nd.drift[0],pd.drift[0],1e-12,'Negative ExB drift has same direction');
+ assert(pd.drift[1]>0&&nd.drift[1]<0,'Grad-B separates both signs across the entire mass transition');
+ for(const c of [p,n]){
+  const duration=p.period*.01,full=M.advance(c,c.initial,duration),half=M.advance(c,M.advance(c,c.initial,duration/2),duration/2);
+  assert(full.r.every(Number.isFinite)&&full.v.every(Number.isFinite),'Adaptive steps stay finite');
+  assert(M.norm(full.r.map((v,k)=>v-half.r[k]))<commonLength*.001,'Common-time integration converges');
+  const energy=M.diagnostics(c,full).energy+c.q*c.electric*full.r[1]/M.e;relative(energy,c.energy,2e-4,'Combined E work matches change in kinetic energy');
+ }
+ const noE={...p,electric:0},grad={...noE,mode:'gradient'},noGrad={...p,gradient:0},exb={...noGrad,mode:'electric'};
+ assert.equal(JSON.stringify(M.fields(noE,r)),JSON.stringify(M.fields(grad,r)),'E=0 isolates Grad-B');assert.deepEqual(M.fields(noGrad,r),M.fields(exb,r),'Gradient=0 isolates ExB');
+}
+relative(M.setup({mode:'combined',species:'electron',massBlend:1}).m,M.species.electron.m,1e-14,'Real electron mass endpoint');
+for(const B of [-.5,.5]){
+ const p=M.setup({mode:'combined',species:'proton',massBlend:1,B,gradient:.02,electric:0});
+ for(const species of ['proton','electron']){
+  const c=M.setup({...p,species});c.length=p.length;const initial=M.diagnostics(c,c.initial),duration=2*p.period,end=M.advance(c,c.initial,duration),final=M.diagnostics(c,end);
+  relative((final.center[1]-initial.center[1])/duration,initial.drift[1],.02,'Measured separation over a shared proton time window');
+  relative(final.energy,c.energy,1e-9,'Both real masses conserve energy in nonuniform B');
+ }
+}
+
 // Run real controls and rendering with a deterministic DOM/canvas fixture.
 const html=fs.readFileSync(path.join(base,'index.html'),'utf8'),nodes=new Map(),noop=()=>{};let lastItems,lastGlyph,renderCalls=0,disposed=false;
 let canvasPath=[],orbitWidths=[],lastGraphPath=[],electricArrow,lastPhysics,integratedTime=0,scaleCards=0,magneticMarks=[],magneticLines=[],magneticArrows=[],fieldTints=[],radialGlows=[];
@@ -46,7 +77,7 @@ for(const [,tag,id,attrs]of html.matchAll(/<(\w+)\b[^>]*\bid="([^"]+)"([^>]*)>/g
 let insetPath=[],insetVectors=[],insetFrames=0;
 const insetContext=new Proxy({clearRect(){insetVectors=[];insetFrames++;},beginPath(){insetPath=[];},moveTo(x,y){insetPath.push([x,y]);},lineTo(x,y){insetPath.push([x,y]);},fill(){if(insetPath.length===7)insetVectors.push({color:this.fillStyle,origin:insetPath[0].map((v,k)=>(v+insetPath[6][k])/2),tip:insetPath[3]});}},{get:(o,k)=>o[k]||noop});
 nodes.get('lorentzCanvas').getContext=()=>insetContext;
-nodes.get('lorentzPanel').open=true;nodes.get('lorentzCanvas').clientWidth=342;nodes.get('lorentzCanvas').clientHeight=280;nodes.get('mode').value='entry';nodes.get('species').value='deuteron';nodes.get('graph').clientWidth=400;nodes.get('graph').clientHeight=200;
+nodes.get('lorentzPanel').open=true;nodes.get('lorentzCanvas').clientWidth=342;nodes.get('lorentzCanvas').clientHeight=280;nodes.get('pairFocus').value='proton';nodes.get('mode').value='entry';nodes.get('species').value='deuteron';nodes.get('graph').clientWidth=400;nodes.get('graph').clientHeight=200;
 let testNow=0,animation;const env={Date:{now:()=>testNow},console,DriftModel:{...M,step(c,state,dt){integratedTime+=dt;return M.step(c,state,dt);},diagnostics(c,state){lastPhysics={config:c,state,...M.diagnostics(c,state)};return M.diagnostics(c,state);}},HiFyzikoParticleStyle:{fields:{electric:"#b57825",magnetic:"#356ac3"}},document:{getElementById:id=>nodes.get(id),querySelectorAll:()=>[],createElement:element},katex:{render(t,el){assert(!/NaN|Infinity|undefined/.test(t),t);require('../versions/vyvoj/m_files/fusion/particles/vendor/katex.js').renderToString(t,{throwOnError:true});el.tex=t;}},HiFyzikoNucleusView:class{draw(w,h,t,items){renderCalls++;lastGlyph=items[0];lastItems=items.filter(p=>!p.detail);}dispose(){disposed=true;}},ResizeObserver:class{observe(){}disconnect(){}},devicePixelRatio:1,addEventListener:noop,removeEventListener:noop,requestAnimationFrame:fn=>{animation=fn;return 1;},cancelAnimationFrame:noop};env.window=env;
 vm.runInNewContext(fs.readFileSync(path.join(base,'app.js'),'utf8'),env);
 for(const mode of ['entry','gyration','electric','gradient','curvature']){const cards=scaleCards;nodes.get('mode').value=mode;nodes.get('mode').onchange();assert(scaleCards>cards,'White scale card in '+mode);nodes.get('play').onclick();animation(100);nodes.get('play').onclick();nodes.get('reverse').onclick();nodes.get('reset').onclick();}
@@ -213,7 +244,7 @@ function expectInsetArrow(color,vector,message){const arrow=insetVectors.find(a=
 for(const species of ['proton','electron','alpha']){
  nodes.get('species').value=species;nodes.get('b').value='500';nodes.get('mode').value='electric';nodes.get('mode').onchange();nodes.get('electric').value=String(Number(nodes.get('electric').max)/2);nodes.get('electric').oninput();
  const current=lastPhysics,fields=M.fields(current.config,current.state.r);assert(nodes.get('lorentzFormula').tex.includes('mathbf E+'),'Full Lorentz formula with E');assert(nodes.get('lorentzCharge').tex.includes(species==='electron'?'-':'+'));if(species==='alpha')assert(nodes.get('lorentzCharge').tex.includes('2e'));
- for(const axis of ['x','y','z'])assert(!nodes.get('lorentzMath').querySelector('[data-key="axis-'+axis+'"]').hidden,'Cartesian axes are shown');expectInsetArrow('#198476',M.cross(current.state.v,fields.B),'Vector cross product');expectInsetArrow('#b17b2c',current.state.v,'Velocity');expectInsetArrow('#356ac3',fields.B,'Magnetic field');expectInsetArrow('#925daa',M.cross(current.state.v,fields.B).map(v=>v*current.config.q),'Signed magnetic force');expectInsetArrow('#b57825',fields.E,'Electric field');expectInsetArrow('#ad6528',fields.E.map(v=>v*current.config.q),'Signed electric force');expectInsetArrow('#314c59',M.cross(current.state.v,fields.B).map((v,k)=>current.config.q*(v+fields.E[k])),'Total Lorentz force');
+ for(const axis of ['x','y','z'])assert(!nodes.get('lorentzMath').querySelector('[data-key="axis-'+axis+'"]').hidden,'Cartesian axes are shown');expectInsetArrow('#198476',M.cross(current.state.v,fields.B),'Vector cross product');expectInsetArrow('#b17b2c',current.state.v,'Velocity');expectInsetArrow('#356ac3',fields.B,'Magnetic field');expectInsetArrow('#925daa',M.cross(current.state.v,fields.B).map(v=>v*current.config.q),'Signed magnetic force');expectInsetArrow('#b57825',fields.E,'Electric field');expectInsetArrow('#ad6528',fields.E.map(v=>v*current.config.q),'Signed electric force');expectInsetArrow('#314c59',M.cross(current.state.v,fields.B).map((v,k)=>current.config.q*(v+5*fields.E[k])),'Illustrative force with amplified E');
  nodes.get('electric').value='0';nodes.get('electric').oninput();assert(!nodes.get('lorentzFormula').tex.includes('mathbf E+'),'E=0 selects magnetic-only formula');assert(nodes.get('lorentzMath').querySelector('[data-key="e"]').hidden&&nodes.get('lorentzMath').querySelector('[data-key="fe"]').hidden,'No stale electric vectors');
 }
 nodes.get('species').value='proton';nodes.get('mode').value='gyration';nodes.get('mode').onchange();nodes.get('pitch').value='90';nodes.get('pitch').oninput();assert(nodes.get('lorentzKey-fb').tex.endsWith('=0'),'Parallel motion has no magnetic force');
@@ -248,6 +279,19 @@ nodes.get('species').value='proton';nodes.get('mode').value='electric';nodes.get
 
 // Each dragging axis follows the requested direction, independent of physics.
 nodes.get('species').value='proton';nodes.get('mode').value='electric';nodes.get('b').value='500';nodes.get('mode').onchange();forceCanvas.ondblclick();const velocityDelta=()=>{const a=insetVectors.find(v=>v.color==='#b17b2c');return a.tip.map((v,k)=>v-a.origin[k]);};const referenceDrag=velocityDelta();forceCanvas.onpointerdown({clientX:100,clientY:100,pointerId:111,preventDefault:noop});forceCanvas.onpointermove({clientX:210,clientY:100});forceCanvas.onpointerup();assert(velocityDelta()[0]>referenceDrag[0],'Right drag uses reversed yaw');forceCanvas.ondblclick();forceCanvas.onpointerdown({clientX:100,clientY:100,pointerId:112,preventDefault:noop});forceCanvas.onpointermove({clientX:100,clientY:145});forceCanvas.onpointerup();assert(velocityDelta()[1]>referenceDrag[1],'Down drag uses the requested vertical direction');forceCanvas.ondblclick();
+
+
+// E×B pitch is constrained; combined mode supports both signs and mass endpoints.
+nodes.get('mode').value='gyration';nodes.get('mode').onchange();nodes.get('pitch').value='75';nodes.get('pitch').oninput();nodes.get('mode').value='electric';nodes.get('mode').onchange();assert(nodes.get('pitchRow').hidden);nodes.get('pitch').value='60';nodes.get('pitch').oninput();assert.equal(lastPhysics.config.pitch,0);assert.equal(lastPhysics.state.v[2],0);
+for(const focus of ['proton','electron'])for(const blend of ['0','50','100']){
+ nodes.get('pairFocus').value=focus;nodes.get('massBlend').value=blend;nodes.get('showPair').checked=true;nodes.get('mode').value='combined';nodes.get('b').value='500';nodes.get('energy').value='500';nodes.get('gradient').value='12';nodes.get('mode').onchange();
+ assert(nodes.get('pitchRow').hidden&&nodes.get('speciesRow').hidden);assert(!nodes.get('electricRow').hidden&&!nodes.get('gradientRow').hidden);assert(!nodes.get('massRow').hidden&&!nodes.get('pairRow').hidden);assert.equal(lastItems.length,2);assert(new Set(lastItems.map(p=>p.id)).has('electron'));assert.equal(lastItems[0].id,focus);assert.equal(nodes.get('graphTitle').textContent,'Separace nábojů');
+ nodes.get('rate').value='0';nodes.get('play').onclick();const before=nodes.get('timeValue').tex;for(let j=0;j<8;j++)animation(driftTick+=80);assert.notEqual(nodes.get('timeValue').tex,before);assert.equal(nodes.get('play').textContent,'Pozastavit');assert(lastItems.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=60&&p.x<=820&&p.y>=100&&p.y<=530));
+ nodes.get('reverse').onclick();animation(driftTick+=80);assert.equal(nodes.get('play').textContent,'Pozastavit');assert(lastItems.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));
+ nodes.get('showPair').checked=false;nodes.get('showPair').onchange();assert.equal(lastItems.length,1,'Each sign can also be shown alone');
+}
+nodes.get('mode').value='combined';nodes.get('mode').onchange();nodes.get('massBlend').value='100';nodes.get('massBlend').oninput();assert(nodes.get('massValue').tex.includes('1836'));assert.equal(nodes.get('timeValue').tex,'0\\,\\mathrm{\\mu s}','Changing model mass prepares a fresh experiment');
+assert(html.includes('5\\mathbf F_E')&&nodes.get('lorentzKey-fe').tex.startsWith('5'),'Magnified electric contribution is explicitly labelled');
 
 env.HiFyzikoFusionDispose();assert(disposed,'GPU lifecycle');
 console.log('PASS: analytic gyration, entry/exit, energy/work, all drift signs and magnitudes, boundary convergence, controls, rendering math and disposal.');
