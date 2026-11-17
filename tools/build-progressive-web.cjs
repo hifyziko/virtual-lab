@@ -149,6 +149,11 @@ function build(directory){
  manifest.progressiveFiles=Object.values(output.assets).map(asset=>asset.path).sort();
  manifest.progressive={schema:1,originalBytes:output.originalBytes,shellBytes:shell.length,assets:output.assets,dependencies:output.dependencies,preserved:output.preserved};
  fs.writeFileSync(index,shell);fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\n');
+ // Only obsolete content-addressed payloads may be removed, after publishing the new manifest.
+ const retained=new Set(manifest.progressiveFiles),lazy=path.join(web,'lazy');
+ if(fs.existsSync(lazy))for(const entry of fs.readdirSync(lazy,{withFileTypes:true})){
+  if(entry.isFile()&&/^[a-z0-9-]+-[a-f0-9]{16}\.js$/.test(entry.name)&&!retained.has('lazy/'+entry.name))fs.unlinkSync(path.join(lazy,entry.name));
+ }
  console.log(JSON.stringify({web,originalBytes:output.originalBytes,shellBytes:shell.length,deferredFiles:manifest.progressiveFiles.length,reductionPercent:+(100*(1-shell.length/output.originalBytes)).toFixed(1)}));
  return output;
 }

@@ -35,3 +35,5 @@
 - Pravidla a aktuální rozpracovanost musí být zapsané v projektu; nespoléhat na paměť předchozího chatu. Lokální absolutní cesty nepoužívat jako závislosti sestavení.
 
 - Fúzní balíčky: elektrické pole má barvu jantarovou `#b57825`, magnetické modrou `#356ac3` (sdílené `HiFyzikoParticleStyle.fields`). Platí pro vektory, siločáry, značky a jejich popisky. Barevná mapa velikosti pole má samostatnou kvantitativní škálu. Podklady matematických popisků v driftovém modulu jsou průhledné.
+
+- Úklid schválený 17. 11. 2026: jediný aktivní strom je `versions/vyvoj/m_files` a jediný uživatelský výstup `versions/aktualni/web`. V `handoffs/` ponechávat jen poslední ověřený předávací ZIP se SHA-256, nevytvářet další archivní kopie úklidu. Staré předávky a regenerovatelné výstupy po ověření odstranit; literaturu, malé modelové vstupy, historii Git a dvě chráněné zálohy zachovat. Podrobnosti v `VERZE.md`.

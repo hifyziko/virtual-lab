@@ -80,21 +80,10 @@ i předávací ZIP je přidávají automaticky. Nekopírujte samotný index.html
 Při přidání další velké datové závislosti upravte mapování v tomto sestavení
 a spusťte `tools/test-progressive.cjs` nebo celé `tools/project/check.cjs`.
 
-### Historické informace o výchozím podkladu
+### Současný místní základ
 
-Následující poznámky popisují základ z 14. 11. 2026. Novější stav určuje Git
-a PREDANI-AKTUALNI.md; starý ZIP se při pokračování přes novější zdroje neobnovuje.
-
-Nejprve přečíst `AGENTS.md` a `VERZE.md`. Upravit aktivní zdroje v `versions/vyvoj/m_files/`; společné nástroje jsou v kořenovém `tools/`.
-
-Sestavení z kořene: `node tools/build-release.cjs`.
-Výsledek: `versions/aktualni/web/index.html`.
-Verze zůstává 1.0. Prohlížeč automaticky nespouštět.
-
-Referenční materiály: kořenové učebnice, `TEs knizka/`, `versions/vyvoj/m_files/reference/`, fúzní rukopis v `docs/fuze/podklady/`. Vývoj fúze a částic: `versions/vyvoj/m_files/fusion/`, rozhodnutí a rešerše: `docs/fuze/`.
-
-Historické kopie z úklidu jsou pouze v `versions/archiv/uklid-2026-11-14/`; nejsou zdrojem pro další editace. Původní dvě chráněné zálohy se nepřepisují. Přenosový ZIP z 12. 11. je uložen v archivu a je starší než fúzní rozšíření z 14. 11.
-
-Aktualizace: databáze částic se sestavuje samostatně přes `tools/build-particle-library.cjs`. Fúzní koncepční galerie a studie se do současné dodávky nezahrnují. Odborná rešerše a plány v `docs/fuze/` se zachovávají jako podklady. Jediný vstup do aplikace je `versions/aktualni/web/index.html`.
-
-Aktivní základ byl na výslovný pokyn uživatele obnoven z kořenového `PREDANI-2026-11-14.zip`. Při další práci vycházet ze zdrojů obnovených v `versions/vyvoj/m_files`, nikoli z dřívějšího předání 1.0 ani z archivované předchozí pracovní kopie. Podrobnosti posledních úprav viz `PREDANI-AKTUALNI.md`; současná aplikace navíc zachovává databázi částic a omezuje vstupy na aktuální web.
+Aktivní je předání z 16. listopadu 2026, commit `7a9914e314a939d86f79a0b0a192e2a80d49734d`.
+Jediný uchovaný soukromý ZIP je v `handoffs/HiFyziko-predani-na-jiny-pocitac-2026-11-16.zip`.
+Starší ZIPy a historické pracovní kopie byly na pokyn uživatele odstraněny.
+Aktuální uspořádání a úklid jsou popsány ve `VERZE.md`; podrobné změny modulů
+v `PREDANI-AKTUALNI.md`. Zdrojové cesty, literatura a chráněné zálohy zůstávají.

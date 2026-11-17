@@ -1,5 +1,17 @@
 # Aktuální stav předání
 
+## Převzetí a úklid — 17. listopadu 2026
+
+Aktivní je balíček z 16. listopadu, commit `7a9914e314a939d86f79a0b0a192e2a80d49734d`.
+Bylo ověřeno všech 1 514 souborů SHA-256 manifestu a shoda veřejných zdrojů
+s hlavní větví GitHubu. Samostatné sestavení z balíčku a projektové kontroly
+prošly. Aktuální vstup je `versions/aktualni/web/index.html`.
+Nový ZIP se uchovává pouze v `handoffs/` spolu se SHA-256; starší předávky,
+historický archiv a nepotřebné dočasné kopie byly odstraněny. Literatura,
+malé vstupy pro přepočet, historie Git a dvě chráněné zálohy zůstávají.
+Přesné uspořádání a zásady dalšího úklidu viz `VERZE.md`. Žádný push nebyl proveden.
+Následující starší záznamy jsou historie, neurčují jiný aktuální základ.
+
 ## Aktuální souhrn pro předání — 16. listopadu 2026
 
 Uživatel výslovně požádal o předávací balíček pro jiný počítač a push celé
