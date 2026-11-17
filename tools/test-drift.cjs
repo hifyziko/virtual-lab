@@ -120,7 +120,7 @@ const entryPosition={...lastGlyph},entryTime=nodes.get('timeValue').tex;nodes.ge
 assert.equal(nodes.get('timeValue').tex,entryTime);relative(lastGlyph.x,entryPosition.x,1e-12,'Entry magnification preserves screen position');relative(lastGlyph.y,entryPosition.y,1e-12,'Entry magnification preserves screen height');assert.equal(nodes.get('play').textContent,'Pozastavit');assert(orbitWidths.at(-1)>40,'Electron entry orbit is visibly magnified');
 let driftTick=700000;for(const mode of ['electric','gradient','curvature']){
  nodes.get('species').value='electron';nodes.get('b').value='500';nodes.get('energy').value='500';nodes.get('mode').value=mode;orbitWidths=[];nodes.get('mode').onchange();
- assert(orbitWidths[0]>15,'Electron orbit visible in '+mode);
+ assert(orbitWidths[0]>(mode==='curvature'?1:15),'Electron orbit visible in '+mode);
  const scaleLabel=nodes.get('sceneMath').querySelector('[data-key="scale"]')?.tex,position={...lastGlyph};
  nodes.get('play').onclick();animation(driftTick+=80);animation(driftTick+=80);assert(Math.hypot(lastGlyph.x-position.x,lastGlyph.y-position.y)>1,'Visible electron motion in '+mode);
  nodes.get('energy').value='1000';nodes.get('energy').oninput();nodes.get('b').value='700';nodes.get('b').oninput();assert.equal(nodes.get('sceneMath').querySelector('[data-key="scale"]')?.tex,scaleLabel,'Live controls keep spatial scale fixed in '+mode);
@@ -200,8 +200,8 @@ assert(/id="b"[^>]*min="0"[^>]*max="6000"/.test(html),'Entry magnitude slider in
 for(const mode of ['entry','gyration','electric','gradient','curvature'])for(const species of Object.keys(M.species)){
  nodes.get('species').value=species;nodes.get('b').value='100';nodes.get('mode').value=mode;nodes.get('mode').onchange();nodes.get('rate').value='-1';nodes.get('play').onclick();
  for(let j=0;j<4;j++){
-  const time=nodes.get('timeValue').tex,position={...lastGlyph},B=lastPhysics.config.B,velocity=[...lastPhysics.state.v],E=lastPhysics.config.electric;
-  nodes.get('reverse').onclick();assert.equal(lastPhysics.config.B,-B);assert.equal(nodes.get('b').value,'100');assert.equal(lastPhysics.config.electric,E);
+  const magnitudeValue=nodes.get('b').value,time=nodes.get('timeValue').tex,position={...lastGlyph},B=lastPhysics.config.B,velocity=[...lastPhysics.state.v],E=lastPhysics.config.electric;
+  nodes.get('reverse').onclick();assert.equal(lastPhysics.config.B,-B);assert.equal(nodes.get('b').value,magnitudeValue);assert.equal(lastPhysics.config.electric,E);
   assert.equal(nodes.get('timeValue').tex,time);assert.equal(lastGlyph.x,position.x);assert.equal(lastGlyph.y,position.y);assert.deepEqual(Array.from(lastPhysics.state.v),velocity);
   animation(driftTick+=80);assert(lastItems.every(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)));assert.equal(nodes.get('play').textContent,'Pozastavit','Reversal keeps playback in '+mode);
  }
@@ -215,7 +215,7 @@ nodes.get('mode').value='gyration';nodes.get('mode').onchange();for(const id of 
 
 // Zero B is available only for entry, where it produces straight flight.
 for(const mode of ['gyration','electric','gradient','curvature']){
- nodes.get('mode').value=mode;nodes.get('b').value='0';nodes.get('mode').onchange();assert.equal(nodes.get('b').min,'100');assert.equal(Math.abs(lastPhysics.config.B),.1);nodes.get('b').value='0';nodes.get('b').oninput();assert.equal(Math.abs(lastPhysics.config.B),.1,'Live input also respects the nonzero minimum');
+ nodes.get('mode').value=mode;nodes.get('b').value='0';nodes.get('mode').onchange();assert(Number(nodes.get('b').min)>=100);assert.equal(Math.abs(lastPhysics.config.B),Number(nodes.get('b').min)/1000);nodes.get('b').value='0';nodes.get('b').oninput();assert.equal(Math.abs(lastPhysics.config.B),Number(nodes.get('b').min)/1000,'Live input also respects the nonzero minimum');
 }
 nodes.get('species').value='deuteron';nodes.get('energy').value='500';nodes.get('mode').value='entry';nodes.get('b').value='0';nodes.get('mode').onchange();assert.equal(nodes.get('b').min,'0');assert.equal(lastPhysics.config.B,0);nodes.get('rate').value='-1';nodes.get('play').onclick();const entryY=lastGlyph.y;for(let j=0;j<5;j++){animation(driftTick+=80);assert.equal(lastGlyph.y,entryY,'Without B the projectile flies straight');}
 const alpha=color=>Number(color.match(/,([.0-9]+)\)$/)[1]);
@@ -359,6 +359,25 @@ nodes.get('pairFocus').value='proton';nodes.get('b').value='500';nodes.get('ener
 const strong=env.__driftSnapshot(),c=strong.config,oldLimit=.08*c.length/(2*c.m*c.speed/Math.abs(c.q*c.B));relative(Math.abs(c.gradient),oldLimit*3,.001,'Default gradient uses the stronger safe range');
 const origin={r:[0,0,0],v:[...c.initial.v]},weakConfig={...c,gradient:c.gradient/3},strongDrift=M.diagnostics(c,origin).drift[1],weakDrift=M.diagnostics(weakConfig,origin).drift[1];relative(strongDrift/weakDrift,3,1e-12,'Actual Grad-B contribution grows threefold');
 for(const species of ['proton','electron']){const sc=M.setup({...c,species});sc.length=c.length;const duration=4*M.setup({...c,species:'proton'}).period,initial=M.diagnostics(sc,sc.initial),end=M.advance(sc,sc.initial,duration),final=M.diagnostics(sc,end);assert(Math.sign(final.center[1]-initial.center[1])===Math.sign(initial.drift[1]),'Strong gradient retains the correct separation direction');relative(final.energy,sc.energy,1e-9,'Stronger B gradient does no work');}
+}
+
+
+// Each displayed charge has its own named live measurements.
+nodes.get('pairFocus').value='proton';nodes.get('massBlend').value='100';nodes.get('showPair').checked=true;nodes.get('mode').value='combined';nodes.get('mode').onchange();assert.equal(nodes.get('readoutsTitle').textContent,'Proton');assert.equal(nodes.get('companionReadoutsTitle').textContent,'Elektron');assert(!nodes.get('companionReadoutGroup').hidden);assert.notEqual(nodes.get('readouts').children[3].tex,nodes.get('companionReadouts').children[3].tex,'Real particles display their own cyclotron periods');
+const protonPeriod=nodes.get('readouts').children[3].tex,electronPeriod=nodes.get('companionReadouts').children[3].tex;nodes.get('pairFocus').value='electron';nodes.get('pairFocus').onchange();assert.equal(nodes.get('readoutsTitle').textContent,'Elektron');assert.equal(nodes.get('companionReadoutsTitle').textContent,'Proton');assert.equal(nodes.get('readouts').children[3].tex,electronPeriod);assert.equal(nodes.get('companionReadouts').children[3].tex,protonPeriod,'Swapping focus preserves the correct measurement owner');
+nodes.get('massBlend').value='10';nodes.get('massBlend').oninput();assert(nodes.get('readoutsTitle').textContent.includes('modelová'));assert.equal(nodes.get('companionReadoutsTitle').textContent,'Proton');nodes.get('showPair').checked=false;nodes.get('showPair').onchange();assert(nodes.get('companionReadoutGroup').hidden);nodes.get('showPair').checked=true;nodes.get('showPair').onchange();assert(!nodes.get('companionReadoutGroup').hidden);
+const previousCompanionEnergy=nodes.get('companionReadouts').children[0].tex;nodes.get('energy').value='700';nodes.get('energy').oninput();assert.notEqual(nodes.get('companionReadouts').children[0].tex,previousCompanionEnergy,'Companion measurements update live');nodes.get('mode').value='electric';nodes.get('mode').onchange();assert(nodes.get('companionReadoutGroup').hidden);
+
+
+// Curvature lesson isolates one field line and guiding-center motion.
+for(const species of ['proton','electron'])for(const sign of [-1,1]){
+ nodes.get('species').value=species;nodes.get('mode').value='curvature';nodes.get('b').value='500';nodes.get('energy').value='500';nodes.get('radius').value='6';nodes.get('mode').onchange();scene.ondblclick();if(Math.sign(lastPhysics.config.B)!==sign)nodes.get('reverse').onclick();nodes.get('vectors').checked=true;magneticLines=[];nodes.get('vectors').onchange();
+ assert.equal(magneticLines.length,1,'Only one circular field line');assert.equal(nodes.get('graphTitle').textContent,'Posun mimo rovinu siločáry');assert.equal(nodes.get('readoutsTitle').textContent,species==='proton'?'Proton':'Elektron');assert(!nodes.get('sceneMath').querySelector('[data-key="curv-parallel"]').hidden);assert(!nodes.get('sceneMath').querySelector('[data-key="curv-drift"]').hidden);for(const key of ['v','f']){const el=nodes.get('sceneMath').querySelector('[data-key="'+key+'"]');assert(!el||el.hidden,'No spinning instantaneous '+key+' in curvature lesson');}
+ const c=env.__driftSnapshot().config,expectedSign=Math.sign(c.q*c.B);assert.equal(Math.sign(M.diagnostics(c,c.initial).drift[2]),expectedSign);nodes.get('rate').value='0';nodes.get('play').onclick();const startTime=nodes.get('timeValue').tex;for(let j=0;j<100;j++)env.__driftAdvance(.08);assert.notEqual(nodes.get('timeValue').tex,startTime);assert.equal(nodes.get('play').textContent,'Pozastavit','Curvature repeats without stopping');assert(lastGlyph.x>=30&&lastGlyph.x<=485&&lastGlyph.y>=100&&lastGlyph.y<=510,'Curvature particle stays outside force card and in scene');
+ const time=nodes.get('timeValue').tex;nodes.get('radius').value='12';nodes.get('radius').oninput();assert.equal(nodes.get('timeValue').tex,time);const snap=env.__driftSnapshot(),r=snap.samples.at(-1).r;assert(Math.abs(Math.hypot(r[0],r[1])/snap.config.R-1)<.3,'Radius control changes the actual curved orbit');assert.equal(snap.config.initial.r[0],snap.config.R,'Repeated emission uses the updated radius');
+}
+for(const energy of ['50','1000'])for(const radius of ['4','12']){
+ nodes.get('energy').value=energy;nodes.get('radius').value=radius;nodes.get('mode').value='curvature';nodes.get('mode').onchange();for(const requestedB of ['0','6000']){nodes.get('b').value=requestedB;nodes.get('b').oninput();const c=env.__driftSnapshot().config,ratio=c.m*c.speed/Math.abs(c.q*c.B*c.R);assert(ratio<=.25001&&ratio>=.07999,'Curvature avoids both unmagnetized and imperceptibly small motion');}
 }
 
 env.HiFyzikoFusionDispose();assert(disposed,'GPU lifecycle');

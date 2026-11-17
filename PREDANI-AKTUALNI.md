@@ -1,5 +1,39 @@
 # Aktuální stav předání
 
+## Údaje obou nábojů a didaktika zakřivení — 17. listopadu 2026
+
+Ve společném driftu mají obě vybrané částice vlastní pojmenovanou sadu
+živých údajů (energie, Larmorův poloměr, driftová rychlost, perioda).
+Horní patří hlavní částici, spodní druhému náboji. Při přepnutí hlavní
+částice se správně přehodí vlastnictví údajů; vypnutí druhého náboje jeho
+sadu skryje. Záporná částice s umělou hmotností je takto označena, při
+skutečném hmotnostním poměru má název Elektron. Názvy jsou i v dodávce,
+nejen ve zdrojích. Již načtený dokument je nutné obnovit (Ctrl+F5).
+
+Drift zakřivení je přepracován kolem podélného pohybu a posunu gyračního
+středu mimo rovinu siločáry. Devět překrývajících se kružnic nahradila
+jediná referenční siločára se třemi směrovými značkami; nový výchozí
+pohled má yaw=-1,1 a tilt=0,4. Scéna rezervuje prostor pro Lorentzovu
+kartu a automaticky se přizpůsobí většímu poloměru. Ukazuje R, směr z,
+posun Delta z, hnědou v_parallel, zelenou v_curv a zelenou stopu středu.
+Rychle rotující okamžité v a F jsou v této hlavní scéně skryté; fyzikální
+Lorentzův piktogram zůstává. Graf má výslovný název Posun mimo rovinu
+siločáry. Výchozí úhel je 80 stupňů, otáčení myší se omezuje na čitelné
+náklony. Indukce se omezuje podle energie, částice a R tak, aby poměr
+m*v/(|q|*B*R) ležel přibližně mezi 0,08 a 0,25. Při velkém posunu se
+částice vypustí znovu bez zastavení času či animace, se zlomem stopy.
+
+Opravena také funkce změny poloměru za běhu: nyní mění skutečnou radiální
+polohu a počáteční místo dalšího vypuštění, ne jen referenční kresbu.
+Změna odklonu používá místní radiální a tečný směr při zachované energii.
+Samotný model předepsaného B a integrace Lorentzovy rovnice se nemění.
+
+Test-drift prošel včetně oddělených údajů, obou hmotností a znamének B,
+jediné siločáry, nepřerušeného běhu, mezí záběru a indukce, skutečné
+změny R a aktualizovaného počátku. Navigace, progressive a audit prošly;
+obě aktuální dodávky sestaveny. Prohlížeč se automaticky nespouštěl;
+vizuální kontrola v prohlížeči zatím neproběhla.
+
 ## Zřetelnější Grad-B drift — 17. listopadu 2026
 
 Na žádost uživatele trojnásobně zvýšen dostupný relativní gradient:
