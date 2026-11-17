@@ -68,3 +68,7 @@ body[data-fusion-page="fu03-drift"] .controls #magneticRow input{position:absolu
 #lorentzLegend{height:52px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1.1fr);grid-template-rows:repeat(2,22px);gap:4px 6px;padding:4px 0;font-size:12px;border-top:1px solid #e3e9ed}
 #lorentzLegend>div{display:flex;align-items:center;justify-content:center;white-space:nowrap}#lorentzItem-f{grid-column:2/-1}
 #lorentzCanvas{cursor:grab;touch-action:none}#lorentzCanvas:active{cursor:grabbing}
+
+#lorentzPreview{font-size:10px;font-weight:500;line-height:16px;padding:0 5px;border-radius:4px;background:#eaf0f5;color:#426584}
+
+#lorentzPanel:not([open]) #lorentzPreview{display:none}

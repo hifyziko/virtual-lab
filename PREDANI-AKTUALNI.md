@@ -1,5 +1,20 @@
 # Aktuální stav předání
 
+## Propojené velikosti šipek a náhled v poli — 17. listopadu 2026
+
+Předchozí šipky piktogramu byly normalizované a u čekající částice mimo
+pole správně vycházelo místní B=0; proto změna B nebyla vidět. Délky nyní
+reagují na skutečné velikosti v, B, v×B, F_B, E, F_E i výsledné F přes
+pevná názorná měřítka. Referenční hodnoty se nemění s ovladačem; rozsahy
+jsou stlačené a mimo běžný rozsah se celá hlavní soustava společně vejde
+do obrázku. Při čekání mimo pole a nenulovém nastaveném B karta ukazuje
+jasně označený náhled „v poli“ se silou pro nastavené pole a aktuální
+rychlost. Po vstupu používá skutečné místní pole. Fyzika mimo pole se
+nemění; při nastaveném B=0 zůstávají síly nulové i v náhledu.
+Test-drift ověřil růst šipek při změně B, E i energie, výslednou sílu
+a oddělení náhledu od skutečné síly mimo pole. Navigace a progressive
+pro obě aktualizované dodávky prošly.
+
 ## Stručný a otočný piktogram bez překrytí — 17. listopadu 2026
 
 Podle snímku uživatele odstraněny nulové hodnoty a dlouhé názvy z nákresu.
