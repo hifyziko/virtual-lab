@@ -11,7 +11,7 @@
  function fields(c,r){
   if(c.mode==='entry'&&r[0]<0)return {B:[0,0,0],E:[0,0,0]};
   if(c.mode==='curvature'){const R=Math.hypot(r[0],r[1]);return {B:[-c.B*r[1]/R,c.B*r[0]/R,0],E:[0,0,0]};}
-  return {B:[0,0,c.B*(c.mode==='gradient'?Math.exp(c.gradient*r[0]/c.length):1)],E:[c.mode==='electric'?c.electric:0,0,0]};
+  return {B:[0,0,c.B*(c.mode==='gradient'?Math.exp(c.gradient*r[0]/c.length):1)],E:[0,c.mode==='electric'?-c.electric:0,0]};
  }
  // Symmetric drift-kick-rotate-kick-drift Boris step; midpoint field sample.
  function step(c,s,dt){

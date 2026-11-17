@@ -16,6 +16,8 @@ const Lab={catalog:[{id:'existing',group:'sync'}],modules:new Map(),home(){},rou
 const c={Lab,LabProgress:{value:key=>'<html>'+key+'</html>'},document:{readyState:'loading',createElement:tag=>new Element(tag)},location:{hash:''},setTimeout:fn=>{timers.add(fn);return fn;},clearTimeout:fn=>timers.delete(fn),addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);}};c.window=c;vm.createContext(c);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8'),c);
 assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,6);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,4,'Fusion, gallery and drift are listed');
+assert.equal(Lab.catalog.at(-1).id,'fu02-galerie','Gallery is last');assert.equal(Lab.catalog.find(e=>e.id==='fu03-drift').num,'02');assert.equal(Lab.catalog.at(-1).num,'03');
+for(const alias of ['fu02-jadra','fu03-atomy','fu04-castice'])assert.equal(Lab.modules.get(alias).sourceId,'fu02-galerie','Historical aliases keep the gallery');
 const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html']);
 const windowFit=fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/module-window-fit.js'),'utf8');
 function checkViewport(app,shell,id){

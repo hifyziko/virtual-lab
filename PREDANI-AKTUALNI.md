@@ -1,5 +1,18 @@
 # Aktuální stav předání
 
+## Galerie na konci a elektrický drift — 17. listopadu 2026
+
+Galerie je poslední položkou skupiny za driftovým experimentem (čísla 01/02/03),
+původní ID a historické odkazy zůstávají. Kladné E směřuje dolů jako v obr. 7.9
+na str. 146 přiloženého rukopisu; výpočet i šipka používají stejnou orientaci.
+Graf elektrického driftu sleduje x. Rozsah E je ±30 MV/m, výchozí 300 kV/m;
+při výchozím B=5 T dává skutečný drift 60 km/s místo téměř neviditelných
+300 m/s. Nejde o násobení vykresleného pohybu. Nula E vypíná, znaménko E
+a obrácení B mění směr podle E×B, nezávisle na náboji. Regresní testy
+pokrývají modelovou energii/práci, oba směry polí, skutečné ovladače, šipku
+a vodorovnou osu grafu včetně změny E během přehrávání bez resetu polohy
+a času. Úplné sestavení a tools/project/check.cjs prošly. Prohlížeč se neotevíral.
+
 ## Převzetí a úklid — 17. listopadu 2026
 
 Aktivní je balíček z 16. listopadu, commit `7a9914e314a939d86f79a0b0a192e2a80d49734d`.

@@ -2,11 +2,11 @@
 (()=>{'use strict';
  const entries=[
   {id:'fu01-reakce',group:'fusion',num:'01',title:'Fúzní reakce a Coulombova bariéra',description:'Přibližování jader, průchod bariérou a názorné ukázky jaderných reakcí.',page:'fuze-bariera/index.html',kind:'Interaktivní experiment'},
-  {id:'fu02-galerie',group:'fusion',num:'02',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'},
-  {id:'fu03-drift',group:'fusion',num:'03',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a elektrický, gradientní i křivostní drift.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'}
+  {id:'fu03-drift',group:'fusion',num:'02',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a elektrický, gradientní i křivostní drift.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'},
+  {id:'fu02-galerie',group:'fusion',num:'03',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
  ];
  const aliases={"fu02-jadra":"nuclei","fu03-atomy":"atoms","fu04-castice":"particles"};
- const routes=[...entries,...Object.entries(aliases).map(([id,mode])=>({...entries[1],id,mode,sourceId:entries[1].id}))];
+ const routes=[...entries,...Object.entries(aliases).map(([id,mode])=>({...entries.find(entry=>entry.id==='fu02-galerie'),id,mode,sourceId:'fu02-galerie'}))];
  for(const entry of routes)Lab.register({...entry,mount(app){
   // The responsive iframe owns its viewport; native canvas fitting would force
   // height:auto on its host and collapse the frame to the browser's 150px default.
