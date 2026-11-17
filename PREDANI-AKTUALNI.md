@@ -1,5 +1,15 @@
 # Aktuální stav předání
 
+## Měkká záře jednotlivých značek B — 17. listopadu 2026
+
+Plošné modré podbarvení je podle upřesnění uživatele odstraněné. Místo něj
+mají jednotlivé značky B lokální radiální záři s několika plynulými stupni
+a zcela průhledným vnějším okrajem. Síla a dosah odpovídají místnímu B.
+U vletu záře nezasahuje před hranici pole; při nulovém B se nekreslí.
+Prostorové šipky mají měkký modrý stín. Výrazné velikosti značek zůstávají.
+Ověřeno test-drift.cjs, test-fusion-navigation.cjs a test-progressive.cjs.
+Obě aktuální dodávky byly aktualizovány, prohlížeč nebyl otevřen.
+
 ## Výraznější velikost značek a podtón B — 17. listopadu 2026
 
 Na další žádost uživatele je rozdíl velikosti značek mezi slabým a silným

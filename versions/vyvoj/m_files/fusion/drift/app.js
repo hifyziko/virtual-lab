@@ -63,26 +63,26 @@
  function path(points,color,lw=1.5,dash=[]){ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash(dash);let started=false;for(const p of points){if(!p){started=false;continue;}const xy=project(p);if(started)ctx.lineTo(...xy);else ctx.moveTo(...xy);started=true;}ctx.stroke();ctx.setLineDash([]);}
  function magneticAppearance(B){
   const level=Math.sqrt(Math.max(0,Math.min(1,Math.abs(B)/6))),hex=HiFyzikoParticleStyle.fields.magnetic,rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)).join(',');
-  return {color:'rgba('+rgb+','+(.24+.66*level).toFixed(3)+')',lineColor:'rgba('+rgb+','+(.12+.32*level).toFixed(3)+')',tintColor:'rgba('+rgb+','+(.015+.075*level).toFixed(3)+')',radius:2.4+4.6*level,width:.75+level,arrowLength:.55+level};
+  return {color:'rgba('+rgb+','+(.24+.66*level).toFixed(3)+')',lineColor:'rgba('+rgb+','+(.12+.32*level).toFixed(3)+')',rgb,glowAlpha:.06+.12*level,radius:2.4+4.6*level,width:.75+level,arrowLength:.55+level};
  }
- function drawFieldTint(style,boundary){
-  if(config.mode==='gradient'){
-   const frame=projectionFrame(),tint=ctx.createLinearGradient(0,0,width,0);
-   for(let i=0;i<=32;i++){const x=width*i/32,r=[camera[0]+(x-frame.origin[0])*config.length/frame.scale,camera[1],0];tint.addColorStop(i/32,magneticAppearance(M.norm(M.fields(config,r).B)).tintColor);}
-   ctx.fillStyle=tint;ctx.fillRect(0,0,width,height);
-  }else{const left=config.mode==='entry'?boundary:0;ctx.fillStyle=style.tintColor;ctx.fillRect(left,0,width-left,height);}
+ function drawMagneticGlow(x,y,style,radius){
+  const glow=ctx.createRadialGradient(x,y,0,x,y,radius),color=a=>'rgba('+style.rgb+','+a.toFixed(3)+')';
+  glow.addColorStop(0,color(style.glowAlpha));glow.addColorStop(.35,color(style.glowAlpha*.65));glow.addColorStop(.7,color(style.glowAlpha*.15));glow.addColorStop(1,color(0));
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,radius,0,2*Math.PI);ctx.fill();
+ }
+ function magneticArrow(a,b,style){
+  ctx.save();ctx.shadowColor='rgba('+style.rgb+','+style.glowAlpha.toFixed(3)+')';ctx.shadowBlur=style.radius*1.6;ctx.shadowOffsetX=ctx.shadowOffsetY=0;arrow(a,b,style.color);ctx.restore();
  }
  function drawField(){
   const boundary=Math.max(0,Math.min(width,project([0,0,0])[0])),L=config.length,sign=Math.sign(config.B),style=magneticAppearance(config.B);
   if(!sign){for(const key of ['inside','outside','external'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();label($('sceneMath'),'b','B=0',width-65,110);return;}
-  drawFieldTint(style,boundary);
   if($('sceneMath').querySelector('[data-key="b"]')?.dataset.texValue==='B=0')$('sceneMath').querySelector('[data-key="b"]').remove();
   if(config.mode==='curvature'){
    for(const z of [-1,0,1])for(const r of [.8,1,1.2]){const points=Array.from({length:121},(_,i)=>{const t=2*Math.PI*i/120;return [config.R*r*Math.cos(t),config.R*r*Math.sin(t),z*L];});path(points,style.lineColor,style.width*.8);}
-   const p=project([config.R,0,0]),q=project([config.R,sign*L*style.arrowLength,0]);arrow(p,q,style.color);label($('sceneMath'),'b','\\boldsymbol B',q[0]+15,q[1]);return;
+   const p=project([config.R,0,0]),q=project([config.R,sign*L*style.arrowLength,0]);magneticArrow(p,q,style);label($('sceneMath'),'b','\\boldsymbol B',q[0]+15,q[1]);return;
   }
   if(config.mode==='gyration'&&Math.abs(gtilt)>.02){
-   for(const x of [-4.5,-3,-1.5,0,1.5,3,4.5])for(const y of [-4.5,-3,-1.5,0,1.5,3,4.5]){const a=[x*L,y*L,-2.5*L],b=[x*L,y*L,2.5*L];path([a,b],style.lineColor,style.width*.65);const mid=[x*L,y*L,0],tip=[x*L,y*L,sign*L*style.arrowLength];arrow(project(mid),project(tip),style.color);}
+   for(const x of [-4.5,-3,-1.5,0,1.5,3,4.5])for(const y of [-4.5,-3,-1.5,0,1.5,3,4.5]){const a=[x*L,y*L,-2.5*L],b=[x*L,y*L,2.5*L];path([a,b],style.lineColor,style.width*.65);const mid=[x*L,y*L,0],tip=[x*L,y*L,sign*L*style.arrowLength];magneticArrow(project(mid),project(tip),style);}
    const tip=project([4.5*L,4.5*L,sign*L*style.arrowLength]);label($('sceneMath'),'b','\\boldsymbol B',tip[0]+16,tip[1]-12);
   }else{
    if(config.mode==='gyration')$('sceneMath').querySelector('[data-key="b"]')?.remove();
@@ -91,6 +91,7 @@
     if(config.mode==='entry'&&(x<boundary+12||(Math.abs(x-(boundary+90))<54&&Math.abs(y-100)<23)))continue;
     if(config.mode==='electric'&&Math.abs(x-(width-65))<50&&y<165||config.mode==='gradient'&&Math.abs(x-width/2)<65&&y<130)continue;
     const r=[camera[0]+(x-frame.origin[0])*L/frame.scale,camera[1]+(frame.origin[1]-y)*L/frame.scale,0],B=M.norm(M.fields(config,r).B),mark=magneticAppearance(B);if(!B)continue;
+    drawMagneticGlow(x,y,mark,config.mode==='entry'?Math.min(mark.radius*3.2,x-boundary):mark.radius*3.2);
     ctx.strokeStyle=mark.color;ctx.lineWidth=mark.width;ctx.beginPath();ctx.arc(x,y,mark.radius,0,2*Math.PI);ctx.stroke();
     if(sign>0){ctx.fillStyle=mark.color;ctx.beginPath();ctx.arc(x,y,mark.radius*.35,0,2*Math.PI);ctx.fill();}else{const d=mark.radius*.72;line(ctx,[x-d,y-d],[x+d,y+d],mark.color,mark.width);line(ctx,[x-d,y+d],[x+d,y-d],mark.color,mark.width);}
    }
