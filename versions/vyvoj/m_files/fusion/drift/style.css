@@ -53,7 +53,7 @@ body[data-fusion-page="fu03-drift"] .controls #bValue{position:absolute;right:0;
 body[data-fusion-page="fu03-drift"] .controls #magneticRow input{position:absolute;left:0;bottom:0;width:100%;margin:0}
 
 /* A collapsible force reminder stays outside the scene layout flow. */
-#lorentzPanel{position:absolute;right:14px;bottom:45px;z-index:4;width:340px;border:1px solid #ccd8de;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 2px 8px #29445412;color:#294454}
+#lorentzPanel{position:absolute;right:14px;bottom:45px;z-index:4;width:340px;border:1px solid #ccd8de;border-radius:8px;background:#fff;box-shadow:0 2px 8px #29445412;color:#294454}
 #lorentzPanel:not([open]){width:160px}
 #lorentzPanel summary{display:flex;align-items:center;gap:6px;height:30px;padding:5px 9px;cursor:pointer;list-style:none;font-size:13px;font-weight:650;white-space:nowrap}
 #lorentzPanel summary::-webkit-details-marker{display:none}
@@ -62,7 +62,9 @@ body[data-fusion-page="fu03-drift"] .controls #magneticRow input{position:absolu
 #lorentzCharge{margin-left:auto;font-size:11px;font-weight:400}
 #lorentzPanel:not([open]) #lorentzCharge{display:none}
 #lorentzContent{padding:0 8px 5px}#lorentzFormula{height:27px;display:flex;align-items:center;justify-content:center;font-size:13px;white-space:nowrap}
-.lorentzDiagram{position:relative;height:260px}.lorentzDiagram canvas,#lorentzMath{position:absolute;inset:0;width:100%;height:100%}#lorentzMath{pointer-events:none}#lorentzMath .mathlabel{font-size:12px;background:rgba(255,255,255,.9);padding:0 2px;line-height:1.1}
-#lorentzContent p{margin:2px 0 0;text-align:center;font-size:10px;color:#687d88;white-space:nowrap}
+.lorentzDiagram{position:relative;height:230px}.lorentzDiagram canvas,#lorentzMath{position:absolute;inset:0;width:100%;height:100%}#lorentzMath{pointer-events:none}#lorentzMath .mathlabel{font-size:13px;background:rgba(255,255,255,.9);padding:0 2px;line-height:1.1}
 
-#lorentzRelation{height:24px;text-align:center;font-size:12px;white-space:nowrap}
+
+#lorentzLegend{height:52px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1.1fr);grid-template-rows:repeat(2,22px);gap:4px 6px;padding:4px 0;font-size:12px;border-top:1px solid #e3e9ed}
+#lorentzLegend>div{display:flex;align-items:center;justify-content:center;white-space:nowrap}#lorentzItem-f{grid-column:2/-1}
+#lorentzCanvas{cursor:grab;touch-action:none}#lorentzCanvas:active{cursor:grabbing}

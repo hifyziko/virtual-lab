@@ -1,5 +1,19 @@
 # Aktuální stav předání
 
+## Stručný a otočný piktogram bez překrytí — 17. listopadu 2026
+
+Podle snímku uživatele odstraněny nulové hodnoty a dlouhé názvy z nákresu.
+V soustavě jsou jen krátké značky a vektory; součin je c. Nezbytné vztahy
+a nulové hodnoty mají pevnou symbolickou legendu pod soustavou. Podle
+dalšího upřesnění je karta pouze paměťová kotva, bez slovního výkladu,
+popisů nebo pouček. Podrobné vysvětlení zůstává v hlavním výkladu modulu.
+Karta je neprůhledně bílá, osy subtilnější a vlastní vektory silnější;
+popisky nezasahují do hrotů šipek. Výchozí pohled je nesymetrický a lze
+ho natáčet tažením; dvojklik ho obnoví. Pohyb částice, čas a hlavní kamera
+se přitom nemění. Zachována stojatá vektorová sazba dle AGENTS.md.
+Test-drift včetně nezávislého otáčení a nulového stavu ze snímku prošel.
+Ověřeny obě dodávky test-fusion-navigation a test-progressive.
+
 ## Sbalitelný kartézský piktogram Lorentzovy síly — 17. listopadu 2026
 
 Do pravého dolního rohu přidána karta Lorentzova síla s rozbalením

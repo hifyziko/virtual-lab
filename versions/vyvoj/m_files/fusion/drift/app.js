@@ -5,7 +5,7 @@
  const num=(n,d=2)=>(Object.is(Number(n.toFixed(d)),-0)?0:Number(n.toFixed(d))).toLocaleString('cs-CZ',{maximumFractionDigits:d,useGrouping:false}).replace(',','{,}');
  const quantity=(n,unit)=>{const a=Math.abs(n);if(!a)return '0\\,\\mathrm{'+unit+'}';const exp=Math.floor(Math.log10(a));return (exp<-2||exp>3?num(n/10**exp)+'\\cdot10^{'+exp+'}':num(n))+'\\,\\mathrm{'+unit+'}';};
  function label(parent,key,s,x,y){let el=parent.querySelector('[data-key="'+key+'"]');if(!el){el=document.createElement('span');el.className='mathlabel';el.dataset.key=key;parent.append(el);}tex(el,s);el.style.left=x+'px';el.style.top=y+'px';return el;}
- let graphMin=0,graphMax=0,axisNoticeUntil=0,speedNoticeUntil=0;let companions=[],companionIds=[],companionStarts={};let ended=false,entered=false,camera=[0,0,0],config,samples,frame=0,playing=false,fieldSign=1,electricFraction=.4,last=0,raf=0,disposed=false,view=null,gyaw=0,gtilt=0,yaw=-.65,tilt=.65,drag=null,width=900,height=650,extent=1;
+ let graphMin=0,graphMax=0,axisNoticeUntil=0,speedNoticeUntil=0;let companions=[],companionIds=[],companionStarts={};let ended=false,entered=false,camera=[0,0,0],config,samples,frame=0,playing=false,fieldSign=1,electricFraction=.4,last=0,raf=0,disposed=false,view=null,gyaw=0,gtilt=0,yaw=-.65,tilt=.65,drag=null,lorentzYaw=.7,lorentzTilt=.55,lorentzDrag=null,width=900,height=650,extent=1;
  try{view=new HiFyzikoNucleusView($('nuclei'));}catch{/* A labeled marker remains available without WebGL. */}
  for(const el of document.querySelectorAll('[data-tex]'))tex(el,el.dataset.tex);
  function makeCompanion(id,index){const c=M.setup({...parameters(),species:id});c.length=config.length;const initial={r:[...(companionStarts[id]||[[-3,0],[3,0],[0,2.5]][index].map(v=>v*config.length).concat(0))],v:[...c.initial.v]};return {config:c,initial,samples:[{...initial,t:0,...M.diagnostics(c,initial)}]};}
@@ -52,9 +52,9 @@
  }
 
  function line(g,a,b,color,width=1,dash=[]){g.beginPath();g.strokeStyle=color;g.lineWidth=width;g.setLineDash(dash);g.moveTo(...a);g.lineTo(...b);g.stroke();g.setLineDash([]);}
- function arrow(a,b,color,g=ctx){
+ function arrow(a,b,color,g=ctx,shaftWidth=1){
   const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(length<.01)return;
-  const ux=dx/length,uy=dy/length,head=Math.min(9*Math.cos(.4),length*.65),wing=head*Math.tan(.4),shaft=Math.min(1,wing*.5),base=[b[0]-head*ux,b[1]-head*uy];
+  const ux=dx/length,uy=dy/length,head=Math.min(9*Math.cos(.4),length*.65),wing=head*Math.tan(.4),shaft=Math.min(shaftWidth,wing*.5),base=[b[0]-head*ux,b[1]-head*uy];
   // One filled silhouette: the shaft ends at the head base, never at its tip.
   const offset=(p,w)=>[p[0]-uy*w,p[1]+ux*w];
   const points=[offset(a,shaft),offset(base,shaft),offset(base,wing),b,offset(base,-wing),offset(base,-shaft),offset(a,-shaft)];
@@ -79,11 +79,11 @@
   if($('sceneMath').querySelector('[data-key="b"]')?.dataset.texValue==='B=0')$('sceneMath').querySelector('[data-key="b"]').remove();
   if(config.mode==='curvature'){
    for(const z of [-1,0,1])for(const r of [.8,1,1.2]){const points=Array.from({length:121},(_,i)=>{const t=2*Math.PI*i/120;return [config.R*r*Math.cos(t),config.R*r*Math.sin(t),z*L];});path(points,style.lineColor,style.width*.8);}
-   const p=project([config.R,0,0]),q=project([config.R,sign*L*style.arrowLength,0]);magneticArrow(p,q,style);label($('sceneMath'),'b','\\boldsymbol B',q[0]+15,q[1]);return;
+   const p=project([config.R,0,0]),q=project([config.R,sign*L*style.arrowLength,0]);magneticArrow(p,q,style);label($('sceneMath'),'b','\\mathbf B',q[0]+15,q[1]);return;
   }
   if(config.mode==='gyration'&&Math.abs(gtilt)>.02){
    for(const x of [-4.5,-3,-1.5,0,1.5,3,4.5])for(const y of [-4.5,-3,-1.5,0,1.5,3,4.5]){const a=[x*L,y*L,-2.5*L],b=[x*L,y*L,2.5*L];path([a,b],style.lineColor,style.width*.65);const mid=[x*L,y*L,0],tip=[x*L,y*L,sign*L*style.arrowLength];magneticArrow(project(mid),project(tip),style);}
-   const tip=project([4.5*L,4.5*L,sign*L*style.arrowLength]);label($('sceneMath'),'b','\\boldsymbol B',tip[0]+16,tip[1]-12);
+   const tip=project([4.5*L,4.5*L,sign*L*style.arrowLength]);label($('sceneMath'),'b','\\mathbf B',tip[0]+16,tip[1]-12);
   }else{
    if(config.mode==='gyration')$('sceneMath').querySelector('[data-key="b"]')?.remove();
    const frame=projectionFrame();
@@ -96,8 +96,8 @@
     if(sign>0){ctx.fillStyle=mark.color;ctx.beginPath();ctx.arc(x,y,mark.radius*.35,0,2*Math.PI);ctx.fill();}else{const d=mark.radius*.72;line(ctx,[x-d,y-d],[x+d,y+d],mark.color,mark.width);line(ctx,[x-d,y+d],[x+d,y-d],mark.color,mark.width);}
    }
   }
-  if(config.mode==='entry'){line(ctx,[boundary,74],[boundary,height-40],style.color,style.width+.5);label($('sceneMath'),'outside','B=0',boundary-80,100);label($('sceneMath'),'inside','\\boldsymbol B'+(sign>0?'\\;\\odot':'\\;\\otimes'),boundary+90,100);}
-  if(config.mode==='electric'||config.mode==='gradient'){const direction=config.mode==='electric'?Math.sign(config.electric):Math.sign(config.gradient),half=35*Math.min(1,Math.abs(config.electric)/(Number($('electric').max)||1)),a=config.mode==='electric'?[width-65,110-half*direction]:[width/2-45*direction,110],b=config.mode==='electric'?[width-65,110+half*direction]:[width/2+45*direction,110];if(direction)arrow(a,b,config.mode==='electric'?HiFyzikoParticleStyle.fields.electric:style.color);label($('sceneMath'),'external',config.mode==='electric'?'\\boldsymbol E':'\\nabla B',config.mode==='electric'?width-88:width/2,config.mode==='electric'?110:91);}
+  if(config.mode==='entry'){line(ctx,[boundary,74],[boundary,height-40],style.color,style.width+.5);label($('sceneMath'),'outside','B=0',boundary-80,100);label($('sceneMath'),'inside','\\mathbf B'+(sign>0?'\\;\\odot':'\\;\\otimes'),boundary+90,100);}
+  if(config.mode==='electric'||config.mode==='gradient'){const direction=config.mode==='electric'?Math.sign(config.electric):Math.sign(config.gradient),half=35*Math.min(1,Math.abs(config.electric)/(Number($('electric').max)||1)),a=config.mode==='electric'?[width-65,110-half*direction]:[width/2-45*direction,110],b=config.mode==='electric'?[width-65,110+half*direction]:[width/2+45*direction,110];if(direction)arrow(a,b,config.mode==='electric'?HiFyzikoParticleStyle.fields.electric:style.color);label($('sceneMath'),'external',config.mode==='electric'?'\\mathbf E':'\\nabla B',config.mode==='electric'?width-88:width/2,config.mode==='electric'?110:91);}
  }
  function drawScale(){
   const barLength=projectionFrame().scale*extent,a=[30,height-83],b=[30+barLength,height-83],cardWidth=Math.max(125,barLength+32);
@@ -150,31 +150,34 @@
   const panel=$('lorentzPanel');tex($('lorentzCharge'),'q='+(config.q<0?'-':'+')+(Math.abs(config.q/M.e)>1.5?'2':'')+'e');
   if(panel.open===false)return;
   const fields=M.fields(config,state.r),electric=M.norm(fields.E)>0,product=M.cross(state.v,fields.B),magneticForce=product.map(v=>v*config.q),electricForce=fields.E.map(v=>v*config.q),magneticTolerance=Math.abs(config.q)*M.norm(state.v)*M.norm(fields.B)*1e-10;
-  tex($('lorentzFormula'),electric?'\\boldsymbol F=q(\\boldsymbol E+\\boldsymbol v\\times\\boldsymbol B)':'\\boldsymbol F=\\boldsymbol F_B=q(\\boldsymbol v\\times\\boldsymbol B)');
-  const c=$('lorentzCanvas'),g=c.getContext('2d'),[w,h]=size(c),parent=$('lorentzMath'),right=[Math.SQRT1_2,-Math.SQRT1_2,0],up=[-1/Math.sqrt(6),-1/Math.sqrt(6),Math.sqrt(2/3)],depth=M.cross(right,up);
-  for(const el of parent.children)el.hidden=true;const placed=[];
+  tex($('lorentzFormula'),electric?'\\mathbf F=q(\\mathbf E+\\mathbf v\\times\\mathbf B)':'\\mathbf F=\\mathbf F_B=q(\\mathbf v\\times\\mathbf B)');
+  const c=$('lorentzCanvas'),g=c.getContext('2d'),[w,h]=size(c),parent=$('lorentzMath'),right=[Math.cos(lorentzYaw),-Math.sin(lorentzYaw),0],up=[-Math.sin(lorentzYaw)*Math.sin(lorentzTilt),-Math.cos(lorentzYaw)*Math.sin(lorentzTilt),Math.cos(lorentzTilt)],depth=M.cross(right,up);
+  for(const el of parent.children)el.hidden=true;const placed=[],segments=[];
   function vector(key,value,origin,color,zeroTolerance=0,length=78){
    const norm=M.norm(value),zero=norm<=zeroTolerance,unit=zero?[0,0,0]:value.map(v=>v/norm),dx=M.dot(unit,right),dy=-M.dot(unit,up),projected=Math.hypot(dx,dy);
    let tip=[origin[0]+length*dx,origin[1]+length*dy],labelPoint;
-   if(zero){labelPoint=[origin[0]+(key==='b'?-12:18),origin[1]+(key==='b'?-29:31)];}
+   if(zero)return;
    else if(projected<.12){g.strokeStyle=color;g.lineWidth=1.3;g.beginPath();g.arc(...origin,4,0,2*Math.PI);g.stroke();if(M.dot(unit,depth)>0){g.fillStyle=color;g.beginPath();g.arc(...origin,1.5,0,2*Math.PI);g.fill();}else{line(g,[origin[0]-3,origin[1]-3],[origin[0]+3,origin[1]+3],color);line(g,[origin[0]-3,origin[1]+3],[origin[0]+3,origin[1]-3],color);}labelPoint=[origin[0]+12,origin[1]-12];}
-   else{arrow(origin,tip,color,g);labelPoint=[tip[0]+8*dx/projected,tip[1]+8*dy/projected];}
-   const symbol={v:'\\boldsymbol v',b:'\\boldsymbol B',fb:'\\boldsymbol F_B',e:'\\boldsymbol E',fe:'\\boldsymbol F_E',f:'\\boldsymbol F',c:'\\boldsymbol v\\times\\boldsymbol B'}[key],el=label(parent,key,symbol+(zero?'=0':''),Math.max(17,Math.min(w-17,labelPoint[0])),Math.max(12,Math.min(h-12,labelPoint[1])));el.style.color=color;el.hidden=false;
-   const hw=key==='c'?38:zero?24:key==='fb'||key==='fe'?15:10,hh=10,preferred=[parseFloat(el.style.left),parseFloat(el.style.top)],offsets=[[0,0],[-12,0],[12,0],[0,-22],[0,22],[-24,0],[24,0],[-12,-22],[12,22]];
-   let point=preferred;for(const offset of offsets){const candidate=[Math.max(hw+2,Math.min(w-hw-2,preferred[0]+offset[0])),Math.max(hh+2,Math.min(h-hh-2,preferred[1]+offset[1]))];if(!placed.some(p=>Math.abs(p.x-candidate[0])<p.hw+hw+2&&Math.abs(p.y-candidate[1])<p.hh+hh+2)){point=candidate;break;}}
+   else{arrow(origin,tip,color,g,1.8);const gap=key==='fb'||key==='fe'?26:22;labelPoint=[tip[0]+gap*dx/projected,tip[1]+gap*dy/projected];}
+   segments.push([origin,tip]);
+   const symbol={v:'\\mathbf v',b:'\\mathbf B',fb:'\\mathbf F_B',e:'\\mathbf E',fe:'\\mathbf F_E',f:'\\mathbf F',c:'\\mathbf v\\times\\mathbf B'}[key],el=label(parent,key,symbol+(zero?'=0':''),Math.max(17,Math.min(w-17,labelPoint[0])),Math.max(12,Math.min(h-12,labelPoint[1])));el.style.color=color;el.hidden=false;
+   const hw=key==='fb'||key==='fe'?15:10,hh=10,preferred=[parseFloat(el.style.left),parseFloat(el.style.top)],offsets=[[0,0],[-12,0],[12,0],[0,-22],[0,22],[-24,0],[24,0],[-12,-22],[12,22]];
+   let point=preferred;for(const offset of offsets){const candidate=[Math.max(hw+2,Math.min(w-hw-2,preferred[0]+offset[0])),Math.max(hh+2,Math.min(h-hh-2,preferred[1]+offset[1]))];const hitsArrow=segments.some(([a,b])=>[.15,.3,.5,.7,.9,1].some(t=>Math.abs(a[0]+(b[0]-a[0])*t-candidate[0])<hw+3&&Math.abs(a[1]+(b[1]-a[1])*t-candidate[1])<hh+3));if(!hitsArrow&&!placed.some(p=>Math.abs(p.x-candidate[0])<p.hw+hw+2&&Math.abs(p.y-candidate[1])<p.hh+hh+2)){point=candidate;break;}}
    el.style.left=point[0]+'px';el.style.top=point[1]+'px';placed.push({x:point[0],y:point[1],hw,hh});
   }
-  const origin=[w*.5,110],point=v=>[origin[0]+M.dot(v,right),origin[1]-M.dot(v,up)];
+  const origin=[w*.5,108],point=v=>[origin[0]+M.dot(v,right),origin[1]-M.dot(v,up)];
   // A quiet Cartesian ground grid and full x/y/z axes make handedness visible.
   for(const coordinate of [-60,-30,0,30,60]){line(g,point([-60,coordinate,0]),point([60,coordinate,0]),'#e7ecef',.7);line(g,point([coordinate,-60,0]),point([coordinate,60,0]),'#e7ecef',.7);}
   if(M.norm(fields.B)&&M.norm(state.v)){const vu=state.v.map(v=>v/M.norm(state.v)*64),bu=fields.B.map(v=>v/M.norm(fields.B)*64),plane=[[0,0,0],vu,vu.map((v,k)=>v+bu[k]),bu].map(point);g.fillStyle='rgba(53,106,195,.055)';g.beginPath();g.moveTo(...plane[0]);for(const p of plane.slice(1))g.lineTo(...p);g.closePath();g.fill();}
-  for(const [axis,key]of [[[1,0,0],'x'],[[0,1,0],'y'],[[0,0,1],'z']]){line(g,point(axis.map(v=>-v*80)),origin,'#c6d0d6',.8,[3,4]);arrow(origin,point(axis.map(v=>v*108)),'#a2b0b8',g);const p=point(axis.map(v=>v*123)),el=label(parent,'axis-'+key,key,p[0],p[1]);el.style.color='#788a95';el.hidden=false;placed.push({x:p[0],y:p[1],hw:9,hh:10});}
+  for(const [axis,key]of [[[1,0,0],'x'],[[0,1,0],'y'],[[0,0,1],'z']]){line(g,point(axis.map(v=>-v*64)),origin,'#c6d0d6',.8,[3,4]);const end=point(axis.map(v=>v*94));line(g,origin,end,'#b1bec6',.9);arrow(point(axis.map(v=>v*88)),end,'#b1bec6',g);const p=point(axis.map(v=>v*(key==='z'?113:125))),el=label(parent,'axis-'+key,key,p[0],p[1]);el.style.color='#788a95';el.hidden=false;placed.push({x:p[0],y:p[1],hw:9,hh:10});}
   g.fillStyle='#596e78';g.beginPath();g.arc(...origin,2.5,0,2*Math.PI);g.fill();
   vector('v',state.v,origin,'#b17b2c');vector('b',fields.B,origin,HiFyzikoParticleStyle.fields.magnetic,0,62);
   vector('c',product,origin,'#198476',M.norm(state.v)*M.norm(fields.B)*1e-10,90);vector('fb',magneticForce,origin,'#925daa',magneticTolerance,58);
-  if(electric){const heading=label(parent,'electric-heading','\\text{Elektrická část a výsledná síla}',w/2,194);heading.style.color='#687d88';heading.hidden=false;vector('e',fields.E,[w*.21,230],HiFyzikoParticleStyle.fields.electric,0,28);vector('fe',electricForce,[w*.5,230],'#ad6528',0,28);vector('f',magneticForce.map((v,k)=>v+electricForce[k]),[w*.79,230],'#314c59',magneticTolerance,28);}
-  else{const zero=label(parent,'magnetic-heading','\\text{Magnetická část}',w/2,222);zero.style.color='#687d88';zero.hidden=false;}
-  tex($('lorentzRelation'),config.q<0?'q<0:\\quad\\boldsymbol F_B\\;\\text{proti}\\;\\boldsymbol v\\times\\boldsymbol B':'q>0:\\quad\\boldsymbol F_B\\;\\text{ve směru}\\;\\boldsymbol v\\times\\boldsymbol B');
+  if(electric){vector('e',fields.E,[w*.21,198],HiFyzikoParticleStyle.fields.electric,0,24);vector('fe',electricForce,[w*.5,198],'#ad6528',0,24);vector('f',magneticForce.map((v,k)=>v+electricForce[k]),[w*.79,198],'#314c59',magneticTolerance,24);}
+    const noB=M.norm(fields.B)===0,noMag=M.norm(magneticForce)<=magneticTolerance;
+  const legend={b:['\\mathbf B'+(noB?'=0':''),HiFyzikoParticleStyle.fields.magnetic],c:['\\mathbf c=\\mathbf v\\times\\mathbf B'+(noMag?'=0':''),'#198476'],fb:['\\mathbf F_B'+(noMag?'=0':'=q\\mathbf c'),'#925daa'],fe:['\\mathbf F_E=q\\mathbf E','#ad6528'],f:['\\mathbf F=\\mathbf F_E+\\mathbf F_B','#314c59']};
+  for(const [key,[formula,color]]of Object.entries(legend)){tex($('lorentzKey-'+key),formula);$('lorentzKey-'+key).style.color=color;}
+  $('lorentzItem-fe').hidden=$('lorentzItem-f').hidden=!electric;
  }
  function render(){
   if(disposed||!config)return;[width,height]=size(canvas);const i=Math.min(samples.length-1,Math.max(0,Math.floor(frame))),s=samples[i];drawField();
@@ -182,7 +185,7 @@
   const centerOn=$('centers').checked;if(centerOn)drawGyrationCircle(s);
   const p=project(s.r);if(centerOn&&s.center){const c=project(s.center);line(ctx,p,c,'rgba(22,125,115,.2)',.7,[3,6]);ctx.beginPath();ctx.arc(...c,3,0,2*Math.PI);ctx.strokeStyle='rgba(22,125,115,.5)';ctx.lineWidth=1;ctx.stroke();}
   const velScale=config.length*.95/config.speed,tip=project(s.r.map((r,k)=>r+s.v[k]*velScale));
-  if($('vectors').checked){arrow(p,tip,'#b17b2c');label($('sceneMath'),'v','\\boldsymbol v',tip[0]+12,tip[1]-12);const f=M.norm(s.force);const old=$('sceneMath').querySelector('[data-key="f"]');if(f){const fp=project(s.r.map((r,k)=>r+s.force[k]/f*config.length*.7));arrow(p,fp,'#925daa');label($('sceneMath'),'f','\\boldsymbol F',fp[0]+12,fp[1]-10);}else old?.remove();}else{for(const key of ['v','f'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();}
+  if($('vectors').checked){arrow(p,tip,'#b17b2c');label($('sceneMath'),'v','\\mathbf v',tip[0]+12,tip[1]-12);const f=M.norm(s.force);const old=$('sceneMath').querySelector('[data-key="f"]');if(f){const fp=project(s.r.map((r,k)=>r+s.force[k]/f*config.length*.7));arrow(p,fp,'#925daa');label($('sceneMath'),'f','\\mathbf F',fp[0]+12,fp[1]-10);}else old?.remove();}else{for(const key of ['v','f'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();}
   const glyphs=[{id:config.species,x:p[0],y:p[1],radius:12,vibration:0}];
   for(let j=0;j<companions.length;j++){const item=companions[j],state=item.samples.at(-1),xy=project(state.r);drawTail(item.samples.length-1,item.samples,item.config.timePeriod);if(centerOn)drawGyrationCircle(state);if(!view){ctx.beginPath();ctx.fillStyle=item.config.q>0?'#d74732':'#126bc3';ctx.arc(...xy,7,0,2*Math.PI);ctx.fill();}glyphs.push({id:item.config.species,x:xy[0],y:xy[1],radius:12,vibration:0});label($('sceneMath'),'companion'+j,{electron:'\\mathrm e^-',proton:'\\mathrm p^+',deuteron:'\\mathrm D^+',alpha:'{}^4\\mathrm{He}^{2+}'}[item.config.species],xy[0],xy[1]-25);}
   const electron=config.species==='electron'?s:companions.find(item=>item.config.species==='electron')?.samples.at(-1);if(electron)electronDetail(electron,glyphs);else for(const key of ['electronZoomTitle','electronZoomRadius'])$('sceneMath').querySelector('[data-key="'+key+'"]')?.remove();
@@ -191,7 +194,7 @@
   const comparing=config.mode==='gyration';$('comparison').hidden=!comparing;graph.hidden=comparing;$('graphMath').hidden=comparing;$('graphLegend').hidden=comparing;$('graphTitle').textContent=comparing?'Porovnání částic':'Příčný pohyb';if(comparing){$('axisNotice').hidden=true;drawComparison();}else drawGraph(i);tex($('timeValue'),quantity(s.t*1e6,'\\mu s'));tex($('rateValue'),num(animationRate())+'\\times');
   if(!$('readouts').children.length)for(let j=0;j<4;j++)$('readouts').append(document.createElement('div'));
   drawScale();drawLorentz(s);
-  const values=['E_k='+quantity(s.energy,'eV'),s.center?'r_L='+quantity(s.rho,'m'):'B=0','|\\boldsymbol v_d|='+quantity(M.norm(s.drift),'m\\,s^{-1}'),'T_c='+(Number.isFinite(config.period)?quantity(config.period*1e6,'\\mu s'):'\\infty')];values.forEach((t,j)=>tex($('readouts').children[j],t));
+  const values=['E_k='+quantity(s.energy,'eV'),s.center?'r_L='+quantity(s.rho,'m'):'B=0','|\\mathbf v_d|='+quantity(M.norm(s.drift),'m\\,s^{-1}'),'T_c='+(Number.isFinite(config.period)?quantity(config.period*1e6,'\\mu s'):'\\infty')];values.forEach((t,j)=>tex($('readouts').children[j],t));
   const status=!config.B?'Magnetické pole je vypnuté. Částice se pohybuje přímo.':ended?'Částice opustila pole. Pokus skončil.':config.mode==='entry'?(s.center?'Částice se stáčí; magnetické pole nekoná práci.':i?'Mimo pole pokračuje částice přímo.':'Připraveno k vletu do magnetického pole.'):config.mode==='electric'?'Směr elektrického driftu nezávisí na náboji.':config.mode==='gradient'?'Změna znaménka náboje obrací směr driftu.':config.mode==='curvature'?'Drift směřuje kolmo k rovině kruhových siločar.':'Bez příčného driftu. Podélný pohyb se zachovává.';
   $('status').textContent=status;if($('status').scrollHeight>$('status').clientHeight||$('status').scrollWidth>$('status').clientWidth)$('status').textContent='';
  }
@@ -233,6 +236,11 @@
   render();
  };
  $('species').onchange=()=>{if(config.mode==='entry')liveChange();else{syncElectricLimits(true);prepare();}};$('mode').onchange=()=>{config.start=$('mode').value==='entry'?[-3,0]:[0,0];$('pitch').value=$('mode').value==='curvature'?'65':'0';syncMagneticRange();syncElectricLimits(true);prepare();};$('reverse').onclick=()=>{fieldSign=-fieldSign;liveChange();};$('vectors').onchange=render;$('centers').onchange=render;
+ const forceCanvas=$('lorentzCanvas');
+ forceCanvas.onpointerdown=event=>{lorentzDrag={x:event.clientX,y:event.clientY,yaw:lorentzYaw,tilt:lorentzTilt};forceCanvas.setPointerCapture(event.pointerId);event.preventDefault?.();};
+ forceCanvas.onpointermove=event=>{if(!lorentzDrag)return;const scale=forceCanvas.clientWidth/forceCanvas.getBoundingClientRect().width;lorentzYaw=lorentzDrag.yaw+(event.clientX-lorentzDrag.x)*scale*.008;lorentzTilt=Math.max(.18,Math.min(1.25,lorentzDrag.tilt+(event.clientY-lorentzDrag.y)*scale*.006));render();};
+ forceCanvas.onpointerup=forceCanvas.onpointercancel=()=>{lorentzDrag=null;};
+ forceCanvas.ondblclick=()=>{lorentzYaw=.7;lorentzTilt=.55;render();};
  $('lorentzPanel').ontoggle=()=>{if($('lorentzPanel').open)render();};
  $('help').onclick=()=>{playing=false;$('play').textContent='Spustit';$('guide').showModal();};$('closeHelp').onclick=()=>$('guide').close();
  const point=event=>{const r=canvas.getBoundingClientRect();return [(event.clientX-r.left)*width/r.width,(event.clientY-r.top)*height/r.height];};
