@@ -1,5 +1,21 @@
 # Aktuální stav předání
 
+## Tišší zvuk pouze při rychlém otáčení — 17. listopadu 2026
+
+Nejnovější pokyn uživatele nahrazuje předchozí popis zvuku níže:
+zvuk zůstává výchozí zapnutý, ale ozývá se pouze v režimu Točit rychle
+(autoSpeed 7). Ruční posun, pomalý a zatížený běh jsou tiché.
+Také zkušební pulz je omezen na tento režim; přechod jinam, pauza či
+skrytí stránky jej přeruší. Opožděné dokončení inicializace audia po
+přepnutí režimu už nemůže spustit zbylý pulz.
+
+Pro měkčí průlet lopatky je šum vyhlazený a filtrovaný dolní propustí,
+tón sinusový, náběh pomalejší. Hlavní zesílení sníženo z 0,28 na 0,16.
+Fyzikální model a průchody polí se nemění. Rozšířené zvukové i původní
+modelové testy prošly. Plné sestavení aktualizováno a v obou dodaných
+lazy lekcích ověřeno omezení režimu, filtr, tón i nižší zesílení.
+Poslech v prohlížeči nebyl ověřen. Bez publikace a bez push.
+
 ## Výchozí zapnutý a výraznější zvuk polí — 17. listopadu 2026
 
 Na výslovné upřesnění uživatele je zvuk synchronního principu výchozí
