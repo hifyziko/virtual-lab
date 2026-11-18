@@ -183,3 +183,12 @@ SOL nyní odpovídá oblasti otevřeného toku vně uzavřené oblasti uvnitř m
 Primární výklad: Entler–Kindl, Jaderná fúze a fúzní elektrárny, obr. 7.18, s. 158, kap. 7.11–7.12, s. 158–160; kap. 7.13.1, s. 160. Odborné doplnění: ITER Fusion Glossary (Separatrix/Scrape-off layer), https://www.iter.org/fusion-glossary?field_alphabets_value=S; P. A. Schneider a kol., Differences in the H-mode Pedestal Width of Temperature and Density, EFDA–JET–PR(11)61, https://scipub.euro-fusion.org/wp-content/uploads/2014/11/EFDP11061.pdf, zejména metody určení vrcholu a šířky pedestalu z profilů. Tato práce neposkytuje univerzální hladinu toku pro vnitřní mez okraje.
 
 Tlačítka zůstávají funkčními rychlými volbami jedné křivky, nově Vnitřní povrch / Separatrix / Siločára v SOL. Nezapínají regiony a nemění plazmovou obálku. Canvasová regrese kontroluje pixely SOL pouze pro psi_N>1 včetně hodnot nad 1,09 a žluté zvýraznění pouze pro psi_N<1. Prošly i testy 97 rovnováh, Three geometrií, aktivních cívek, dvojkliku a matematické sazby. Náhled řezu 380×540 vizuálně prohlédnut s přibližnou textovou vrstvou, skutečný WebGL v prohlížeči nebyl nově otevřen.
+
+
+### Čtyři větve separatrix a výplň SOL (18. 11. 2026)
+
+Modré šrafování celé otevřené oblasti nahrazeno jednotnou jemnou výplní se shodným klíčem legendy. Výklad výslovně ztotožňuje výplň s oblastí příkladových modrých siločar; nevytváří další vrstvu mezi nimi a první stěnou. Výplň neurčuje hustotu ani transportní šířku.
+
+Pro kresbu separatrix se tok interpoluje po částech kubicky a lokálně navazuje hodnotou i nulovým gradientem na exportovaný X-bod. Korekce s hladkým útlumem končí dvě původní buňky od X-bodu. Jemná kreslicí síť zachovává čtyři větve se společným průsečíkem; odstraněna druhá obrysová čára na hladině 0,999 a umělá značka křížku. Vnitřní hladina nadále slouží pouze výplni a prostorové obálce. Statická GS data, vyhodnocení pole a fyzikální integrátor beze změn; jde o rekonstrukci kontury z konečné sítě. Prostorová siločára se v X-bodě sama nekříží.
+
+Regrese všech 97 rovnováh ověřuje čtyři větve v exportovaném X-bodě, dva různé směry křížení, protilehlé tečny a shodu s uloženým normalizovaným tokem do 0,001. Test modelu i skutečný canvas prošly. Vizuálně prohlédnut náhled řezu 380 × 540 s přibližnou textovou vrstvou; nejde o HTML/WebGL screenshot.
