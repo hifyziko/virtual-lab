@@ -1,5 +1,21 @@
 # Aktuální stav předání
 
+## Spodní mezera magnetického udržení — 18. listopadu 2026
+
+Na pokyn uživatele zmenšena časová lišta z 37 na 24 logických pixelů
+a odstup nad ní z 10 na 4. Odstup hlavičky zůstává 10; pracovní plocha
+1360 × 820 i automatické měřítko jsou zachované. Scéna a levý graf získají
+19 pixelů výšky v základním měřítku. V režimu uzavírání do toroidu je
+lišta dál skrytá a její nová mezera se neuplatní. Výpočty ani ovládání
+se nemění. Úprava je omezená na CSS modulu fu04-udrzeni.
+
+Obě aktivní dodávky včetně lazy balíčku aktualizované komponentovým
+sestavením build-particle-library.cjs; jejich CSS se shoduje se zdrojem.
+Celé tools/project/check.cjs prošlo včetně škálování, udržení, helicity,
+ovladačů, načítání a auditu. Prohlížeč nebyl spuštěn, jde o kontrolu zdrojů
+a automatické testy, nikoli vizuální ověření. Bez pushe.
+
+
 ## Oprava načítání a využití plochy — 17. listopadu 2026
 
 Helicita dříve načítala všech 18 datových souborů (284 MB); veřejný výběr
