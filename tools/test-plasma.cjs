@@ -1,6 +1,9 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const P=require('../versions/vyvoj/m_files/fusion/plasma/model.js');
+// The bound marker follows its atom, advances only with model time, and is
+// released at that same position without adding a free charge beforehand.
+{const m=new P.Model(),a=m.atoms[0],first=m.boundElectron(a);assert.equal(m.particles().length,1);m.step(.04);const bound=m.boundElectron(a);assert(Math.abs(Math.hypot(bound.x-a.ion.x,bound.y-a.ion.y)-m.boundRadius)<1e-12);assert(bound.angle>first.angle);assert.deepEqual(m.boundElectron(a),bound);m.setTemperature(1.2);m.equilibrate();assert.equal(a.electron.x,bound.x);assert.equal(a.electron.y,bound.y);assert((a.electron.vx-a.ion.vx)*(bound.x-a.ion.x)+(a.electron.vy-a.ion.vy)*(bound.y-a.ion.y)>0);m.setTemperature(.2);m.equilibrate();assert.equal(a.electron,null);assert.equal(m.particles().length,1);assert.deepEqual(m.boundElectron(a),bound);console.log('PASS: bound electron orbit, release continuity and restored neutral marker.');}
 assert(P.saha(.2)<1e-9);assert(P.saha(2)>.999);let prev=0;for(let T=.15;T<3;T+=.01){const a=P.saha(T);assert(a>=prev&&a<=1);prev=a;}
 // Magnetic rotation preserves kinetic energy, reverses with charge and ignores neutrals.
 for(const q of [-1,0,1]){const v=P.rotate(2,3,q,1,6,.02);assert(Math.abs(v[0]**2+v[1]**2-13)<1e-12);const back=P.rotate(...v,q,1,-6,.02);assert(Math.hypot(back[0]-2,back[1]-3)<1e-12);if(q===0)assert.deepEqual(v,[2,3]);}
@@ -55,4 +58,4 @@ const bounds={x:30,y:20,width:180,height:110},gradients=[];const maskContext=new
 
 
 
-{for(let seed=1;seed<=20;seed++){const m=new P.Model();m.seed=seed;m.setTemperature(1.2);m.equilibrate();m.collisions=false;const a=m.atoms[0],i=a.ion,e=a.electron,r=Math.hypot(e.x-i.x,e.y-i.y),mu=i.m*e.m/(i.m+e.m),energy=.5*mu*((e.vx-i.vx)**2+(e.vy-i.vy)**2)-.55/Math.sqrt(r*r+.14*.14);assert(energy>0);for(let n=0;n<500;n++)m.step(.002);assert(Math.hypot(e.x-i.x,e.y-i.y)>r+1,'Freshly ionized isolated pair separates');}console.log('PASS: positive relative escape energy and integrated separation for 20 initial states.');}
+{for(let seed=1;seed<=20;seed++){const m=new P.Model();m.seed=seed;m.setTemperature(1.2);m.equilibrate();m.collisions=false;const a=m.atoms[0],i=a.ion,e=a.electron,r=Math.hypot(e.x-i.x,e.y-i.y),mu=i.m*e.m/(i.m+e.m),energy=.5*mu*((e.vx-i.vx)**2+(e.vy-i.vy)**2)-.55/Math.sqrt(r*r+.14*.14);assert(energy>0);for(let n=0;n<1000;n++)m.step(.002);assert(Math.hypot(e.x-i.x,e.y-i.y)>r+1,'Freshly ionized isolated pair separates');}console.log('PASS: positive relative escape energy and integrated separation for 20 initial states.');}

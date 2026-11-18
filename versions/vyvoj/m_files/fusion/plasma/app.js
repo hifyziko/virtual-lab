@@ -24,8 +24,9 @@ $('play').onclick=()=>{running=!running;$('play').textContent=running?'Pozastavi
 $('reset').onclick=()=>{model=new P.Model();$('playback').value=1;zoom=1;viewX=P.width/2;viewY=P.height/2;sign=1;running=true;$('count').value=1;$('temperature').value=.2;$('magnet').checked=false;$('b').value=6;$('mutual').checked=true;$('fields').checked=true;$('trails').checked=true;$('collisions').checked=true;$('lines').checked=true;$('lineDensity').value=1;$('centers').checked=false;$('play').textContent='Pozastavit';readouts();draw();};
 $('help').onclick=()=>$('guide').showModal();$('closeHelp').onclick=()=>$('guide').close();
 function surface(c,context){const w=c.clientWidth,h=c.clientHeight,d=Math.min((devicePixelRatio||1)*c.getBoundingClientRect().width/w,Math.sqrt(8000000/(w*h)));if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d);}context.setTransform(d,0,0,d,0,0);context.clearRect(0,0,w,h);return [w,h];}
+function sphere(x,y,r,color,edge){const fill=ctx.createRadialGradient(x-r*.3,y-r*.4,0,x,y,r);fill.addColorStop(0,'#ffffff');fill.addColorStop(.3,color);fill.addColorStop(1,edge);ctx.save();ctx.fillStyle=fill;ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fill();ctx.restore();}
 function draw(){const [w,h]=surface(canvas,ctx),scale=Math.min(w/(P.width*cameraExtent),h/(P.height*cameraExtent))*zoom,ox=w/2-viewX*scale,oy=h/2-(P.height-viewY)*scale,X=x=>ox+x*scale,Y=y=>oy+(P.height-y)*scale,ps=model.particles();
- const radius=(model.atoms.length===1?18:Math.max(6,13-model.atoms.length*.075))*zoom;
+ const radius=model.boundRadius*scale/1.575;
  if($('fields').checked){ctx.save();fieldView.draw(ctx,w,h,ps.map(p=>({x:X(p.x),y:Y(p.y),q:p.q,cloud:0})),scale,running,[viewX,viewY].join('/'),{x:ox,y:oy,width:P.width*scale,height:P.height*scale},$('lines').checked,Number($('lineDensity').value));ctx.restore();}
  $('fieldScale').hidden=!$('fields').checked;
  ctx.save();
@@ -36,8 +37,9 @@ function draw(){const [w,h]=surface(canvas,ctx),scale=Math.min(w/(P.width*camera
   const halo=ctx.createRadialGradient(x,y,outline*.6,x,y,r);halo.addColorStop(0,'rgba(255,255,255,.94)');halo.addColorStop(.65,'rgba(255,255,255,.8)');halo.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=halo;ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fill();
   const cloud=ctx.createRadialGradient(x,y,0,x,y,outline);cloud.addColorStop(0,'#ede8f5');cloud.addColorStop(.65,'#d9cdebbf');cloud.addColorStop(1,'#b6a2ce85');ctx.fillStyle=cloud;ctx.beginPath();ctx.arc(x,y,outline,0,2*Math.PI);ctx.fill();ctx.strokeStyle='#fffffff2';ctx.lineWidth=3.5;ctx.stroke();ctx.strokeStyle='#74608e';ctx.lineWidth=1.3;ctx.stroke();
  }
- const r=p.q<0?radius*.52:p.q>0?radius*.7:radius*.38,fill=ctx.createRadialGradient(x-r*.3,y-r*.4,0,x,y,r);fill.addColorStop(0,'#ffffff');fill.addColorStop(.3,p.q===0?'#eb746c':color);fill.addColorStop(1,p.q<0?'#154776':'#942b35');ctx.save();ctx.fillStyle=fill;ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fill();ctx.restore();
+ const r=p.q<0?radius*.52:p.q>0?radius*.7:radius*.38;sphere(x,y,r,p.q===0?'#eb746c':color,p.q<0?'#154776':'#942b35');
  }
+ for(const a of model.atoms)if(!a.electron){const e=model.boundElectron(a);sphere(X(e.x),Y(e.y),radius*.52,'#126bc3','#154776');}
  const ions=model.atoms.filter(a=>a.electron);if($('centers').checked&&ions.length){ctx.save();ctx.setLineDash([5,6]);ctx.lineWidth=1.8;for(const [key,color] of [['ion','#b43128'],['electron','#126bc3']]){const x=X(ions.reduce((sum,a)=>sum+a[key].x,0)/ions.length);ctx.strokeStyle=color;ctx.beginPath();ctx.moveTo(x,Y(P.height));ctx.lineTo(x,Y(0));ctx.stroke();}ctx.restore();}
  ctx.restore();}
 function cameraScale(){return Math.min(canvas.clientWidth/(P.width*cameraExtent),canvas.clientHeight/(P.height*cameraExtent))*zoom;}

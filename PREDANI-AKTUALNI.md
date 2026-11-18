@@ -3150,3 +3150,17 @@ Oprava dodávky plazmatu: po cílených změnách je nutné vždy spustit
 tools/build-progressive-web.cjs; rozcestník načítá zabalený dokument,
 nikoli přímo fuze-plazma/index.html. Oba balíky nyní přestavěny a
 ověřena přítomnost lineDensity i opravy únikové energie v lazy modulu.
+
+
+## Obíhající elektron v modulu Plyn a plazma — 18. listopadu 2026
+
+Neutrální atom má modrý elektron na obvodu obalu. Fáze oběhu používá
+čas modelu, takže respektuje pauzu i rychlost přehrávání. Při ionizaci
+se volný elektron připraví přímo v poloze vázané značky a pokračuje
+radiálně ven se zachovanou přípravou únikové energie a zpětného rázu.
+Poloměr obalu je společný pro model a kreslení, nezávislý na kameře.
+Vázaná značka není volný náboj ani zdroj elektrického pole. Výklad
+výslovně odlišuje názorné obíhání od skutečné trajektorie v atomu.
+Regrese plazmatu prošla včetně návaznosti uvolnění a dvaceti únikových
+stavů; pro větší počáteční vzdálenost ověřuje odtržení po delším čase.
+Prohlížeč automaticky neotevřen; vzhled v prohlížeči neověřen. Bez pushe.
