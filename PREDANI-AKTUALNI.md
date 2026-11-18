@@ -3164,3 +3164,5 @@ výslovně odlišuje názorné obíhání od skutečné trajektorie v atomu.
 Regrese plazmatu prošla včetně návaznosti uvolnění a dvaceti únikových
 stavů; pro větší počáteční vzdálenost ověřuje odtržení po delším čase.
 Prohlížeč automaticky neotevřen; vzhled v prohlížeči neověřen. Bez pushe.
+
+18. 11. 2026 — Plyn a plazma: zmenšen poloměr vázaného i volného elektronu z 0,52 na 0,20 násobku základní kreslicí velikosti. Vázaný elektron má přibližně polovinu průměru protonu v atomu (0,20 / 0,38); při ionizaci se jeho velikost nemění. Obě aktuální dodávky včetně lazy balíků přestavěny. Kontroly plazmatu, syntaxe a progressive prošly; bez pushe.

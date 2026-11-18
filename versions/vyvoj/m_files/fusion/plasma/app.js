@@ -37,9 +37,9 @@ function draw(){const [w,h]=surface(canvas,ctx),scale=Math.min(w/(P.width*camera
   const halo=ctx.createRadialGradient(x,y,outline*.6,x,y,r);halo.addColorStop(0,'rgba(255,255,255,.94)');halo.addColorStop(.65,'rgba(255,255,255,.8)');halo.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=halo;ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fill();
   const cloud=ctx.createRadialGradient(x,y,0,x,y,outline);cloud.addColorStop(0,'#ede8f5');cloud.addColorStop(.65,'#d9cdebbf');cloud.addColorStop(1,'#b6a2ce85');ctx.fillStyle=cloud;ctx.beginPath();ctx.arc(x,y,outline,0,2*Math.PI);ctx.fill();ctx.strokeStyle='#fffffff2';ctx.lineWidth=3.5;ctx.stroke();ctx.strokeStyle='#74608e';ctx.lineWidth=1.3;ctx.stroke();
  }
- const r=p.q<0?radius*.52:p.q>0?radius*.7:radius*.38;sphere(x,y,r,p.q===0?'#eb746c':color,p.q<0?'#154776':'#942b35');
+ const r=p.q<0?radius*.20:p.q>0?radius*.7:radius*.38;sphere(x,y,r,p.q===0?'#eb746c':color,p.q<0?'#154776':'#942b35');
  }
- for(const a of model.atoms)if(!a.electron){const e=model.boundElectron(a);sphere(X(e.x),Y(e.y),radius*.52,'#126bc3','#154776');}
+ for(const a of model.atoms)if(!a.electron){const e=model.boundElectron(a);sphere(X(e.x),Y(e.y),radius*.20,'#126bc3','#154776');}
  const ions=model.atoms.filter(a=>a.electron);if($('centers').checked&&ions.length){ctx.save();ctx.setLineDash([5,6]);ctx.lineWidth=1.8;for(const [key,color] of [['ion','#b43128'],['electron','#126bc3']]){const x=X(ions.reduce((sum,a)=>sum+a[key].x,0)/ions.length);ctx.strokeStyle=color;ctx.beginPath();ctx.moveTo(x,Y(P.height));ctx.lineTo(x,Y(0));ctx.stroke();}ctx.restore();}
  ctx.restore();}
 function cameraScale(){return Math.min(canvas.clientWidth/(P.width*cameraExtent),canvas.clientHeight/(P.height*cameraExtent))*zoom;}
