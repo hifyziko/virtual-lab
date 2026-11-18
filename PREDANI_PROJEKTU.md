@@ -30,6 +30,9 @@ Nikdy nerozbalujte balíček přes jinou rozpracovanou kopii.
    sloučením, nikdy resetem s odstraněním práce ani force pushem.
 4. Upravujte zdroje v `versions/vyvoj/m_files`, nikoli pouze výsledné HTML.
 5. Sestavte `node tools/build-release.cjs`, ověřte `node tools/project/check.cjs`.
+   Úplné sestavení připravuje mezikroky v `tmp/release-build-*`; aktuální
+   rozcestník zůstává dostupný. Teprve kompletní dodávka včetně fúzní navigace
+   a ověřených dat nahradí aktivní index. Zachovat tento postup i u dalších builderů.
 6. Nové veřejné soubory registrujte pomocí `node tools/project/files.cjs add cesta`.
 7. Spusťte `node tools/project/files.cjs stage`, zkontrolujte `git diff --cached`
    a vytvořte místní commit. `git push` až na výslovný pokyn uživatele.

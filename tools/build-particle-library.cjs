@@ -2,7 +2,7 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const root=path.resolve(__dirname,'..'),source=path.join(root,'versions/vyvoj/m_files/fusion');
 require('./build-atom-preview.cjs');
 for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
- const dest=path.join(root,folder),web=path.join(dest,'web'),entries=[];
+ const release=require('./project/release-output.cjs'),dest=folder==='versions/aktualni'?release.current():release.mirror(),web=path.join(dest,'web'),entries=[];
  function copy(dir,prefix,base=dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory()){if(p===path.join(source,'confinement','helicity-data'))continue;copy(p,prefix,base);}else{const rel=prefix+path.relative(base,p).replaceAll('\\','/');let data=fs.readFileSync(p);if(rel.endsWith('.html'))data=Buffer.from(data.toString().replaceAll('../particles/','../shared/particles/').replaceAll('../navigation/','../shared/fusion/').replaceAll('../confinement/','../fuze-udrzeni/'));const out=path.join(web,rel);fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,data);entries.push({path:rel,bytes:data.length,sha256:crypto.createHash('sha256').update(data).digest('hex')});}}}
  copy(path.join(source,'particles'),'shared/particles/');copy(path.join(source,'particle-list'),'fuze-seznam/');copy(path.join(source,'barrier'),'fuze-bariera/');
  copy(path.join(source,'navigation'),'shared/fusion/');copy(path.join(source,'drift'),'fuze-drift/');copy(path.join(source,'confinement'),'fuze-udrzeni/');

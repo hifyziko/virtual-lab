@@ -49,6 +49,11 @@ for(const entry of Lab.modules.values()){
 assert.equal(expectedPages.size,0);
 for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
  const web=path.join(root,folder,'web'),manifest=JSON.parse(fs.readFileSync(path.join(root,folder,'manifest.json'),'utf8'));
+ const hub=fs.readFileSync(path.join(web,'index.html'),'utf8'),navigationOffset=hub.indexOf('<!-- particle-library:start -->');
+ assert(navigationOffset>=0,'Delivered hub includes the fusion navigation, not only its data files');
+ assert(navigationOffset>hub.indexOf('<script id="physics-visual">'),'Fusion home extension is installed after the base physics hub');
+ assert(manifest.progressive&&hub.includes('id="progressive-web-install"'),'Delivered hub is complete before it becomes current');
+ for(const entry of Lab.catalog.filter(e=>e.group==='fusion'))assert(hub.includes("id:'"+entry.id+"'"),'Delivered hub registers '+entry.id);
  const published=new Set(require('./project/common.cjs').webFiles(manifest));
  for(const entry of Lab.modules.values()){
   if(entry.sourceId){assert.deepEqual(manifest.progressive.dependencies[entry.id],['fusion-'+entry.sourceId]);assert(!manifest.progressive.assets['fusion-'+entry.id],'Aliases must share the gallery payload');continue;}

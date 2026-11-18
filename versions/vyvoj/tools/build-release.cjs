@@ -2,7 +2,7 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto'),{execFileSync}=require('child_process');
 const root=path.resolve(__dirname,'..'),version=process.argv[2]||'aktualni',working=version==='aktualni';
 if(!working&&!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(version||''))throw Error('Usage: node tools/build-release.cjs 1.1.0');
-const dest=path.join(root,'versions',version),web=path.join(dest,'web');
+const dest=require('../../../tools/project/release-output.cjs').mirror(version),web=path.join(dest,'web');
 if(!working&&fs.existsSync(dest))throw Error('Version already exists: '+version+'; choose a new version.');
 execFileSync(process.execPath,['m_files/Web/integrate-transformers.cjs'],{cwd:root,stdio:'inherit'});
 execFileSync(process.execPath,['m_files/Web/build-compact-delivery.cjs'],{cwd:root,stdio:'inherit'});

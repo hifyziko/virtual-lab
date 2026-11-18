@@ -35,6 +35,7 @@
     "tools/precompute-tokamak-equilibrium.py",
     "tools/progressive-loader.css",
     "tools/progressive-loader.js",
+    "tools/project/release-output.cjs",
     "tools/scene-loading.js",
     "tools/test-commutation.cjs",
     "tools/test-confinement-atlas.cjs",

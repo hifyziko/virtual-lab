@@ -3,7 +3,8 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const visual=process.argv.includes('--visual');
 const activate=process.argv.includes('--activate');
 const root=path.resolve(__dirname,'..'),version=activate?'aktualni':visual?'1.8.0-fyzika-vizual':'1.8.0-fyzika-preview';
-const source=path.join(root,'versions/aktualni'),dest=path.join(root,'versions',version);
+const release=require('./project/release-output.cjs');
+const source=release.current(),dest=activate?release.current():path.join(root,'versions',version);
 if(fs.existsSync(dest)&&!activate&&!process.argv.includes('--update-preview'))throw Error('Preview already exists; pass --update-preview to update this experimental preview only.');
 let html=fs.readFileSync(path.join(source,'web/index.html'),'utf8');
 html=html.replace(/<style id="physics-(?:preview|visual)-style">[\s\S]*?<\/style>/g,'').replace(/<script id="physics-(?:preview|visual)">[\s\S]*?<\/script>/g,'');
@@ -45,7 +46,7 @@ fs.writeFileSync(path.join(dest,'CTETE.txt'),'Zkušební členění Virtuální 
 console.log(JSON.stringify({version,files:files.length,entry:path.join(dest,'web/index.html')}));
 if(activate){
  fs.writeFileSync(path.join(dest,'CTETE.txt'),'Virtuální laboratoř fyziky — verze 1.0. Otevřete web/index.html. Sestavení z kořene projektu: node tools/build-release.cjs. Schválený vizuální rozcestník se přidává automaticky. Elektrostatika a plazma/fúze jsou zatím náměty.');
- const mirror=path.join(root,'versions/vyvoj/versions/aktualni');
+ const mirror=release.mirror();
  fs.cpSync(path.join(dest,'web'),path.join(mirror,'web'),{recursive:true});
  for(const name of ['manifest.json','CTETE.txt'])fs.copyFileSync(path.join(dest,name),path.join(mirror,name));
 }

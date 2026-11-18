@@ -1,5 +1,190 @@
 # Aktuální stav předání
 
+## Předání na druhý počítač — 18. listopadu 2026
+
+Uživatel výslovně požádal o soukromý ZIP a push, v pořadí nejprve
+ověřený ZIP, poté push. Archiv proto může mít pushPending=true;
+to zachycuje okamžik balení před následným odesláním stejného commitu.
+Kompletní sestavení a tools/project/check.cjs prošly před balením.
+Přesný commit je v _handoff/state.json. Aktuální plazma obsahuje hustotu
+siločar 0,5–4× a opravenou únikovou energii ionizované dvojice.
+Z pozorování kmitání zůstaly jen volitelné svislice středů, výchozí vypnuté.
+Součástí předání jsou i aktuální úpravy divertoru, synchronizace
+a izolované sestavení, které zachovává dostupný rozcestník.
+Na novém počítači rozbalit do nové složky a spustit
+node tools/project/restore.cjs; potom přečíst pravidla a ověřit stav Gitu.
+
+
+## Uvolnění elektronů při ionizaci — 18. listopadu 2026
+
+Opravena příprava nového elektronu: radiální relativní rychlost zahrnuje
+únikovou energii měkkého Coulombova potenciálu a původní relativní
+kinetickou energii. Zachována hybnost dvojice se zpětným rázem iontu;
+energii dodává modelovaný tepelný rezervoár při změně ionizace.
+Žádná průběžná odpudivá síla ani posouvání vykreslených částic.
+Test dvaceti počátečních stavů ověřuje kladnou relativní energii a
+skutečné odtržení integrované izolované dvojice. To nezaručuje únik
+v magnetickém poli, od stěn ani od dalších nábojů. Rekombinace je nadále
+řízena cílovou ionizací, není řešena mikroskopicky. Výklad doplněn.
+Aktuální výstupy cíleně aktualizovány včetně manifestů; bez pushe.
+
+
+## Zaměření plazmatu na ionizaci — 18. listopadu 2026
+
+Konečné upřesnění: zůstává pouze nezaškrtnutá volba Středy nábojových složek,
+která kreslí dvě svislé čáry bez popisků. Graf a vychýlení odstraněny.
+Uživatel odložil rozvoj kolektivního kmitání. Odstraněny
+značky středů, jejich přepínač, tlačítko vychýlení, graf oddělení nábojů
+a příslušný návod. Priorita je názorné porovnání neutrálního plynu,
+částečné a plné ionizace a reakce částic na pole. Přirozené vzájemné
+síly a srážky zachované. Předchozí návrh PIC nyní není aktivní úkol.
+Test modelu a ovládání prošel; aktualizována aktuální dodávka.
+
+
+## Oprava dočasně chybějících fúzních modulů — 18. listopadu 2026
+
+Příčinou nebylo smazání modulů, ale průběžné přepisování aktivního rozcestníku
+během úplného sestavení: základní mezikrok ještě neobsahoval fúzní navigaci.
+Úplný build nově používá izolované výstupy v tmp/release-build-* pro obě místní
+dodávky. Před zveřejněním ověří přítomnost všech fúzních registrací, jejich
+lazy dat, pořadí rozcestníku a SHA-256 všech souborů. Aktivační HTML nahradí
+atomickým přejmenováním až po nakopírování připravených dat. Neúspěšné sestavení
+ponechá poslední kompletní index. Předchozí lazy payloady zůstávají dostupné
+pro již otevřené stránky. Zámek brání souběhu dvou úplných sestavení.
+
+Nové kontroly v tools/project/test-tools.cjs simulují chybu kopírování,
+neúplný rozcestník a poškozený datový soubor. Test fúzní navigace ověřuje také
+skutečný obsah dodaného indexu. Během nového kompletního sestavení zůstával
+aktivní index s šesti fúzními moduly a kontrola navigace procházela.
+Úplné sestavení s izolovanými výstupy bylo dokončeno a obě aktuální dodávky
+byly úspěšně přepnuty. Dočasné výstupy i zámek byly po dokončení odstraněny.
+
+## Odstranění samostatného kolektivního režimu — 18. listopadu 2026
+
+Podle výslovného pokynu uživatele odstraněn celý samostatný režim Kolektivní
+kmitání: volič, PIC solver, jeho zvláštní vykreslení a předvolby, výklad i testy.
+Zůstává jediný původní 2D model částic, Coulombovy síly, ionizace, srážky a B.
+Přehrávání 0,25–4× je společné, výchozí 1×, maximální krok 0,003.
+Volitelné přerušované svislice ukazují skutečné průměrné vodorovné polohy
+elektronů a iontů (od čtyř dvojic), jejich rozdíl se dál měří v grafu.
+Do dynamiky nebyla přidána žádná společná oscilace ani budicí síla.
+
+Numerická diagnostika: 100 atomů, plná ionizace, B=0, kontakty vypnuté,
+jednorázové posunutí elektronů o 0,65; při t*=3 vychází oddělení 0,0257
+s elektrickou interakcí, 0,6578 bez ní, z totožných počátečních dat.
+Zásadní kontrola: návrat podobné velikosti vzniká i při ponechání interakcí
+pouze uvnitř původních dvojic (přibližně 0,053 při t*=3). Tento výsledek
+NELZE prezentovat jako průkazný kolektivní plazmový kmit. Párově korelovaný
+vznik elektronů a jen sto elektronů jsou významná omezení; šum, kontakty
+a stěny dále zakrývají souhrnnou odezvu. UI výklad toto výslovně uvádí.
+
+Doporučený další fyzikální rozvoj (zatím neimplementován): v tomtéž modelu
+použít početnější výpočetní soubor s vyrovnanou počáteční hustotou a pole
+řešené z hustoty náboje, například 2D PIC/Poisson; zobrazovat jen vzorek
+částic a prostorovou poruchu hustoty. Ověřit konvergenci počtem a krokem,
+energii i rozlišení kolektivní odezvy od párového návratu a odrazů.
+Nevracet samostatnou předepsanou animaci. Doplněk k literatuře:
+MIT OCW 22.611J, Basic plasma concepts (Debye shielding, plasma frequency,
+plasma parameter); Stanford PDML About (mnoho částic v Debyeově sféře).
+https://ocw.mit.edu/courses/22-611j-introduction-to-plasma-physics-i-fall-2006/pages/syllabus/
+https://pdml.stanford.edu/about
+
+Sestavení tools/build-particle-library.cjs dokončeno pro oba výstupy;
+celá sada tools/project/check.cjs prošla včetně auditu veřejných souborů.
+Testy původního modelu a nových měřených značek prošly; kontrola návratu
+porovnává totožná počáteční data, netvrdí průkaz kolektivity. Canvasový
+náhled zkontrolován bez otevření prohlížeče. Bez pushe.
+
+
+## Čitelnější kolektivní pokus — 18. listopadu 2026
+
+Na připomínku malého, pomalého a chaotického pohybu: viditelný vzorek
+zmenšen z 32 na 12 elektronů ve dvou řadách; iontové značky ztlumené,
+jejich záře v PIC režimu vypnutá. Šipky pole řidší, stopy kratší a slabší.
+Všech 4096 makročástic se dál počítá. Parametr počáteční poruchy zvětšen
+z 1,2 na 2; jde o jinou počáteční podmínku, nikoli zesílenou budicí sílu
+během pohybu. Výchozí přehrávání 2×, samostatný posuvník 0,25–4×.
+Maximální integrační krok 0,003 zůstává zachován zvýšením počtu podkroků.
+
+Nepoužitelné ovladače ionizace, počtu, teploty, srážek a B jsou v PIC
+režimu skryté, čímž levý graf získá větší výšku. V původním částicovém
+pokusu jsou zachované. Dokumentace opravena na 12 zobrazených značek.
+Test plazmatu prošel včetně skutečného UI tempa 4× a 0,25× při stejné
+mezní délce integračního kroku. Odchylka energie nového výchozího modelu
+v testovaném intervalu je přibližně 0,058 procenta. Canvasové náhledy
+prohlédnuté; prohlížeč neotevřen. Bez pushe.
+
+## Místní doplnění po pushi 85bb18c — 18. listopadu 2026
+
+Pozadí Divertoru sjednoceno se sdíleným světlým podkladem částicových modulů
+`#f9faf6`; odstraněn samostatný modrošedý gradient za tokamakem. Graf proudů
+a popisky používají bílé podklady. Materiálové odlesky rendereru zachované.
+
+Fialová 3D obálka nyní sleduje separatrix, nikoli vybraný magnetický povrch.
+Výběr povrchu nemění mez uzavřené oblasti; změna rovnováhy proudy nebo tlakem ano.
+Ostrá hranice fialové/žluté na zvolené hladině psi_N=0,90 byla následně odstraněna.
+Okrajová vrstva je schematický plynulý přechod pouze uvnitř separatrix; její
+fyzikální vnitřní mez a šířka nejsou řešeny transportním modelem. SOL je šrafovaná
+oblast otevřených siločar od separatrix po materiálový obrys, bez umělé horní
+meze psi_N=1,09. Předvolby přejmenovány na Vnitřní povrch, Separatrix a Siločára
+v SOL; vybírají jednu křivku, nepřepínají oblasti. Regrese ověřuje umístění
+šrafování vně a žlutého přechodu uvnitř separatrix i neměnnou GPU geometrii
+obálky při výběru a její změnu při ovládání cívek.
+
+Divertor: žlutá okrajová vrstva uvnitř separatrix podle Entler–Kindl, obr. 7.18,
+s. 158; vrstva SOL zůstává vně. Doplněna první stěna a sjednoceno názvosloví.
+Odstraněno číslo 3 a popisek oblasti mezi větvemi; okrajová vrstva má vlastní
+slovní popisek. Přidáno výrazné označení ovládaných PF cívek v řezu a indikace
+cívek mimo detailní záběr, bez automatické změny měřítka. Tlačítko Srovnat
+odstraněno, kameru obnovuje dvojklik v prostoru. Mapa se jmenuje Normalizovaný
+magnetický tok, posuvník Výběr magnetického povrchu; výklad odlišuje tok a indukci.
+Ověřeno na 97 stavech, Three geometrii a canvasových náhledech tří rozměrů.
+Podrobnosti docs/fuze/iter-divertor-2026-11-18.md. Změny jsou místní a vznikly
+po původním ověřeném předávacím ZIPu s commitem 85bb18c. Další push ani balíček
+se nevytvářejí bez nového výslovného pokynu.
+
+## Samokonzistentní kolektivní pokus PIC — 18. listopadu 2026
+
+Na výslovný pokyn uživatele nahrazen předchozí harmonický společný posun
+samokonzistentním 1D elektrostatickým particle-in-cell výpočtem. Každý ze
+4096 elektronových makročástic má vlastní polohu a rychlost. Náboj se
+lineárně přenáší (CIC) na 128 uzlů. Periodická diskrétní Poissonova rovnice
+se řeší FFT; potenciál má nulový střed, E je jeho centrální záporná
+derivace. Stejná CIC váha interpoluje pole k částicím. Posun je integrovaný
+velocity-Verletovou metodou. Normalizace n0=e=me=eps0=omega_pe=1; ionty
+tvoří nehybné homogenní pozadí. Žádná časová sinusovka ani síla úměrná
+předem zadanému společnému posunu se nepoužívá.
+
+Výchozí porucha je prostorová nepravidelná kombinace šesti módů s pevně
+reprodukovatelnými fázemi, amplitudovým parametrem 1,2 a malým rozptylem
+rychlostí 0,06. Uživatelem schválen dobře viditelný, ne extrémní počátek.
+Vychýlit elektrony jednorázově připraví srovnávací jeden sinusový mód;
+další pohyb není buzený. Vypnutí elektrického působení vede k balistickému
+pohybu aktuálními rychlostmi. Vrací se jen 32 vybraných značek; všechny
+makročástice se počítají. Svislé rozložení značek je grafické. Barvy pásů
+odpovídají aktuální rho, šipky lokálnímu vypočtenému E. Graf měří projekci
+na první původní prostorový mód, nikoli společné přikázané vychýlení.
+Obecný částicový pokus, jeho pružné stěny a srážky zůstávají samostatné.
+
+Ověření: prostorové reziduum Poissonovy rovnice <1e-12; náboj a nulový
+střed E. Malá studená porucha (amplituda 0,2) dává periodu 6,285057 proti
+2*pi = 6,283185, přibližně 0,03 procenta odchylky. Sítě 32/64/128 dávají
+6,313539 / 6,290751 / 6,285057: chyba klesá se zjemněním. Max. relativní
+odchylka energie v tomto testu přibližně 0,043 procenta. Testuje se také
+půlení časového kroku, nulová porucha, nezávislý lokální zásah do jedné
+částice a vypnutí pole. Rovnoměrné posunutí všech částic v periodickém
+homogenním pozadí nevytvoří návratovou sílu. Výchozí nepravidelný pokus
+po 120 normalizovaných jednotkách času zůstává konečný a má max. odchylku
+energie přibližně 0,055 procenta. Tyto hodnoty jsou numerické kontroly
+konkrétního omezeného modelu, nikoli validace reálného fúzního plazmatu.
+
+Primární odborné podklady: MIT Hutchinson, kap. 5, s. 101–102 (malá
+plazmová porucha a teoretická frekvence); WarpX 26.01, Electrostatic PIC
+(Poissonovo pole z hustoty makročástic); ParticleInCell.jl, Tutorial:
+Langmuir oscillations (periodický PIC ověřovací pokus). Odkazy přímo
+ve společném výkladu; přesné předpoklady a normalizace doplněny. Canvasové
+náhledy začátku a další fáze prohlédnuty, prohlížeč neotevřen. Bez pushe.
+
 ## Předání na jiný počítač — 18. listopadu 2026
 
 Aktuální sestavení zahrnuje přepracovaný Divertor s parametrickou konstrukcí ITER,
@@ -2936,3 +3121,32 @@ EM krátký balík zkrácen z pěti na dvě periody buzení v CPU i GPU modelu;
 doplněn test klidu zdroje po konci balíku.
 
 18. 11. 2026 — Divertor: po revizi uživatelem jemná technická siločára (1,8 px řez / 2,1 px prostor, úzký světlý lem a malé plné hlavy). Výchozí plazma růžovofialové bez mapy; kvantitativní mapy zůstávají volitelné. Čtyři dolní prvky mají číselné značky a klíč vpravo bez dlouhých křížících se spojnic. Separatrix a SOL mají krátké odkazy. Ověřeno rozložení 380×540, 580×600 a 800×600, canvasové náhledy s přibližným textem prohlédnuty. Test 97 stavů, skutečných Three geometrií a confinement prošel. Podrobnosti docs/fuze/iter-divertor-2026-11-18.md. Bez push.
+
+## 18. listopadu 2026 — viditelný budicí proud při fázování
+
+Uživatel před sepnutím nenašel ovladač budicího proudu: dosud byl nepřímo
+zastoupen ovladačem Napětí generátoru. V modulu sm12-synchronizing je nyní
+přímo posuvník Budicí proud, v poměrné hodnotě Ib/IbN (0,75 až 1,25),
+s vedlejším údajem odpovídajícího sdruženého napětí. Lineární vztah
+Ug/UN=(Ib/IbN)(fg/fN) používá UN=400 V a fN=50 Hz; proud v ampérech
+se bez parametrů budicího vinutí nevymýšlí. Změna frekvence zachovává
+budicí proud a mění napětí. Stávající předvolby zachovávají své elektrické
+počáteční stavy. Po sepnutí je ovladač nadále zamknutý pro pevný záznam.
+Návod výslovně popisuje normalizaci a zanedbání saturace.
+
+Lokální DOM test synchronizing/test-synchronizing-ui.cjs prošel (doplněna
+maketa window.addEventListener pro novější zvukový modul), včetně změn
+buzení před sepnutím, obou spínačů, předvoleb, fázorů a KaTeXu.
+Prohlížeč neotevřen; bez vizuální kontroly a bez pushe.
+
+Dokončení: aktuální dodávka přestavěna; po obnovení manifestu progresivního načítání prošla celá sada tools/project/check.cjs. Bez pushe.
+
+Plazma: doplněn posuvník Hustota siločar 0,5–4×, výchozí 1×.
+Mění počet startů siločar v synchronním i worker rendereru; hustota
+je součást klíče cache i identifikace pohledu. Fyzikální síly nemění.
+Aktuální výstupy a manifesty aktualizovány.
+
+Oprava dodávky plazmatu: po cílených změnách je nutné vždy spustit
+tools/build-progressive-web.cjs; rozcestník načítá zabalený dokument,
+nikoli přímo fuze-plazma/index.html. Oba balíky nyní přestavěny a
+ověřena přítomnost lineDensity i opravy únikové energie v lazy modulu.

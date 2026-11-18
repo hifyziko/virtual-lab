@@ -14,7 +14,7 @@ class Model{
  particles(){return this.atoms.flatMap(a=>a.electron?[a.ion,a.electron]:[a.ion]);}
  get ionCount(){return this.atoms.filter(a=>a.electron).length;}
  get target(){return Math.round(saha(this.T)*this.atoms.length);}
- equilibrate(){const count=this.ionCount;if(count<this.target){const a=this.atoms.find(a=>!a.electron),angle=this.random()*Math.PI*2;a.ion.q=1;a.electron=this.particle(a.ion.x+.25*Math.cos(angle),a.ion.y+.25*Math.sin(angle),-1,1);}else if(count>this.target){const a=this.atoms.find(a=>a.electron);a.electron=null;a.ion.q=0;a.ion.trail=[];}}
+ equilibrate(){const count=this.ionCount;if(count<this.target){const a=this.atoms.find(a=>!a.electron),angle=this.random()*Math.PI*2;a.ion.q=1;const r=.25,nx=Math.cos(angle),ny=Math.sin(angle),ion=a.ion;a.electron=this.particle(ion.x+r*nx,ion.y+r*ny,-1,1);const e=a.electron,mu=ion.m*e.m/(ion.m+e.m),escape=2*coupling/(mu*Math.sqrt(r*r+soft*soft)),thermal=(e.vx-ion.vx)**2+(e.vy-ion.vy)**2,speed=Math.sqrt(escape+thermal),cx=(ion.m*ion.vx+e.m*e.vx)/(ion.m+e.m),cy=(ion.m*ion.vy+e.m*e.vy)/(ion.m+e.m);ion.vx=cx-e.m/(ion.m+e.m)*speed*nx;ion.vy=cy-e.m/(ion.m+e.m)*speed*ny;e.vx=cx+ion.m/(ion.m+e.m)*speed*nx;e.vy=cy+ion.m/(ion.m+e.m)*speed*ny;}else if(count>this.target){const a=this.atoms.find(a=>a.electron);a.electron=null;a.ion.q=0;a.ion.trail=[];}}
  field(x,y,parts=this.particles()){let ex=0,ey=0;for(const p of parts){if(!p.q)continue;const dx=x-p.x,dy=y-p.y,f=coupling*p.q/(dx*dx+dy*dy+soft*soft)**1.5;ex+=f*dx;ey+=f*dy;}return [ex,ey];}
  accelerations(ps){const acc=ps.map(()=>[0,0]);if(!this.mutual)return acc;for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const a=ps[i],b=ps[j];if(!a.q||!b.q)continue;const dx=a.x-b.x,dy=a.y-b.y,f=coupling*a.q*b.q/(dx*dx+dy*dy+soft*soft)**1.5;acc[i][0]+=f*dx/a.m;acc[i][1]+=f*dy/a.m;acc[j][0]-=f*dx/b.m;acc[j][1]-=f*dy/b.m;}return acc;}
  collide(ps){if(!this.collisions)return;for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const a=ps[i],b=ps[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),radius=(a.q<0?.055:.10)+(b.q<0?.055:.10);if(d>=radius)continue;const nx=d>1e-12?dx/d:1,ny=d>1e-12?dy/d:0,invA=1/a.m,invB=1/b.m,sum=invA+invB,overlap=radius-d; a.x-=nx*overlap*invA/sum;a.y-=ny*overlap*invA/sum;b.x+=nx*overlap*invB/sum;b.y+=ny*overlap*invB/sum;const relative=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;if(relative>=0)continue;const impulse=-2*relative/sum;a.vx-=impulse*nx*invA;a.vy-=impulse*ny*invA;b.vx+=impulse*nx*invB;b.vy+=impulse*ny*invB;}}
@@ -24,23 +24,5 @@ class Model{
  displace(){for(const a of this.atoms)if(a.electron){a.electron.x=a.electron.x+.65;a.electron.trail=[];}}
  separation(){const ions=this.atoms.filter(a=>a.electron);return ions.length?ions.reduce((s,a)=>s+a.electron.x-a.ion.x,0)/ions.length:0;}
 }
-/* Cold electron-fluid displacement against a fixed, uniform ion background.
- * Gauss: E=ne*e*xi/epsilon0; electron equation xi''=-omega_pe^2*xi.
- * time = omega_pe*t, positions in an illustrative common length unit.
- * MIT Hutchinson, ch.5, eqs.(5.47)-(5.50), not pairwise disk dynamics. */
-class CollectiveModel{
- constructor(){this.collective=true;this.time=0;this.T=0;this.B=0;this.mutual=true;this.collisions=false;this.xi=1.2;this.velocity=0;this.atoms=[];
-  for(let row=0;row<4;row++)for(let col=0;col<6;col++){const x=width*(.24+col*.104),y=height*(.26+row*.16),ion={x,y,vx:0,vy:0,q:1,m:25,trail:[]},electron={x:x+this.xi,y,vx:0,vy:0,q:-1,m:1,trail:[]};this.atoms.push({ion,electron});}
- }
- get ionCount(){return this.atoms.length;}
- get target(){return this.ionCount;}
- get electric(){return this.mutual?this.xi:0;}
- particles(){return this.atoms.flatMap(a=>[a.ion,a.electron]);}
- separation(){return this.xi;}
- magneticAt(){return 0;}
- sync(){for(const a of this.atoms){a.electron.x=a.ion.x+this.xi;a.electron.vx=this.velocity;}}
- step(dt){if(this.mutual){const c=Math.cos(dt),s=Math.sin(dt),xi=this.xi;this.xi=c*xi+s*this.velocity;this.velocity=-s*xi+c*this.velocity;}else this.xi+=this.velocity*dt;this.time+=dt;this.sync();}
- displace(){this.xi=1.2;this.velocity=0;this.sync();for(const p of this.particles())p.trail=[];}
-}
-const api={Model,CollectiveModel,saha,rotate,density,width,height};root.HiFyzikoPlasma=api;if(typeof module!=='undefined')module.exports=api;
+const api={Model,saha,rotate,density,width,height};root.HiFyzikoPlasma=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

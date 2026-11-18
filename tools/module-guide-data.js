@@ -20,7 +20,7 @@
   stiffness:'Bartoš: Teorie elektrických strojů, str. 124–125 (synchronizační moment); Fitzgerald: Electric Machinery, kap. 5.7.',
   regulation:'Chapman: Instructor’s Manual, příklad 5-4(b–e), tištěné str. 115–116. Jde o příručku řešení, nikoli plnou učebnici.',
   model:'Vlastní výukový model projektu a jeho metodika; uvedené knihy elektrických strojů toto téma nepokrývají.',
-  plasma:'S. Entler, V. Kindl: Jaderná fúze a fúzní elektrárny, kap. 2.1–2.2, str. 30–32; rámečky 2.1 a 2.3. Kolektivní kmitání: I. H. Hutchinson, MIT, Introduction to Plasma Physics I, kap. 5, str. 101–102, obr. 5.1, vztahy 5.47–5.50.',
+  plasma:'S. Entler, V. Kindl: Jaderná fúze a fúzní elektrárny, kap. 2.1–2.2, str. 30–32; rámečky 2.1 a 2.3.',
   drift:'S. Entler, V. Kindl: Jaderná fúze a fúzní elektrárny, kap. 7.3–7.4, str. 141–148 (gyrace a drifty).'
  };
  const entries = {};
@@ -155,7 +155,7 @@
   ['Měňte poruchu a sledujte vývoj úhlu a rychlosti rotoru v čase.','Porovnejte návrat do synchronismu s trvalým nárůstem úhlu.'],
   ['Po poruše rotor nezmění úhel skokem: nejprve zrychluje či zpomaluje podle nerovnováhy momentů.','Staticky přípustný bod nemusí přežít velkou poruchu. Záleží na délce poruchy, setrvačnosti a tlumení.'],null,['sm03-torque','sm12-synchronizing']);
  add('sm12-synchronizing','syncconnect',
-  ['Srovnejte sled fází, velikost napětí, frekvenci a okamžitý úhel generátoru vůči síti.','Sepněte spínač a porovnejte proud a moment pro dobré a špatné sfázování.'],
+  ['Posuvníkem Budicí proud srovnejte napětí generátoru se sítí. Nastavte také frekvenci, sled fází a okamžitý úhel.','Sepněte spínač a porovnejte proud a moment pro dobré a špatné sfázování.'],
   ['Malé rozdílové napětí v jediném okamžiku nenahrazuje kontrolu sledu fází a rozdílu frekvencí.','Klec tlumí relativní pohyb rotoru; neopravuje nesprávný sled fází. Model je výukový, nikoli návod k obsluze skutečné rozvodny.'],null,['sm04-transients','09-synchronni']);
  add('sm09-pmsm-phasor','synchronous',
   ['Měňte složky proudového vektoru a porovnejte tok, napětí a moment.','Sledujte zvlášť magnetový a reluktanční příspěvek u různých rotorů.'],
@@ -200,7 +200,7 @@
   ['Přepínejte skupiny Vše, částice, jádra a atomy.','Tažením prohlížejte prostorové modely a porovnávejte jejich druhy a popisky.'],
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
  add('fu07-plazma','plasma',
-  ['Přidávej atomy a posuvníkem teploty dodávej teplo. Sleduj uvolňování elektronů a pole vzniklých nábojů.','Zapni magnetické pole a porovnej dráhy neutrálních atomů, iontů a elektronů. V pokusu Kolektivní kmitání sleduj návrat vychýlené elektronové tekutiny a porovnej zapnuté/vypnuté elektrické působení.'],
+  ['Přidávej atomy a posuvníkem teploty dodávej teplo. Sleduj uvolňování elektronů a pole vzniklých nábojů.','Zapni magnetické pole a porovnej dráhy neutrálních atomů, iontů a elektronů.'],
   ['Plazma může být částečně ionizované. Od samotné ionizace je odlišuje kolektivní chování a kvazineutralita v dostatečně velkém objemu.','Jde o názorný model se zmenšeným poměrem hmotností. Počet zobrazených atomů není hustota skutečného plynu; magnetické pole stáčí i jednotlivý volný náboj.'],String.raw`m\frac{\mathrm d\mathbf v}{\mathrm dt}=q(\mathbf E+\mathbf v\times\mathbf B)`,['fu03-drift','fu02-galerie']);
  add('fu03-drift','drift',
   ['Začněte vletem do magnetického pole: nastavte částici, energii a směr a spusťte pokus. Před spuštěním lze částici přetáhnout.','Přepněte na gyraci nebo jednotlivé drifty. Animaci pozastavíte tlačítkem, restart vrátí částici. Energii a indukci měňte i za běhu.'],

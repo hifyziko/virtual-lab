@@ -44,6 +44,7 @@
 !/tools/project/files.cjs
 !/tools/project/handoff.cjs
 !/tools/project/prepare-web.cjs
+!/tools/project/release-output.cjs
 !/tools/project/restore.cjs
 !/tools/project/test-tools.cjs
 !/tools/project/zip.cjs

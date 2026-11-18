@@ -8,4 +8,7 @@
 
 .version{font-size:10px;color:#73657b;white-space:nowrap}
 
-.control select{display:block;width:100%;margin-top:3px;padding:4px 6px;border:1px solid #d8cce3;border-radius:6px;color:#49355c;background:white;font:inherit}.controls input:disabled,.controls button:disabled{opacity:.45}#collectiveReadout{line-height:1.7}.controls{gap:5px}.magnetic,#bValue{color:#37434b}
+.controls input:disabled,.controls button:disabled{opacity:.45}.controls{gap:5px}.magnetic,#bValue{color:#37434b}
+
+[hidden]{display:none!important}
+

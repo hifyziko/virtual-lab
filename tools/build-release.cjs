@@ -5,19 +5,23 @@ if(process.platform==='win32'){
  const retryModule=path.join(__dirname,'build-io-retry.cjs').replaceAll('\\','/');require(retryModule);
  if(!(process.env.NODE_OPTIONS||'').includes('build-io-retry.cjs'))process.env.NODE_OPTIONS=((process.env.NODE_OPTIONS||'')+' --require='+JSON.stringify(retryModule)).trim();
 }
-const dest=path.join(root,'versions',version),web=path.join(dest,'web');
+const release=require('./project/release-output.cjs');
+const activeBuild=working&&fs.existsSync(path.join(root,'versions/vyvoj/m_files/Web/mmf-module.js'));
+if(activeBuild)release.begin();
+const dest=release.current(version),web=path.join(dest,'web');
 // The current source tree was restored under versions/vyvoj; publish it to the stable root entry.
 const activeSource=path.join(root,'versions','vyvoj');
 if(fs.existsSync(path.join(activeSource,'m_files','Web','mmf-module.js'))){
  if(!working&&!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(version))throw Error('Invalid version');
  if(!working&&fs.existsSync(dest))throw Error('Version already exists: '+version);
  execFileSync(process.execPath,['tools/build-release.cjs',version],{cwd:activeSource,stdio:'inherit'});
- fs.cpSync(path.join(activeSource,'versions',version),dest,{recursive:true});
+ fs.cpSync(release.mirror(version),dest,{recursive:true});
  if(working)execFileSync(process.execPath,['tools/build-physics-preview.cjs','--visual','--activate'],{cwd:root,stdio:'inherit'});
  if(working)execFileSync(process.execPath,['tools/build-particle-library.cjs'],{cwd:root,stdio:'inherit'});
  if(working)execFileSync(process.execPath,['tools/build-progressive-web.cjs'],{cwd:root,stdio:'inherit'});
+ if(working)release.publish();
  require('./update-version-index.cjs');
- console.log('Updated stable application: '+path.join(web,'index.html'));
+ console.log('Updated stable application: '+path.join(release.current(version),'web/index.html'));
  process.exit(0);
 }
 if(!working&&!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(version||''))throw Error('Usage: node tools/build-release.cjs 1.1.0');
