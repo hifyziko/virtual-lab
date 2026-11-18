@@ -1,5 +1,16 @@
 # Aktuální stav předání
 
+## Divertor — oprava podle obr. 7.18 knihy, 18. listopadu 2026
+
+Odstraněno vybarvení celé mezery mezi separatrix a první stěnou jako SOL.
+Modrý pás u separatrix a podél divertorových větví je výslovně schematický;
+jeho šířka ani útlum nejsou výsledkem transportního výpočtu. Mezera k první
+stěně zůstává nevybarvená, konstrukční šrafování leží pouze za první stěnou.
+Žlutá okrajová vrstva zůstává uvnitř separatrix. Přímé porovnání: Entler–Kindl,
+Jaderná fúze a fúzní elektrárny, obr. 7.18, s. 158, kap. 7.11–7.12.
+Kontura se v X-bodě kříží; výklad označuje její lokální numerickou rekonstrukci.
+Podrobnosti a omezení jsou v docs/fuze/iter-divertor-2026-11-18.md.
+
 ## Předání na druhý počítač — 18. listopadu 2026
 
 Uživatel výslovně požádal o soukromý ZIP a push, v pořadí nejprve

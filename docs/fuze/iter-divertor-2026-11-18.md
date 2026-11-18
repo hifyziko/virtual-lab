@@ -192,3 +192,8 @@ Modré šrafování celé otevřené oblasti nahrazeno jednotnou jemnou výplní
 Pro kresbu separatrix se tok interpoluje po částech kubicky a lokálně navazuje hodnotou i nulovým gradientem na exportovaný X-bod. Korekce s hladkým útlumem končí dvě původní buňky od X-bodu. Jemná kreslicí síť zachovává čtyři větve se společným průsečíkem; odstraněna druhá obrysová čára na hladině 0,999 a umělá značka křížku. Vnitřní hladina nadále slouží pouze výplni a prostorové obálce. Statická GS data, vyhodnocení pole a fyzikální integrátor beze změn; jde o rekonstrukci kontury z konečné sítě. Prostorová siločára se v X-bodě sama nekříží.
 
 Regrese všech 97 rovnováh ověřuje čtyři větve v exportovaném X-bodě, dva různé směry křížení, protilehlé tečny a shodu s uloženým normalizovaným tokem do 0,001. Test modelu i skutečný canvas prošly. Vizuálně prohlédnut náhled řezu 380 × 540 s přibližnou textovou vrstvou; nejde o HTML/WebGL screenshot.
+
+
+### Oprava podle přímého porovnání s knihou — 18. 11. 2026
+
+Přímo zkontrolován obr. 7.18 na s. 158 a kap. 7.11–7.12, s. 158–160, Entler–Kindl, Jaderná fúze a fúzní elektrárny. Předchozí plošná výplň celé oblasti otevřeného toku až k první stěně nevystihovala schéma knihy. Nahrazena úzkým schematickým modrým pásem s grafickým útlumem podle vzdálenosti v normalizovaném toku. Volba útlumu je výslovně grafická, neurčuje transportní šířku ani hustotu. Mezera směrem k první stěně zůstává nevybarvená; neoznačuje nulovou hustotu. Příklady kontur změněny na 1,008 / 1,016 / 1,025. Šrafování pouze za první stěnou značí konstrukci s ilustrativní tloušťkou. Žlutá okrajová vrstva zůstává uvnitř separatrix. Popis kontury v X-bodě výslovně uvádí rekonstrukci z konečné sítě. Předchozí zápisy o celoplošné výplni tímto nahrazeny.
