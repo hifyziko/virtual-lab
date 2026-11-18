@@ -201,3 +201,10 @@ Přímo zkontrolován obr. 7.18 na s. 158 a kap. 7.11–7.12, s. 158–160, Entl
 
 ### Kontrast okrajové vrstvy — 18. listopadu 2026
 Na pokyn uživatele zvýšeno krytí a sytost žluté okrajové vrstvy v základním řezu. Zachován stejný plynulý útlum i šířka schematického zvýraznění, růžové jádro a fyzikální data. Sladěn žlutý klíč legendy.
+
+
+### Geometrie kazety podle oficiálních obrázků ITER — 18. listopadu 2026
+
+Přímo prohlédnut https://www.iter.org/machine/divertor, obrázek divertor_metal_overview.jpg a animace divertor_iter_animation_0.gif. Oficiální popis potvrzuje 54 ocelových kazet, dva svislé terče a dóm. Vlastní profily nově vystihují hluboké U nosiče, zakřivené převážně svislé terče a vyvýšený dóm na podpěrách; fotografie, animace ani jejich síť se do webu nepřebírají. Vlastní metrické profily jsou názorná aproximace vzhledu, nikoli odměřený výrobní CAD. Změněna také spodní část konstrukční obálky, aby obklopila nosník. Společné targetProfiles jsou v datech a generátoru; model průsečíků používá jejich jednotlivé úsečky, renderer stejné čelní plochy. Terče už nejsou dvě nezávislé přímé desky. Geometrie ovlivňuje kontaktní body; žádná uložená GS rovnováha, proud, tlak ani hodnota toku se nezměnily, ověřeno přesným porovnáním JSON všech dat mimo machine.
+
+Regrese: obě převážně svislé křivky, obálka bez průniku nosníku, referenční SOL dopadá na skutečný vykreslený povrch před komorou; všechny rovnováhy a UI prošly. Prošla počáteční generovaná Three geometrie včetně konečných vrcholů/normál a materiálů. Canvasový řez a samostatný technický náhled slouží vizuální kontrole; nejde o skutečný HTML/WebGL screenshot.

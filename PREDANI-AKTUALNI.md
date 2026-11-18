@@ -1,5 +1,17 @@
 # Aktuální stav předání
 
+## Divertor — geometrie kazet podle ITER, 18. listopadu 2026
+
+Přímo prohlédnut oficiální přehledový obrázek a rotující animace kazety na
+https://www.iter.org/machine/divertor. Dřívější ploché nosiče a výrazně šikmý
+vnější terč nahrazeny kazetou tvaru U, dvěma zakřivenými převážně svislými
+terči a samostatným dómem na podpěrách. Celkem 54 kazet. Profily jsou vlastní
+názornou aproximací; nejde o výrobní rozměry ani převzatou CAD síť.
+Stejné profily slouží řezu, 3D sestavě i ukončení siločar na první překážce.
+Spodní konstrukční obrys komory obklopuje kazetu a neprotíná její nosník.
+Všech 97 rovnováh a referenční pole zůstaly nezměněné. Generátor má stejné
+nové vstupy geometrie; žádný přepočet GS nebyl spuštěn.
+
 ## Divertor — oprava podle obr. 7.18 knihy, 18. listopadu 2026
 
 Odstraněno vybarvení celé mezery mezi separatrix a první stěnou jako SOL.

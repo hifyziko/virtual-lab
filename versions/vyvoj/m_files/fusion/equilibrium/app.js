@@ -30,7 +30,7 @@ function readouts(){
  tex($('surfaceReadout'),u<.999?String.raw`p_{\mathrm{pl}}=${num(M.profile(state.p,u)/1000,0)}\,\mathrm{kPa}`:u<1.001?String.raw`\psi_{\mathrm N}=1\quad\text{separatrix}`:String.raw`\psi_{\mathrm N}>1\quad\text{otevřená větev}`);
  const steering=D.steering?.[series],pressure=series==='pressure',ci=D.machine.coils.findIndex(c=>c[0]===series);$('parameter').max=D.series[series].length-1;$('parameter').value=index;$('coilSelector').hidden=pressure||!!steering;$('parameterName').textContent=steering?(series==='vertical'?'Dolů ← poloha → nahoru':'K ose stroje ← poloha → ven'):pressure?'Tlak na ose':'Proud '+series;$('zero').textContent=steering?'Výchozí poloha':pressure?'Výchozí tlak':'Výchozí proud';
  tex($('parameterValue'),steering?String.raw`${num((state.axis[series==='vertical'?1:0]-D.reference.axis[series==='vertical'?1:0])*100,1)}\,\mathrm{cm}`:pressure?String.raw`${num(state.paxis/1000,0)}\,\mathrm{kPa}`:String.raw`${num(state.currents[ci]/D.machine.coils[ci][5]/1000,2)}\,\mathrm{kA}`);
- const atTarget=p=>p&&D.machine.targets.some(([a,b])=>Math.abs((p[0]-a[0])*(b[1]-a[1])-(p[1]-a[1])*(b[0]-a[0]))<1e-7);
+ const atTarget=p=>p&&M.targetSegments(D.machine).some(([a,b])=>Math.abs((p[0]-a[0])*(b[1]-a[1])-(p[1]-a[1])*(b[0]-a[0]))<1e-7);
  $('hint').textContent=u>1.001&&selected.length&&!(atTarget(selected[0])&&atTarget(selected.at(-1)))?(selected.some(p=>D.machine.dome.some(q=>Math.hypot(p[0]-q[0],p[1]-q[1])<.25))?'Otevřená větev zasahuje PFC centrálního dómu.':'Vybraná siločára dopadá na první stěnu. Zvolte povrch blíže separatrix.'):steering?'Proudy '+steering.coils.join(' + ')+'. Čárkovaně: výchozí plazma.':pressure?'Mění se tlak. Všechny proudy cívek zůstávají pevné.':selected.length?'Mění se pouze '+series+'. Čárkovaný obrys označuje výchozí plazma.':'Vybraná křivka zde neprotíná oba terče. Zvolte povrch blíže separatrix.';
  $('hint').style.visibility=$('hint').scrollHeight>$('hint').clientHeight?'hidden':'visible';
  document.querySelectorAll('[data-series]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.series===series));document.querySelectorAll('[data-preset]').forEach(b=>b.setAttribute('aria-pressed',Math.abs(u-({core:.5,edge:1,sol:1.025}[b.dataset.preset]))<.002));
@@ -44,7 +44,7 @@ function materialBand(c,T,W,H){const wall=D.machine.wall,area=wall.reduce((sum,a
  const outer=wall.map((p,i)=>{const a=wall[(i+wall.length-1)%wall.length],b=wall[(i+1)%wall.length],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);return [p[0]+sign*dy/L*.18,p[1]-sign*dx/L*.18];});
  c.save();c.beginPath();for(const polygon of [outer,wall]){polygon.forEach((p,i)=>i?c.lineTo(...T(p)):c.moveTo(...T(p)));c.closePath();}c.clip('evenodd');c.fillStyle='#d8e3e9';c.fillRect(0,0,W,H);c.beginPath();for(let x=-H;x<W;x+=6){c.moveTo(x,H);c.lineTo(x+H,0);}c.lineWidth=.7;c.strokeStyle='#7896a8';c.stroke();c.restore();
 }
-function renderSection(){const dim=setup($('section'));if(!dim)return;const {W,H,dpr}=dim,c=ctx;const full=$('fullMachine').checked,r0=full?.7:3.2,r1=full?13:9.3,zmax=full?8.4:5,S=Math.min((W-70)/(r1-r0),(H-95)/(2*zmax)),center=(r0+r1)/2,cx=W/2,cy=(H-60)/2+5,T=p=>[cx+(p[0]-center)*S,cy-p[1]*S];sectionTransform={T,S,cx,cy,W,H,center};c.clearRect(0,0,W,H);$('sectionMath').replaceChildren();
+function renderSection(){const dim=setup($('section'));if(!dim)return;const {W,H,dpr}=dim,c=ctx;const full=$('fullMachine').checked,r0=full?.7:3.2,r1=full?13:9.3,zmax=full?8.4:5.9,S=Math.min((W-70)/(r1-r0),(H-95)/(2*zmax)),center=(r0+r1)/2,cx=W/2,cy=(H-60)/2+5,T=p=>[cx+(p[0]-center)*S,cy-p[1]*S];sectionTransform={T,S,cx,cy,W,H,center};c.clearRect(0,0,W,H);$('sectionMath').replaceChildren();
  const callout=(id,text,p,x,y,w=84,h=18,color=C.sep)=>{x=Math.max(w/2+8,Math.min(W-w/2-8,x));y=Math.max(h/2+8,Math.min(H-h/2-8,y));const el=label($('sectionMath'),id,text,x,y,color);el.className='sectionCallout';el.style.width=w+'px';el.style.height=h+'px';const dx=p[0]-x,dy=p[1]-y,t=1/Math.max(Math.abs(dx)/(w/2),Math.abs(dy)/(h/2)),end=[x+dx*t,y+dy*t];path(c,[p,end],q=>q,color,.8);};
  // Compact feature keys avoid running long leaders across the lower plasma.
  const features=[];
@@ -63,8 +63,12 @@ function renderSection(){const dim=setup($('section'));if(!dim)return;const {W,H
  for(const p of paths.p)path(c,p,T,'#647c8790',1);for(const family of paths.sol)for(const p of family)path(c,p,T,C.b,1.2);
  for(const p of paths.privateFlux)path(c,p,T,C.b,1,[2,4]);
  for(const p of paths.sep)path(c,p,T,C.sep,1.9);if(!full){if(paths.edge.length){const p=paths.edge.reduce((a,b)=>b[1]>a[1]?b:a),q=T(p);callout('separatrix',String.raw`\text{separatrix}`,q,q[0],Math.max(22,q[1]-44),90,18,C.sep);}const line=paths.sol[1]?.[0]||paths.sol[0]?.[0];if(line?.length){const p=line.reduce((a,b)=>b[0]>a[0]?b:a),q=T(p);callout('sol',String.raw`\text{vrstva SOL}`,q,Math.min(W-47,q[0]+55),q[1],78,18,C.b);}const edge=M.core(state,g,.98);if(edge.length){const p=edge.reduce((a,b)=>b[1]>a[1]?b:a),q=T(p);callout('edgeRegion',String.raw`\text{okrajová vrstva}`,q,q[0],q[1]+30,112,18,'#8d6b1c');}const wall=D.machine.wall.filter(p=>p[1]>1.5&&p[1]<3);if(wall.length){const p=wall.reduce((a,b)=>b[0]>a[0]?b:a),q=T(p);callout('firstWall',String.raw`\text{první stěna}`,q,W-51,q[1]-24,86,18,'#52656e');}}
- for(const [a,b]of D.machine.targets){if($('showDivertor').checked)path(c,[a,b],T,'#a0adb5',11);if($('showPFC').checked){path(c,[a,b],T,'#575f66',7);path(c,[a,b],T,'#9ba2a7',1);}}if($('showDivertor').checked)path(c,D.machine.dome.map(p=>[p[0],p[1]-.09]),T,'#a0adb5',8);if($('showPFC').checked)path(c,D.machine.dome,T,'#676f76',5);
- if(!full){feature('innerTarget',2,String.raw`\text{vnitřní terč}`,T([4.1,-3.65]),[-15,-14],C.target);feature('outerTarget',4,String.raw`\text{vnější terč}`,T([6,-4.45]),[18,-2],C.target);}
+ const strip=(line,width,color)=>{for(let i=1;i<line.length;i++){const a=line[i-1],b=line[i],dr=b[0]-a[0],dz=b[1]-a[1],L=Math.hypot(dr,dz),n=[dz/L*width,-dr/L*width];c.beginPath();[a,b,[b[0]+n[0],b[1]+n[1]],[a[0]+n[0],a[1]+n[1]]].forEach((p,i)=>i?c.lineTo(...T(p)):c.moveTo(...T(p)));c.closePath();c.fillStyle=color;c.fill();}};
+ if($('showDivertor').checked){strip(D.machine.cassette.rail,D.machine.cassette.thickness,'#a0adb5');for(const support of D.machine.cassette.supports)strip(support,.09,'#919fa8');}
+ for(const line of D.machine.targetProfiles){if($('showDivertor').checked)strip(line,.18,'#a0adb5');if($('showPFC').checked){strip(line,.065,'#575f66');path(c,line,T,'#747d83',1);}}
+ if($('showPFC').checked){strip(D.machine.dome,.07,'#676f76');path(c,D.machine.dome,T,'#9ba2a7',1);}
+
+ if(!full){feature('innerTarget',2,String.raw`\text{vnitřní terč}`,T([4.1,-3.65]),[-15,-14],C.target);feature('outerTarget',4,String.raw`\text{vnější terč}`,T([5.78,-4.25]),[18,-2],C.target);}
  path(c,selected,T,'#ffffff',3.2);path(c,selected,T,C.b,1.8);
  if(u>1.001&&selected.length){for(const [i,p]of [selected[0],selected.at(-1)].entries()){const q=T(p);c.beginPath();c.arc(...q,4,0,2*Math.PI);c.fillStyle=C.target;c.fill();label($('sectionMath'),'impact'+i,String.raw`\text{dopad}`,q[0]+(i?25:-25),q[1]-12,C.target);}}
  const axis=T(state.axis);c.fillStyle=C.sep;c.beginPath();c.arc(...axis,3,0,Math.PI*2);c.fill();label($('sectionMath'),'axis',String.raw`\text{osa}`,axis[0],axis[1]-17);if(index!==midpoint()&&$('reference').checked){const old=T(D.reference.axis);c.strokeStyle='#74838b';c.beginPath();c.arc(...old,4,0,Math.PI*2);c.stroke();arrow(c,old,axis,C.b,2);}
@@ -112,19 +116,19 @@ function renderSpace(){const dim=setup($('space'));if(!dim)return;const {W,H,dpr
   for(let j=1;j<profile.length-1;j++){face([xyz(profile[0],a),xyz(profile[j+1],a),xyz(profile[j],a)]);face([xyz(profile[0],b),xyz(profile[j],b),xyz(profile[j+1],b)]);}
  }
  function visible(phi){return !$('cut').checked||phi>Math.PI;}
- // 54 cassette assemblies, each carrying two targets and the central dome.
- // Target front faces remain exactly on the field-line intersection surfaces.
+ // ITER reference: 54 U-shaped cassettes; two curved vertical targets and a raised dome.
+ // Own illustrative profiles; the same PFC fronts are used for field-line contact.
+ const solidStrip=(curve,thickness,a,b,color,material='case')=>{for(let j=1;j<curve.length;j++){const q=curve[j-1],r=curve[j],dr=r[0]-q[0],dz=r[1]-q[1],L=Math.hypot(dr,dz),n=[dz/L*thickness,-dr/L*thickness];sector([q,r,[r[0]+n[0],r[1]+n[1]],[q[0]+n[0],q[1]+n[1]]],a,b,color,material,1,1);}};
  if($('showDivertor').checked||$('showPFC').checked)for(let k=0;k<54;k++){const a=k*2*Math.PI/54+.003,b=(k+1)*2*Math.PI/54-.003;if(!visible((a+b)/2))continue;
-  if($('showDivertor').checked){const rail=[[3.94,-4.6],[4.5,-4.95],[5.2,-5.03],[6.4,-5.1]];for(let j=1;j<rail.length;j++){const q=rail[j-1],r=rail[j];sector([q,r,[r[0],r[1]-.22],[q[0],q[1]-.22]],a,b,'#a3afb7','case',1,3);}for(const r of [4.2,6.1])sector([[r-.12,-4.8],[r+.12,-4.8],[r+.12,-5.3],[r-.12,-5.3]],a+.015,b-.015,'#87959f','case',1,2);}
-  // PFC fronts stay on the same analytic target surfaces used by field tracing.
-  for(const [q,r]of D.machine.targets){const dr=r[0]-q[0],dz=r[1]-q[1],L=Math.hypot(dr,dz),n=[dz/L,-dr/L],point=t=>[q[0]+dr*t,q[1]+dz*t],offset=(p,t)=>[p[0]+n[0]*t,p[1]+n[1]*t];
-   if($('showDivertor').checked)sector([offset(q,.09),offset(r,.09),offset(r,.29),offset(q,.29)],a,b,'#9aa6ae','case',1,3);
-   if($('showPFC').checked){sector([offset(q,.065),offset(r,.065),offset(r,.09),offset(q,.09)],a+.006,b-.006,'#b0805a','winding',1,3);for(let finger=0;finger<3;finger++){const A=a+(b-a)*finger/3+.0025,B=a+(b-a)*(finger+1)/3-.0025;for(let row=0;row<14;row++){const p=point((row+.035)/14),t=point((row+.965)/14);sector([p,t,offset(t,.065),offset(p,.065)],A,B,row%2?'#737a80':'#858b90','tungsten',1,2);}}}
+  if($('showDivertor').checked){solidStrip(D.machine.cassette.rail,D.machine.cassette.thickness,a,b,'#a3afb7');for(const support of D.machine.cassette.supports)solidStrip(support,.09,a+.018,b-.018,'#87959f');for(const r of [4.2,5.7])sector([[r-.1,-5.27],[r+.1,-5.27],[r+.1,-5.48],[r-.1,-5.48]],a+.012,b-.012,'#87959f','case',1,1);}
+  for(const curve of D.machine.targetProfiles){
+   if($('showDivertor').checked)solidStrip(curve,.22,a,b,'#9aa6ae');
+   if($('showPFC').checked){solidStrip(curve,.08,a+.006,b-.006,'#b0805a','winding');for(let finger=0;finger<3;finger++){const A=a+(b-a)*finger/3+.0025,B=a+(b-a)*(finger+1)/3-.0025;for(let row=1;row<curve.length;row++){const q=curve[row-1],r=curve[row],lo=.025,hi=.975,p=q.map((v,j)=>v+(r[j]-v)*lo),t=q.map((v,j)=>v+(r[j]-v)*hi);solidStrip([p,t],.06,A,B,row%2?'#737a80':'#858b90','tungsten');}}}
   }
-  const dome=D.machine.dome;
-  if($('showDivertor').checked)sector([...dome,[dome.at(-1)[0],-4.8],[dome[0][0],-4.8]],a,b,'#a0acb3','case',1,3);
-  if($('showPFC').checked)for(let j=1;j<dome.length;j++){const p=dome[j-1],q=dome[j];for(let finger=0;finger<3;finger++){const A=a+(b-a)*finger/3+.003,B=a+(b-a)*(finger+1)/3-.003;sector([p,q,[q[0],q[1]-.07],[p[0],p[1]-.07]],A,B,'#777e84','tungsten',1,2);}}
+  if($('showDivertor').checked)solidStrip(D.machine.dome,.14,a+.005,b-.005,'#a0acb3');
+  if($('showPFC').checked)for(let finger=0;finger<3;finger++){const A=a+(b-a)*finger/3+.003,B=a+(b-a)*(finger+1)/3-.003;solidStrip(D.machine.dome,.07,A,B,'#777e84','tungsten');}
  }
+
  mark('divertor');
  if($('hardware').checked||$('blanket').checked){
   // Double-wall vessel divided into nine sectors. Blanket panels face plasma.
