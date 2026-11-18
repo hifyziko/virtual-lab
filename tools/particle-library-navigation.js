@@ -6,7 +6,8 @@
   {id:'fu03-drift',group:'fusion',num:'02',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a E×B drift, grad-B drift i drift zakřivení.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'},
   {id:'fu04-udrzeni',group:'fusion',num:'03',title:'Magnetické udržení',description:'Solenoid, magnetické zrcadlo, uzavření do toroidu a skládání helikálního magnetického pole.',page:'fuze-udrzeni/index.html',kind:'Interaktivní experiment'},
   {id:'fu06-divertor',group:'fusion',num:'04',title:'Divertor',description:'Od magnetické osy přes separatrix a x-bod až k otevřeným siločarám a divertorovým terčům.',page:'fuze-rovnovaha/divertor.html',kind:'Interaktivní experiment'},
-  {id:'fu02-galerie',group:'fusion',num:'05',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
+  {id:'fu08-ostrovy',group:'fusion',num:'05',title:'Magnetické přepojení a vznik ostrova',description:'Proč malá porucha roste nebo slábne: proudová vrstva, přepojení siločar a počátek ostrůvkové nestability.',page:'fuze-ostrovy/index.html',kind:'Interaktivní experiment'},
+  {id:'fu02-galerie',group:'fusion',num:'06',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
  ];
  const aliases={"fu02-jadra":"nuclei","fu03-atomy":"atoms","fu04-castice":"particles"};
  const routes=[...entries,{...entries.find(e=>e.id==='fu06-divertor'),id:'fu05-rovnovaha',sourceId:'fu06-divertor'},...Object.entries(aliases).map(([id,mode])=>({...entries.find(entry=>entry.id==='fu02-galerie'),id,mode,sourceId:'fu02-galerie'}))];

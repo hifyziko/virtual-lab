@@ -37,6 +37,7 @@
 !/tools/precompute-confinement.cjs
 !/tools/precompute-helicity-electric.cjs
 !/tools/precompute-helicity.cjs
+!/tools/precompute-islands.cjs
 !/tools/precompute-tokamak-equilibrium.py
 !/tools/progressive-loader.css
 !/tools/progressive-loader.js
@@ -67,6 +68,7 @@
 !/tools/test-fusion-render-lifecycle.cjs
 !/tools/test-fusion-visual-contract.cjs
 !/tools/test-helicity.cjs
+!/tools/test-islands.cjs
 !/tools/test-module-guide.cjs
 !/tools/test-particle-library.cjs
 !/tools/test-plasma.cjs
@@ -521,6 +523,12 @@
 !/versions/vyvoj/m_files/fusion/equilibrium/index.html
 !/versions/vyvoj/m_files/fusion/equilibrium/model.js
 !/versions/vyvoj/m_files/fusion/equilibrium/style.css
+!/versions/vyvoj/m_files/fusion/islands/app.js
+!/versions/vyvoj/m_files/fusion/islands/data.js
+!/versions/vyvoj/m_files/fusion/islands/index.html
+!/versions/vyvoj/m_files/fusion/islands/layout.js
+!/versions/vyvoj/m_files/fusion/islands/model.js
+!/versions/vyvoj/m_files/fusion/islands/style.css
 !/versions/vyvoj/m_files/fusion/navigation/page.js
 !/versions/vyvoj/m_files/fusion/navigation/style.css
 !/versions/vyvoj/m_files/fusion/particle-list/CTETE.txt

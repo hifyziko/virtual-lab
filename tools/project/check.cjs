@@ -15,6 +15,7 @@ const commands=[
  ['tools/test-particle-library.cjs'],
  ['tools/test-drift.cjs'],
  ['tools/test-plasma.cjs'],
+ ['tools/test-islands.cjs'],
  ['tools/test-confinement.cjs'],
  ['tools/test-scene-loading.cjs'],
  ['tools/test-confinement-atlas.cjs'],

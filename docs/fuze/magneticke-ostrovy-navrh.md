@@ -1,6 +1,70 @@
 # Magnetické přepojení a vznik ostrova — rešerše a návrh
 
+## Realizovaná první etapa — 18. listopadu 2026
+
+Modul `fu08-ostrovy` / `fusion/islands` nyní ukazuje počátek rezistivní
+ostrůvkové nestability v místní Harrisově proudové vrstvě. Starší návrh
+níže popisuje také dosud nerealizované části: tokamakový řez, prostorový
+ostrov, nelineární vývoj, NTM a ECCD. Nejde o dokončení těchto rozšíření.
+
+Realizace používá dvě lineární rovnice redukované MHD pro poruchu toku
+a vířivost; `model.js` obsahuje znaménkové konvence a `index.html` jejich
+úplné vysvětlení. Pevný interval x = −8 až 8, periodická harmonická y,
+257 bodů, k = 0,7, magnetická difuzivita 0,02, viskozita 0,01. Harrisova
+tloušťka a = 0,7 nebo 2; počáteční toková amplituda ve středu 10⁻⁵,
+počáteční proudění nulové. Rovnováha je udržovaná, její vlastní difuze
+je odečtená. Časový krok 0,008, explicitní metoda středního bodu,
+Poissonova úloha řešená tridiagonálně. Data generuje
+`node tools/precompute-islands.cjs`; runtime nic nepřepočítává.
+
+Úzká vrstva vykazuje růst, široká útlum. Růst končí při W/a = 0,12
+(t* přibližně 92,58), útlum při t* = 160. Limit je didaktický limit
+časového záznamu malé poruchy, nikoli vypočtená saturace či univerzální
+hranice linearity. Přesnější mez závisí na rezistivní vrstvě.
+
+Test `tools/test-islands.cjs` kontroluje shodu časového kroku a prostorové
+sítě (257 proti 513 bodům, amplituda po t*=40 do 1 %), Poissonův reziduál,
+symetrii a energetickou bilanci poruchy. Diskrétně platí
+dE/dt = −k ∫ f B₀″ p dx − η ∫ (Lp)² dx − ν ∫ ω² dx;
+energie může přicházet z udržované rovnováhy, difuzní členy ji odčerpávají.
+Modelový hash chrání shodu dat se zdrojem. Ověřeno také ovládání,
+KaTeX, pauza, přehrávání, časový posuvník a disposal. Siločáry vykreslené
+skutečným canvasem byly vizuálně prohlédnuté; celá stránka v prohlížeči
+automaticky neotevřena. Modul je přidaný do společného sestavení a lazy
+načítání. Původní soukromé ani veřejné převzaté obrázky nejsou přibalené.
+
 18. listopadu 2026. Návrh dalšího modulu, nikoli implementovaný modul.
+
+## Schválené zaměření — 18. listopadu 2026
+
+Uživatel schválil pokračování s prioritou názorně vysvětlit příčinu
+a časový vývoj nestability. Výchozí pokus má postupovat od proudového
+profilu přes malou poruchu k přepojení a růstu ostrova. Děj musí být
+čitelný bez předchozí znalosti MHD a umožňovat pauzu a krokování.
+
+Výchozí otázka pro studenta: Proč se jedna malá porucha utlumí,
+zatímco druhá sama zesílí?
+
+Výklad má postupně odhalit:
+
+1. Proud plazmatem vytváří část magnetického pole. Jeho prostorové
+   rozložení určuje výchozí konfiguraci a může poskytovat volnou energii
+   rezistivní ostrůvkové nestabilitě. Samotná nerovnoměrnost proudu
+   ani racionální hodnota q nestačí jako obecné kritérium nestability.
+2. Stejný malý počáteční podnět vyvolá ve dvou doložených konfiguracích
+   odlišnou odezvu. Student vidí profil proudu a graf velikosti poruchy.
+3. V úzké rezistivní vrstvě se může změnit propojení siločar. Elektrický
+   odpor umožňuje porušení zamrznutí toku; není sám zdrojem energie
+   a nezaručuje růst každé poruchy.
+4. Přepojené pole vytváří ostrov se středem, separatrix a X-body.
+   Zvětšování ostrova je svázané s časovým vývojem vypočteného pole.
+5. Prostor a řez ukazují stejný útvar. Navazující výklad vysvětlí
+   vliv ostrova na transport a odliší mechanismus NTM.
+
+Při přípravě není dovoleno nahradit chybějící dynamiku automaticky
+rostoucím geometrickým parametrem a označit jej za MHD simulaci.
+Stav realizace: schváleno zaměření; numerický model a modul zatím
+nejsou implementované ani ověřené.
 
 ## Návaznost na projekt
 

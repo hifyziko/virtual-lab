@@ -218,6 +218,10 @@
  add('em06-vlna','emwave',
   ['Začněte před pohybem a zvolte Vznik ohybu. Porovnejte bílé siločáry s původním polem; zelený kruh vyznačuje čelo změny.','Zvolte Vlna odchází. Vpravo sledujte magnetické pole, jeho znaménko a směr. Přepněte na dipólovou anténu nebo prostorový detail.'],
   ['Vzdálené pole odpovídá dřívějšímu pohybu náboje. Změna se šíří konečnou rychlostí světla; siločáry nejsou hmotná vlákna.','Model počítá retardované pole pohybujících se bodových nábojů. Neřeší impedanci ani rezonanci antény; prostorový detail je rovinné přiblížení.'],String.raw`\mathbf S=\frac{1}{\mu_0}\mathbf E\times\mathbf B`,['em01-indukovane-napeti','em03-silove-ucinky']);
+ sources.islands='Entler, Kindl: Jaderná fúze a fúzní elektrárny, kap. 7.18, s. 171–172, rámeček 7.10. Výpočetní doplněk: O. Agullo, Resistive MHD Stability Theory, ITER School 2017, snímky 16 a 20–28.';
+ add('fu08-ostrovy','islands',
+  ['Spusť úzkou proudovou vrstvu a sleduj vznik ostrova. Pauzou a krokováním prohlédni přepojení siločar.','Přepni na širokou vrstvu a porovnej útlum stejné počáteční amplitudy. Příčný výřez mění pouze zvětšení.'],
+  ['Rozložení proudu určuje výchozí magnetickou konfiguraci. V nestabilním případě se porucha a proudění zesilují; odpor umožňuje změnu propojení pole.','Lineární rezistivní MHD zachycuje počátek nestability v místní rovinné vrstvě. Záznam končí u malého ostrova; nepočítá nasycení, NTM ani disrupci.'],null,['fu04-udrzeni','fu06-divertor']);
  const aliases={'fu05-rovnovaha':'fu06-divertor','fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
  window.ModuleGuideData={sources,entries,aliases};
 })();

@@ -1,0 +1,1 @@
+(()=>{'use strict';const root=document.documentElement;function fit(){root.style.setProperty('--fusion-fit',String(Math.max(.01,Math.min(((root.clientWidth||innerWidth)-16)/1360,(innerHeight-16)/820))));}fit();addEventListener('resize',fit);document.addEventListener('fullscreenchange',fit);})();

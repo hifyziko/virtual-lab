@@ -3189,3 +3189,15 @@ stavů; pro větší počáteční vzdálenost ověřuje odtržení po delším 
 Prohlížeč automaticky neotevřen; vzhled v prohlížeči neověřen. Bez pushe.
 
 18. 11. 2026 — Plyn a plazma: zmenšen poloměr vázaného i volného elektronu z 0,52 na 0,20 násobku základní kreslicí velikosti. Vázaný elektron má přibližně polovinu průměru protonu v atomu (0,20 / 0,38); při ionizaci se jeho velikost nemění. Obě aktuální dodávky včetně lazy balíků přestavěny. Kontroly plazmatu, syntaxe a progressive prošly; bez pushe.
+
+
+## Magnetické přepojení a vznik ostrova — 18. listopadu 2026
+
+Přidán fu08-ostrovy jako místní lineární MHD experiment: Harrisova
+proudová vrstva, útlum a růst stejné malé poruchy, vypočtené siločáry,
+profil proudu, časový graf, pauza a krokování. Data mají hash modelu,
+test ověřuje časovou/síťovou konvergenci i bilanci energie poruchy.
+Růst končí na W/a=0,12, bez předstírané nelineární saturace. Prostorový
+tokamak, NTM a ECCD zůstávají navazující rozšíření. Podrobnosti a přesné
+meze v docs/fuze/magneticke-ostrovy-navrh.md. Canvas siločar prohlédnut,
+celá stránka v prohlížeči neotevřena. Přidáno lazy načítání, bez pushe.

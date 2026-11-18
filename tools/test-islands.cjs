@@ -1,0 +1,26 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('fs'),vm=require('vm'),crypto=require('crypto'),path=require('path');
+const dir=path.resolve(__dirname,'../versions/vyvoj/m_files/fusion/islands'),{Model}=require(dir+'/model.js'),katex=require(dir+'/../particles/vendor/katex.js');
+const host={window:{}};vm.runInNewContext(fs.readFileSync(dir+'/data.js','utf8'),host);const data=host.window.IslandData;
+assert.equal(data.modelHash,crypto.createHash('sha256').update(fs.readFileSync(dir+'/model.js')).digest('hex'));
+function run(a,n,dt){const m=new Model({a,n});for(let t=0;t<40-dt/2;t+=dt)m.step(dt);return m;}
+for(const a of [.7,2]){
+ const m=run(a,257,.008),half=run(a,257,.004),fine=run(a,513,.002);
+ assert(Math.abs(m.amplitude/half.amplitude-1)<1e-5,'Time convergence');
+ assert(Math.abs(m.amplitude/fine.amplitude-1)<.01,'Spatial convergence within 1%');
+ assert(a<1?m.amplitude>m.seed*5:m.amplitude<m.seed*.4,'Growth or damping emerges from integration');
+ const f=m.flow(m.w),lp=m.lap(m.p),lf=m.lap(f),[dp,dw]=m.rhs(m.p,m.w),df=m.flow(dw);let energyRate=0,work=0,diss=0;
+ for(let i=1;i<m.n-1;i++){energyRate+=(-lp[i]*dp[i]-lf[i]*df[i])*m.dx;work+=-m.k*f[i]*m.Bpp[i]*m.p[i]*m.dx;diss+=(m.eta*lp[i]**2+m.nu*m.w[i]**2)*m.dx;assert(Math.abs(lf[i]-m.w[i])<1e-10,'Poisson residual');assert(Number.isFinite(m.p[i]));}
+ assert(Math.abs(energyRate-work+diss)<1e-12,'Perturbation energy balances equilibrium exchange and dissipation');
+ console.log('PASS MHD:',a<1?'growing':'damped','time/grid convergence, Poisson solve and energy balance.');
+}
+for(const c of Object.values(data.cases)){assert.equal(c.frames[0].time,0);for(let j=0;j<c.frames.length;j++){const f=c.frames[j];assert.equal(f.p.length,c.n);assert(f.p.every(Number.isFinite));assert.equal(f.p[0],0);assert.equal(f.p.at(-1),0);if(j)assert(f.time>c.frames[j-1].time);for(let i=0;i<c.n;i++){assert(Math.abs(f.p[i]-f.p[c.n-1-i])<1e-10);assert(Math.abs(f.f[i]+f.f[c.n-1-i])<1e-10);}}}
+assert(data.cases.growing.frames.at(-1).width/.7<.121);assert(data.cases.damped.frames.at(-1).amplitude<1e-7);
+const html=fs.readFileSync(dir+'/index.html','utf8');for(const [,s]of html.matchAll(/data-tex="([^"]+)"/g))katex.renderToString(s,{throwOnError:true});
+const noop=()=>{},napi=process.env.ISLAND_CANVAS_MODULE?require(process.env.ISLAND_CANVAS_MODULE):null,ctx=new Proxy({},{get:()=>noop}),nodes=new Map();
+for(const m of html.matchAll(/<(\w+)\b[^>]*\bid="([^"]+)"[^>]*>/g)){const [tag,id]=[m[1],m[2]],size=id==='field'?[720,580]:[270,220],node=tag==='canvas'&&napi?napi.createCanvas(...size):{};Object.assign(node,{dataset:{},style:{},value:m[0].match(/value="([^"]+)"/)?.[1]||'',checked:m[0].includes(' checked'),clientWidth:size[0],clientHeight:size[1],getBoundingClientRect:()=>({width:size[0]}),showModal(){this.open=true;},close(){this.open=false;}});if(!napi||tag!=='canvas')node.getContext=()=>ctx;nodes.set(id,node);}
+let cb,cancel=false;const events=new Map(),c={IslandData:data,katex:{render:(s,n)=>{n.textContent=s;katex.renderToString(s,{throwOnError:true});}},document:{getElementById:id=>nodes.get(id),querySelectorAll:()=>[]},requestAnimationFrame:fn=>{cb=fn;return 1;},cancelAnimationFrame:()=>{cancel=true;},addEventListener:(k,v)=>events.set(k,v),removeEventListener:k=>events.delete(k)};c.window=c;vm.runInNewContext(fs.readFileSync(dir+'/app.js','utf8'),c);
+const initial=nodes.get('timeValue').textContent;cb(0);cb(50);assert.equal(nodes.get('timeValue').textContent,initial);nodes.get('play').onclick();cb(100);assert.notEqual(nodes.get('timeValue').textContent,initial);nodes.get('help').onclick();assert(nodes.get('guide').open);nodes.get('closeHelp').onclick();assert(!nodes.get('guide').open);
+nodes.get('time').value=1;nodes.get('time').oninput();assert(nodes.get('stage').textContent.includes('Konec'));if(napi){fs.mkdirSync(path.resolve(__dirname,'../tmp/islands'),{recursive:true});fs.writeFileSync(path.resolve(__dirname,'../tmp/islands/field.png'),nodes.get('field').toBuffer('image/png'));}
+nodes.get('zoom').value=.1;nodes.get('zoom').oninput();nodes.get('marks').checked=false;nodes.get('marks').onchange();assert(nodes.get('oLabel').hidden);
+nodes.get('case').value='damped';nodes.get('case').onchange();assert.equal(nodes.get('timeValue').textContent,initial);nodes.get('step').onclick();assert.notEqual(nodes.get('timeValue').textContent,initial);nodes.get('reset').onclick();assert.equal(nodes.get('timeValue').textContent,initial);c.HiFyzikoFusionDispose();assert(cancel);assert.equal(events.size,0);console.log('PASS: data fingerprint, symmetry, limits, KaTeX, controls, pause, seek, reset and disposal.');

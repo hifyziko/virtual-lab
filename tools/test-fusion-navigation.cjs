@@ -15,11 +15,11 @@ class Element{
 const Lab={catalog:[{id:'existing',group:'sync'}],modules:new Map(),home(){},route(){},register(module){this.modules.set(module.id,module);}};
 const c={Lab,LabProgress:{value:key=>'<html>'+key+'</html>'},document:{readyState:'loading',createElement:tag=>new Element(tag)},location:{hash:''},setTimeout:fn=>{timers.add(fn);return fn;},clearTimeout:fn=>timers.delete(fn),addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);}};c.window=c;vm.createContext(c);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8'),c);
-assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,10);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,7,'Six fusion modules are listed');
-assert.equal(Lab.catalog.at(-1).id,'fu02-galerie','Gallery is last');assert.equal(Lab.catalog.find(e=>e.id==='fu03-drift').num,'02');assert.equal(Lab.catalog.at(-1).num,'05');
+assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,11);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,8,'Seven fusion modules are listed');
+assert.equal(Lab.catalog.at(-1).id,'fu02-galerie','Gallery is last');assert.equal(Lab.catalog.find(e=>e.id==='fu03-drift').num,'02');assert.equal(Lab.catalog.at(-1).num,'06');
 assert(!Lab.catalog.some(e=>e.id==='fu05-rovnovaha'));assert.equal(Lab.modules.get('fu05-rovnovaha').sourceId,'fu06-divertor');
 for(const alias of ['fu02-jadra','fu03-atomy','fu04-castice'])assert.equal(Lab.modules.get(alias).sourceId,'fu02-galerie','Historical aliases keep the gallery');
-const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-plazma/index.html','fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html','fuze-udrzeni/index.html','fuze-rovnovaha/divertor.html']);
+const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-ostrovy/index.html','fuze-plazma/index.html','fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html','fuze-udrzeni/index.html','fuze-rovnovaha/divertor.html']);
 let guideRoot,guideHeading;
 c.ModuleGuide={collect(root){guideRoot=root;},prepareHeading(heading,full){guideHeading=heading;assert.equal(full.parentElement,heading);}};
 const windowFit=fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/module-window-fit.js'),'utf8');
