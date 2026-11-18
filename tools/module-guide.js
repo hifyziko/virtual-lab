@@ -36,6 +36,7 @@
   const scope=root.ownerDocument===document?root:root.ownerDocument;
   let nodes=roots.get(root);if(!nodes){nodes=[];roots.set(root,nodes);}
   active={route:location.hash,root,nodes};
+  const wall=scope.querySelector('#zoomWall');if(wall)wall.closest('main')?.style.setProperty('grid-template-rows','100px minmax(0,1fr)');
   const settings=scope.querySelector('.settingsPanel');
   if(settings&&!settings.querySelector('[data-guide-fusion-theory]')){
    const paragraphs=[...settings.querySelectorAll(':scope > p')];
@@ -45,7 +46,8 @@
     const summary=settings.parentElement.querySelector('summary');if(summary)summary.textContent='Další nastavení';
    }
   }
-  const candidates=scope.querySelectorAll('details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]');
+  for(const row of scope.querySelectorAll('.statusline')){if(!row.querySelector('button,input,select,canvas,svg'))row.style.setProperty('display','none','important');}
+  const candidates=scope.querySelectorAll('main > .footer,main > .footnote,main > .footerbar,main > .mathnote,.sceneFoot,details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]');
   for(const node of candidates){
    if(nodes.includes(node)||node.closest('[data-guide-source]'))continue;
    if(node.matches('details')){

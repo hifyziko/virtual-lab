@@ -118,3 +118,7 @@ html:has(main.uniform-module-layout),body:has(main.uniform-module-layout),main.u
 
 /* Soft module surface; fusion uses its own framing. */
 html:not(:has(body[data-fusion-page])) body>main,html:not(:has(body[data-fusion-page])) body>.workspace{position:relative;isolation:isolate;background:transparent!important}html:not(:has(body[data-fusion-page])) body>main::before,html:not(:has(body[data-fusion-page])) body>.workspace::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:28px;background:#e9f3ed;mask-image:linear-gradient(to right,transparent,#000 24px,#000 calc(100% - 24px),transparent),linear-gradient(to bottom,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-composite:intersect}
+
+/* Status summaries belong in the guide; reserve the workspace for the experiment. */
+.workspace>.statusline{display:none!important}
+main.uniform-module-layout:has(#zoomWall){grid-template-rows:100px minmax(0,1fr)}

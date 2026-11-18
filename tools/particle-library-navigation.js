@@ -1,15 +1,15 @@
 /* Fusion shares the catalog, hash routing, search and disposal of the other lessons. */
 (()=>{'use strict';
  const entries=[
+  {id:'fu07-plazma',group:'fusion',num:'00',title:'Plyn, ionizovaný plyn a plazma',description:'Od jediného atomu k souboru částic: teplota, ionizace, vlastní elektrické pole a odezva na magnetické pole.',page:'fuze-plazma/index.html',kind:'Interaktivní experiment'},
   {id:'fu01-reakce',group:'fusion',num:'01',title:'Fúzní reakce a Coulombova bariéra',description:'Přibližování jader, průchod bariérou a názorné ukázky jaderných reakcí.',page:'fuze-bariera/index.html',kind:'Interaktivní experiment'},
   {id:'fu03-drift',group:'fusion',num:'02',title:'Drift částic v poli',description:'Vlet do magnetického pole, gyrace a E×B drift, grad-B drift i drift zakřivení.',page:'fuze-drift/index.html',kind:'Interaktivní experiment'},
   {id:'fu04-udrzeni',group:'fusion',num:'03',title:'Magnetické udržení',description:'Solenoid, magnetické zrcadlo, uzavření do toroidu a skládání helikálního magnetického pole.',page:'fuze-udrzeni/index.html',kind:'Interaktivní experiment'},
-  {id:'fu05-rovnovaha',group:'fusion',num:'04',title:'Rovnováha tokamaku',description:'Tlak, poloha a tvar plazmatu. Numerické rovnováhy, magnetické plochy a proudy řídicích cívek.',page:'fuze-rovnovaha/index.html',kind:'Interaktivní experiment'},
-  {id:'fu06-divertor',group:'fusion',num:'05',title:'Magnetické plochy a divertor',description:'Od magnetické osy přes separatrix a x-bod až k otevřeným siločarám a divertorovým terčům.',page:'fuze-rovnovaha/divertor.html',kind:'Interaktivní experiment'},
-  {id:'fu02-galerie',group:'fusion',num:'06',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
+  {id:'fu06-divertor',group:'fusion',num:'04',title:'Divertor',description:'Od magnetické osy přes separatrix a x-bod až k otevřeným siločarám a divertorovým terčům.',page:'fuze-rovnovaha/divertor.html',kind:'Interaktivní experiment'},
+  {id:'fu02-galerie',group:'fusion',num:'05',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
  ];
  const aliases={"fu02-jadra":"nuclei","fu03-atomy":"atoms","fu04-castice":"particles"};
- const routes=[...entries,...Object.entries(aliases).map(([id,mode])=>({...entries.find(entry=>entry.id==='fu02-galerie'),id,mode,sourceId:'fu02-galerie'}))];
+ const routes=[...entries,{...entries.find(e=>e.id==='fu06-divertor'),id:'fu05-rovnovaha',sourceId:'fu06-divertor'},...Object.entries(aliases).map(([id,mode])=>({...entries.find(entry=>entry.id==='fu02-galerie'),id,mode,sourceId:'fu02-galerie'}))];
  for(const entry of routes)Lab.register({...entry,mount(app){
   // The responsive iframe owns its viewport; native canvas fitting would force
   // height:auto on its host and collapse the frame to the browser's 150px default.

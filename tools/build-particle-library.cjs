@@ -10,14 +10,15 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
   const rel='fuze-udrzeni/helicity-chunks/'+name+'.js',data=Buffer.from('window.HiFyzikoHelicityData=window.HiFyzikoHelicityData||{};window.HiFyzikoHelicityData['+JSON.stringify(name)+']='+JSON.stringify(raw)+';\n');
   const out=path.join(web,rel);fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,data);entries.push({path:rel,bytes:data.length,sha256:crypto.createHash('sha256').update(data).digest('hex')});
  });
- copy(path.join(source,'equilibrium'),'fuze-rovnovaha/');
+ copy(path.join(source,'equilibrium'),'fuze-rovnovaha/');copy(path.join(source,'plasma'),'fuze-plazma/');
  const index=path.join(web,'index.html');let html=fs.readFileSync(index,'utf8').replace(/<!-- particle-library:start -->[\s\S]*?<!-- particle-library:end -->\s*/g,'').replace(/<style id="fusion-navigation-style">[\s\S]*?<\/style>/g,'');
  html=html.replace('</head>',()=>'<style id="fusion-navigation-style">'+fs.readFileSync(path.join(source,'navigation/style.css'),'utf8')+'</style></head>');
  html=html.replace(/<script id="module-guide-data">[\s\S]*?<\/script>/g,()=>'<script id="module-guide-data">'+fs.readFileSync(path.join(__dirname,'module-guide-data.js'),'utf8')+'</script>');
  const js=fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8');
  const anchor=html.includes('<script id="progressive-web-install">')?'<script id="progressive-web-install">':'</body>';
  html=html.replace(anchor,()=>`<!-- particle-library:start --><script>${js}</script><!-- particle-library:end -->\n`+anchor);fs.writeFileSync(index,html);
- const file=path.join(dest,'manifest.json'),m=JSON.parse(fs.readFileSync(file,'utf8'));m.files=m.files.filter(f=>!['fuze-galerie/','fuze-castice/','fuze-seznam/','fuze-bariera/','fuze-drift/','fuze-udrzeni/','fuze-rovnovaha/','shared/particles/','shared/fusion/'].some(p=>f.path.startsWith(p))).concat(entries);const item=m.files.find(f=>f.path==='index.html');if(item){item.bytes=Buffer.byteLength(html);item.sha256=crypto.createHash('sha256').update(html).digest('hex');}if(m.progressive)m.progressive.shellBytes=Buffer.byteLength(html);m.bytes=m.files.reduce((n,f)=>n+f.bytes,0);fs.writeFileSync(file,JSON.stringify(m,null,2)+'\n');
+ const file=path.join(dest,'manifest.json'),m=JSON.parse(fs.readFileSync(file,'utf8'));m.files=m.files.filter(f=>!['fuze-plazma/','fuze-galerie/','fuze-castice/','fuze-seznam/','fuze-bariera/','fuze-drift/','fuze-udrzeni/','fuze-rovnovaha/','shared/particles/','shared/fusion/'].some(p=>f.path.startsWith(p))).concat(entries);const item=m.files.find(f=>f.path==='index.html');if(item){item.bytes=Buffer.byteLength(html);item.sha256=crypto.createHash('sha256').update(html).digest('hex');}if(m.progressive)m.progressive.shellBytes=Buffer.byteLength(html);m.bytes=m.files.reduce((n,f)=>n+f.bytes,0);fs.writeFileSync(file,JSON.stringify(m,null,2)+'\n');
+ require('./build-em-wave.cjs').build(web);
  if(m.progressive)require('./build-progressive-web.cjs').build(web);
 }
 console.log('Built retained particle database; no fusion concept modules or alternate entry generated.');

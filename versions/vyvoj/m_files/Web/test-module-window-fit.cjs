@@ -88,3 +88,17 @@ ctx.innerHeight=768;temporaryFooterTop=709;ctx.fitImportedModule(frame,content,1
 const stableHeight=frame.style.transform;temporaryFooterTop=724;ctx.fitImportedModule(frame,content,1000);
 assert.equal(frame.style.transform,stableHeight,'previous horizontal scrollbar must not change available height');
 console.log('PASS: transient vertical/horizontal scrollbars cannot alter viewport inputs or cause resize drift.');
+
+// Fullscreen enter/exit also works when the browser API is unavailable or rejected.
+(async()=>{
+ const source=fs.readFileSync(__dirname+'/fullscreen-navigation.js','utf8');
+ const toggle=source.slice(source.indexOf('async function toggle()'),source.indexOf('window.toggleModuleFullscreen'));
+ for(const capability of ['native','missing','rejected']){
+  let full=false,exits=0,resizes=0,requests=0;
+  const env={active:()=>full,exit:async()=>{full=false;exits++;},update(){},Event:class{},window:{dispatchEvent(){resizes++;}},document:{body:{classList:{add(){full=true;}}},documentElement:{}}};
+  if(capability!=='missing')env.document.documentElement.requestFullscreen=async()=>{requests++;if(capability==='rejected')throw Error('denied');};
+  vm.runInNewContext(toggle+';this.run=toggle;',env);await env.run();assert(full);await env.run();assert(!full);assert.equal(exits,1);assert.equal(resizes,1);assert.equal(requests,capability==='missing'?0:1);
+ }
+ assert(source.includes("e.stopImmediatePropagation();toggle();"),'one central capture handler prevents double toggles');
+ console.log('PASS: fullscreen toggle with native API, missing API and rejected request; exit remains available.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

@@ -93,7 +93,9 @@ function transform(original){
 function addFusionPages(output,web){
  const navigation=fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8');
  const pages=[...navigation.matchAll(/id:'(fu\d+-[a-z]+)'[^\n]+?page:'([^']+)'/g)];
- if(pages.length!==6)throw Error('Expected six fusion modules');
+ const ids=new Set(pages.map(p=>p[1]));if(ids.size!==pages.length||!['fu01-reakce','fu02-galerie','fu03-drift','fu04-udrzeni','fu06-divertor'].every(id=>ids.has(id)))throw Error('Incomplete or duplicate fusion module routes');
+ const waveNavigation=fs.readFileSync(path.join(__dirname,'em-wave-navigation.js'),'utf8');
+ pages.push(...waveNavigation.matchAll(/id:'(em06-vlna)'[^\n]+?page:'([^']+)'/g));
  const published=new Set(require('./project/common.cjs').policy().webFiles);
  output.preserved=output.preserved.filter(item=>!item.key.startsWith('fusion-'));
  for(const key of Object.keys(output.assets))if(key.startsWith('fusion-'))delete output.assets[key];
@@ -127,6 +129,7 @@ function addFusionPages(output,web){
  }
  const aliases=JSON.parse(navigation.match(/const aliases=(\{[^\n]+\});/)[1]);
  for(const id of Object.keys(aliases))output.dependencies[id]=['fusion-fu02-galerie'];
+ output.dependencies['fu05-rovnovaha']=['fusion-fu06-divertor'];
  const install='<script id="progressive-web-install">LabProgress.install('+encode(output.assets)+','+encode(output.dependencies)+');</script>';
  output.html=output.html.replace(/<script id="progressive-web-install">[\s\S]*?<\/script>/,()=>install);
 }

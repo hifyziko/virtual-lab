@@ -1,6 +1,10 @@
 /* Reproducible web delivery; immutable version directories, no destructive cleanup. */
 const fs=require('fs'),path=require('path'),crypto=require('crypto'),{execFileSync}=require('child_process');
 const root=path.resolve(__dirname,'..'),version=process.argv[2]||'aktualni',working=version==='aktualni';
+if(process.platform==='win32'){
+ const retryModule=path.join(__dirname,'build-io-retry.cjs').replaceAll('\\','/');require(retryModule);
+ if(!(process.env.NODE_OPTIONS||'').includes('build-io-retry.cjs'))process.env.NODE_OPTIONS=((process.env.NODE_OPTIONS||'')+' --require='+JSON.stringify(retryModule)).trim();
+}
 const dest=path.join(root,'versions',version),web=path.join(dest,'web');
 // The current source tree was restored under versions/vyvoj; publish it to the stable root entry.
 const activeSource=path.join(root,'versions','vyvoj');

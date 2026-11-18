@@ -20,6 +20,7 @@
   stiffness:'Bartoš: Teorie elektrických strojů, str. 124–125 (synchronizační moment); Fitzgerald: Electric Machinery, kap. 5.7.',
   regulation:'Chapman: Instructor’s Manual, příklad 5-4(b–e), tištěné str. 115–116. Jde o příručku řešení, nikoli plnou učebnici.',
   model:'Vlastní výukový model projektu a jeho metodika; uvedené knihy elektrických strojů toto téma nepokrývají.',
+  plasma:'S. Entler, V. Kindl: Jaderná fúze a fúzní elektrárny, kap. 2.1–2.2, str. 30–32; rámečky 2.1 a 2.3. Kolektivní kmitání: I. H. Hutchinson, MIT, Introduction to Plasma Physics I, kap. 5, str. 101–102, obr. 5.1, vztahy 5.47–5.50.',
   drift:'S. Entler, V. Kindl: Jaderná fúze a fúzní elektrárny, kap. 7.3–7.4, str. 141–148 (gyrace a drifty).'
  };
  const entries = {};
@@ -198,6 +199,9 @@
  add('fu02-galerie','model',
   ['Přepínejte skupiny Vše, částice, jádra a atomy.','Tažením prohlížejte prostorové modely a porovnávejte jejich druhy a popisky.'],
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
+ add('fu07-plazma','plasma',
+  ['Přidávej atomy a posuvníkem teploty dodávej teplo. Sleduj uvolňování elektronů a pole vzniklých nábojů.','Zapni magnetické pole a porovnej dráhy neutrálních atomů, iontů a elektronů. V pokusu Kolektivní kmitání sleduj návrat vychýlené elektronové tekutiny a porovnej zapnuté/vypnuté elektrické působení.'],
+  ['Plazma může být částečně ionizované. Od samotné ionizace je odlišuje kolektivní chování a kvazineutralita v dostatečně velkém objemu.','Jde o názorný model se zmenšeným poměrem hmotností. Počet zobrazených atomů není hustota skutečného plynu; magnetické pole stáčí i jednotlivý volný náboj.'],String.raw`m\frac{\mathrm d\mathbf v}{\mathrm dt}=q(\mathbf E+\mathbf v\times\mathbf B)`,['fu03-drift','fu02-galerie']);
  add('fu03-drift','drift',
   ['Začněte vletem do magnetického pole: nastavte částici, energii a směr a spusťte pokus. Před spuštěním lze částici přetáhnout.','Přepněte na gyraci nebo jednotlivé drifty. Animaci pozastavíte tlačítkem, restart vrátí částici. Energii a indukci měňte i za běhu.'],
   ['Mimo pole se částice pohybuje přímo; v čistě magnetickém poli mění směr, nikoli kinetickou energii.','E×B drift má pro oba náboje stejný směr. Grad-B drift a drift zakřivení obracejí směr se znaménkem náboje. Pole jsou předepsaná; model nepočítá vlastní pole plazmatu.'],String.raw`\mathbf v_E=\frac{\mathbf E\times\mathbf B}{B^2}`,['fu01-reakce','fu02-galerie','em03-silove-ucinky']);
@@ -207,12 +211,13 @@
   ['Porovnejte únik ze solenoidu s odrazem ve zrcadle. Měňte zrcadlový poměr a úhel rychlosti deuteronu vůči poli.','Posuvníkem uzavřete solenoid a složte samostatná pole. Zapněte průsvitné magnetické plochy, vypněte siločáry a posouvejte jejich řez.'],
   ['Odraz vzniká Lorentzovou integrací v poli konečných kruhových závitů odvozeném z vektorového potenciálu. Částice ve ztrátovém kuželu unikají.','Toroid odstraní otevřené konce, samotné toroidální pole však neodstraní drifty. Helicita magnetických siločar označuje lokální sklon; není to globální magnetická helicita.'],String.raw`\mathbf B=\mathbf B_{\mathrm T}+\mathbf B_{\mathrm P}`,['fu03-drift','fu01-reakce']);
  sources.equilibrium='Entler, Kindl: Jaderná fúze a fúzní elektrárny, kap. 7.9, s. 154–156; kap. 7.11–7.12, s. 158–160. Numerický model: FreeGS 0.8.2.';
- add('fu05-rovnovaha','equilibrium',
-  ['Přepněte pokus Tlak, Poloha nebo Tvar a měňte jediný posuvník. Sledujte magnetickou osu, plochy a proudy cívek.','Kliknutím v řezu vyberete plochu. Tažením otáčejte propojený prostorový pohled.'],
-  ['Tlaková a magnetická síla se v rovnováze vyvažují. Tlak je na magnetické ploše konstantní.','Proudy cívek jsou vypočtené pro požadovaný tvar. Posloupnost statických rovnováh není simulací stability ani časového regulátoru.'],String.raw`-\nabla p_{\mathrm{pl}}+\mathbf J\times\mathbf B=0`,['fu06-divertor','fu04-udrzeni']);
  add('fu06-divertor','equilibrium',
-  ['Volte Uvnitř, Separatrix a K terčům. Posuvník prochází magnetickými plochami od osy do vrstvy SOL.','Porovnejte poloidální řez s prostorem. Mapa poloidálního pole ukazuje zeslabení u x-bodu.'],
-  ['Separatrix odděluje uzavřené plochy od otevřených siločar. V x-bodě zaniká pouze poloidální složka pole.','Otevřené siločáry vedou k divertorovým terčům. Směrové značky nejsou částice ani simulace tepelného toku.'],String.raw`\psi(r_{\mathrm c},z)=\mathrm{konst.}`,['fu05-rovnovaha','fu04-udrzeni']);
- const aliases={'fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
+  ['Vyberte poloidální cívku a měňte její proud. Ostatní proudy zůstávají pevné. Sledujte změnu osy a separatrix.','Volte Uvnitř, Separatrix a K terčům. Porovnejte tlak, indukci a proudovou hustotu v řezu a prostoru.'],
+  ['Poloha plazmatu je výsledkem rovnováhy při zadaných proudech. Nepoužívá se regulátor polohy. Výběr jiné cívky obnoví výchozí stav.','Statické rovnováhy nepopisují vertikální stabilitu ani transport tepla k terčům. Geometrie vychází z ITER; nejde o konkrétní výboj.'],String.raw`-\nabla p_{\mathrm{pl}}+\mathbf J\times\mathbf B=0`,['fu04-udrzeni','fu03-drift']);
+ sources.emwave='Feynman, Leighton, Sands: The Feynman Lectures on Physics, I, kap. 28; II, kap. 20. Vlastní retardovaný bodový dipólový model; metodika v docs/EM-VLNA.md.';
+ add('em06-vlna','emwave',
+  ['Začněte před pohybem a zvolte Vznik ohybu. Porovnejte bílé siločáry s původním polem; zelený kruh vyznačuje čelo změny.','Zvolte Vlna odchází. Vpravo sledujte magnetické pole, jeho znaménko a směr. Přepněte na dipólovou anténu nebo prostorový detail.'],
+  ['Vzdálené pole odpovídá dřívějšímu pohybu náboje. Změna se šíří konečnou rychlostí světla; siločáry nejsou hmotná vlákna.','Model počítá retardované pole pohybujících se bodových nábojů. Neřeší impedanci ani rezonanci antény; prostorový detail je rovinné přiblížení.'],String.raw`\mathbf S=\frac{1}{\mu_0}\mathbf E\times\mathbf B`,['em01-indukovane-napeti','em03-silove-ucinky']);
+ const aliases={'fu05-rovnovaha':'fu06-divertor','fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
  window.ModuleGuideData={sources,entries,aliases};
 })();

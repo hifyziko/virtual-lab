@@ -118,7 +118,7 @@ const controls=sourceNode('details','Pokročilé nastavení',{interactive:true})
 const positions=sourceNode('details','Přesné polohy vodičů',{classes:['.precisePositions']});
 const live=sourceNode('details','Lorentzova síla',{interactive:true});
 const modal=sourceNode('dialog','Od sil k momentu');
-const root={ownerDocument:c.document,isConnected:true,querySelector:()=>null,querySelectorAll:()=>[theory,learning,controls,positions,live,modal,fieldNote]};
+const root={ownerDocument:c.document,isConnected:true,querySelector:()=>null,querySelectorAll:selector=>selector==='.statusline'?[]:[theory,learning,controls,positions,live,modal,fieldNote]};
 c.location.hash='#dc02-kotva';c.ModuleGuide.collect(root);
 for(const n of [theory,learning,modal,fieldNote])assert.equal(n.style.display,'none','theory removed from scene flow');
 for(const n of [controls,positions,live])assert.equal(n.style.display,undefined,'interactive/settings/scene content retained');

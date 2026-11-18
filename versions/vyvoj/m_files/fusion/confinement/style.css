@@ -60,6 +60,8 @@ body:has(#mirrorRelation:not([hidden])) #status{display:none}
 
 #atlasProgress{height:30px;margin:22px 0}#atlasRetry{font-size:16px;padding:8px 18px}#hLoadValue{font-size:21px}
 
+.unrollToggle{position:absolute;z-index:5;right:14px;top:12px;font-size:11px;padding:5px 8px}.unrollPanel{position:absolute;z-index:6;right:14px;top:45px;width:316px;border:1px solid #cad6df;border-radius:9px;background:#fffffff5;box-shadow:0 4px 20px #19374d18;padding:7px}.unrollHeading{display:flex;align-items:center;justify-content:space-between;font-size:12px}.unrollHeading button{border:0;padding:0 5px;font-size:18px;line-height:20px}.unrollPlot{position:relative;height:220px}.unrollPlot canvas{width:300px;height:220px}.unrollPlot>span{position:absolute;font-size:10px;transform:translate(-50%,-50%)}#unrollPhi{left:160px;top:209px}#unrollTheta{left:13px;top:96px;transform:translate(-50%,-50%) rotate(-90deg)}#unrollZero{left:30px;top:188px}#unrollOneX{left:283px;top:190px}#unrollOneY{left:28px;top:14px}.unrollFoot{display:flex;justify-content:space-between;font-size:10px;color:#526a77}.sceneWrap:has(.unrollToggle:not([hidden])) .sceneTitle{max-width:calc(100% - 165px)}
+
 /* Keep the header spacing; give the spare playback-row height to the desk. */
 body[data-fusion-page="fu04-udrzeni"] main{gap:0}
 body[data-fusion-page="fu04-udrzeni"] main>header{margin-bottom:10px}

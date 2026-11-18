@@ -1,6 +1,6 @@
 # Pracovní projekt · verze 1.0
 
-## Jediný aktuální stav — 17. listopadu 2026
+## Jediný aktuální stav — 18. listopadu 2026
 
 Na výslovný pokyn uživatele byl převzat soukromý balíček
 `HiFyziko-predani-na-jiny-pocitac-2026-11-16.zip`, commit
@@ -12,7 +12,7 @@ souhlasily s balíčkem. Žádné místní změny nebyly zahozeny.
 - **Upravitelné zdroje:** `versions/vyvoj/m_files/`.
 - **Společné nástroje:** `tools/` a `config/project-files.json`.
 - **Aktuální výuka:** `versions/aktualni/web/index.html`; spouštění také přes `SPUSTIT_VYUKU.cmd`.
-- **Aktuální soukromý předávací ZIP:** `handoffs/HiFyziko-predani-2026-11-17-oprava-nacitani.zip` a sousední `.sha256`; po ověření nahrazuje dřívější předání z 17. listopadu.
+- **Aktuální soukromý předávací ZIP:** `handoffs/virtual-lab-<čas>-<commit>.zip` a sousední `.zip.sha256`; přesný commit a potvrzení push uvádí `_handoff/state.json` uvnitř balíčku. Po ověření nahrazuje dřívější předání.
 - **Literatura a malé modelové vstupy:** původní cesty; nikdy do veřejného webu ani Gitu.
 - **Chráněné zálohy:** `versions/1.0.0-pred-upravami` a `versions/1.5.8-pred-schematem`; zůstávají nedotčené.
 

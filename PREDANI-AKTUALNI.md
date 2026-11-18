@@ -1,5 +1,390 @@
 # Aktuální stav předání
 
+## Předání na jiný počítač — 18. listopadu 2026
+
+Aktuální sestavení zahrnuje přepracovaný Divertor s parametrickou konstrukcí ITER,
+SOL, čitelnými značkami a jemnou siločárou, rozvinutí magnetického povrchu,
+interaktivní plazma a modul elektromagnetické vlny s pohybujícími se náboji.
+Zahrnuje také sjednocený výklad, opravy celého okna a aktuální navigaci.
+Podrobnosti fúze jsou v docs/fuze/iter-divertor-2026-11-18.md;
+elektromagnetické vlny v docs/EM-VLNA.md. Omezení výukových modelů zůstávají
+uvedená v jejich výkladu. Verze aplikace zůstává 1.0.
+
+Úplné sestavení node tools/build-release.cjs, celá sada node tools/project/check.cjs,
+kontrola nástrojů předání a příprava veřejného webu prošly. Windows sestavení
+omezeně opakuje dočasně blokované zápisy souborů; toto opatření dědí i podprocesy.
+Prohlížeč nebyl automaticky spuštěn; testy DOM/canvas a GPU geometrie nenahrazují
+vizuální kontrolu skutečného WebGL ve všech prohlížečích.
+
+Uživatel výslovně schválil push a následné soukromé předání. Balíček se vytváří
+teprve po pushi; přesný commit, vzdálený stav a SHA-256 souborů obsahuje _handoff/.
+Na novém počítači rozbalit ZIP do nové složky a spustit node tools/project/restore.cjs.
+Soukromá literatura a malé modelové podklady patří pouze do tohoto ZIPu.
+Přihlašovací údaje ani surový velký archiv modelů se nepřenášejí.
+
+## Odloženo: kolektivita vznikající z částicového výpočtu — 18. listopadu 2026
+
+Uživatel upozornil, že současné Kolektivní kmitání působí jako předem
+naprogramovaná animace. Platná připomínka: CollectiveModel řeší přesně
+odvozený harmonický posun a všem elektronům přiděluje tentýž posun;
+nejde o emergentní výsledek samostatných částic a pole. Další krok je
+navrhnout a ověřit samokonzistentní elektrostatický model (např. 1D PIC
+s řešením Poissonovy rovnice), v němž návratová odezva vznikne z rozložení
+náboje, bez předpisu společného harmonického pohybu. Současný režim nelze
+prezentovat jako takový částicový důkaz. Uživatel práci výslovně odložil
+na jindy, nyní model nepřepsán. V této navazující relaci proběhlo pouze
+čtení současného modelu a testů. Žádný push ani nový předávací ZIP.
+
+## Kolektivní elektronové kmitání — 18. listopadu 2026
+
+V úvodu do plazmatu nová nabídka Pokus: Plyn a ionizace / Kolektivní
+kmitání. Druhý režim je samostatný standardní model studené elektronové
+tekutiny proti homogennímu pevnému iontovému pozadí podle Hutchinson,
+MIT 22.611J (2003), kap. 5, s. 101–102, obr. 5.1, rovnice 5.47–5.50:
+https://ocw.mit.edu/courses/22-611j-introduction-to-plasma-physics-i-fall-2003/75c75c5df51f8fba1b2a903fde937ddc_chap5.pdf
+
+Gaussův zákon dává E = ne*e*xi/eps0, pohyb elektronů xi'' = -omega_pe²*xi.
+Implementováno přesným krokem v normalizovaném čase omega_pe*t. Všechny
+značky elektronové tekutiny mají společné vychýlení, ionty jsou pevné.
+Barevné krajní pásy ukazují oddělený povrchový náboj, jantarové šipky
+společné elektrické pole. Nekreslí se neodpovídající siločáry bodových
+kuliček. Vypnutí vzájemného působení ruší pole: pohyb pokračuje aktuální
+rychlostí. Vychýlit elektrony znovu připraví společný posun a nulovou
+rychlost; jde o vnější zásah. Původní částicový stav se při návratu zachová.
+
+Ovladače teploty, ionizace, počtu, srážek a B jsou v tomto režimu záměrně
+neaktivní. Předpoklady: lineární malá porucha, studená elektronová tekutina,
+nehybné ionty, bez srážek, B a tlumení. Nejde o Debyeovo stínění, šíření
+vln nebo automatický důkaz plazmových podmínek původního částicového modelu.
+Značky jsou výběrové body kontinua, nikoli skutečný krystal. Výklad a
+zdrojové odkazy aktualizovány. B značky a popisek mají na pokyn uživatele
+v tomto modulu grafitovou barvu #37434b, modrá je vyhrazena elektronům.
+
+Testy ověřují analytickou periodu, konstantní normalizovanou energii,
+společný posun, pevné ionty, znaménko pole, nulovou celkovou sumu nábojů,
+vypnutí pole a skutečné přepnutí UI. Canvasové náhledy počáteční a opačné
+fáze prohlédnuty bez otevření prohlížeče; skutečné HTML/WebGL tím neověřeno.
+
+## Plynulost, znaménko záře a revize fyziky — 18. listopadu 2026
+
+Původní lokální raster byl při pohybu opožděný za elektrony. Nahrazen
+září kreslenou synchronně podle aktuální polohy každého náboje: elektron
+modře, kladný iont červeně. Záře nyní značí náboj, nikoli kvantitativní
+velikost E; odstraněna neplatná barevná škála velikosti. Siločáry dál
+vycházejí ze součtu Coulombových polí, jejich šipky míří od kladného
+náboje k zápornému. Worker počítá pouze siločáry, nikoli plošný raster.
+Proředěno trasování pro menší prodlevu. Stopy zaznamenávají integrační
+mezikroky, maximální krok snížen na 0,003 názorného času.
+
+Fyzikální audit: Sahova rovnice odpovídá Entler–Kindl, rámeček 2.1,
+s. 31; Lorentzova síla a její směr kap. 2.2, rámeček 2.3, s. 31–32.
+Vlastní dynamika je výuková ilustrace: rovina, poměr hmotností 25:1,
+zesílená a změkčená Coulombova interakce, kontaktní disky, ideální stěny,
+umělé časování ionizace. Nelze ji vydávat za kvantitativní simulaci
+vodíkového plazmatu, skutečných srážek ani Debyeova stínění. Kontakty
+zachovávají kinetickou energii izolované dvojice; poziční korekce kontaktů
+v souběžném elektrickém potenciálu nejsou důkazem zachování celé energie.
+Stručné vymezení nově na začátku společného výkladu. Doplňkově ověřeno
+Fitzpatrick, Collisions a Debye Shielding (odkazy již ve výkladu).
+Test plazmatu prošel včetně aktuálních poloh záře, barev a směru E.
+
+## Siločáry a lokální teplá škála — 18. listopadu 2026
+
+Na pokyn uživatele odstraněna celoplošná modrá mapa plazmového úvodu.
+Zůstávají siločáry a jemná barevná vrstva jen kolem volných nábojů;
+plynule přechází od světlé jantarové do červené podle stejného výsledného
+E a dosavadní normalizace. Škála a výklad aktualizovány. Prostor mimo
+lokální okolí je průhledný; jde o grafické okno, nikoli omezení dosahu
+síly nebo fyzikální model stínění. Síly, srážky a stěny zachovány.
+Test ověřuje průhledné vzdálené pozadí, přítomnost lokální škály,
+teplou paletu i zachování siločar; celý test plazmatu prošel.
+
+## Viditelnost atomů a elektrické působení — 18. listopadu 2026
+
+Neutrální obal se nad modrou mapou ztrácel: nový světlý podklad, jemně
+fialový obal a dvojitý světlý/tmavší obrys zachovávají rozpoznatelnost.
+Neutrální atom nadále není zdrojem E pole; kreslí se nad mapou.
+
+Znaménka Coulombových sil ověřena jako správná. Po zvětšení prostoru
+byl jejich vizuální účinek slabý vůči tepelnému pohybu; názorný koeficient
+elektrického působení zvýšen z 0,055 na 0,55. Zesílení a modelové měřítko
+uvedeny ve výkladu. Všechny náboje používají stejné měřítko, párové síly
+zůstávají stejně velké a opačné. Test integrovaných drah ověřuje znatelné
+odpuzování i přitažlivost původně klidné dvojice, součet hybností a vypnutí
+elektrického působení. Celý test plazmatu prošel, včetně stability a stěn.
+
+## Pružné stěny hřiště obnoveny — 18. listopadu 2026
+
+Na výslovný pokyn uživatele částice opět uzavírají ideální pružné stěny.
+Odraz zrcadlí přesah a obrací jen normálovou rychlost; nepoužívá se
+návratový potenciál, který mohl dříve dodat energii. Ošetřen i vícenásobný
+přesah a kontakt částic posunutých srážkovou korekcí. Zohledněn modelový
+poloměr kontaktu. E a B zůstávají přes hranici a vyhasínají až v lemu.
+Výklad opraven z otevřeného prostoru na ideální pružné stěny. Testy
+potvrdily zachování rychlosti a udržení atomu i obou znamének náboje
+po 10 000 krocích včetně B; ověřena i tečná složka rychlosti.
+
+## Názvy předvoleb Divertoru — 18. listopadu 2026
+
+Po ověření knihy Entler–Kindl, kap. 7.9 a 7.11–7.12, s. 154–159,
+přejmenovány předvolby Uvnitř / Separatrix / K terčům na Uzavřené plochy /
+Separatrix / Vrstva SOL. Výklad volby aktualizován. Hodnoty normalizovaného
+toku, fyzika a předvolby samotné se nemění; jde o opravu terminologie.
+
+## EM vlna: vyšší rozlišení — 18. listopadu 2026
+
+Ostrost pláten nyní respektuje skutečné zvětšení modulu i DPR. GPU mapy
+1024–3072 bodů na stranu; CPU mřížka zvýšena z 97 na 257 bodů a rastr
+z 512 na 1024. Zvýšení platí také pro prostorovou vlnu a spodní graf.
+
+
+## Uvolnění plochy a odebrání clonění — 18. listopadu 2026
+
+Na pokyn uživatele odstraněna zdrojová citace z patičky plazmového úvodu;
+úplná citace knihy zůstává ve Zdroje společného výkladu. Patička odstraněna
+z rozložení, označení Verze 1.0 je malé v hlavičce. Uvolněná výška přechází
+na scénu a graf. Odebrán i posuvník Clonění pole z okolí a jeho profil;
+B je opět homogenní v celém prostoru. Zachovány indukce, zapnutí i obrácení
+pole. Test plazmatu prošel včetně zachování rychlosti při změně B.
+
+## Clonění z okolí a otevřený prostor — 18. listopadu 2026
+
+Upřesnění uživatele: posuvník má pole zmenšovat ze všech stran směrem
+ke středu, nikoli odsouvat pouze zleva. Nové Clonění pole z okolí
+plynule zmenšuje středový obdélník s hladkým okrajem. Stejný profil
+používá magnetická síla i značky. Jde o předepsanou názornou masku,
+ne o materiálový magnetický štít; indukované E se nepočítá.
+
+Umělá návratová síla zcela odstraněna, prostor je otevřený. Původní
+vnitřní okrajový potenciál mohl po ionizaci dodat elektronu energii
+a společně s B vyvolávat pohyb kolem okraje. Samotné B práci nekoná.
+Nové částice ani vychýlení elektronů se neomezují na původní obdélník.
+Částice mohou opustit záběr; začátek pokusu obnoví reset. Test potvrdil
+průchod hranicí bez umělého zrychlení a konstantní rychlost izolovaného
+náboje při průběžné změně masky B. Zachovány srážky a elektrické síly.
+
+## Pole za hranicí a odstranění okrajového urychlení — 18. listopadu 2026
+
+Magnetické značky nově pokračují do stejného vnějšího lemu jako E mapa;
+jejich kryvost plynule slábne. Fyzikální B zůstává homogenní a elektrické
+síly neoříznuté. Návratová síla přesunuta z vnitřní oblasti až za hranici
+(začíná 0,6 názorné jednotky vně), aby nově vytvořený elektron nezískal
+energii z původního vnitřního okrajového potenciálu. Test potvrzuje průchod
+nominální hranicí beze změny rychlosti při vypnutých interakcích.
+Uživatel navrhl posuvník pro odsouvání pole; čeká se na upřesnění druhu pole
+a cílového jevu. Zatím neimplementován.
+
+## Rychlé porovnání ionizace, větší hřiště a srážky — 18. listopadu 2026
+
+Plocha hřiště zdvojnásobena při zachování poměru stran (oba rozměry krát
+odmocnina ze dvou). Kamera zahrnuje celé hřiště s ochranným lemem.
+Tlačítka Plyn / Částečná ionizace / Plná ionizace připraví cílovou ionizaci
+okamžitě a zachovávají pole, kameru a pauzu; při méně než 12 atomech
+připraví 24 atomů. Teplotní rozsah zjemněn na 0,15–1,2 eV po 0,001 eV.
+Plynulá ionizace posuvníkem konverguje rychleji po dávkách podle rozdílu.
+Volby nejsou označeny jako ostrá hranice vzniku plazmatu: kolektivní
+odezvu může mít už částečně ionizovaný soubor. Samotné dva náboje ji
+nedokazují; výklad tento rozdíl uvádí.
+
+Nový výchozí přepínač Srážky částic: pružné klasické diskové kontakty
+atomů, iontů a elektronů, s hmotnostně váženým impulsem a odstraněním
+překryvu. Zachování hybnosti a kinetické energie izolovaného kontaktu
+ověřeno testem. Nejde o skutečné účinné průřezy, srážkovou ionizaci ani
+mikroskopický model Coulombových srážek; omezení uvedena v dialogu.
+Srážky lze vypnout nezávisle na vzájemném elektrickém působení.
+
+## EM vlna: světlá scéna a spodní rozložení — 18. listopadu 2026
+
+Odstraněn řádek Virtuální laboratoř… z modulu. Scéna má světlé pozadí
+a tmavé čitelné popisky. Opravena výška panelů, spodní rezerva map, oddělení
+časové osy a poloha popisků náboje. Vodorovné otáčení prostorové vlny nyní
+sleduje tažení myši. Přestavěna aktuální dodávka; EM a progressive testy prošly.
+
+
+## Ochranný lem a čitelnější mapa — 18. listopadu 2026
+
+Výchozí pohled plazmového úvodu a dvojklik nyní zahrnují ochranný lem:
+měřítko počítá s 1,36násobkem rozměrů hřiště, takže celé vnější vytrácení
+zůstává v obraze. Test ověřuje rezervu alespoň 16 procent na každé straně.
+Mlhavost mapy snížena zvýšením kryvosti z 24 na 64 procent a rozlišení
+z 144 na 384 bodů za pohybu; při pauze až 1024 bodů na šířku.
+Měkká maska zůstává pouze za fyzikální hranicí. Kuličky a dynamika zachovány.
+Test plazmatu prošel. Úpravy Divertoru požadované před tímto upřesněním
+(SOL, jemnost řezu a zarovnání grafu proudů) jsou stále další otevřenou prací;
+v této změně nebyly implementovány.
+
+## Plynulá okrajová síla místo tvrdého odrazu — 18. listopadu 2026
+
+Částice se na pokyn uživatele už neodrážejí okamžitou změnou znaménka
+rychlosti. U okrajů působí hladká kubicky rostoucí názorná návratová síla,
+integrovaná v obou půlkrocích. Zrušen tvrdý grafický ořez částic. Jde
+o modelovou okrajovou podmínku, ne o skutečné elektromagnetické udržení;
+uvedeno ve výkladu. Měkká oblast dovoluje malé přesahy, stabilita ověřena.
+Výchozí zoom a dvojklik drží celé hřiště v maximálním vejitelném měřítku;
+canvas nově zabírá celou šířku scény. Test ověřuje plynulé obrácení
+rychlosti po malých krocích, bez okamžitého zrcadlení polohy a rychlosti.
+
+## Měkký vnější okraj a samostatné siločáry — 18. listopadu 2026
+
+Vytrácení elektrického pole přesunuto mimo fyzikální hřiště: uvnitř
+nezeslabuje, za hranicí přechází do průhledna v šířce 16 procent rozměru.
+Nové zaškrtávátko Siločáry elektrického pole skrývá čáry a šipky při
+zachování mapy. Název ovladače změněn na Magnetická indukce podle uživatele.
+Test plazmatu prošel včetně masky přesahující skutečné hranice.
+
+## EM vlna: vznik ohybu a samostatné B — 18. listopadu 2026
+
+Modul em06-vlna nyní používá retardované Liénardovo–Wiechertovo pole pohybujících
+se nábojů. Výchozí pokus ukazuje přesun jednoho náboje z klidu do klidu, původní
+a aktuální siločáry, příčinné čelo a odcházející poruchu. Přidány tři časové
+předvolby, samostatná podepsaná mapa B a WebGL výpočet pole na pixel. Siločáry
+se integrují přímo z pole. Doplněn výklad a nové numerické testy LW modelu.
+Numerika, ovládání a KaTeX prošly; kontrolní CPU snímky prohlédnuty. Celé UI
+a WebGL kompilace v prohlížeči nebyly ověřeny, nový prohlížeč se neotevíral.
+Aktuální dodávka přestavěna; prošly testy EM, progressive načítání a společného
+výkladu i audit veřejných souborů. Podrobnosti a omezení: docs/EM-VLNA.md. Bez push.
+
+## Souvislá mapa a měkčí okraje plazmatu — 18. listopadu 2026
+
+Podle snímku odstraněna lokální intenzitou řízená průhlednost mapy,
+která vytvářela kolem nábojů oddělené kulové skvrny. Při přítomnosti
+volných nábojů má mapa souvislé slabé pozadí, její celková kryvost je
+24 procent. Bez volných nábojů zůstává mapa průhledná. Vytrácení celé
+vrstvy je rozšířeno na pětinu rozměru hřiště s jemnými přechodovými
+body. Směry, čáry a fyzikální výpočet zachovány. Test plazmatu prošel.
+
+## Hřiště a vytrácení na jeho hranicích — 18. listopadu 2026
+
+Zvětšen fyzikální prostor z 12 × 7,5 na 18 × 10 názorných jednotek,
+nové částice se rozmísťují po celé ploše. Canvas získal boční i svislou
+plochu. Opraven svislý počátek projekce při posunu: částice, magnetické
+značky, ořez a hranice nyní sdílejí tutéž transformaci. Ostrý vnitřní
+rámeček odstraněn. Celé elektrické pole včetně siločar vyhasíná u skutečných
+stěn hřiště, ne podle viewportu; maska sleduje zoom a posun. Částice
+i magnetické značky jsou oříznuté stejným hřištěm. Test plazmatu prošel,
+včetně konkrétních souřadnic masky pro posunuté hranice. Bez prohlížeče.
+
+## Neutrální atomy bez elektrického pole — 18. listopadu 2026
+
+Na pokyn uživatele odstraněno názorné elektrické pole neutrálních atomů.
+Do mapy ani siločar nevstupují; zdrojem jsou pouze volné ionty a elektrony.
+Platí pro worker i synchronní fallback, upraven i společný výklad.
+Test potvrzuje nulovou mapu a žádné siločáry neutrálního souboru.
+
+## Zklidnění pole plazmatu — 18. listopadu 2026
+
+Podle dalšího snímku proředěny svazky siločar podle počtu nábojů,
+odstraněno dvojí trasování spojení z obou znamének, zeslabena mapa
+i čáry a zmenšeny/rozestoupeny směrové hroty. Celá vrstva včetně
+siločar mizí u všech okrajů přes průhlednost; kuličky zůstávají ostré.
+Bez změny fyziky. Kontroly modelu, workeru, kamery a hladkosti prošly.
+
+## EM vlna — technické mapy a siločáry, 18. listopadu 2026
+
+Na připomínku uživatele přepracována hlavní scéna na dvě kvantitativní
+mapy pole a vyzařovaného toku energie, s technickou pásmovou paletou,
+číselnými legendami a pevnými lineárními/logaritmickými rozsahy. Vlevo
+lze přepínat velikost E, podepsané Ez a velikost B. Elektrické siločáry
+jsou skutečnou integrací okamžitého pole, s adaptivním krokem; alternativně
+vektory nebo samotná mapa. Staré pomocné kružnice odstraněné.
+Graf zmenšen, ovládání zhutněné, hlavní plochu dostaly mapy. Model zůstává
+analytický bodový dipól; výsledky nejsou vydávány za řešení z Ansysu.
+
+Přestavěny obě aktuální dodávky včetně lazy dokumentu. Cílené testy
+fyziky, barevných stupnic, tečnosti siločar, ovladačů, KaTeXu, načítání
+a auditu prošly. Canvas mapy prohlédnuté; celý prohlížeč neotevřen.
+Podrobnosti docs/EM-VLNA.md. Bez commitu a pushe.
+
+
+## Oprava siločar podle snímku uživatele — 18. listopadu 2026
+
+V plazmovém úvodu odstraněna interpolace směru z hrubého rastru, která
+vytvářela zalomené krátké úseky u neutrálních atomů. Siločáry nyní začínají
+rovnoměrně kolem zdrojů a používají přímé vyhodnocení součtu polí a adaptivní
+krok jako v reakcích. Záporné zdroje se integrují proti poli, orientace
+zobrazené čáry zůstává správná. Mapa slábne s polem i u okrajů scény;
+odstraněn ostrý ořez mapy podle obdélníku fyzikálního prostoru. Kuličky,
+ovládání a dynamika zachovány. Test ověřuje i radiální hladkost všech
+šestnácti siločar neutrálního atomu. Vizuálně v prohlížeči neověřeno.
+
+## Pole a zoom v úvodu do plazmatu — 18. listopadu 2026
+
+Podle posledního upřesnění uživatele zůstávají původní názorné kuličky;
+renderer katalogu se do tohoto modulu nepřevádí. Hlášení o nefunkčním
+zapínání pole uživatel odvolal, ovládání zůstalo zachováno.
+Elektrické pole nyní používá barevnou mapu velikosti výsledného vektoru
+a souvislé dvoubarevné siločáry podle výtvarného řešení fúzních reakcí.
+Názorné pole neutrálního atomu vyhasíná v obalu, neovlivňuje dynamiku.
+Mapa má viditelnou bezrozměrnou škálu; její význam je ve výkladu.
+Výpočet obrazu běží v Blob workeru, při pauze se zjemní; kamera odmítá
+opožděný výsledek ze starého pohledu. Bez workeru je synchronní fallback.
+
+Scéna získala šířku a výšku z kompaktnějšího rozložení. Kolečko přibližuje
+kolem kurzoru, tažení posouvá kameru, dvojklik vrací celek. Stav pokusu
+se nemění. Canvas zohledňuje skutečné zvětšení modulu a hustotu pixelů,
+takže obraz při zvětšení není jen natažen z původního rozlišení.
+Fyzikální model ani vzhled kuliček se neměnily. Bez pushe a prohlížeče.
+
+Komponentové sestavení i celé `node tools/project/check.cjs` prošly.
+Test plazmatu nově skutečně spouští zdroj Blob workeru, kontroluje
+odmítnutí starého pohledu, ukončení workeru, zvětšené pixelové rozlišení,
+zoom kolem kurzoru, návrat pohledu, znaménka a vyrušení polí.
+Při sestavení doplněna chybějící runtime závislost právě upraveného
+modulu elektromagnetické vlny: `em-vlna/field-renderer.js` do seznamu
+sestavení i veřejných souborů. Jeho fyzikální ani výtvarný kód se neměnil.
+
+## Anténa a elektromagnetická vlna — 18. listopadu 2026
+
+Nový modul em06-vlna v Elektřině a magnetismu (pořadí 12). Uživatel upřesnil
+EM vlnu, nikoli AM modulaci. Dva propojené pohledy: anténa a retardované
+okolní pole; otočný prostorový detail rovinné vlny. Sdílený čas, pevná sonda,
+frekvence, plynulé vypnutí, vlnový balík, volitelné E/B a tok energie.
+Samostatný dialog Ovládání a výklad vysvětluje i meze bodového dipólu.
+Zdrojový MATLAB byl přečten jako námět, do veřejného výběru se nekopíruje.
+Zdroje a metodika: docs/EM-VLNA.md. Bez numerického řešení reálné antény.
+
+Úplné sestavení prošlo s existujícím lokálním atomickým zápisem velkého HTML;
+integrátorův vstup byl následně obnoven bajtově z kopie před tímto sestavením.
+Prošlo celé tools/project/check.cjs včetně nového fyzikálního testu,
+Maxwellových rovnic, KaTeXu, ovladačů, lazy načítání a auditu. Poslední drobný
+posun popisku náboje následně ověřen cíleným testem a komponentovým sestavením.
+Obě aktuální dodávky a jejich lazy manifesty aktualizované. Canvas scény byly
+zkontrolovány jako rastry; kompletní vzhled v prohlížeči nebyl ověřen a
+prohlížeč nebyl spuštěn. Verze zůstává 1.0. Bez commitu a bez pushe.
+
+
+## Plyn, ionizovaný plyn a plazma — 18. listopadu 2026
+
+Nový úvodní modul `fu07-plazma`, zdroj `fusion/plasma`, výstup
+`fuze-plazma/index.html`. Začíná jedním neutrálním atomem; posuvníky přidávají
+atomy a mění teplotu. Podle upřesnění uživatele se neřeší mechanismus ohřevu,
+jen dodání tepla a kontrast neutrálního a ionizovaného souboru. Volné náboje
+vytvářejí společné E pole a lze zapnout/obrátit B pole. Samostatný pokus
+vychýlí elektrony; graf sleduje oddělení středních poloh nábojů.
+
+Podklad přímo ověřen v Entler–Kindl, kap. 2.1–2.2, s. 30–32; rámeček 2.1
+ověřen i obrazově. Cílová ionizace vychází ze Sahovy rovnice při pevné hustotě
+1e20 m^-3. Názorná dynamika má hmotnostní poměr 25:1, měkkou Coulombovu
+interakci, rovinný pohyb a odrazné stěny; není to kvantitativní simulace
+vodíkového plazmatu. Počet značek není hustota, žádný práh počtu částic
+automaticky neoznačuje plazma. Omezení a zdroje jsou ve společném výkladu.
+
+Test `tools/test-plasma.cjs` ověřuje ionizaci, neutralitu, směry gyrace,
+zachování energie při magnetické rotaci, součet vnitřních sil, stabilitu
+a skutečné obsluhy UI včetně pauzy, restartu a disposal bez prohlížeče.
+Nový modul je součástí lazy sestavení a veřejného seznamu zdrojů/runtime.
+Bez spuštění prohlížeče a bez pushe.
+
+Ověření dokončeno: `node tools/build-particle-library.cjs` aktualizoval
+aktuální web i lazy balíčky; celé `node tools/project/check.cjs` prošlo
+včetně nového testu, 61 společných výkladů, navigace a veřejného auditu.
+Vizuální kontrola v prohlížeči neprovedena. Plné `build-release.cjs`
+opakovaně skončilo chybou zápisu UNKNOWN do generovaného souboru
+`Web/interaktivni-elektricke-stroje.html`. Tento před relací nezměněný
+soubor byl po neúspěšném sestavení vrácen přesně z místního LFS objektu
+(SHA-256 6eae652d32ad30db62522a279362979d75de5834ff5299214e97c204359167b1).
+Dodávka nového modulu byla dokončena komponentovým sestavením výše.
+
 ## Spodní mezera magnetického udržení — 18. listopadu 2026
 
 Na pokyn uživatele zmenšena časová lišta z 37 na 24 logických pixelů
@@ -15,6 +400,43 @@ Celé tools/project/check.cjs prošlo včetně škálování, udržení, helicit
 ovladačů, načítání a auditu. Prohlížeč nebyl spuštěn, jde o kontrolu zdrojů
 a automatické testy, nikoli vizuální ověření. Bez pushe.
 
+## Názorné polohování plazmatu — 18. listopadu 2026
+
+Divertor nově začíná pokusem Nahoru / dolů (PF2 + PF5), druhá volba Dovnitř / ven používá PF3 + PF4. Každá řada má 17 statických řešení s předem pevnou kombinací proudů, bez zpětné vazby. Celkem 97 stavů. Skutečný posun osy: svisle −34,3 až +35,2 cm, radiálně −28,1 až +32,3 cm. Vedlejší posun se zachovává. Výchozí detail ukazuje zvětšené plazma; celý stroj a konstrukci lze zapnout. Obrácený směr vodorovného otáčení opraven. Výklad a řez rozlišují vnitřní/vnější terč jediného dolního divertoru. Geometrie je vlastní parametrická ilustrace, ne import STL. Test ověřuje monotónní směrový účinek i pevné proudové kombinace. Web je aktualizován lokálně; push nebyl požadován.
+
+
+## Aktuální stav — Divertor a rozvinutá plocha, 18. listopadu 2026
+
+Na pokyn uživatele je v Magnetickém udržení přidané malé tlačítko Rozvinout
+plochu vpravo nahoře. Náhled používá stejnou siločáru jako prostorový pohled,
+periodické úhlové souřadnice a vybraný povrch. Fyzika částice je zachovaná.
+
+Samostatná karta Rovnováha tokamaku je odstraněná. Divertor nese krátký název,
+obsahuje vlastní parametrickou ilustraci ITER se šesti PF a šesti CS podle
+zveřejněných poloh/průřezů, prostorové TF cívky, komoru a terče. Staré ID
+rovnováhy přesměruje na tentýž Divertor. Zdrojové cesty zůstávají zachované.
+
+Nové ovládání: výběr jedné PF cívky a jejího proudu, vždy s ostatními proudy
+pevnými; samostatný tlakový pokus. 63 statických forward GS rovnováh, bez
+regulátoru polohy. Nejde o časovou stabilitu. Osm map: tlak plazmatu, B, BP,
+BT, Jphi, magnetický tlak, lokální beta a normalizovaný tok. Stejná škála
+v řezu a na prostorové ploše. Detaily numeriky, ověřené zdroje, rozlišení
+sítě, omezení a licence viz docs/fuze/iter-divertor-2026-11-18.md.
+
+Oficiální tiskové STL byly prohlédnuty jen jako reference. Nepřenášejí se
+na veřejný web ani do Gitu. Web má vlastní kresbu. Podklady v tmp lze znovu
+stáhnout; nepovažovat je za zdrojovou závislost sestavení.
+
+Průběžně prošly testy 63 rovnováh, nezměněných ostatních proudů, tečnosti
+siločar, osmi map, KaTeXu, ovladačů a rozvinuté plochy. Canvas výstupy byly
+prohlédnuté; prohlížeč nebyl spuštěn. Push ani místní commit nebyl požadován.
+
+Dokončeno: úplné node tools/build-release.cjs a node tools/project/check.cjs
+prošly, včetně všech fyzikálních testů, lazy načítání a auditu veřejných
+souborů. Obě aktivní dodávky obsahují stejné aktuální zdroje modulů.
+Při sestavení byl použit dřívější lokální atomický zápis velkého HTML;
+sledovaný integrovaný vstup byl následně obnoven z vlastní předbuildové
+kopie (bajtově shodné s HEAD). Verze zůstává 1.0. Žádný push ani commit.
 
 ## Oprava načítání a využití plochy — 17. listopadu 2026
 
@@ -2426,3 +2848,91 @@ iontu s elektronem. Drift/navigace prošly, obě dodávky aktualizované.
 - Magnetické udržení: značka deuteronu sjednocena na D⁺ místo ²H⁺, v popisku přes KaTeX.
 
 - Plynulejší ohýbání: krok posuvníku 0,001; při tažení plášť 96 × 32, po 140 ms klidu návrat na 192 × 64. GPU cesta nepočítá zbytečně CPU osvětlení každé plošky, sdílí převody barev a nemění rozměry framebufferu při každém snímku. Projekce bodů siločar jen jednou. Ideální geometrie bez čekání na worker. Návrh uživatele: propojit solenoid a uzavírání do navazujícího pokusu s únikem částice; zatím diskuse, neimplementováno.
+
+## Místní aktualizace webu — 18. listopadu 2026
+
+Při kontrole zde byla čistá main na 7a9914e a hotový web ze 16. listopadu.
+Proveden git pull --ff-only na 01f70f3 (25 novějších commitů včetně LFS).
+Samotný pull neaktualizuje ignorovaný versions/aktualni/web; následovalo
+úplné sestavení a úspěšné node tools/project/check.cjs včetně auditu.
+Windows opět hlásil UNKNOWN při přímém přepisu velkého integrovaného HTML,
+i mimo sandbox. Sestavení dokončeno s dočasným lokálním preloadem
+ tmp/build-atomic.cjs pro atomický zápis tohoto souboru (NODE_OPTIONS).
+Nejde o novou závislost sestavení. Sledovaný generovaný vstup byl po sestavení
+obnoven z ověřeného místního LFS objektu aktuálního commitu.
+Prohlížeč nebyl otevřen, push ani commit neproběhl. Označení zůstává 1.0.
+## Celá obrazovka a spodní lišty — 18. 11. 2026
+- Společná navigace zachytává tlačítka celé obrazovky před lokálními handlery, takže jeden klik nepřepíná dvakrát. Náhradní zobrazení zůstává použitelné i bez Fullscreen API nebo po odmítnutí požadavku. Fúzní vložené moduly přepínají hlavní okno; dostupný návrat a Esc.
+- Spodní souhrny .statusline skryty v pracovní ploše (včetně řádku Asynchronní motor pod lupou). Vysvětlující patičky .footer/.footnote/.footerbar, .mathnote a driftová .sceneFoot přesunuty do společného výkladu; zachována živá měření a ovládací prvky. Hystereze neponechává prázdné pevné řádky po patičkách.
+- Automatické ověření: všechny 30 vložené lekce, opakované rozměrové kontroly a test vstupu/výstupu z fullscreen při podporovaném, chybějícím i odmítnutém API. Prohlížeč automaticky neotevřen; skutečné uživatelské gesto v prohlížeči není tímto testem ověřeno.
+
+- Dodávka sestavena, cílené kontroly fullscreen/rozměrů, společného výkladu, progressive, navigace fúze a audit veřejných souborů prošly. Celkové check.cjs zastaveno na souběžně rozpracovaném test-tokamak-equilibrium.cjs (choose: chybějící D.series[series]); nesouvisí s touto úpravou. Generovaný integrovaný vstup po sestavení vrácen do stavu Git, vlastní změny zůstávají ve sdílených upravitelných zdrojích.
+
+### Navazující zpřesnění konstrukce ITER (18. 11. 2026)
+
+Konstrukční zobrazení přepracováno na 18 D-cívek s rovnou vnitřní větví, 9 sektorů komory a 54 divertorových kazet s objemovými terči a středovou částí. Vlastní parametrická ilustrace, nikoli import STL či výrobní CAD. Jednotný poloviční řez všech konstrukčních sestav. Přepínač Konstrukce ITER automaticky zapíná celkový záběr. Výpočtová data 97 rovnováh a povrchy dopadu siločar zůstávají stejné. Kontrola rovnováh a vykreslení konstrukce s řezem i bez řezu prošla; aktualizovány obě místní webové dodávky. Bez push.
+
+### TF cívky a demonstrace součástí (18. 11. 2026)
+
+TF cívky odděleny od konstrukce a standardně zapnuty. Vlastní přepínače TF / PF a solenoid / konstrukce. Nabídka Ukázat zvýrazňuje TF, PF, CS, komoru či divertor; u TF doplněn směr toroidálního pole. Výběr nemění fyzikální stav, prostorový celkový záběr nezmenšuje detail řezu. Ověřeny výběry, reset, výchozí viditelnost a 97 rovnováh. Aktualizována místní webová dodávka, bez push.
+
+### Ostrost a konstrukční pohled ITER (18. 11. 2026)
+
+Canvas a WebGL respektují zvětšení modulu i DPR, mapy řezu nemají pevné nízké rozlišení. Pouzdra mají ostré hrany a ocelové odstíny; paneláž a vinutí teplé odlišení. Přidána hrdla komory a intercoil spoje, řez otevírá přední polovinu. Test tokamaku a confinement rendereru prošel. Aktualizována místní dodávka; bez push. Podrobnosti a omezení v docs/fuze/iter-divertor-2026-11-18.md.
+
+### Rozložení Divertoru a popisky grafu (18. 11. 2026)
+
+Prostřední řez zúžen z 55 % na 44 % scény, prostorový pohled rozšířen na 56 %. Popisky profilu mají společný počátek a rozměry s canvasem; horní jednotka a dolní souřadnice jsou uvnitř grafu, maximální hodnota je v samostatném levém okraji mimo hrot osy. Test tokamaku prošel, místní web přestavěn. Bez push.
+
+### Názvosloví knihy a q95 (18. 11. 2026)
+
+Divertor: samostatné přepínače Vakuová nádoba / Blanket a první stěna; názvy magnetické indukce rozepsané. Zdroje knihy doplněné v dialogu. Vlastní q95 se nově vyhodnocuje z pole a zobrazuje; reference 2,48 proti přibližně 3 pro základní scénář ITER. Model zatím nemá kalibrovaný profil proudu a q na ITER, výklad tuto odchylku přiznává. Další fyzikální zpřesnění vyžaduje úpravu vstupních profilů a nové řešení rovnováh. Aktualizována místní dodávka, bez push.
+
+### Nádoba, kolize a SOL (18. 11. 2026)
+
+Vakuová nádoba nyní viditelná standardně, dvouplášťová s mezerou a příčkami. Ocel a wolfram v odstínech kovové šedi podle materiálů. Přibližný TF obrys opraven proti kolizi s PF6 (vzorkovaný odstup 0,139 m; není úplnou CAD kontrolou). SOL ořez končí na první materiálové překážce, nepreferuje terče za stěnou. Dopady vyznačené; výklad podle Entler–Kindl doplněný o odborné ITER School zdroje a omezení numerické sítě/transportu. Jediné tlačítko výkladu díky existujícímu sjednocení theory/explanation. Test 97 stavů a regrese první stěny prošel. Podrobnosti v docs/fuze/iter-divertor-2026-11-18.md. Bez push.
+
+### Užší řez a barevné vrstvy (18. 11. 2026)
+
+Řez 37,4 % scény (−15 % proti předchozím 44 %), prostor 62,6 %. Funkční měděné odstíny TF/PF/CS, ocelová modrošedá nádoba, teplý světlý blanket s vlastním objemem, tmavá wolframová první stěna/PFC. Oddělení první stěny, blanketu a nádoby vysvětleno ve výkladu. Tloušťky ilustrativní. Dodávka aktualizovaná lokálně, bez push.
+
+### Technický render a viditelnost (18. 11. 2026)
+
+Checkbox bloky vpravo nahoře nahrazují Ukázat; samostatné TF/PF/CS, nádoba, blanket/první stěna, divertor. Divertor používá kontrastnější technický režim sdíleného rendereru, kovové odlesky a explicitní hrany. Mapy neosvětlené. Testy tokamaku a Three mesh builderu prošly, GL vzhled v prohlížeči neověřen. Přestavěny místní dodávky, bez push.
+
+### Popisky CS a srozumitelný pohyb značek (18. 11. 2026)
+
+Popisky CS3U–CS3L přesunuty doprava vedle jednotlivých cívek s levou kotvou textu; nekříží sloupec svislé osy ani její číselné popisky. Velikost scény zachována. Sekční viditelnost CS nyní reaguje na samostatný CS checkbox. Spustit nahrazeno Rozpohybovat značky / Zastavit značky s aria-pressed a tooltipem. Zapnutí animace zapíná viditelnost směrových značek; skrytí značek animaci zastaví. Nejde o spuštění plazmatu ani časový vývoj rovnováhy. Test ověřuje oddělení sloupců popisků a chování tlačítka. Web přestavěn lokálně; bez push.
+
+### Souvislá nádoba (18. 11. 2026)
+
+Odstraněna bloková konstrukce nádoby z obdélníkových pásů. Dva pláště nyní tvoří spojitou zakřivenou skořepinu bez rastru hran a vnitřních příčných destiček; uzavření pouze na řezu. Modulové bloky ponechané u blanketu. TF/PF výrazněji odlišené světlou zlatavou a červenohnědou měděnou. Sektory skutečné nádoby se svařují, nejde o oddělené bloky. Podrobnosti v docs/fuze/iter-divertor-2026-11-18.md. Bez push.
+
+### Vzhled podle reference FUSION INDUSTRY (18. 11. 2026)
+
+Na odkaz uživatele https://fusionindustry.jp/en/technology/3d/tokamak přepracována vlastní ilustrace: TF ocelový rám se sraženými hranami + samostatné vinutí, PF/CS vrstvené povrchy, linie vinutí CS a táhla, podpěrné patky TF. PBR kovy s vlastní procedurální mapou odrazů, tmavé pozadí pouze prostoru. Zachovány mapy a numerická pole. Nepřebírá se cizí model ani kód. Konstrukční detaily nadále ilustrativní, výstup skutečného GL v prohlížeči neověřen. Podrobnosti a testy v docs/fuze/iter-divertor-2026-11-18.md. Lokální sestavení, bez push.
+
+### Místní oficiální model ITER a měřené oblouky TF (18. 11. 2026)
+
+ZIP v Downloads byl ověřen: stejná v2.0, 54 položek. Čtyři soukromé referenční díly uložené v docs/fuze/podklady/iter-model s CRC/SHA-256. Ze STEP hlavního pouzdra TF ověřeny oblouky a šířka; vlastní webová geometrie upravena podle těchto číselných parametrů, bez přibalení převzaté sítě. Opravené normály kovů zachovávají ostré hrany; zesvětlené odrazové prostředí. Kontrolní render exportované geometrie vytvořen v Blender/Cycles (není screenshot WebGL). Automatická kontrola odmítla čtení nesouvisejících karet Chrome, dál se v něm nepokračovalo; skutečný webový GL výstup vizuálně neověřen. Podrobnosti a limity viz docs/fuze/iter-divertor-2026-11-18.md. Lokální sestavení; bez push.
+
+### Světlý Divertor, PFC a výkon (18. 11. 2026)
+
+Světlý podklad obnoven. Samostatné Kazety divertoru / PFC divertoru; wolframové členění obou terčů a dómu, oddělený chladič a ocelová kazeta. Geometrie dómu přidána do prvního materiálového kontaktu, nikoli do nového řešení pole. Při otáčení se nově znovu používají GPU sítě a mění se jen matice; pole se nepřepočítává. Cache světové geometrie, jediné vyhodnocení barev po obrysu, řádková maska rastru a lehčí síť nádoby. Kamera neobnovuje řez ani grafy. Předvolby ploch prolínají hotové obrazy. Testy ověřují skutečnou identitu Three geometrie a shodu projekce i PFC, dopad na dóm a ovládání. Detaily, zdroje knihy a omezení viz docs/fuze/iter-divertor-2026-11-18.md. Lokální dodávky aktualizované; bez push.
+
+### Opravené překreslování Divertoru (18. 11. 2026)
+
+Opraveny dvě regrese optimalizace: cache prostoru se nyní explicitně maže před kopií průhledného snímku a čtvrtá pomocná složka bodu siločáry phi se nikdy nezapisuje do XYZ bufferu. Otáčení ruší prolínání starého pohledu. Pixelový test s reálným canvasem ověřil smazání starého pixelu, Three test ověřil přesné XYZ a celé páry konců úseček. Výpočty plazmatu zachované. Podrobnosti v docs/fuze/iter-divertor-2026-11-18.md. Lokální sestavení, bez push.
+
+### Stabilní pohled a PF (18. 11. 2026)
+
+Checkboxy vpravo nahoře jsou ve dvou širších řadách. PF fungují samostatně; vazba viditelnosti na TF odstraněna. 3D měřítko vychází stále z celého stroje a nemění se při přepínání částí. Zoom 0,3–4× ponechán na myši. Celý řez mění jen 2D rozsah, nádoba jej sama nepřepíná. Three test ověřil všech šest samostatných PF a stejné matice kamery před/po změnách viditelnosti. Progressive a navigace prošly; místní dodávky aktualizované, bez push.
+
+### Izočáry, SOL a karta proudů (18. 11. 2026)
+
+Tlaková mapa oříznuta vektorovou křivkou psi_N=0,999 místo zubaté masky. Analytické bilineární izočáry zjemněné uvnitř buněk při zachování toku; opraven asymptotický rozhodovač sedlové buňky. Data 97 stavů zachována, křivka 0,999 ověřena ve všech. SOL a výřez soukromého toku mají jemné kvalitativní šrafování, popisky a legendu; nejde o transportní šířku ani tlak v SOL. Graf proudů v zarovnané kompaktní kartě s popisky uvnitř, stabilní škálou podle celé řady a názvy PF v dolní řadě. Testy fyziky, analytického sedla, Three geometrie a kompaktního grafu prošly. Obě místní dodávky aktualizované, bez push. Podrobnosti v docs/fuze/iter-divertor-2026-11-18.md.
+
+EM krátký balík zkrácen z pěti na dvě periody buzení v CPU i GPU modelu;
+doplněn test klidu zdroje po konci balíku.
+
+18. 11. 2026 — Divertor: po revizi uživatelem jemná technická siločára (1,8 px řez / 2,1 px prostor, úzký světlý lem a malé plné hlavy). Výchozí plazma růžovofialové bez mapy; kvantitativní mapy zůstávají volitelné. Čtyři dolní prvky mají číselné značky a klíč vpravo bez dlouhých křížících se spojnic. Separatrix a SOL mají krátké odkazy. Ověřeno rozložení 380×540, 580×600 a 800×600, canvasové náhledy s přibližným textem prohlédnuty. Test 97 stavů, skutečných Three geometrií a confinement prošel. Podrobnosti docs/fuze/iter-divertor-2026-11-18.md. Bez push.
