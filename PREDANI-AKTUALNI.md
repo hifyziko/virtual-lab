@@ -3201,3 +3201,10 @@ Růst končí na W/a=0,12, bez předstírané nelineární saturace. Prostorový
 tokamak, NTM a ECCD zůstávají navazující rozšíření. Podrobnosti a přesné
 meze v docs/fuze/magneticke-ostrovy-navrh.md. Canvas siločar prohlédnut,
 celá stránka v prohlížeči neotevřena. Přidáno lazy načítání, bez pushe.
+
+
+Ostrovy — přepracování názornosti: výchozí schéma tokamaku → řez →
+místní vrstva, čtyři navazující kroky, proud a jeho směr, zvýrazněná
+toková kontura před/po přepojení, vypočtené proudění a X-body uvnitř
+obrazu. Výpočetní data beze změny. Canvasové náhledy prohlédnuté,
+celá stránka v prohlížeči neotevřena; podrobnosti v návrhu ostrovů.

@@ -209,3 +209,27 @@ bez ošetření přechodů režimů nestačí k průchodu od nulové poruchy.
 
 Výsledek této rešerše je návrh. Nový modul, numerická báze ani veřejné
 obrazové assety zatím nevznikly; předpočty nebyly spuštěny.
+
+
+## Přepracování názornosti po připomínce uživatele
+
+Původní samostatný detail ostrova neposkytoval dostatečný kontext.
+Nový výchozí pohled ukazuje vlastní prostorové schéma tokamaku, příčný
+řez s vnořenými plochami a vybranou vrstvu, propojenou s rozvinutým
+místním pohledem. Výslovně se odlišuje schéma od globálního MHD řešení
+a příčná složka vůči rezonanční šroubovici od celého magnetického pole.
+Čtyři kroky: Kde se to děje; Proud vytváří pole; Jak se pole přepojí;
+Růst, nebo útlum. Přepnutí kroku nezmění fyzikální čas.
+
+V detailu jsou dvě periody: X-body leží uvnitř obrazu, centrální O-bod
+uprostřed. Pevná hodnota tokové funkce šestkrát větší než počáteční
+porucha zvýrazňuje nejprve dvě oddělené větve, později uzavřenou
+konturu v ostrově. Nejde o sledování totožnosti hmotné siločáry.
+Zelené šipky vycházejí z uložené proudové funkce: vx=−k f cos(ky),
+vy=f′ sin(ky), délky normalizované pro každý snímek a promítnuté
+stejně jako souřadnice. Fialové tečky v rovnovážném kroku znázorňují
+proud k pozorovateli. Šipky jsou společné vyplněné siluety.
+
+Vizuálně prohlédnuty skutečné canvasové náhledy kontextu a detailu
+před/po přepojení. Test doplněn o průchod čtyřmi kroky a viditelnost
+kontextu, proudu a proudění. Celá HTML stránka v prohlížeči neotevřena.
