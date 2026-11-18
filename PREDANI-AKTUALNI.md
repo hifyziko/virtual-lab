@@ -6,7 +6,7 @@ Odstraněno vybarvení celé mezery mezi separatrix a první stěnou jako SOL.
 Modrý pás u separatrix a podél divertorových větví je výslovně schematický;
 jeho šířka ani útlum nejsou výsledkem transportního výpočtu. Mezera k první
 stěně zůstává nevybarvená, konstrukční šrafování leží pouze za první stěnou.
-Žlutá okrajová vrstva zůstává uvnitř separatrix. Přímé porovnání: Entler–Kindl,
+Žlutá okrajová vrstva zůstává uvnitř separatrix; její sytost a krytí byly zvýšeny pro čitelné odlišení od růžového jádra. Přímé porovnání: Entler–Kindl,
 Jaderná fúze a fúzní elektrárny, obr. 7.18, s. 158, kap. 7.11–7.12.
 Kontura se v X-bodě kříží; výklad označuje její lokální numerickou rekonstrukci.
 Podrobnosti a omezení jsou v docs/fuze/iter-divertor-2026-11-18.md.

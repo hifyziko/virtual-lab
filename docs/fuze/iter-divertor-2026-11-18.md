@@ -197,3 +197,7 @@ Regrese všech 97 rovnováh ověřuje čtyři větve v exportovaném X-bodě, dv
 ### Oprava podle přímého porovnání s knihou — 18. 11. 2026
 
 Přímo zkontrolován obr. 7.18 na s. 158 a kap. 7.11–7.12, s. 158–160, Entler–Kindl, Jaderná fúze a fúzní elektrárny. Předchozí plošná výplň celé oblasti otevřeného toku až k první stěně nevystihovala schéma knihy. Nahrazena úzkým schematickým modrým pásem s grafickým útlumem podle vzdálenosti v normalizovaném toku. Volba útlumu je výslovně grafická, neurčuje transportní šířku ani hustotu. Mezera směrem k první stěně zůstává nevybarvená; neoznačuje nulovou hustotu. Příklady kontur změněny na 1,008 / 1,016 / 1,025. Šrafování pouze za první stěnou značí konstrukci s ilustrativní tloušťkou. Žlutá okrajová vrstva zůstává uvnitř separatrix. Popis kontury v X-bodě výslovně uvádí rekonstrukci z konečné sítě. Předchozí zápisy o celoplošné výplni tímto nahrazeny.
+
+
+### Kontrast okrajové vrstvy — 18. listopadu 2026
+Na pokyn uživatele zvýšeno krytí a sytost žluté okrajové vrstvy v základním řezu. Zachován stejný plynulý útlum i šířka schematického zvýraznění, růžové jádro a fyzikální data. Sladěn žlutý klíč legendy.

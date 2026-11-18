@@ -23,6 +23,6 @@
 .mathOverlay>span.sectionCallout{display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:1px 3px;background:rgba(255,255,255,.95);border:1px solid #d6dfe5;border-radius:3px;line-height:1.1}
 .mathOverlay>span.sectionFeature{display:flex;align-items:center;justify-content:center;box-sizing:border-box;border:1px solid currentColor;border-radius:50%;background:#fff;font-size:9px;line-height:1}
 .mathOverlay>span.sectionKeyText{display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;background:rgba(255,255,255,.96);border-radius:2px;padding:0 3px;font-size:10px;line-height:1.25}
-.legend .edgeKey{color:#8d6b1c}.legend .edgeKey:before{border-top-width:5px;border-top-color:#eac74c}
+.legend .edgeKey{color:#8d6b1c}.legend .edgeKey:before{border-top-width:5px;border-top-color:#ffd823}
 .mathOverlay>span.activeCoilName{font-weight:700;background:#fff3d9;padding:2px 4px;border-radius:2px}
 .mathOverlay>span.activeCoilOutside{display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:#fff3d9;border:1px solid #b78041;border-radius:3px;font-size:10px}
