@@ -1,5 +1,27 @@
 # Aktuální stav předání
 
+## Divertor a blanket — oddělené plochy sestavy, 18. listopadu 2026
+
+Na základě uživatelova anotovaného řezu přepracováno zasazení divertoru:
+ochranné límce navazují na samostatný profil první stěny, terče pokračují
+k výše umístěnému nesouměrnému dómu, pod ním je prostor pro odčerpávání.
+První stěna, stínicí bloky blanketu, úchyty a dvojitá nádoba už nesdílejí
+jedinou plochu. Blanket má vlastní modulární geometrii a místa pro porty;
+její členění nereprodukuje skutečných 440 výrobních pozic ITER. Spodní
+čerpací kanály jsou duté a navazují na prostor pod divertorem.
+
+V oficiálním archivu IO_3D_models_v2.0.zip ověřeny divertorové STL/OBJ/STEP.
+STL tří kazet a jednoho sektoru nádoby jsou soukromě v docs/fuze/podklady/
+iter-model se záznamem CRC a SHA-256; nepatří do Gitu ani webu. Samostatný
+soubor blanketu v seznamu 54 položek není. Tisková orientace STL není montážní
+souřadný systém; veřejný model zůstává vlastní přiznanou aproximací podle
+řezů a podkladů, nikoli ověřeným CAD sestavením.
+
+Opraveno zahazování celé kontury při chybějícím druhém dopadu v rozsahu
+dat: známá větev zůstává viditelná, konec sítě není dopad na materiál.
+Přidána detekce případného zásahu uzavřeného plazmatu do materiálu.
+Všechna uložená pole, rovnováhy, proudy a profily jsou nezměněné.
+
 ## Divertor — geometrie kazet podle ITER, 18. listopadu 2026
 
 Přímo prohlédnut oficiální přehledový obrázek a rotující animace kazety na

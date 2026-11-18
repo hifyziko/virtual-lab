@@ -20,7 +20,7 @@ function path(c,line,project,color,width=1,dash=[]){if(line.length<2)return;c.be
 function arrow(c,a,b,color,width=3){const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);if(L<1)return;const ux=dx/L,uy=dy/L,h=Math.min(10,L*.4),half=Math.min(5,L*.2),base=L-h;c.beginPath();for(const [i,[x,y]]of [[0,-width/2],[base,-width/2],[base,-half],[L,0],[base,half],[base,width/2],[0,width/2]].entries()){const X=a[0]+ux*x-uy*y,Y=a[1]+uy*x+ux*y;i?c.lineTo(X,Y):c.moveTo(X,Y);}c.closePath();c.fillStyle=color;c.fill();}
 function triangle(c,p,q,size=4){const a=Math.atan2(q[1]-p[1],q[0]-p[0]);c.save();c.translate(...p);c.rotate(a);c.fillStyle=C.b;c.beginPath();c.moveTo(size,0);c.lineTo(-size*.6,size*.45);c.lineTo(-size*.6,-size*.45);c.closePath();c.strokeStyle='#ffffff';c.lineWidth=.6;c.stroke();c.fill();c.restore();}
 function clipped(line){const branch=M.divertorBranch(line,D.machine);return branch.length?[branch]:[];}
-function getPaths(s){if(contoursCache.has(s.id))return contoursCache.get(s.id);const p=Array.from({length:13},(_,i)=>M.core(s,g,.08+i*.07));const sep=M.separatrix(s,g).flatMap(line=>Math.hypot(line[0][0]-line.at(-1)[0],line[0][1]-line.at(-1)[1])<1e-5&&M.contains(line,s.axis)?[line]:clipped(line));const sol=[1.008,1.016,1.025].map(v=>M.contours(s,g,v).filter(p=>M.contains(p,s.axis)).flatMap(clipped));const privateFlux=M.contours(s,g,.97).filter(line=>!M.contains(line,s.axis)&&line.every(p=>p[1]<s.xpoints[0][1]+.2)).flatMap(clipped);const outer=(()=>{for(const v of [.995,.99,.98,.95]){const line=M.core(s,g,v);if(line.length)return line;}return p.at(-1);})(),nearEdge=M.core(s,g,.999),result={p,sep,sol,privateFlux,outer,edge:nearEdge.length?nearEdge:outer};contoursCache.set(s.id,result);if(contoursCache.size>8)contoursCache.delete(contoursCache.keys().next().value);return result;}
+function getPaths(s){if(contoursCache.has(s.id))return contoursCache.get(s.id);const p=Array.from({length:13},(_,i)=>M.core(s,g,.08+i*.07));const sep=M.separatrix(s,g).flatMap(line=>Math.hypot(line[0][0]-line.at(-1)[0],line[0][1]-line.at(-1)[1])<1e-5&&M.contains(line,s.axis)?[line]:clipped(line));const sol=[1.008,1.016,1.025].map(v=>M.contours(s,g,v).filter(p=>M.contains(p,s.axis)).flatMap(clipped));const privateFlux=M.contours(s,g,.97).filter(line=>!M.contains(line,s.axis)&&line.every(p=>p[1]<s.xpoints[0][1]+.2)).flatMap(clipped);const outer=(()=>{for(const v of [.995,.99,.98,.95]){const line=M.core(s,g,v);if(line.length)return line;}return p.at(-1);})(),nearEdge=M.core(s,g,.999),result={p,sep,sol,privateFlux,outer,edge:nearEdge.length?nearEdge:outer,contact:M.materialContact(nearEdge.length?nearEdge:outer,D.machine)};contoursCache.set(s.id,result);if(contoursCache.size>8)contoursCache.delete(contoursCache.keys().next().value);return result;}
 function choose(){const next=D.series[series][index];if(state&&(state.id!==next.id||chosenSurface!==u)&&cache.width){const images=[cache,spaceCache].map(src=>{const c=document.createElement('canvas');c.width=src.width;c.height=src.height;c.getContext('2d').drawImage(src,0,0);return c;});fade={start:performance.now(),images};}state=next;paths=getPaths(state);const candidates=Math.abs(u-1)<1e-6?paths.sep:u<.999? [M.core(state,g,u)]:M.contours(state,g,u).filter(p=>M.contains(p,state.axis)).flatMap(clipped);selected=candidates.filter(p=>p.length>3).sort((a,b)=>Math.max(...b.map(p=>p[1]))-Math.max(...a.map(p=>p[1]))||b.length-a.length)[0]||[];if(selected.length>2){const b=M.field(state,g,...selected[1]);if((selected[2][0]-selected[1][0])*b[0]+(selected[2][1]-selected[1][1])*b[2]<0)selected.reverse();}spaceLine=M.fieldline(state,g,selected);chosenSurface=u;cameraOnly=false;dirty=true;readouts();}
 function readouts(){
  tex($('surfaceValue'),String.raw`\psi_{\mathrm N}=${num(u,3)}`);
@@ -30,8 +30,8 @@ function readouts(){
  tex($('surfaceReadout'),u<.999?String.raw`p_{\mathrm{pl}}=${num(M.profile(state.p,u)/1000,0)}\,\mathrm{kPa}`:u<1.001?String.raw`\psi_{\mathrm N}=1\quad\text{separatrix}`:String.raw`\psi_{\mathrm N}>1\quad\text{otevřená větev}`);
  const steering=D.steering?.[series],pressure=series==='pressure',ci=D.machine.coils.findIndex(c=>c[0]===series);$('parameter').max=D.series[series].length-1;$('parameter').value=index;$('coilSelector').hidden=pressure||!!steering;$('parameterName').textContent=steering?(series==='vertical'?'Dolů ← poloha → nahoru':'K ose stroje ← poloha → ven'):pressure?'Tlak na ose':'Proud '+series;$('zero').textContent=steering?'Výchozí poloha':pressure?'Výchozí tlak':'Výchozí proud';
  tex($('parameterValue'),steering?String.raw`${num((state.axis[series==='vertical'?1:0]-D.reference.axis[series==='vertical'?1:0])*100,1)}\,\mathrm{cm}`:pressure?String.raw`${num(state.paxis/1000,0)}\,\mathrm{kPa}`:String.raw`${num(state.currents[ci]/D.machine.coils[ci][5]/1000,2)}\,\mathrm{kA}`);
- const atTarget=p=>p&&M.targetSegments(D.machine).some(([a,b])=>Math.abs((p[0]-a[0])*(b[1]-a[1])-(p[1]-a[1])*(b[0]-a[0]))<1e-7);
- $('hint').textContent=u>1.001&&selected.length&&!(atTarget(selected[0])&&atTarget(selected.at(-1)))?(selected.some(p=>D.machine.dome.some(q=>Math.hypot(p[0]-q[0],p[1]-q[1])<.25))?'Otevřená větev zasahuje PFC centrálního dómu.':'Vybraná siločára dopadá na první stěnu. Zvolte povrch blíže separatrix.'):steering?'Proudy '+steering.coils.join(' + ')+'. Čárkovaně: výchozí plazma.':pressure?'Mění se tlak. Všechny proudy cívek zůstávají pevné.':selected.length?'Mění se pouze '+series+'. Čárkovaný obrys označuje výchozí plazma.':'Vybraná křivka zde neprotíná oba terče. Zvolte povrch blíže separatrix.';
+ const impactKinds=selected.length?[selected[0],selected.at(-1)].map(p=>M.materialKind(p,D.machine)):[];const atTarget=p=>M.materialKind(p,D.machine)==='target';
+ $('hint').textContent=paths.contact?'Plazma zasahuje stěnu nebo terč. Zmenšete změnu proudu či tlaku.':u>1.001&&selected.length&&[selected[0],selected.at(-1)].some(p=>!M.materialKind(p,D.machine))?'Větev končí na okraji výpočetní sítě; další průběh není určen.':u>1.001&&selected.length&&!(atTarget(selected[0])&&atTarget(selected.at(-1)))?(impactKinds.includes('dome')?'Otevřená větev zasahuje PFC centrálního dómu.':impactKinds.includes('baffle')?'Siločára dopadá na ochranný límec terče.':'Vybraná siločára dopadá na první stěnu. Zvolte povrch blíže separatrix.'):steering?'Proudy '+steering.coils.join(' + ')+'. Čárkovaně: výchozí plazma.':pressure?'Mění se tlak. Všechny proudy cívek zůstávají pevné.':selected.length?'Mění se pouze '+series+'. Čárkovaný obrys označuje výchozí plazma.':'Vybraná křivka zde neprotíná oba terče. Zvolte povrch blíže separatrix.';
  $('hint').style.visibility=$('hint').scrollHeight>$('hint').clientHeight?'hidden':'visible';
  document.querySelectorAll('[data-series]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.series===series));document.querySelectorAll('[data-preset]').forEach(b=>b.setAttribute('aria-pressed',Math.abs(u-({core:.5,edge:1,sol:1.025}[b.dataset.preset]))<.002));
 }
@@ -40,10 +40,12 @@ function domainRaster(w,h){const key=state.id+':domains:'+w+':'+h;if(mapCache.ha
 if(v>1){const alpha=Math.round(130*Math.exp(-(((v-1)/.018)**2)));if(alpha)pixels.data.set([53,106,195,alpha],i*4);}}c.putImageData(pixels,0,0);ec.putImageData(edgePixels,0,0);const result={image,edgeImage};mapCache.set(key,result);if(mapCache.size>10)mapCache.delete(mapCache.keys().next().value);return result;}
 // Construction hatching belongs outside the first wall (book fig. 7.18).
 // Its illustrated thickness is not an engineering dimension.
-function materialBand(c,T,W,H){const wall=D.machine.wall,area=wall.reduce((sum,a,i)=>{const b=wall[(i+1)%wall.length];return sum+a[0]*b[1]-b[0]*a[1];},0),sign=area>0?1:-1;
- const outer=wall.map((p,i)=>{const a=wall[(i+wall.length-1)%wall.length],b=wall[(i+1)%wall.length],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);return [p[0]+sign*dy/L*.18,p[1]-sign*dx/L*.18];});
- c.save();c.beginPath();for(const polygon of [outer,wall]){polygon.forEach((p,i)=>i?c.lineTo(...T(p)):c.moveTo(...T(p)));c.closePath();}c.clip('evenodd');c.fillStyle='#d8e3e9';c.fillRect(0,0,W,H);c.beginPath();for(let x=-H;x<W;x+=6){c.moveTo(x,H);c.lineTo(x+H,0);}c.lineWidth=.7;c.strokeStyle='#7896a8';c.stroke();c.restore();
+function materialBand(c,T,W,H){const d=D.machine.blanket;
+ for(const panel of M.blanketModules(D.machine).filter(p=>p.column===0)){const {q,r,normal:n}=panel,offset=(p,t)=>[p[0]+n[0]*t,p[1]+n[1]*t];
+  c.save();c.beginPath();[offset(q,d.shieldStart),offset(r,d.shieldStart),offset(r,d.shieldStart+d.shieldDepth),offset(q,d.shieldStart+d.shieldDepth)].forEach((p,i)=>i?c.lineTo(...T(p)):c.moveTo(...T(p)));c.closePath();c.clip();c.fillStyle='#d8e1e5';c.fillRect(0,0,W,H);c.beginPath();for(let x=-H;x<W;x+=6){c.moveTo(x,H);c.lineTo(x+H,0);}c.strokeStyle='#91a3af';c.lineWidth=.6;c.stroke();c.restore();
+ }
 }
+
 function renderSection(){const dim=setup($('section'));if(!dim)return;const {W,H,dpr}=dim,c=ctx;const full=$('fullMachine').checked,r0=full?.7:3.2,r1=full?13:9.3,zmax=full?8.4:5.9,S=Math.min((W-70)/(r1-r0),(H-95)/(2*zmax)),center=(r0+r1)/2,cx=W/2,cy=(H-60)/2+5,T=p=>[cx+(p[0]-center)*S,cy-p[1]*S];sectionTransform={T,S,cx,cy,W,H,center};c.clearRect(0,0,W,H);$('sectionMath').replaceChildren();
  const callout=(id,text,p,x,y,w=84,h=18,color=C.sep)=>{x=Math.max(w/2+8,Math.min(W-w/2-8,x));y=Math.max(h/2+8,Math.min(H-h/2-8,y));const el=label($('sectionMath'),id,text,x,y,color);el.className='sectionCallout';el.style.width=w+'px';el.style.height=h+'px';const dx=p[0]-x,dy=p[1]-y,t=1/Math.max(Math.abs(dx)/(w/2),Math.abs(dy)/(h/2)),end=[x+dx*t,y+dy*t];path(c,[p,end],q=>q,color,.8);};
  // Compact feature keys avoid running long leaders across the lower plasma.
@@ -59,18 +61,19 @@ function renderSection(){const dim=setup($('section'));if(!dim)return;const {W,H
  const domains=domainRaster(Math.max(260,Math.ceil((g.rmax-g.rmin)*S*dpr)),Math.max(340,Math.ceil((g.zmax-g.zmin)*S*dpr)));if(['none','p','j','beta'].includes(map)){const a=T([g.rmin,g.zmax]),b=T([g.rmax,g.zmin]);c.drawImage(domains.image,a[0],a[1],b[0]-a[0],b[1]-a[1]);}
  if(map==='none'&&paths.edge.length){const a=T([g.rmin,g.zmax]),b=T([g.rmax,g.zmin]);c.save();c.beginPath();paths.edge.forEach((p,i)=>i?c.lineTo(...T(p)):c.moveTo(...T(p)));c.closePath();c.clip();c.drawImage(domains.edgeImage,a[0],a[1],b[0]-a[0],b[1]-a[1]);c.restore();}
  // The material-contact contour represents the first wall in this teaching cut.
- materialBand(c,T,W,H);path(c,[...D.machine.wall,D.machine.wall[0]],T,'#52656e',2);if($('reference').checked)path(c,M.core(D.reference,g,.995),T,'#647079',1.5,[3,5]);
+ materialBand(c,T,W,H);path(c,D.machine.firstWall,T,'#52656e',2);if($('hardware').checked)path(c,[...D.machine.wall,D.machine.wall[0]],T,'#9aaab4',1.2);if($('reference').checked)path(c,M.core(D.reference,g,.995),T,'#647079',1.5,[3,5]);
  for(const p of paths.p)path(c,p,T,'#647c8790',1);for(const family of paths.sol)for(const p of family)path(c,p,T,C.b,1.2);
  for(const p of paths.privateFlux)path(c,p,T,C.b,1,[2,4]);
- for(const p of paths.sep)path(c,p,T,C.sep,1.9);if(!full){if(paths.edge.length){const p=paths.edge.reduce((a,b)=>b[1]>a[1]?b:a),q=T(p);callout('separatrix',String.raw`\text{separatrix}`,q,q[0],Math.max(22,q[1]-44),90,18,C.sep);}const line=paths.sol[1]?.[0]||paths.sol[0]?.[0];if(line?.length){const p=line.reduce((a,b)=>b[0]>a[0]?b:a),q=T(p);callout('sol',String.raw`\text{vrstva SOL}`,q,Math.min(W-47,q[0]+55),q[1],78,18,C.b);}const edge=M.core(state,g,.98);if(edge.length){const p=edge.reduce((a,b)=>b[1]>a[1]?b:a),q=T(p);callout('edgeRegion',String.raw`\text{okrajová vrstva}`,q,q[0],q[1]+30,112,18,'#8d6b1c');}const wall=D.machine.wall.filter(p=>p[1]>1.5&&p[1]<3);if(wall.length){const p=wall.reduce((a,b)=>b[0]>a[0]?b:a),q=T(p);callout('firstWall',String.raw`\text{první stěna}`,q,W-51,q[1]-24,86,18,'#52656e');}}
+ for(const p of paths.sep)path(c,p,T,C.sep,1.9);if(!full){if(paths.edge.length){const p=paths.edge.reduce((a,b)=>b[1]>a[1]?b:a),q=T(p);callout('separatrix',String.raw`\text{separatrix}`,q,q[0],Math.max(22,q[1]-44),90,18,C.sep);}const line=paths.sol[1]?.[0]||paths.sol[0]?.[0];if(line?.length){const p=line.reduce((a,b)=>b[0]>a[0]?b:a),q=T(p);callout('sol',String.raw`\text{vrstva SOL}`,q,Math.min(W-47,q[0]+55),q[1],78,18,C.b);}const edge=M.core(state,g,.98);if(edge.length){const p=edge.reduce((a,b)=>b[1]>a[1]?b:a),q=T(p);callout('edgeRegion',String.raw`\text{okrajová vrstva}`,q,q[0],q[1]+30,112,18,'#8d6b1c');}const wall=D.machine.firstWall.filter(p=>p[1]>1.5&&p[1]<3);if(wall.length){const p=wall.reduce((a,b)=>b[0]>a[0]?b:a),q=T(p);callout('firstWall',String.raw`\text{první stěna}`,q,W-51,q[1]-24,86,18,'#52656e');}}
  const strip=(line,width,color)=>{for(let i=1;i<line.length;i++){const a=line[i-1],b=line[i],dr=b[0]-a[0],dz=b[1]-a[1],L=Math.hypot(dr,dz),n=[dz/L*width,-dr/L*width];c.beginPath();[a,b,[b[0]+n[0],b[1]+n[1]],[a[0]+n[0],a[1]+n[1]]].forEach((p,i)=>i?c.lineTo(...T(p)):c.moveTo(...T(p)));c.closePath();c.fillStyle=color;c.fill();}};
  if($('showDivertor').checked){strip(D.machine.cassette.rail,D.machine.cassette.thickness,'#a0adb5');for(const support of D.machine.cassette.supports)strip(support,.09,'#919fa8');}
+ for(const line of D.machine.baffles){if($('showDivertor').checked)strip(line,.16,'#a0adb5');if($('showPFC').checked)strip(line,.055,'#676f76');}
  for(const line of D.machine.targetProfiles){if($('showDivertor').checked)strip(line,.18,'#a0adb5');if($('showPFC').checked){strip(line,.065,'#575f66');path(c,line,T,'#747d83',1);}}
  if($('showPFC').checked){strip(D.machine.dome,.07,'#676f76');path(c,D.machine.dome,T,'#9ba2a7',1);}
 
- if(!full){feature('innerTarget',2,String.raw`\text{vnitřní terč}`,T([4.1,-3.65]),[-15,-14],C.target);feature('outerTarget',4,String.raw`\text{vnější terč}`,T([5.78,-4.25]),[18,-2],C.target);}
+ if(!full){feature('innerTarget',2,String.raw`\text{vnitřní terč}`,T([4.11,-3.61]),[-15,-14],C.target);feature('outerTarget',4,String.raw`\text{vnější terč}`,T([5.43,-4.3]),[18,-2],C.target);}
  path(c,selected,T,'#ffffff',3.2);path(c,selected,T,C.b,1.8);
- if(u>1.001&&selected.length){for(const [i,p]of [selected[0],selected.at(-1)].entries()){const q=T(p);c.beginPath();c.arc(...q,4,0,2*Math.PI);c.fillStyle=C.target;c.fill();label($('sectionMath'),'impact'+i,String.raw`\text{dopad}`,q[0]+(i?25:-25),q[1]-12,C.target);}}
+ if(u>1.001&&selected.length){for(const [i,p]of [selected[0],selected.at(-1)].entries()){if(!M.materialKind(p,D.machine))continue;const q=T(p);c.beginPath();c.arc(...q,4,0,2*Math.PI);c.fillStyle=C.target;c.fill();label($('sectionMath'),'impact'+i,String.raw`\text{dopad}`,q[0]+(i?25:-25),q[1]-12,C.target);}}
  const axis=T(state.axis);c.fillStyle=C.sep;c.beginPath();c.arc(...axis,3,0,Math.PI*2);c.fill();label($('sectionMath'),'axis',String.raw`\text{osa}`,axis[0],axis[1]-17);if(index!==midpoint()&&$('reference').checked){const old=T(D.reference.axis);c.strokeStyle='#74838b';c.beginPath();c.arc(...old,4,0,Math.PI*2);c.stroke();arrow(c,old,axis,C.b,2);}
  for(const x of state.xpoints.filter(p=>M.contains(D.machine.wall,p))){const q=T(x);if(!full)feature('x',1,String.raw`\text{X-bod}`,q,[16,-15]);else label($('sectionMath'),'x',String.raw`\text{X-bod}`,q[0]+38,q[1]-3);}
  if(!full){const right=W-10,width=116,left=right-width,top=T([7,-2.2])[1];features.sort((a,b)=>a.n-b.n);let y=top;for(const f of features){const h=22;const badge=label($('sectionMath'),f.id+'Key',String(f.n),left+9,y+h/2,f.color);badge.className='sectionFeature';badge.style.width='14px';badge.style.height='14px';const el=label($('sectionMath'),f.id,f.text,left+24,y+h/2,f.color);el.className='sectionKeyText';el.style.width='91px';el.style.height=h+'px';el.style.transform='translate(0,-50%)';y+=h+4;}}
@@ -108,9 +111,9 @@ function renderSpace(){const dim=setup($('space'));if(!dim)return;const {W,H,dpr
  if($('csCoils').checked){for(let k=0;k<6;k++){const t=(k+.5)*2*Math.PI/6;if($('cut').checked&&t<Math.PI)continue;tube([2.09*Math.cos(t),2.09*Math.sin(t),-6.15],[2.09*Math.cos(t),2.09*Math.sin(t),6.15],.055);}mark('cs');}
  // Independently constructed teaching geometry in metres; not imported STL.
  // A sector is a solid revolved R-Z section with closed end faces.
- function sector(profile,a,b,color,material='metal',alpha=1,steps=3){
+ function sector(profile,a,b,color,material='metal',alpha=1,steps=3,region='engineering'){
   const xyz=([r,z],t)=>[r*Math.cos(t),r*Math.sin(t),z];
-  const face=pts=>objects.push({face:true,material,alpha,baseColor:color,points:pts.map(P)});
+  const face=pts=>objects.push({face:true,material,alpha,region,baseColor:color,points:pts.map(P)});
   for(let i=0;i<steps;i++){const t=a+(b-a)*i/steps,v=a+(b-a)*(i+1)/steps;for(let j=0;j<profile.length;j++){const q=profile[j],r=profile[(j+1)%profile.length];face([xyz(q,t),xyz(r,t),xyz(r,v),xyz(q,v)]);}}
   // All supplied sections are convex or thin quads, so fan caps are valid.
   for(let j=1;j<profile.length-1;j++){face([xyz(profile[0],a),xyz(profile[j+1],a),xyz(profile[j],a)]);face([xyz(profile[0],b),xyz(profile[j],b),xyz(profile[j+1],b)]);}
@@ -125,6 +128,7 @@ function renderSpace(){const dim=setup($('space'));if(!dim)return;const {W,H,dpr
    if($('showDivertor').checked)solidStrip(curve,.22,a,b,'#9aa6ae');
    if($('showPFC').checked){solidStrip(curve,.08,a+.006,b-.006,'#b0805a','winding');for(let finger=0;finger<3;finger++){const A=a+(b-a)*finger/3+.0025,B=a+(b-a)*(finger+1)/3-.0025;for(let row=1;row<curve.length;row++){const q=curve[row-1],r=curve[row],lo=.025,hi=.975,p=q.map((v,j)=>v+(r[j]-v)*lo),t=q.map((v,j)=>v+(r[j]-v)*hi);solidStrip([p,t],.06,A,B,row%2?'#737a80':'#858b90','tungsten');}}}
   }
+  for(const curve of D.machine.baffles){if($('showDivertor').checked)solidStrip(curve,.16,a,b,'#9aa6ae');if($('showPFC').checked)solidStrip(curve,.055,a+.004,b-.004,'#747b81','tungsten');}
   if($('showDivertor').checked)solidStrip(D.machine.dome,.14,a+.005,b-.005,'#a0acb3');
   if($('showPFC').checked)for(let finger=0;finger<3;finger++){const A=a+(b-a)*finger/3+.003,B=a+(b-a)*(finger+1)/3-.003;solidStrip(D.machine.dome,.07,A,B,'#777e84','tungsten');}
  }
@@ -133,22 +137,28 @@ function renderSpace(){const dim=setup($('space'));if(!dim)return;const {W,H,dpr
  if($('hardware').checked||$('blanket').checked){
   // Double-wall vessel divided into nine sectors. Blanket panels face plasma.
   const wall=D.machine.wall;
-  const wallOffset=(i,t)=>{const n=wall.length,p=wall[(i+n)%n],a=wall[(i-1+n)%n],b=wall[(i+1)%n],dr=b[0]-a[0],dz=b[1]-a[1],L=Math.hypot(dr,dz);const thickness=.30+.12*Math.max(0,Math.min(1,p[0]-4));return [p[0]-dz/L*thickness*t,p[1]+dr/L*thickness*t];};
+  const wallOffset=(i,t)=>{const n=wall.length,p=wall[(i+n)%n],a=wall[(i-1+n)%n],b=wall[(i+1)%n],dr=b[0]-a[0],dz=b[1]-a[1],L=Math.hypot(dr,dz);return [p[0]-dz/L*t,p[1]+dr/L*t];};
   if($('hardware').checked){const face=points=>objects.push({face:true,material:'vessel',alpha:1,baseColor:'#9cabb6',points:points.map(P)}),xyz=([r,z],phi)=>[r*Math.cos(phi),r*Math.sin(phi),z];
    // Continuous welded shells, without rectangular patch end walls.
-   for(let j=0;j<wall.length;j+=2){for(const [lo,hi]of [[.5,.72],[1.55,1.77]]){const a=wallOffset(j,lo),b=wallOffset(j+2,lo),c=wallOffset(j+2,hi),d=wallOffset(j,hi);for(let k=0;k<96;k++){const t=start+(end-start)*k/96,v=start+(end-start)*(k+1)/96;face([xyz(a,t),xyz(b,t),xyz(b,v),xyz(a,v)]);face([xyz(d,v),xyz(c,v),xyz(c,t),xyz(d,t)]);}if($('cut').checked)for(const t of [start,end])face([xyz(a,t),xyz(b,t),xyz(c,t),xyz(d,t)]);}}
+   for(let j=0;j<wall.length;j+=2){for(const [lo,hi]of [[0,.055],[.13,.18]]){const a=wallOffset(j,lo),b=wallOffset(j+2,lo),c=wallOffset(j+2,hi),d=wallOffset(j,hi);for(let k=0;k<96;k++){const t=start+(end-start)*k/96,v=start+(end-start)*(k+1)/96;if(Math.abs(Math.atan2(Math.sin(((t+v)/2-Math.PI/9)*9),Math.cos(((t+v)/2-Math.PI/9)*9)))/9<.065&&((a[0]>8&&b[0]>8&&Math.min(a[1],b[1])<.78&&Math.max(a[1],b[1])>-.78)||(a[0]>6.3&&b[0]>6.3&&Math.min(a[1],b[1])< -4.35&&Math.max(a[1],b[1])> -5.05)))continue;face([xyz(a,t),xyz(b,t),xyz(b,v),xyz(a,v)]);face([xyz(d,v),xyz(c,v),xyz(c,t),xyz(d,t)]);}if($('cut').checked)for(const t of [start,end])face([xyz(a,t),xyz(b,t),xyz(c,t),xyz(d,t)]);}}
    mark('vessel');
   }
-  for(let k=0;k<9;k++){const a=k*2*Math.PI/9,b=(k+1)*2*Math.PI/9;if(b<=start)continue;const stop=Math.min(b,end),begin=Math.max(a,start);
-   for(let j=0;j<wall.length;j+=4){const q=wall[j],r=wall[(j+4)%wall.length],dr=r[0]-q[0],dz=r[1]-q[1],L=Math.hypot(dr,dz),thickness=.30+.12*Math.max(0,Math.min(1,(q[0]+r[0])/2-4)),n=[-dz/L*thickness,dr/L*thickness];
-
-    mark('vessel');
-    if($('blanket').checked&&q[1]>-3.2&&r[1]>-3.2){const t=.06,Q=[q[0]+(r[0]-q[0])*t,q[1]+(r[1]-q[1])*t],R=[r[0]-(r[0]-q[0])*t,r[1]-(r[1]-q[1])*t];for(let l=0;l<4;l++){const A=begin+(stop-begin)*l/4+.008,B=begin+(stop-begin)*(l+1)/4-.008;const offset=(p,t)=>[p[0]+n[0]*t,p[1]+n[1]*t];sector([offset(Q,.08),offset(R,.08),offset(R,.43),offset(Q,.43)],A,B,'#aaa18b','case',1,2);sector([Q,R,offset(R,.08),offset(Q,.08)],A,B,'#74787b','case',1,2);}mark('blanket');}
-   }
+  if($('blanket').checked){const d=D.machine.blanket;
+   for(const panel of M.blanketModules(D.machine)){const {q,r,a,b,normal:n}=panel;if(b<=start)continue;const A=Math.max(a,start),offset=(p,t)=>[p[0]+n[0]*t,p[1]+n[1]*t],bevel=.025;
+    // Detachable first wall in front, massive shield block behind, separated mounts.
+    sector([q,r,offset(r,d.firstWallThickness),offset(q,d.firstWallThickness)],A,b,'#747c82','tungsten',1,1,'blanket-first-wall');
+    const Q=offset(q,d.shieldStart),R=offset(r,d.shieldStart),S=offset(r,d.shieldStart+d.shieldDepth),T=offset(q,d.shieldStart+d.shieldDepth);
+    sector([Q,R,S,T],A+.002,b-.002,'#a5adb1','case',1,1,'blanket-shield');
+    const mid=q.map((v,j)=>(v+r[j])/2),dr=r[0]-q[0],dz=r[1]-q[1],L=Math.hypot(dr,dz),u=[dr/L*.10,dz/L*.10],m0=[mid[0]-u[0],mid[1]-u[1]],m1=[mid[0]+u[0],mid[1]+u[1]];
+    for(const f of [.28,.72]){const phi=A+(b-A)*f;sector([offset(m0,d.shieldStart+d.shieldDepth),offset(m1,d.shieldStart+d.shieldDepth),offset(m1,d.mountEnd),offset(m0,d.mountEnd)],phi-.012,phi+.012,'#7f909b','case',1,1,'blanket-mount');}
+   }mark('blanket');
   }
   // Equatorial diagnostic/access ducts: rectangular steel necks on the sectors.
-  function box(r0,r1,z0,z1,width,phi){const q=(r,t,z)=>[r*Math.cos(phi)-t*Math.sin(phi),r*Math.sin(phi)+t*Math.cos(phi),z],v=[[r0,-width/2,z0],[r1,-width/2,z0],[r1,width/2,z0],[r0,width/2,z0],[r0,-width/2,z1],[r1,-width/2,z1],[r1,width/2,z1],[r0,width/2,z1]].map(p=>q(...p));for(const ids of [[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7],[4,5,6,7],[0,3,2,1]])objects.push({face:true,material:'case',alpha:1,baseColor:'#9cabb6',points:ids.map(i=>P(v[i]))});}
-  if($('hardware').checked)for(let k=0;k<9;k++){const phi=(k+.5)*2*Math.PI/9;if(!visible(phi))continue;box(8.9,10.95,-.78,.78,1.15,phi);box(10.8,11.08,-.94,.94,1.48,phi);}
+  function duct(r0,r1,z0,z1,width,phi){const project=(r,t,z)=>[r*Math.cos(phi)-t*Math.sin(phi),r*Math.sin(phi)+t*Math.cos(phi),z],ring=(r,inset)=>[[r,-width/2+inset,z0+inset],[r,width/2-inset,z0+inset],[r,width/2-inset,z1-inset],[r,-width/2+inset,z1-inset]].map(p=>project(...p)),outer=[ring(r0,0),ring(r1,0)],inner=[ring(r0,.08),ring(r1,.08)],face=points=>objects.push({face:true,material:'vessel',region:'pumping-duct',alpha:1,baseColor:'#9cabb6',points:points.map(P)});
+   for(let j=0;j<4;j++){const k=(j+1)%4;face([outer[0][j],outer[1][j],outer[1][k],outer[0][k]]);face([inner[0][k],inner[1][k],inner[1][j],inner[0][j]]);for(let end=0;end<2;end++)face([outer[end][j],outer[end][k],inner[end][k],inner[end][j]]);}
+  }
+  if($('hardware').checked)for(let k=0;k<9;k++){const phi=(k+.5)*2*Math.PI/9;if(!visible(phi))continue;duct(8.8,11.05,-.78,.78,1.15,phi);duct(6.55,10.5,-5.05,-4.35,.90,phi);}
+
   mark('vessel');
  }
  if($('tfCoils').checked){
