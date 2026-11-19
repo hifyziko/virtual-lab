@@ -74,6 +74,11 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
   if(entry.sourceId){assert.deepEqual(manifest.progressive.dependencies[entry.id],['fusion-'+entry.sourceId]);assert(!manifest.progressive.assets['fusion-'+entry.id],'Aliases must share the gallery payload');continue;}
   const file=path.join(web,entry.page),html=fs.readFileSync(file,'utf8');assert(html.includes('data-fusion-page="'+entry.id+'"'));assert(html.includes('aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a>'));assert(html.includes('<header data-fusion-heading'));assert(html.includes('<h1 data-module-number="'+entry.num+'">'));
   if(entry.id==='fu06-divertor')assert(html.includes('<h1 data-module-number="03">Tokamak: pole a plazma</h1>'),'The renamed lesson heading is delivered under its existing route');
+  if(entry.id==='fu11-rekonexe'){
+   assert.match(html,/<main class="shell">\s*<header data-fusion-heading\b/);
+   const cutHeader=html.match(/<article class="panel main">\s*<header>([^]*?)<\/header>/)?.[1];
+   for(const id of ['sectionTitle','sectionToggle','inject'])assert.ok(cutHeader?.includes('id="'+id+'"'),'Missing cut control: '+id);
+  }
   for(const [,ref] of html.matchAll(/(?:src|href)="([^"]+)"/g)){
    const url=new URL(ref,'https://lab.invalid/'+entry.page),rel=decodeURIComponent(url.pathname.slice(1));
    if(url.origin!=='https://lab.invalid'){assert.equal(url.protocol,'https:','External references must use HTTPS');continue;}
