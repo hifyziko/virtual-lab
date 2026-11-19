@@ -1,5 +1,504 @@
 # Aktuální stav předání
 
+## COMPASS-U: sjednocené černé pozadí, světlá záloha zachovaná — 19. listopadu 2026
+
+Obě videa v modulu fu10-compass i výchozím soukromém HTML přehrávači
+mají stejné čistě černé pozadí RGB 0,0,0. Celek 84,125 s,
+27397300 B; vnitřek 36 s, 20150673 B. Full HD, 24 fps,
+bez popisků. Kamera, montážní pohyb, geometrie, materiály a plánované
+parametry se nemění. Černá je jen scéna videa a její načítací překryv;
+světlé ovládání a zbytek aplikace zůstávají zachované.
+
+Původní světlý výstup je BEZE ZMĚNY ve složce Blender-animace/Final-celek,
+včetně MP4, Blenderu a celé světlé PNG sekvence. Po dodání černé varianty
+se čtením znovu ověřila shoda všech jeho souborů a 2019 PNG přes SHA-256.
+K otevření zálohy slouží COMPASS-U_montaz_svetle.html a samostatně zachovaný
+COMPASS-U_webovy-nahled_svetle.zip. Také původní Final-prulet se nemění.
+
+Nové soukromé výstupy: Final-celek-cerne (MP4, samostatný Blender,
+2019 skutečně průhledných PNG RGBA a manifesty) a Final-prulet-cerne
+(nově složené MP4 z původní průhledné sekvence). Podklad je tedy stejný
+v obou videích, zatímco jejich PNG lze skládat i na jinou barvu.
+Výchozí HTML a webový ZIP používají nové černé varianty. Do veřejného
+modulu jdou pouze dvě aktuální MP4 a malé náhledy; světlá záloha,
+Blender ani PNG sekvence se na web nepřibalují.
+
+Ověřeno všech 2019 nových PNG, jejich kopie SHA-256, oba počty snímků,
+fps a rozlišení, dekódování několika etap, černé rohy obou koncových
+videí a barvy neprůhledných částí proti PNG. Prošlo sestavení i kontrola
+projektu. Prohlížeč nebyl otevřen. Uživatel následně výslovně schválil
+push včetně obou videí a požaduje funkční načítání z webu. Tato dodávka
+je určená k publikaci přes stávající GitHub Pages; soukromé zálohy,
+Blender a PNG sekvence se neodesílají.
+
+## COMPASS-U: finální montáž a nový modul — 19. listopadu 2026
+
+Hotový modul fu10-compass, téma Tokamak; zdroje jsou v
+versions/vyvoj/m_files/fusion/compass-u/, stabilní vstup
+versions/aktualni/web/index.html#fu10-compass. Velké video vlevo,
+plánované parametry vpravo, přepínání celku/vnitřní sestavy, posuvník,
+kapitoly, rychlost a společná nápověda. Zachován původní světlý vzhled,
+kompaktní ovládání, počáteční vystředění i měřítko podle okna a patička 1.0.
+
+Celková montáž je nově finální kovový render: 1920 × 1080, 24 fps,
+2019 snímků, 84,125 s, MP4 34 364 287 B. Delší přílety dílů,
+proměnná výška a vzdálenost kamery, pohled nad otevřený tokamak a
+závěrečný oblet. Bílý studiový podklad se skutečnými měkkými stíny.
+Bez popisků. Geometrie tokamaku se podle výslovného pokynu nemění;
+upravené normály zachovávají ostré hrany nad 25 stupňů a rovné desky.
+SHA-256 vrcholů a topologie před/po úpravě souhlasí; všech 159 objektů
+je v původní koncové poloze (největší odchylka pod 4e-12 m).
+
+Soukromé výstupy jsou v COMPASS-U/Blender-animace/Final-celek:
+MP4, soběstačný Blender zdroj, dvě ukázková PNG, úplná sekvence PNG_RGBA
+a kontrolní manifesty. Všech 2019 kopírovaných PNG ověřeno SHA-256;
+sekvence má 4 451 865 506 B a obsahuje neprůhledný bílý podklad.
+Pro transparentní nový render vypnout samostatnou kolekci Podklad a stín.
+Samostatný finální průlet vnitřkem zůstává 36 s, 20 130 103 B; jeho
+původní transparentní PNG sekvence je zachovaná. Obě MP4 mají moov na
+začátku pro web. Přehrávač COMPASS-U_montaz.html a soukromý webový ZIP
+už používají obě finální videa. Na web nejdou CAD, Blender ani PNG sekvence.
+
+Aktuální návrhové hodnoty: ÚFP AV ČR, Tokamak overview,
+https://www.ipp.cas.cz/Compass_U/overview/, ověřeno 19. 11. 2026.
+R 0,894 m, a 0,27 m, B 5 T, Ip 2 MA; ohřev počátečně NBI 3–4 MW
+a ECRH 1 MW, později až 8 a 10 MW. Geometrie se podle nových čísel
+nepřepočítává. Datum spuštění zařízení není přebíráno ze starších podkladů.
+Podrobnosti a citace montáže jsou v docs/fuze/compass-u.md.
+
+Ověřeno: rozlišení, počet snímků, fps, dekódování začátku/pohledu shora/
+konce, barvy MP4 proti PNG (průměrná odchylka pod 0,82 z 255),
+jediné vybrané video, zapamatování času, posuvník, obnovení přehrávání,
+etapy ohřevu, chyba/opakování, uvolnění médií, navigace a lazy URL včetně
+náhledů. Prošlo úplné sestavení a node tools/project/check.cjs.
+Prohlížeč nebyl spuštěn; žádný push nebyl proveden.
+
+## Dvě témata fúze a přejmenování tokamaku — 19. listopadu 2026
+
+Uživatel schválil rozdělení oblasti Plazma a fúze na Základy plazmatu
+a fúze (plyn/plazma, reakce/bariéra, drift, galerie) a Magnetické udržení
+a tokamak (udržení, tokamak, přepojení/ostrovy). Dlaždice mají nenápadný
+krémový nebo ocelově modrý podklad a textový štítek Základy/Tokamak.
+Obě témata se v oblasti otevírají nezávisle. Číslování je od 01 v každém
+tématu, původní module IDs i group-fusion zůstávají funkční.
+
+Dosavadní Divertor má širší název Tokamak: pole a plazma v katalogu,
+hlavičce a titulu stránky. Obsah a source/route fu06-divertor, alias
+fu05-rovnovaha i URL fuze-rovnovaha/divertor.html zůstaly zachované.
+Globální vzhled není přepnutý na tmavou variantu; barevné změny jsou
+omezené na nové skupiny a jejich dlaždice. Modely a renderery se nemění.
+Ověřeno: přesné rozdělení 4/3 modulů, samostatné číslování, jediná dlaždice
+každého modulu, otevření obou skupin a zachování historických odkazů.
+Prošly testy navigace, progresivního načítání, 97 rovnováh s GPU geometrií,
+sestavení a audit veřejného výběru. Prohlížeč nebyl spuštěn.
+
+## Materiálový CAD řez cívek — 19. listopadu 2026
+
+Uživatel zvolil „Materiálový CAD řez: přesné kontury a střídmé rozlišení
+kovů“. Předchozí dekorativní varianty jsou zrušené. V řezu nejsou mřížky,
+šrafové výplně, odlesky ani ozdobné rámečky vinutí. Konstrukce je ocelově
+šedá, obálka vinutí tlumeně měděná; kreslí se zdrojové hranice součástí.
+
+V pojmenovaném STEP byly ověřeny CS_WINDING_SPACE_RESERVATION#2HWWAG
+a CS_WINDING_VOLUME_INSIDE#JV9VPZ. Jejich skutečné poloidální obrysy
+včetně stupňů na koncích nahrazují šest vybarvených obalových obdélníků.
+Šest označených modulů se dělí uvnitř této obálky, podpěra zůstává zvlášť.
+Zdroj obsahuje obálky prostorů vinutí, nikoli samostatné závity nebo kabely;
+žádné takové detaily nejsou domýšlené. Modulové dělení zůstává idealizací.
+
+PF používají původní vnitřní profily vinutí tam, kde jsou ve zdroji.
+U PF1/PF6 chybí samostatný vnitřní obrys; uložena je výslovně označená
+odvozená obálka uvnitř hlavních svislých stěn pouzdra, nikoli předstíraný
+výrobní detail. Materiálové regiony se regenerují existujícím příkazem
+node tools/extract-iter-parameters.cjs --coil-bodies; zdrojové řezy zůstaly.
+
+Detailní varianta má opět shodný referenční render; 3D geometrie, fyzika,
+polohy PF popisků a průchody spojnic zůstaly zachované. Centry názvů CS
+odpovídají skutečné obálce vinutí. Ověřeno v úzkém i širokém renderu.
+Prošly testy 97 rovnováh s GPU geometrií a kontrolami původu materiálových
+kontur, reprodukovatelnost generátoru, sestavení, navigace, progresivní
+načítání i audit veřejného výběru. Sestavené zdroje jsou shodné.
+
+## Technická konvence řezu vinutím místo mřížky — 19. listopadu 2026
+
+Uživatel odmítl pravidelnou mřížku profilů jako tabulkovou výplň. Je
+odstraněna: svazky CS/PF jsou souvislé ploché měděně odlišené oblasti
+s jemným šrafováním pod 45 stupni a samostatným obrysem izolační mezery.
+Šrafování označuje řez materiálem, nikoli jednotlivé vodiče nebo jejich
+počet. Kolem názvů se vynechávají pouze šrafy, podklad zůstává souvislý.
+Žádné prostorové odlesky ani čtvercové buňky. Polohy, dělení modulů,
+popisky a geometrie zůstaly stejné; změna se týká jen Celého řezu.
+Ověřeno v samostatném renderu a testu 97 rovnováh s GPU geometrií.
+Sestavení, navigace a progresivní načítání prošly; sestavený skript
+je shodný se zdrojem. Prohlížeč nebyl spuštěn.
+
+## Ploché průřezy vinutí CS a PF — 19. listopadu 2026
+
+Předchozí kovový gradient a boční dekorace CS neodpovídaly poloidálnímu
+řezu a byly odstraněny. CS se opět kreslí jako šest plochých řezů modulů,
+s konstrukčním obrysem a měděně zbarveným svazkem profilů vodičů uvnitř.
+Střed zůstává čitelný pro svislý název; nejde o stříbrný středový prut.
+Také PF1–PF6 mají v řezu měděně odlišené vinutí. Pokud zdrojový CAD
+obsahuje vhodný vnitřní obrys svazku, použije se; jinak je svazek
+schematicky vepsaný do pouzdra. Mřížka vodičů a izolace je názorná,
+nepředepisuje výrobní počet, rozměry ani složení jednotlivých vodičů.
+
+Úprava je jen v Celém řezu. Popisky, průchody spojnic, fyzika a 3D
+geometrie zůstaly zachované. Ověřeno v renderu řezu a testech 97 rovnováh
+s GPU geometrií. Referenční render detailní varianty je nezměněný.
+Sestavení, navigace a progresivní načítání prošly. Sestavený skript
+odpovídá zdroji; prohlížeč nebyl spuštěn.
+
+## Technické zpracování solenoidu v celém řezu — 19. listopadu 2026
+
+Šest oddílů CS má jemně zkosený kovový obrys, decentní příčné stínování
+a zlatavé náznaky vinutí po stranách. Střed zůstává čistý pro vystředěné
+svislé jméno modulu, bez rámečku popisku. Spáry jsou vizuálně oddělené.
+Textura závitů je schematická a neudává skutečný počet či konstrukci vodičů.
+Rozměry, šest modulů a jejich názvy se nemění; úprava platí pouze pro
+Celý řez, detailní varianta a 3D geometrie zůstávají stejné.
+Ověřeno v renderu úzkého i širokého řezu a testu 97 rovnováh s GPU
+geometrií a kontrolami umístění popisků.
+Sestavení, navigace a progresivní načítání prošly; sestavený skript
+odpovídá zdroji. Referenční render detailního řezu je beze změny.
+
+## Konkrétní vedení popisků pouze v celém řezu — 19. listopadu 2026
+
+Uživatel určil místa popisků a doplnil, že detailní řez se nemá měnit.
+V celém řezu jsou názvy CS vystředěné v šesti stejně velkých grafických
+oddílech; rušivé pomocné vnitřní CAD čáry se v tomto modulovém náhledu
+nevykreslují. PF3 je nad průřezem, PF4 pod průřezem. Spojnice separatrix
+má průchod mezi PF1 a PF2, nádoby mezi PF2 a PF3, SOL pod názvem PF4
+a X-bodu blízko nad PF5. Profil zůstává vodorovný. Všechny spojnice
+jsou souvislé, bez skrytých částí.
+
+Detailní varianta bez Celého řezu používá dosavadní rozložení; její
+referenční render je byte-identický s předchozím stavem. Data rovnováh,
+zdrojová geometrie a 3D náhled se nemění. Testy ověřují vystředění CS,
+polohy PF3/PF4, průchody spojnic určenými mezerami a nekřížení skutečných
+úseků lomených čar. Vizuálně ověřen úzký i široký celý řez.
+Prošly testy 97 rovnováh s GPU geometrií, nové kontroly popisků,
+sestavení, navigace i progresivní načítání. Sestavený skript je shodný.
+
+## Vodorovný profil a skutečný prostor pro názvy CS — 19. listopadu 2026
+
+Spojnice profilu zůstává vodorovná ve výšce profilového řezu. Ostatní
+spojnice upřednostňují vodorovnou polohu; sklánějí se jen kvůli průřezu PF,
+názvům cívek či nekřížení ostatních spojnic. Zrušeno automatické šikmení
+všech čar. Spojnice jsou nadále celé viditelné.
+
+U svislých názvů CS se nyní hledá volný obdélník pro celý text v rámci
+každého modulu proti skutečným čarám CAD řezu, nikoli jen volný sloupec
+v několika výškách. To opravuje zejména CS3L, jehož spodní část protínala
+příčná konstrukční hrana. Popisky nemají box a geometrie se nemění.
+Poloha názvů je uložená podle rozměrů řezu, takže se výběr při posouvání
+parametrů neopakuje. Vizuálně ověřen celý úzký a široký řez.
+Regrese ověřuje vodorovný profil a celý obdélník každého svislého názvu
+CS proti původním čarám řezu při třech velikostech. Prošly testy 97
+rovnováh s GPU geometrií, sestavení, navigace i progresivní načítání.
+
+## Souvislé šikmé odkazové čáry — 19. listopadu 2026
+
+Podle upřesnění uživatele je předchozí skrývání spojnic za cívkami zrušeno.
+Každý popisek má jedinou souvislou šikmou spojnici od kotvy k boxu, bez
+ořezu a skrytých úseků. Rozložení volí sklon a výšku textu podle kotvy,
+rozměru řezu a polohy ostatních spojnic. Při volbě výšky se penalizuje
+průchod přes názvy cívek, PF průřezy a křížení ostatních spojnic.
+Tvar řezu, kotvy, styly cívek a fyzikální data zůstaly zachované.
+Vizuálně ověřeno pro úzký a široký celý řez. Regrese kontroluje šikmost
+a vzájemné nekřížení souvislých spojnic v obou rozsazích řezu.
+Prošly testy 97 rovnováh s GPU geometrií, sestavení, navigace a progresivní
+načítání. Sestavený skript odpovídá zdroji; prohlížeč nebyl spuštěn.
+
+## Čitelnost CS/TF a odkazové čáry za cívkami — 19. listopadu 2026
+
+Odkazové čáry popisků jsou v celém řezu ořezané přesnými siluetami
+viditelných TF, PF a CS průřezů (včetně jejich otvorů). V ploše cívky se
+nekreslí čára ani její bílý podklad; neprotínají tedy průřez ani jeho jméno.
+TF je výrazněji označené na vnějším rameni namísto úzké vnitřní větve.
+Svislé názvy modulů CS hledají volný pruh mezi původními čarami řezu,
+aby je neprotínala středová čára. Boxy zůstávají jen u aktivních cívek.
+Geometrie, dělení, rovnováhy ani profil se nemění.
+
+Ověřeno v renderu úzkého i širokého celého řezu a testu 97 rovnováh
+s GPU geometrií, popisky a ovládáním.
+Odkazové čáry respektují i volné místo kolem jmen cívek v otvorech
+průřezů. Finální sestavení, navigace a progresivní načítání prošly;
+sestavené soubory jsou shodné se zdroji.
+
+## Prosté popisky cívek a svislé CS — 19. listopadu 2026
+
+Neaktivní popisky cívek v poloidálním řezu mají průhledný podklad bez
+rámečku. Barevný box a zvýraznění zůstávají pouze právě ovládaným cívkám.
+Jména šesti modulů CS jsou otočená o 90 stupňů a vystředěná v jejich
+úzkých oddílech. Polohy, dělení solenoidu a fyzikální data se nemění.
+Sestaveno do aktuálního webu; navigace a progresivní načítání prošly,
+sestavený styl je shodný se zdrojem. Prohlížeč nebyl spuštěn.
+
+## Vzhled ponechán původní, varianta uchována — 19. listopadu 2026
+
+Poslední pokyn uživatele: výchozí vzhled zůstává původní; tmavou variantu
+uchovat pro případné pozdější přepnutí. Rozhodnutí a kompletní rozcestník
+podkladů jsou v [docs/grafika/README.md](docs/grafika/README.md), s viditelným
+odkazem z hlavního README a pravidlem v AGENTS.md. Původní dodaný vizuální
+standard je v této složce uložen v nezměněném znění, nezávisle na ploše počítače.
+Zdroje adaptéru, samostatný builder i obnovitelný náhled zůstávají zachované.
+Standard je referenční varianta, nikoli souhlas s redesignem nebo aktivací.
+`index.html` a běžné spouštění se nemění. Nic se nepublikuje ani nepushuje.
+
+## Bod uvnitř SOL, označení cívek a dělení CS v řezu — 19. listopadu 2026
+
+Bod SOL neleží na vykreslené vnější kontuře: při stejné výšce je umístěn
+uprostřed mezi separatrix a vnější hladinou 1,025. Jeho tok se kontroluje
+uvnitř tohoto rozmezí a poloha mimo uzavřené plazma; bod je menší, aby
+nezakrýval obě hranice tenké schematické vrstvy.
+
+V celém poloidálním řezu se u viditelných cívek zobrazují PF1–PF6 a TF.
+Centrální solenoid má pět dělicích spár a šest označených oddílů:
+shora CS3U, CS2U, CS1U, CS1L, CS2L, CS3L. Dělení odpovídá šesti grafickým
+modulům 3D idealizace, nemění proudy ani fyzikální parametry. Aktivní PF
+mají zvýrazněné názvy. Datové podklady původního řezu zůstaly nedotčené.
+
+Dolní místo pro barevnou stupnici je oddělené od názvu a čísel radiální
+osy i při celém řezu; grafika si tento prostor rezervuje také bez mapy,
+aby změna mapy neměnila měřítko. Regrese hlídá všech 12 jmen PF/CS a TF,
+kotvu SOL, popisky mimo kresbu a volné místo pro stupnici.
+Ověřeno ve vykresleném celém řezu, testu 97 rovnováh s GPU geometrií,
+sestavení, navigaci a progresivním načítání. Sestavené zdroje jsou shodné.
+
+## Nezávazný návrh tmavého vzhledu — 19. listopadu 2026
+
+Na žádost uživatele samostatný náhled `versions/aktualni/web/nahled-vzhledu.html`:
+úvodní obrazovka, oblast Elektřina a magnetismus a první sekce Základní
+elektromagnetické principy včetně jejích modulů. Běžný `index.html` nový vzhled
+nenačítá. V dalších sekcích se zkušební styl vypíná. Nejde o schválený redesign.
+Předložený vizuální standard sloužil jako reference barevnosti a komponent;
+výslovné zadání zachovat poměry oken má přednost před doporučeným makrolayoutem.
+
+Sdílené tokeny a pravidla: `versions/vyvoj/m_files/Web/visual-proposal.css`;
+omezení rozsahu a porovnávací odkaz: `visual-proposal.js`.
+Po zpětné vazbě uživatele je přepracovaný také vnitřek modulů: tmavé plochy
+grafů a scén, ovládání, výsledky, osy a kontrastní popisky. Původní pokus
+s ponecháním světlých panelů byl odmítnut. Adaptér `visual-proposal-paint.js`
+připravuje vložené lekce před prvním vykreslením a mění pouze vlastnosti
+vzhledu v CSS, SVG a vykreslování Canvas. Rozměry, poměry panelů, geometrie,
+výpočty a škálovací mechanismus zůstávají původní. Materiálové přechody,
+ImageData a numerické RGB škály se nepřebarvují. Barevné rodiny fyzikálních
+veličin jsou zachované, vybrané tahy a popisky mají světlejší odstíny;
+povinné barvy elektrického a magnetického pole se zachovávají přesně.
+Náhled vzniká po progresivním sestavení nástrojem `tools/build-visual-proposal.cjs`,
+sdílí stejné odložené datové soubory a eviduje se v obou manifestech.
+Není přidaný do veřejného výběru `webFiles`; nebyl publikován ani odeslán na GitHub.
+
+Návrat k běžnému vzhledu: otevřít `index.html`, případně použít porovnávací odkaz
+v náhledu. Odstranění integrace: odebrat volání `build-visual-proposal.cjs`
+z `tools/build-release.cjs` a znovu sestavit. Ostatní rozpracované změny zachovat.
+Prohlížeč nebyl automaticky spuštěn; vizuální kontrola rozlišení a fullscreen
+zůstává k posouzení při otevření návrhu.
+Prošlo sestavení, navigace samotného náhledu, progresivní načítání, výklady
+a stávající testy škálování a fullscreen. Samostatná kontrola ověřila přesnou
+shodu obou HTML mimo vložky návrhu, omezení stylu na vybrané cesty
+a kontrolní součty dodávky. Kontroly rozměrů používají simulované prostředí;
+nejsou náhradou vizuální kontroly návrhu v prohlížeči.
+Po úpravě vnitřku navíc prošla simulovaná kontrola barevného adaptéru,
+zachování argumentů a stavu Canvas, numerických RGB škál i offscreen rastrů,
+neměnného těla/modelu vloženého dokumentu a přípravy před jeho vykreslením.
+Pokus přečíst existující okno Chrome přes Computer Use odmítla politika
+nástroje; vzhled tedy ani po této revizi není vizuálně ověřený v prohlížeči.
+
+## Jediný průchod siločáry a označení SOL podle knihy — 19. listopadu 2026
+
+Prostorové zobrazení opět používá jeden poloidální průchod vybrané
+siločáry, bez opakování obrysů. Výraznější magnetický povrch zůstává.
+Ověřeno v Entler–Kindl, Jaderná fúze a fúzní elektrárny, kap. 7.11–7.12,
+obr. 7.18, s. 158–159: okrajová vrstva uvnitř, SOL vně separatrix.
+Kotva popisku SOL nyní míří na otevřenou hladinu 1,025 u dolního boku,
+kde je její odstup od separatrix čitelný, nikoli na nejvzdálenější bod
+tenkého pásu poblíž separatrix. Kotva separatrix používá její skutečnou
+konturu místo blízké vnitřní hladiny výplně. SOL má světle modrou výplň
+a jedinou jemnější vnější konturu; černá separatrix zůstává samostatná.
+Šířka výplně je stále pouze schematická, nikoli výsledek transportu.
+Regrese kontroluje tok v kotvě SOL nad jednotkou a polohu vně uzavřené
+oblasti; knižní PDF zůstává neveřejné.
+Prošly testy 97 rovnováh a GPU geometrie, kotvy SOL, sestavení,
+navigace i progresivního načítání. Nové označení vizuálně ověřeno v řezu.
+
+## Více oběhů siločáry — 19. listopadu 2026
+
+Uzavřený poloidální obrys se při prostorovém trasování prochází až třikrát
+s nepřerušenou toroidální fází. Nejde o kopie stejné křivky ani umělé
+spojení konců. Zachován limit šesti toroidálních oběhů i zastavení u X-bodu;
+otevřená větev SOL se neopakuje. Pole, rovnováhy a profil zůstávají stejné.
+Neutrální zobrazení vybraného povrchu má zvýšené krytí z 0,19 na 0,29
+a jeho řezné plochy z 0,16 na 0,24. Kamera a geometrie se neměnily.
+Regrese kontroluje prodloužení stopy, plynulou fázi a nepřítomnost skoků,
+a nezměněné trasování otevřených větví.
+Prošly testy 97 rovnováh s GPU geometrií a novými regresními kontrolami,
+sestavení, navigace i progresivního načítání.
+
+## Popisky řezu, vybraný povrch a kompaktní ovládání — 19. listopadu 2026
+
+SOL, separatrix, X-bod, vakuová nádoba a profil mají vyhrazený pravý
+popiskový sloupec mimo kresbu. Kotvy zůstávají na skutečné geometrii;
+odkazové čáry a cílové body jsou barevně odlišené. Pozice textů se řadí
+s minimálním rozestupem i při posouvání profilového řezu. Název radiální
+osy je pod čísly, název svislé osy nad hrotem. Změnilo se rozložení,
+nikoli tvar nebo data levého řezu. Ověřeny oba rozsahy při třech rozměrech.
+
+Aktuální uzavřený magnetický povrch je v prostoru viditelnější průsvitnou
+modrou plochou; při konstrukčním řezu má navíc průsvitné řezy a obrysy.
+Siločára je dál samostatná prostorová křivka. Otevřená větev SOL se nesmí
+uzavírat umělými řeznými plochami. Fyzikální data se neměnila.
+
+Levé ovládání má nižší selecty, tlačítka a rozestupy; uvolněná výška patří
+flexibilnímu grafu profilu. Posuvník výšky zůstává přímo u grafu.
+Regrese kontroluje nepřekrývání popisků, jejich umístění mimo kresbu,
+oddělení titulku radiální osy od čísel a viditelnost vybraného povrchu.
+Prošly testy 97 rovnováh a GPU geometrie, popisků a povrchu, sestavení,
+navigace i progresivního načítání. Popisky byly vizuálně ověřeny
+v samostatném renderu plátna pro úzký a široký celý řez.
+
+## Oprava deformovaného TF těla — 19. listopadu 2026
+
+Předchozí varianta s polárním přepisem podpěr a výřezů PF byla chybná
+a je zrušena. Sloučila hlavní tělo, lokální podpěry a pás vinutí; vznikly
+zubaté a deformované obrysy. Test průniků sám o sobě správnost nezajišťuje.
+
+Aktuální idealizace odděluje hladké D-tělo TF od lokálních konstrukčních
+detailů. Vnitřní obrys vychází z původního CAD otvoru. Obal vzniká jeho
+normálovým odsazením o 0,88 m, podle tloušťky 0,880901 m změřené v původním
+nepřerušeném vnějším boku. Jde o názorné hlavní tělo se sjednocenou tloušťkou,
+nikoli přesnou kopii celého pouzdra STEP. Drobné podpěry se vynechávají;
+nedělají se umělé zářezy do pásu vinutí ani přídavná 20mm vůle.
+PF pouzdra nadále používají své vlastní zdrojové obrysy a polohy.
+Generátor: node tools/extract-iter-parameters.cjs --coil-bodies.
+Starší přepínač --coil-clearances je pouze alias nové opravené varianty.
+
+Zvětšený výchozí záběr, pevné měřítko při vypínání dílů, ovládání myší,
+levý řez i diagnostický profil zůstávají. Regrese nyní ověřuje i hladký
+konvexní D-obrys bez zářezů podpěr, vedle vzorkování průniků s PF.
+Ověřeno v samostatném renderu geometrie, testu 97 rovnováh s GPU geometrií,
+nových tvarových regresích, sestavení, navigaci a progresivním načítání.
+Sestavené soubory jsou shodné se zdroji. Prohlížeč nebyl spuštěn.
+
+## Profil napříč komorou — 19. listopadu 2026
+
+Graf podél poloidálního obrysu nahrazen vodorovným profilovým řezem.
+Posuvník Výška řezu mění z; zelená přerušovaná čára v levém řezu ukazuje
+skutečnou polohu vzorkování. Vodorovná osa grafu je R v metrech, rozsah
+je pevný podle komory a výpočetní sítě. Značky průchodů separatrix a první
+stěnou vycházejí z průsečíků s jejich geometrií. Graf přebírá veličinu
+barevné mapy; bez mapy zobrazuje tlak. Tlak, j a beta se kreslí pouze
+v uzavřeném plazmatu; mimo síť, komoru a v materiálu jsou mezery.
+Vzorkování nemění vybraný magnetický povrch, pole, rovnováhu ani 3D kameru.
+Jde o názorný diagnostický řez, nikoli model konkrétního snímače.
+Regrese porovnává hodnoty s původním modelem, polohu průsečíků, mezery
+v SOL a materiálu a změnu výšky bez zásahu do rovnováhy nebo kamery.
+Ověřeno sestavení, 97 rovnováh s GPU geometrií a novými testy profilu,
+navigace a progresivní načítání. Křivka profilu byla zkontrolována také
+v renderu plátna; prohlížeč nebyl spuštěn.
+
+## Pevná plocha tokamaku a spodní popisky — 19. listopadu 2026
+
+Odstraněno pozdější CSS přepsání `.views` na relativní polohu s automatickou
+výškou. Plocha je opět absolutně ukotvená ze všech stran; rozměry pixelového
+bufferu canvasu nesmějí zvětšovat prostor a tím měnit měřítko po přepnutí
+geometrie. Pevná obálka celé sestavy a ruční zoom/otáčení myší zůstávají.
+Popis plazmatu a legenda jsou společně dole mimo tokamak. Doplněn význam
+osy `s/s_celkem`: normalizovaná délka po vybraném poloidálním obrysu,
+nikoli radiální poloha nebo délka prostorové siločáry. Test hlídá také
+výsledné CSS ukotvení prostoru, nejen kamerovou matici rendereru.
+Ověřeno: test 97 rovnováh včetně GPU geometrie a kamery, sestavení,
+navigace fúzních modulů a progresivní načítání. Prohlížeč nebyl spuštěn.
+
+## Navazující porty, materiály a stálé měřítko — 19. listopadu 2026
+
+Opraveny tři rodiny portů: otvor v obou pláštích, přechodové hrdlo a příruba
+vycházejí ze stejného rámu. Poloidální parametrizace obou plášťů obsahuje
+společné roviny otvoru; kořenové hrany mají přesně dvě incidentní plochy.
+Stejné rámy prořezávají ve 3D i panely první stěny, stínění a úchyty.
+Nahradilo to nesprávnou podmínku pro vynechávání panelů podle azimutu.
+Levý řez včetně obkladu je přesně shodný s předchozím stavem.
+
+Materiály mají vlastní metalness/roughness a odrazivost: pouzdra, nádoba,
+broušená hrdla, leštěné příruby, vinutí, stínění a wolframové povrchy.
+Řezné krycí plochy se nyní vytvářejí samostatně pro tělesa se svým materiálem;
+otevřené dekorativní vložky se do stencilové výplně nezapočítávají.
+Vizuální parametry jsou názorné, nikoli naměřené vlastnosti povrchů.
+
+Odstraněno automatické přizpůsobování kamery náklonu. Měřítko používá pevnou
+obálku celé sestavy pro všechny orientace a nezávisí na viditelnosti dílů.
+Kolečko, explicitní reset a skutečná změna rozměru plochy zůstávají funkční.
+Testy ověřují stálé měřítko při orbitování a shodnou kamerovou matici při
+přepínání jednotlivých součástí. Rovnováhy, pole a levý referenční řez jsou
+nezměněné. Sestaveno lokálně; cílené testy geometrie a rendereru i úplná kontrola node tools/project/check.cjs prošly. Sestavené soubory geometrie a rendereru jsou shodné se zdroji.
+
+## Technické zpracování prostoru a souvislá siločára — 19. listopadu 2026
+
+Na uživatelovo porovnání s původním obrázkem doplněny sražené hrany TF,
+hladké 3D profily, vinutí, kovové lemy, spáry a táhla CS. Opraveny normály
+PF/CS: válcové stěny se už nevyboulí odleskem čel. Zůstává lehká parametrická
+sestava (cca 565 tisíc trojúhelníků včetně všech detailů, nikoli velká síť CAD).
+Levý řez ani uložené rovnováhy nejsou změněny.
+
+Vybraná prostorová siločára je opět celá, výrazná modrá s bílým lemem.
+Používá trubici s transportovanými jednotkovými rámy a konstantní šířkou
+v pixelech; kamera nemění její GPU buffery. Hloubkový test zachovává fyzické
+zakrytí konstrukcí. Pohyb směrových značek pokračuje ve 3D. Diagnostické
+kontury se dále ořezávají. Výtvarný řez odkrývá konstrukci, nikoli část
+vybrané siločáry. Barevné vložky řezů mají oddělené hloubky proti blikání.
+Viz docs/fuze/iter-native-cad.md. Sestavení a celá projektová kontrola prošly.
+Prošly také cílené Three testy normál válcových stěn, rámy trubice, stálá
+šířka siločáry při změně měřítka a disposal. Vizuálně prohlédnut samostatný
+VTK náhled s barevnými vložkami a celou siločárou; prohlížeč se nespouštěl.
+
+## Lehká parametrická sestava ITER — 18. listopadu 2026
+
+Po uživatelově kontrole nahrazen objemný detailní export matematickými
+šablonami a jejich opakováním. Geometrická data 151,5 MB → 0,325 MB,
+celá sestava včetně obkladů 103 milionů → 389 952 trojúhelníků.
+D-cívka a sektor nádoby sdílejí šablony; šest PF prstenců, CS a trojice
+divertorových kazet se generují z kompaktních profilů. Montážní fáze
+a počty 18 TF / 9 sektorů / 54 kazet zůstávají zachované. Výrobní detaily
+jsou záměrně idealizované. Velké sítě nejsou v aktivním stromu ani dodávce.
+
+Uživatel výslovně ocenil a požádal zachovat levý řez. Jeho podklady jsou
+bitově shodné, ověřené pomocí referenceSections/SHA-256. Fyzikální data
+a 97 rovnováh jsou nezměněné. Při řezu se ořezává i prostorová siločára;
+směrové šipky jsou 3D značky s hloubkovým testem místo překryvu přes CS.
+Aktuální zdroje: cad-parameters.js, parametric.js, cad.js, blanket.js.
+Předchozí níže popsaný nativní export je již překonaný způsob dodávky.
+Viz docs/fuze/iter-native-cad.md. Sestaveno do versions/aktualni/web;
+celá projektová kontrola prošla. Prohlížeč se nespouští.
+
+## Nativní sestava ITER a rekonstrukce obkladů — 18. listopadu 2026
+
+Dokončeno nahrazení ručních konstrukčních profilů skutečnou sestavou STEP
+z oficiálního modelu ITER pro 3D tisk v2.0. Tato úprava nahrazuje níže
+popsané předchozí aproximace nádoby, cívek a divertoru. Zdrojové montážní
+souřadnice zůstávají zachované, převod mm → m je ve všech osách stejný;
+opakování dílů používá pouze rotace kolem osy stroje. STL tiskové orientace
+nejsou vydávané za montážní souřadnice. Sítě i přesné poloidální řezy
+exportují volitelné import-iter-cad.py a pack-iter-cad.py. Běžné sestavení
+zůstává čistě Node.js bez CAD kernelu nebo přepočtu polí.
+
+Uživatel výslovně doplnil požadavek rekonstruovat chybějící obklady podle
+M. Merola, Design of ITER Plasma Facing Components (2009), snímky 78,
+82–83 a 89. Rekonstrukce v blanket.js je oddělená od převzatých dílů:
+18 lomených řad, samostatná čelní deska, stínicí bloky a úchyty k nádobě.
+Opakování a výřezy jsou ilustrativní, nikoli výrobní mapa 440 modulů.
+Přesné porovnání s předchozím commitem potvrdilo shodu všech dat mimo
+machine, SHA-256 5a62035c6e7b10ee05fb9eefe0a0e5b9361c3db6f35794790cf8a7a0476811af.
+Žádná rovnováha ani pole se při opravě konstrukce nepočítají znovu.
+
+Podrobnosti, původ a omezení převodu: docs/fuze/iter-native-cad.md.
+STEP, BRep, STL a PDF zůstávají privátně mimo Git a veřejný web.
+Stav ověření: sestavení tools/build-release.cjs a celá projektová kontrola
+prošly. Prošly testy 97 rovnováh, vytvoření nativních Three sítí s náhradou
+WebGL driveru, kamera/cache/disposal, canvasový řez a samostatný VTK náhled.
+Regrese všech 18 řad obkladů ověřuje polohu stínění za skutečnými čelními
+trojúhelníky. Prohlížeč nebyl spuštěn. Web je v versions/aktualni/web.
+
 ## Divertor a blanket — oddělené plochy sestavy, 18. listopadu 2026
 
 Na základě uživatelova anotovaného řezu přepracováno zasazení divertoru:
@@ -3230,3 +3729,15 @@ místní vrstva, čtyři navazující kroky, proud a jeho směr, zvýrazněná
 toková kontura před/po přepojení, vypočtené proudění a X-body uvnitř
 obrazu. Výpočetní data beze změny. Canvasové náhledy prohlédnuté,
 celá stránka v prohlížeči neotevřena; podrobnosti v návrhu ostrovů.
+
+### Ostrovy — souvislý prostorový pohled, 18. 11. 2026
+Odstraněn postup čtyřmi prezentačními kroky. Modul má otočný torus, posuvný řez a současně místní detail. Stejná vypočtená amplituda řídí všechny pohledy; toroidální geometrie je analytická ilustrace 2/1, šířka zvětšena 4×. Numerické a integrační testy prošly; aktivní web přestavěn, bez push. Podrobnosti v docs/fuze/magneticke-ostrovy-navrh.md.
+
+### Ostrovy — důraz na příčinu a místní detail (18. 11. 2026)
+Prstenec zmenšen na orientační sloupec spolu s řezem; hlavní plochu zabírá rozvinutá vrstva. Vodicí čáry spojují aktuální polohu řezu v toru s řezem a vybranou vrstvu s detailem. Doplněna kóta šířky ostrova a popisky s odkazy na pole, proudění, přepojení a střed ostrova. Obráceno tažení myší v obou osách; konvence zapsána v AGENTS.md a ověřena testem. Test-islands a test-fusion-navigation prošly, aktivní web přestavěn; canvas detail ověřen snímkem. Celý prohlížeč neotevírán, bez push.
+
+### Ostrovy — porovnání neporušeného pole (18. 11. 2026)
+Po zpětné vazbě ze snímku: výchozí příčný rozsah zmenšen na ±0,07a, redukován počet kontur, plocha ostrova podbarvena. Doplněno schéma proudu od pozorovatele a opačných příčných složek pole, přepínač porovnání bez poruchy při stejném čase/měřítku a šedá referenční kontura pevného toku. Odstraněny dlouhé propojovací čáry přes text. Výslovně uvedeno, že počáteční nenulová porucha již obsahuje malý ostrov a výpočet neřeší její původ. Test ostrovů ověřuje i zachování času při porovnání; test navigace prošel. Canvas kontrolován; prohlížeč neotevírán. Bez push.
+
+### Ostrovy — svislé ovládání (18. 11. 2026)
+Podle dalšího upřesnění uživatele obrácena pouze svislá osa vůči předchozí opravě: tažení dolů zvyšuje elevaci, doprava snižuje azimut. AGENTS.md i test upraveny. Test-islands prošel, aktivní web přestavěn.

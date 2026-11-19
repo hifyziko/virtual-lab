@@ -1,5 +1,7 @@
 # Uživatelské konvence pro výukovou grafiku
 
+- Rozhodnutí 19. 11. 2026: ponechat původní vzhled jako výchozí. Tmavý laboratorní styl je pouze další možná varianta. Viditelné podklady, původní návrhový standard, zdroje náhledu a postup pro budoucí přepnutí jsou v [docs/grafika/README.md](docs/grafika/README.md). Uchovat je; neaktivovat ani plošně nerozšiřovat bez nového pokynu uživatele. Referenční standard v této složce není aktivní pravidlo pro redesign. Zachovat současné poměry oken.
+
 - V uživatelském výkladu a citacích knihy neuvádět „poskytnutá finální verze rukopisu“ ani obdobné poznámky o stavu či předání rukopisu. Uvádět autory, název knihy a konkrétní kapitoly/strany.
 
 - Výklad psát přímo pro studenta, stručně a případně bodově: význam veličin, jev a co sledovat v pokusu. Nepoužívat redakční nadpisy typu „Jak souvisí rovnice v rámečku s knihou“. Citace patří ke zdrojům. Dodržovat české vyjadřování knihy, zejména „banánová trajektorie“, nikoli „banánová orbita“.
@@ -49,3 +51,5 @@
 - Úklid schválený 17. 11. 2026: jediný aktivní strom je `versions/vyvoj/m_files` a jediný uživatelský výstup `versions/aktualni/web`. V `handoffs/` ponechávat jen poslední ověřený předávací ZIP se SHA-256, nevytvářet další archivní kopie úklidu. Staré předávky a regenerovatelné výstupy po ověření odstranit; literaturu, malé modelové vstupy, historii Git a dvě chráněné zálohy zachovat. Podrobnosti v `VERZE.md`.
 
 - Sjednocení výkladu (17. 11. 2026): uživatel schválil pilot Momentové charakteristiky AM a rozšíření na celý projekt. Společný vzor je jedno tlačítko „Ovládání a výklad“ vlevo vedle „Celá obrazovka“. Sdružovat návod k ovládání, doporučený pokus a teorii/model do společného dialogu, zachovat vztahy a zdroje. Matematiku i čísla s jednotkami sázet KaTeXem, české slovní indexy přes \text. Otevření nemění stav pokusu ani rozměry modulu. Uvolněnou plochu po výkladových pruzích přidělit grafům. Rozbalovací nastavení a živé popisky grafů nejsou výklad; zachovat jejich funkci u pokusu.
+
+- Ovládání prostorových scén myší (18. 11. 2026): při tažení doprava snižovat azimut kamery; při tažení dolů zvyšovat její elevaci (oprava svislé osy podle uživatele). Tuto konvenci zachovat v nových a upravovaných prostorových modulech.

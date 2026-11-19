@@ -1,0 +1,13 @@
+'use strict';
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),path=require('path'),dir=path.resolve(__dirname,'../versions/vyvoj/m_files/fusion/equilibrium'),M=require(dir+'/model.js'),three={};vm.runInNewContext(fs.readFileSync(dir+'/../particles/vendor/three.js','utf8'),three);const T=three.THREE,c={window:{THREE:T},atob};c.window.TokamakModel=M;
+for(const name of ['cad-parameters.js','parametric.js','cad.js','blanket.js'])vm.runInNewContext(fs.readFileSync(dir+'/'+name,'utf8'),c);
+const CAD=c.window.TokamakCAD,objects=CAD.objects({visible:{blanket:true},focus:'all',active:[],cut:false}),vertex=(mesh,i)=>new T.Vector3(...mesh.positions.slice(i*3,i*3+3));
+for(let row=1;row<=18;row++){
+ const front=objects.find(o=>o.cadId==='reconstructed-fw-'+row).cadMesh,shield=objects.find(o=>o.cadId==='reconstructed-shield-'+row).cadMesh,faces=[];
+ for(let i=0;i<front.frontTriangles.length;i+=9)faces.push(new T.Triangle(...[0,3,6].map(j=>new T.Vector3(...front.frontTriangles.slice(i+j,i+j+3)))));
+ for(let i=0;i<shield.frontTriangles.length;i+=9){const p=new T.Vector3();for(const j of [0,3,6])p.add(new T.Vector3(...shield.frontTriangles.slice(i+j,i+j+3)));p.multiplyScalar(1/3);let best=null,distance=Infinity,closest=new T.Vector3();for(const face of faces){const q=face.closestPointToPoint(p,new T.Vector3()),d=q.distanceToSquared(p);if(d<distance){distance=d;best=face;closest.copy(q);}}assert(best);assert(p.clone().sub(closest).dot(best.getNormal(new T.Vector3()))<=.0002,'Shield must remain behind the faceted first wall, row '+row);}
+
+}
+assert.equal(objects.filter(o=>o.cadId.startsWith('reconstructed-mount')).length,18);
+for(const o of objects){assert.equal(o.rotations.length,9,'Every lining sector repeats at the same nine vessel azimuths');for(let i=0;i<o.rotations.length;i++)assert(Math.abs(o.rotations[i]-(30+40*i)*Math.PI/180)<1e-12);const mesh=o.cadMesh;for(let i=0;i<mesh.positions.length;i+=3){const theta=Math.atan2(mesh.positions[i+1],mesh.positions[i]);assert(Math.abs(theta)<=Math.PI/9+1e-6,o.cadId+" extends outside its vessel sector");}for(let i=0;i<mesh.indices.length;i+=3){const p=new T.Vector3();for(let j=0;j<3;j++)p.add(vertex(mesh,mesh.indices[i+j]));p.multiplyScalar(1/3);if(p.x<=6.2||Math.abs(Math.atan2(p.y,p.x))>=5*Math.PI/180-1e-6)continue;for(const port of c.window.TokamakParametricMesh.portSpecs){const v=-Math.sin(port.tilt)*(p.x-port.r)+Math.cos(port.tilt)*(p.z-port.z);assert(Math.abs(v)>=port.h/2-2e-6,'No lining face blocks the shared port opening');}}}
+console.log('PASS: all 18 blanket rows keep the shield behind the actual triangulated first wall; separate mounts and source attribution retained.');

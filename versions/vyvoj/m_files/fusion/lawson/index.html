@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HiFyziko Virtual Lab | Lawsonovo kritérium</title>
+<link rel="stylesheet" href="../particles/vendor/katex.css">
+<script defer src="../particles/vendor/katex.js"></script>
+<link rel="stylesheet" href="../navigation/style.css">
+<style>
+*{box-sizing:border-box}html{font-family:Inter,"Segoe UI",Arial,sans-serif}body{margin:0;background:radial-gradient(ellipse at 49% -14%,#f3f5f7 0%,#ffffff 56%,#ffffff 100%);color:var(--ink);font-size:14px}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid #845219;outline-offset:3px}
+.shell{max-width:1240px;margin:auto;padding:0 22px 28px}header{height:63px;border-bottom:1px solid #ded2e8;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px}.brand span:nth-child(2){font-weight:400;color:#354751}.logo{width:35px;height:35px;border-radius:10px;border:1px solid #ded2e8;display:grid;place-items:center;background:#f3f5f7;color:#285b76;font-weight:900}.subtitle{font-size:10px;color:#354751;text-transform:uppercase;letter-spacing:.16em;font-weight:700}.hero{padding:20px 0 15px}.hero h1{font-size:clamp(24px,3vw,34px);margin:5px 0 7px;letter-spacing:-.03em;line-height:1.15}.hero p{color:#354751;line-height:1.48;max-width:890px;margin:0}.modes{display:flex;gap:8px;margin-top:15px}.mode{border:1px solid #ded2e8;border-radius:10px;background:#f3f5f7;color:#354751;font-weight:800;padding:10px 13px;display:flex;gap:8px;align-items:center}.mode[aria-selected=true]{background:#f3f5f7;border-color:#ded2e8;color:#285b76;box-shadow:inset 0 0 0 1px #725198}.mode .num{border-radius:6px;padding:2px 7px;background:#f3f5f7;color:#285b76}.goal{display:flex;gap:11px;align-items:center;background:#f3f5f7;border:1px solid #ded2e8;padding:12px 15px;border-radius:13px;margin-bottom:14px;color:#285b76;line-height:1.4}.goal .symbol{font-size:20px;font-weight:900;border-radius:9px;background:#f3f5f7;color:#285b76;width:35px;height:35px;display:grid;place-items:center;flex-shrink:0}.goal small{display:block;color:#354751;margin-top:3px;font-size:12px}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(330px,1fr);gap:15px}.card{border:1px solid #ded2e8;background:linear-gradient(150deg,#f3f5f7,#ffffff 95%);border-radius:15px;box-shadow:0 14px 34px #72519822;overflow:hidden}.card-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;gap:10px;border-bottom:1px solid #ded2e8}.card-head strong{font-size:14px}.pill{white-space:nowrap;padding:5px 10px;border-radius:999px;background:#f1ebf6;border:1px solid #ded2e8;color:#913b50;font-weight:800;font-size:11px}.pill.ok{background:#e8f4ed;border-color:#ded2e8;color:#296347}.pill.excess{background:#fbf3df;border-color:#ded2e8;color:#845219}
+.stage{height:354px;position:relative;background:#ffffff}.stage canvas{height:100%;width:100%;display:block}.canvas-note{pointer-events:none;position:absolute;top:13px;left:14px;background:#f3f5f7b8;border:1px solid #ded2e8;border-radius:9px;padding:7px 9px;color:#354751;font-size:11px}.canvas-note b{color:#69468b}.leak-readout{pointer-events:none;position:absolute;right:13px;top:13px;min-width:120px;background:#f3f5f7cf;border:1px solid #ded2e8;border-radius:10px;padding:8px 10px;box-shadow:0 0 20px #7251981f}.leak-readout>span{display:block;letter-spacing:.1em;font-size:9px;font-weight:800;color:#285b76}.leak-readout strong{display:block;font-size:17px;color:#285b76;margin:3px 0 5px;font-variant-numeric:tabular-nums}.leak-trace{height:5px;border-radius:6px;background:#f3f5f7;overflow:hidden}.leak-trace i{display:block;height:100%;width:55%;border-radius:6px;background:linear-gradient(90deg,#285b76,#285b76);box-shadow:0 0 8px #725198;transition:width .15s linear}.legend{pointer-events:none;position:absolute;bottom:12px;left:15px;right:15px;display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#354751}.legend span:nth-child(1){color:#845219}.legend span:nth-child(2){color:#285b76}.energy{padding:12px 17px 6px;display:grid;gap:11px}.energy-row{display:grid;grid-template-columns:155px 1fr 78px;align-items:center;gap:9px}.energy-row strong{font-size:12px}.energy-row output{font-weight:800;text-align:right;font-variant-numeric:tabular-nums;font-size:13px}.rail{background:#f3f5f7;border:1px solid #ded2e8;border-radius:20px;height:15px;overflow:hidden}.fill{height:100%;border-radius:20px;transition:width .22s ease}.fill.heat{background:linear-gradient(90deg,#845219,#845219);box-shadow:0 0 12px #7251987d}.fill.loss{background:linear-gradient(90deg,#285b76,#285b76);box-shadow:0 0 12px #7251987d}.balance{margin:9px 16px 15px;padding:11px 13px;border-radius:9px;border:1px solid #ded2e8;background:#f1ebf6;line-height:1.45;color:#913b50;font-size:13px}.balance.ok{border-color:#ded2e8;background:#f3f5f7;color:#296347}.balance.excess{border-color:#ded2e8;background:#fbf3df;color:#845219}
+.panel{padding:16px}.panel h2{font-size:19px;margin:0 0 6px}.panel .sub{color:var(--muted);font-size:12px;line-height:1.5;margin:0 0 13px}.choice-grid{display:grid;gap:9px}.choice{width:100%;display:flex;align-items:center;gap:12px;background:#f3f5f7;color:var(--ink);border:1px solid #ded2e8;border-radius:11px;padding:12px;text-align:left}.choice:hover,.temps button:hover{background:#f3f5f7}.choice[aria-pressed=true]{background:#f3f5f7;border-color:#ded2e8;box-shadow:inset 0 0 0 1px #725198}.choice .big{display:grid;place-items:center;border-radius:9px;background:#f3f5f7;width:40px;height:40px;font-weight:900;font-size:20px;color:#285b76;flex-shrink:0}.choice strong,.choice small{display:block}.choice strong{font-size:14px}.choice small{color:#354751;margin-top:3px;font-size:11px}.check{margin-left:auto;color:#296347;font-size:19px;font-weight:900}.temps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.temps button{background:#f3f5f7;border:1px solid #ded2e8;border-radius:10px;padding:10px 5px 9px;color:var(--ink);font-weight:800}.temps button[aria-pressed=true]{background:#f3f5f7;border-color:#ded2e8;box-shadow:inset 0 0 0 1px #725198}.temps small{display:block;color:#354751;font-weight:500;font-size:10px;margin-top:2px}.temps button{position:relative}
+.temps button::after{content:'✓';position:absolute;right:4px;bottom:3px;color:#21623c;visibility:hidden;font-size:13px;line-height:1}
+.temps button.done::after{visibility:visible}
+.temps button small{padding-inline:9px}.section-label{font-size:10px;font-weight:800;letter-spacing:.12em;color:#354751;text-transform:uppercase;margin:14px 0 7px}.facts{display:grid;grid-template-columns:1fr 1fr;background:#f3f5f7;border:1px solid #ded2e8;border-radius:10px;padding:12px 13px;gap:10px}.facts>div>span{display:block;font-size:11px;color:#354751}.facts b{display:block;font-size:15px;margin-top:3px;font-variant-numeric:tabular-nums}.facts .k{color:#354751;font-size:11px;font-weight:500}.sliderbox{border:1px solid #ded2e8;border-radius:12px;background:#f3f5f7;padding:12px;margin-top:12px}.sliderbox label{font-size:13px;font-weight:800;display:flex;justify-content:space-between;gap:7px;align-items:baseline}.sliderbox output{font-size:20px;color:#285b76;font-variant-numeric:tabular-nums}.sliderbox input{width:100%;accent-color:#285b76;margin:12px 0 5px}.range-ends{display:flex;justify-content:space-between;font-size:10px;color:#354751}.save{margin-top:12px;background:#e8f4ed;border:1px solid #ded2e8;border-radius:10px;padding:12px;color:#296347;font-weight:850;width:100%;font-size:14px}.save:disabled{opacity:.35;cursor:not-allowed}.help{font-size:12px;color:#354751;min-height:20px;line-height:1.4;margin-top:10px}.help b{color:#285b76}.results{margin-top:14px;padding:16px 18px}.results-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.results h2{font-size:18px;margin:0}.results p{font-size:12px;color:#354751;line-height:1.5;margin:6px 0 12px}.measurements{display:flex;flex-wrap:wrap;gap:9px}.measure{border:1px solid #ded2e8;border-radius:9px;background:#f3f5f7;padding:9px 12px;min-width:175px}.measure b{font-size:13px;display:block}.measure>span{color:#354751;font-size:11px}.discovery{background:linear-gradient(125deg,#f3f5f7,#f3f5f7);border:1px solid #ded2e8;border-radius:12px;padding:12px 15px;margin-top:11px;color:#296347}.discovery h3{margin:0 0 5px;font-size:15px}.discovery p{color:#354751;margin:0;font-size:12px}.formula{font-size:24px;font-weight:900;color:#296347;padding:6px 0;letter-spacing:.02em}.plot{background:#f3f5f7;border:1px solid #ded2e8;border-radius:11px;padding:5px 4px 3px;position:relative}.plot svg{display:block;width:100%;height:264px}.plot .empty{position:absolute;top:41%;width:100%;text-align:center;font-size:12px;color:#354751;pointer-events:none}.actions{display:flex;gap:9px;align-items:center;margin-top:10px;flex-wrap:wrap}.secondary{background:#f3f5f7;border:1px solid #ded2e8;border-radius:9px;padding:9px 11px;color:#285b76;font-weight:700;font-size:12px}.secondary:disabled{opacity:.45;cursor:not-allowed}.analysis{font-size:12px;color:#354751;margin-top:9px;line-height:1.55}.analysis b{color:#285b76}.notes{font-size:11px;color:#354751;line-height:1.6;padding:14px 2px 10px}.links{font-size:11px;color:#354751;padding-bottom:20px}.links a{color:#285b76}.hide{display:none!important}
+/* Live factors: output of the experiment, next to the energy-balance evidence. */
+.factor-panel{margin:11px 16px 3px;padding:13px 14px;border:1px solid #ded2e8;background:linear-gradient(125deg,#f3f5f7,#f3f5f7);border-radius:12px}
+.factor-head{display:flex;gap:6px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.factor-head strong{font-size:13px;color:#285b76}
+.factor-head>span{font-size:10px;color:#354751}
+.factor-line{display:grid;grid-template-columns:minmax(0,1fr) 15px minmax(0,1fr) 15px minmax(0,1fr);gap:4px;align-items:stretch}
+.factor-line.phase-one{grid-template-columns:minmax(0,1fr) 15px minmax(0,1fr)}
+.factor-line.phase-one .factor-temperature,.factor-line.phase-one .multiply-temperature{display:none}
+.factor-box{border:1px solid #ded2e8;border-radius:9px;padding:9px 8px;background:#f3f5f7;min-width:0}
+.factor-box small{display:block;color:#354751;font-size:10px;margin-bottom:5px}
+.factor-box .factor-symbol{color:#285b76;display:inline-block;margin-bottom:4px;font-size:15px}
+.factor-box .factor-value{display:block;color:#285b76;font-size:13px;font-weight:800;line-height:1.4;white-space:nowrap}
+.factor-box.factor-density{border-top:2px solid #ded2e8}.factor-box.factor-temperature{border-top:2px solid #ded2e8}.factor-box.factor-time{border-top:2px solid #ded2e8}
+.factor-times{align-self:center;text-align:center;color:#354751;font-size:20px}
+.factor-result{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;border-top:1px solid #ded2e8;margin-top:11px;padding-top:10px}
+.factor-result .result-label{font-size:11px;color:#354751}
+.factor-result .result-number{color:#296347;font-size:17px;font-weight:750;line-height:1.45}
+.factor-hint{font-size:11px;color:#354751;margin-top:7px;line-height:1.5;min-height:16px}
+.measure{min-width:210px}.measure .measure-math{display:block;font-size:13px;color:#296347;margin-top:5px}
+.compare-line{font-size:15px;font-weight:750;color:#296347;padding:6px 0}
+.plot-axis-top{position:absolute;top:9px;left:16px;z-index:1;font-size:11px;color:#354751;pointer-events:none}
+.plot-axis-bottom{text-align:center;color:#354751;font-size:12px;margin-top:-12px;margin-bottom:6px}
+.math .katex{font-size:1em}.formula .katex{font-size:1.03em}.factor-result .katex{font-size:1em}
+/* Readable values with and without fully loaded KaTeX CSS. */
+.facts>div{min-width:0}
+.facts b{font-size:14px;line-height:1.4;white-space:nowrap;min-width:0}
+.facts .k{margin-top:5px;white-space:nowrap;line-height:1.4}
+.facts .k .katex{font-size:1em}
+.facts b .katex{font-size:.94em}
+.factor-box{min-width:0}
+.factor-box .factor-value{font-size:12.5px;white-space:nowrap;overflow:visible}
+.factor-box .factor-value .katex{font-size:.92em}
+.katex{white-space:nowrap}
+.katex .katex-html{white-space:nowrap}
+@media(max-width:430px){.facts{grid-template-columns:1fr}.facts>div+div{border-top:1px solid #ded2e8;padding-top:10px}.factor-line:not(.phase-one){grid-template-columns:1fr;gap:5px}.factor-line:not(.phase-one) .factor-times{font-size:15px;line-height:1;height:14px}.factor-result .result-number{font-size:14px}}
+@media(max-width:940px){.layout{grid-template-columns:1fr}.stage{height:340px}.choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.shell{padding:0 10px 20px}header{height:55px}.subtitle{display:none}.hero{padding:15px 0 12px}.hero h1{font-size:27px}.modes{display:grid;grid-template-columns:1fr 1fr}.mode{font-size:11px;padding:9px 7px}.goal{padding:10px}.stage{height:260px}.canvas-note{font-size:10px;padding:5px 7px}.leak-readout{min-width:89px;right:7px;top:7px;padding:6px 7px}.leak-readout>span{font-size:8px}.leak-readout strong{font-size:13px}.card-head{padding:10px}.pill{font-size:10px}.legend{font-size:10px}.energy-row{grid-template-columns:117px 1fr 60px;gap:6px}.energy-row strong,.energy-row output{font-size:11px}.energy{padding:12px 10px 7px}.balance{margin:7px 10px 11px}.panel{padding:12px}.choice-grid{grid-template-columns:1fr}.facts{padding:10px}.plot svg{height:246px}.results{padding:13px 11px}.formula{font-size:19px}.factor-panel{margin:10px 9px 3px;padding:11px 9px}.factor-box{padding:7px 5px}.factor-box .factor-value{font-size:11px}.factor-line{gap:3px;grid-template-columns:minmax(0,1fr) 11px minmax(0,1fr) 11px minmax(0,1fr)}.factor-line.phase-one{grid-template-columns:minmax(0,1fr) 11px minmax(0,1fr)}.factor-times{font-size:16px}.factor-result .result-number{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.fill{transition:none}}
+
+/* Phase 0: short mandatory measurement of thermal-energy decay. */
+.mode:disabled{opacity:.48;cursor:not-allowed}
+.cooling-metrics{padding:13px 18px 17px;display:grid;gap:10px}
+.cool-energy-head{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cool-energy-head>div{display:grid;gap:4px;min-width:0;border:1px solid #ded2e8;background:#f3f5f7;border-radius:10px;padding:10px 12px}
+.cool-energy-head>div+div{text-align:right}
+.cool-muted{font-size:11px;color:#354751}
+.cool-energy-head strong{font-size:23px;font-weight:850;font-variant-numeric:tabular-nums;color:#285b76}
+.cool-energy-head>div:first-child strong{color:#845219}
+.cool-energy-head>div:last-child strong{color:#285b76}
+.cool-unit{font-size:11px;color:#354751;line-height:1.35}.cool-physics-note{border:1px solid #ded2e8;border-radius:9px;padding:9px 12px;background:#f3f5f7;color:#354751;font-size:12px;line-height:1.5}.cool-physics-note b{color:#845219}.cool-off-label{display:block;margin:0 0 3px;color:#296347;font-size:11px;font-weight:800}.leak-readout .loss-kind{font-size:10px;color:#285b76;letter-spacing:normal;text-transform:none;font-weight:600;display:block;margin-top:2px}
+.cool-bar{height:19px;border-radius:11px;background:#f3f5f7;border:1px solid #ded2e8;overflow:hidden;position:relative}
+.cool-bar>i{display:block;height:100%;width:100%;border-radius:9px;background:#725198;box-shadow:0 0 13px #72519855;transition:width .07s linear}
+.cool-bar-line{position:absolute;top:0;bottom:0;left:36.7879%;width:2px;background:#f3f5f7;box-shadow:0 0 5px #725198}
+.cool-note,.cool-times{display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap;color:#354751;font-size:11px}
+#coolCurve{width:100%;height:175px;display:block;background:#f3f5f7;border:1px solid #ded2e8;border-radius:10px}
+#coolClock{font-weight:850;color:#285b76}
+.cool-options{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:13px 0 12px}
+.cool-choice{background:#f3f5f7;color:#354751;border:1px solid #ded2e8;border-radius:11px;padding:13px 10px;display:grid;gap:5px;text-align:left;min-height:89px}
+.cool-choice b{font-size:13px}.cool-choice small{font-size:11px;color:#354751}.cool-choice span{font-size:11px;color:#296347}
+.cool-choice[aria-pressed=true]{border-color:#ded2e8;background:#f3f5f7;box-shadow:inset 0 0 0 1px #725198}
+.cool-choice:disabled{opacity:.6;cursor:not-allowed}
+.cool-results{display:grid;gap:7px;margin-top:13px}
+.cool-result{border:1px solid #ded2e8;background:#f3f5f7;border-radius:9px;color:#354751;padding:9px 10px;font-size:12px;line-height:1.45}
+.cool-result.done{border-color:#ded2e8;background:#f3f5f7;color:#296347}
+.cool-quiz{margin-top:15px;border:1px solid #ded2e8;background:#f3f5f7;padding:12px;border-radius:12px}
+.cool-quiz>strong{font-size:14px;line-height:1.5}.cool-quiz p{color:#354751;font-size:12px}
+.cool-answer{background:#f3f5f7;color:#285b76;border:1px solid #ded2e8;border-radius:9px;width:100%;text-align:left;padding:10px;margin-top:8px;line-height:1.5;font-size:12px}
+.cool-answer:hover{background:#f3f5f7}.cool-answer[aria-pressed=true]{border-color:#ded2e8;background:#f3f5f7}
+.cool-equation{margin-top:12px;color:#296347;background:#f3f5f7;border:1px solid #ded2e8;padding:12px;border-radius:9px;text-align:center}
+.cool-equation>.math{font-size:22px;color:#296347}.cool-equation p{font-size:12px;text-align:left;line-height:1.6;margin-bottom:0;color:#354751}
+.phase0 #powerMetrics,.phase0 #factorPanel,.phase0 #balance,.phase0 #factsHeader,.phase0 #factsPanel,.phase0 #tauControl,.phase0 #save,.phase0 #help{display:none!important}
+.phase0 #coolingMetrics{display:grid!important}
+.phase0 #res1,.phase0 #res2{display:none!important}
+@media(max-width:620px){.modes{grid-template-columns:1fr;gap:5px}.cool-energy-head strong{font-size:19px}.cooling-metrics{padding:11px 9px}.cool-options{gap:6px}.cool-choice{padding:9px 8px}.cool-choice b{font-size:12px}#coolCurve{height:155px}}
+
+/* Phase 0: student-set initial loss power, with two independent measurements. */
+.cool-sliderbox{margin:2px 0 13px;padding:12px 13px;background:#f3f5f7;border:1px solid #ded2e8;border-radius:11px}
+.cool-sliderbox label{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;font-weight:750;color:#354751;align-items:center;margin:0 0 8px}
+.cool-sliderbox output{font-size:18px;font-variant-numeric:tabular-nums;color:#285b76;font-weight:900}
+.cool-sliderbox input[type=range]{width:100%;accent-color:#285b76;cursor:pointer;min-height:22px}
+.cool-sliderbox input[type=range]:disabled{opacity:.4;cursor:not-allowed}
+.cool-sliderbox .range-ends{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#354751;margin:2px 0 8px}
+.cool-sliderbox p{margin:0;color:#354751;font-size:11px;line-height:1.5}
+.cool-choice b{display:flex;align-items:center;gap:7px}
+.cool-swatch{width:9px;height:9px;border-radius:100%;display:inline-block}
+.cool-swatch.a{background:#285b76}.cool-swatch.b{background:#845219}
+@media(max-width:620px){.cool-sliderbox{padding:11px 9px}.cool-sliderbox label{font-size:12px}.cool-sliderbox output{font-size:16px}}
+
+/* V13 – microscopic encounter experiment: the missing causal link for density. */
+.micro-lab{margin-top:13px;border:1px solid #ded2e8;background:linear-gradient(155deg,#f3f5f7,#f3f5f7);padding:12px;border-radius:12px}
+.micro-heading{display:flex;align-items:flex-start;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.micro-lab h3{margin:0;color:#285b76;font-size:14px;line-height:1.4}
+.micro-lab p{font-size:11px;color:#354751;line-height:1.55;margin:6px 0 10px}
+.micro-tag{border:1px solid #ded2e8;border-radius:6px;padding:4px 6px;color:#285b76;font-size:10px;white-space:nowrap}
+.micro-scenes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.micro-scene{border:1px solid #ded2e8;border-radius:9px;padding:7px 6px;background:#f3f5f7;min-width:0;transition:box-shadow .18s,border-color .18s}
+.micro-scene.selected{border-color:#ded2e8;box-shadow:inset 0 0 0 1px #725198,0 0 14px #72519812}
+.micro-label{display:flex;gap:4px;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;color:#285b76}
+.micro-label small{font-size:10px;color:#354751;font-weight:500}
+.micro-scene canvas{display:block;width:100%;aspect-ratio:220/138;cursor:crosshair;margin:5px 0;border:1px solid #ded2e8;border-radius:8px;background:radial-gradient(ellipse at 50% 50%,#f3f5f7 0%,#f3f5f7 85%)}
+.micro-pairs{font-size:11px;color:#354751;line-height:1.5}
+.micro-pairs b{font-size:13px;color:#845219}
+.micro-compare{display:grid;grid-template-columns:1fr;gap:7px;margin-top:10px;padding:10px;background:#f3f5f7;border:1px solid #ded2e8;border-radius:9px}
+.micro-equation{font-size:13px;font-weight:750;color:#285b76;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;line-height:1.6}
+.micro-compare .emph{font-size:18px;color:#845219;font-weight:850}
+.micro-heat{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.micro-heat>div{background:#f3f5f7;border-radius:7px;padding:7px 8px;min-width:0}
+.micro-heat small{display:block;color:#354751;font-size:10px}
+.micro-heat strong{color:#845219;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14px}
+.micro-heat-rail{height:7px;margin-top:5px;border-radius:5px;overflow:hidden;background:#f3f5f7}
+.micro-heat-rail span{display:block;height:100%;background:#aa6d29}
+.micro-feedback{margin-top:9px;min-height:42px;font-size:12px;line-height:1.55;border-left:3px solid #ded2e8;background:#f3f5f7;padding:7px 9px;color:#285b76}
+.micro-footnote{color:#354751;font-size:10px;line-height:1.5;margin-top:8px}
+.micro-legend{display:flex;gap:11px;flex-wrap:wrap;margin:7px 0 0;font-size:10px;color:#354751}
+.micro-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+.micro-dot.d{background:#285b76}.micro-dot.t{background:#69468b}
+.micro-explainer{color:#285b76;background:#f3f5f7;border:1px solid #ded2e8;padding:9px 10px;border-radius:9px;font-size:11px;line-height:1.55;margin-top:10px}
+.micro-explainer b{color:#296347}.micro-reaction{font-size:16px;text-align:center;margin:5px 0 7px;color:#845219;line-height:1.5}
+.micro-lab button.micro-action{background:#f3f5f7;color:#285b76;border:1px solid #ded2e8;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;padding:7px 10px;margin-top:8px}
+@media(max-width:430px){.micro-scenes{gap:6px}.micro-scene{padding:6px 5px}.micro-pairs{font-size:10px}.micro-label{font-size:11px}.micro-heat strong{font-size:12px}.micro-equation{font-size:12px}}
+
+/* Dvě protichůdné teplotní závislosti – vysvětlení skutečného minima Lawsonovy křivky. */
+.temp-why{margin-top:12px;border:1px solid #ded2e8;border-radius:12px;background:linear-gradient(135deg,#f3f5f7,#f3f5f7);padding:13px 14px;color:#285b76;min-width:0}
+.temp-why-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px 9px}
+.temp-why-head strong{font-size:14px}.temp-why-head small{font-size:10px;color:#354751}
+.temp-lead{font-size:12px;line-height:1.55;color:#354751;margin:8px 0 0}
+.temp-balance{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.temp-case{border-radius:9px;border:1px solid #ded2e8;padding:9px 10px;background:#f3f5f7;min-width:0}
+.temp-case.low{border-color:#ded2e8}.temp-case.high{border-color:#ded2e8}
+.temp-case-title{display:flex;gap:6px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;color:#285b76;font-size:11px;font-weight:800}
+.temp-case-title span{font-size:10px;color:#354751;font-weight:600}
+.race-bar{margin-top:7px}
+.race-name{display:flex;justify-content:space-between;gap:4px;align-items:baseline;margin-bottom:3px;font-size:10px;color:#354751}
+.race-name strong{color:#285b76;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.race-track{width:100%;height:8px;border-radius:9px;background:#f3f5f7;overflow:hidden}
+.race-track i{height:100%;border-radius:9px;display:block}
+.race-track .heat{background:#aa6d29}
+.race-track .need{background:#487895}
+.temp-outcome{font-size:11px;font-weight:800;margin-top:8px;border-top:1px solid #ded2e8;padding-top:7px;line-height:1.4}
+.temp-outcome.down{color:#296347}.temp-outcome.up{color:#913b50}
+.temp-live{border-radius:9px;background:#f3f5f7;border:1px solid #ded2e8;padding:10px 11px;margin-top:10px;min-width:0}
+.temp-live-top{display:flex;justify-content:space-between;gap:5px;align-items:center;flex-wrap:wrap}
+.temp-live-title{font-size:11px;font-weight:800;color:#285b76}
+.temp-live-phase{font-size:11px;font-weight:800;color:#296347}
+.temp-live-rows{display:grid;gap:5px;margin-top:8px}
+.temp-live-row{display:grid;grid-template-columns:minmax(0,1fr) 52px minmax(0,1fr);gap:7px;align-items:center;font-size:11px;color:#354751}
+.temp-live-row output{font-size:11px;font-weight:800;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.temp-live-track{border-radius:6px;height:7px;overflow:hidden;background:#f3f5f7}
+.temp-live-track i{height:100%;border-radius:6px;display:block;transition:width .2s ease}
+.temp-live-track .heat{background:#aa6d29}
+.temp-live-track .need{background:#487895}
+.temp-live-note{font-size:11px;line-height:1.52;color:#354751;margin:7px 0 0}
+.temp-footnote{font-size:10px;line-height:1.5;color:#354751;margin:8px 0 0}
+@media(max-width:540px){.temp-balance{grid-template-columns:1fr}.temp-why{padding:11px}.temp-case{padding:9px}.temp-live-row{grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:5px}}
+
+/* Energetický souboj: čitelný fyzikální mechanismus místo statických čísel. */
+.duel{margin-top:12px;border:1px solid #ded2e8;background:linear-gradient(165deg,#f3f5f7,#f3f5f7);border-radius:13px;padding:11px 12px;min-width:0}
+.duel-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:5px 10px;font-size:12px;color:#285b76;margin-bottom:8px}
+.duel-tag{font-size:10px;color:#354751;font-weight:600}
+.duel canvas{width:100%;height:auto;aspect-ratio:740/300;display:block;border:1px solid #ded2e8;border-radius:9px;background:#ffffff}
+ .duel-counter{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:5px 9px;margin-top:7px;font-size:11px;color:#354751;border-radius:8px;background:#f3f5f7;padding:8px 10px;border:1px solid #ded2e8}
+.duel-counter strong{font-size:12px;color:#285b76;font-variant-numeric:tabular-nums}
+.duel-readouts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0 8px}
+.duel-readout{border-radius:8px;padding:8px 10px;border:1px solid #ded2e8;background:#f3f5f7;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.duel-readout span{font-size:10px;font-weight:700;color:#354751}
+.duel-readout strong{font-size:15px;font-weight:850;white-space:nowrap;font-variant-numeric:tabular-nums}
+.duel-readout.heat strong{color:#845219}.duel-readout.loss strong{color:#285b76}
+.duel-outcome{border-radius:9px;padding:10px 11px;color:#285b76;font-size:13px;font-weight:800;line-height:1.4;border:1px solid #ded2e8;background:#f3f5f7}
+.duel-outcome.win{background:#e8f4ed;border-color:#ded2e8;color:#845219}.duel-outcome.lose{background:#f3f5f7;border-color:#ded2e8;color:#285b76}
+.duel-question{font-size:12px;font-weight:700;color:#285b76;line-height:1.5;margin:8px 0 4px}
+.duel-conditions{font-size:10px;color:#354751;line-height:1.55;margin:8px 0 0}
+.duel-link{font-size:11px;color:#354751;background:#f3f5f7;border:1px solid #ded2e8;padding:7px 9px;border-radius:8px;margin:4px 0 8px;line-height:1.5}.duel-link strong{color:#285b76;font-variant-numeric:tabular-nums}.duel-readout.loss{transition:border-color .2s,background .2s}.duel.manual .duel-readout.loss{border-color:#ded2e8;background:#f3f5f7}
+.duel-details{margin-top:12px;border:1px solid #ded2e8;border-radius:10px;padding:10px 12px;background:#f3f5f7}
+.duel-details summary{font-size:12px;cursor:pointer;color:#285b76;font-weight:750}
+.duel-details .temp-balance{margin-top:12px}
+@media(max-width:540px){.duel{padding:9px}.duel-readouts{grid-template-columns:1fr}.duel-readout{padding:7px 9px}.duel-readout strong{font-size:14px}}
+
+/* Jednoduché vysvětlení výsledné Lawsonovy křivky; nenarušuje fyzikální scénu. */
+.temperature-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:11px 0 10px}
+.temperature-step{background:#f3f5f7;border:1px solid #ded2e8;border-radius:9px;padding:10px 11px;min-width:0}
+.temperature-step strong{display:block;color:#285b76;font-size:13px;line-height:1.3;margin-bottom:5px}
+.temperature-step span{display:block;color:#354751;font-size:12px;line-height:1.45}
+.temperature-step.low{border-top:2px solid #ded2e8}
+.temperature-step.optimum{border-top:2px solid #ded2e8}
+.temperature-step.high{border-top:2px solid #ded2e8}
+.temperature-takeaway{border-left:3px solid #ded2e8;padding:7px 10px;background:#f3f5f7;color:#354751!important;font-size:13px!important;line-height:1.5!important;margin:9px 0 11px!important}
+@media(max-width:650px){.temperature-steps{grid-template-columns:1fr}.temperature-step{padding:9px 10px}}
+.minimum-explanation{background:#f3f5f7;border:1px solid #ded2e8;border-radius:10px;padding:12px 15px;margin:11px 0 12px}
+.minimum-explanation p{margin:0 0 8px;line-height:1.55}
+.minimum-explanation p:last-child{margin-bottom:0}
+@media(max-width:650px){.minimum-explanation{padding:10px 12px}}
+
+:root{color-scheme:light;--ink:#233f49;--muted:#665c70;--amber:#845219;--cyan:#285b76;--green:#296347;--red:#913b50}
+html{font-family:"Segoe UI",Arial,sans-serif}
+.shell{max-width:1360px;padding:8px 12px 18px}
+.modulehead{height:auto;justify-content:flex-start}
+.version{font-size:10px;color:#73657b}
+.hero{padding:10px 0}.hero h2{font-size:17px;margin:0 0 4px}.modes{margin-top:8px}
+.card{background:#fff;border:1px solid var(--fusion-line);border-radius:14px;box-shadow:none}
+button,.mode,.choice,.cool-choice,.cool-answer,.temps button,.secondary{background:#fff;color:var(--fusion-ink);border-color:var(--fusion-line);border-radius:8px}
+button:disabled{opacity:.55}
+.mode[aria-selected=true],.save{background:var(--fusion-accent);color:white;border-color:var(--fusion-accent)}
+.choice[aria-pressed=true],.cool-choice[aria-pressed=true],.temps button[aria-pressed=true]{background:#eee7f5;color:var(--fusion-ink);border-color:var(--fusion-accent);box-shadow:none}
+.sliderbox input{accent-color:var(--fusion-accent)}
+.mode,.choice,.cool-choice,.save{padding:7px 10px}
+.goal,.sliderbox,.facts{background:#f7f3fa;border-color:var(--fusion-line)}
+.stage,.plot{background:#f8f8f5}
+@media(min-width:901px){
+ .layout{grid-template-columns:minmax(290px, .85fr) minmax(0,2fr);align-items:start}
+ .layout>.card.panel{grid-column:1;grid-row:1}
+ .layout>.card:first-child{grid-column:2;grid-row:1}
+}
+
+body{overflow:hidden}
+.shell{position:absolute;left:50%;top:8px;width:1360px;height:820px;max-width:none;padding:8px;transform:translateX(-50%) scale(var(--fusion-fit,1));transform-origin:top center;display:flex;flex-direction:column;gap:10px}
+.shell .modulehead{height:46px;min-height:46px;padding:0;flex-wrap:nowrap}
+.hero{padding:0;display:flex;align-items:center;justify-content:space-between;gap:16px}.hero h2{margin:0}.hero .modes{display:flex;margin:0}.hero>p,.goal .symbol,.goal small{display:none}
+.goal{margin:0;padding:7px 12px}
+.shell .layout{display:grid;grid-template-columns:232px minmax(0,1fr);gap:12px;align-items:stretch;flex:1;min-height:0}
+.layout>.card.panel{grid-area:1/1;padding:12px;overflow:auto}
+.workspace{grid-area:1/2;min-height:0;min-width:0;overflow:auto;border:1px solid #ded2e8;border-radius:14px;background:white}
+.workspace>.card{border:0}.workspace>.results{margin:0}
+.workspace .stage{height:260px}.workspace #coolCurve{height:210px}
+.panel .cool-options,.panel .choice-grid,.panel .facts{grid-template-columns:1fr}
+.panel .temps{grid-template-columns:repeat(2,minmax(0,1fr))}
+.panel .cool-choice{min-height:0;padding:6px 8px}.panel h2{font-size:15px}
+.workspace #encounterLab,.workspace #temperatureWhy{margin:0 12px 12px}
+.workspace .micro-scenes{grid-template-columns:1fr 1fr}
+.workspace canvas{max-width:100%}
+.workspace .micro-scenes canvas{height:auto}
+.workspace .stage .legend,.workspace .canvas-note{color:#233f49}
+
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;background:transparent;border:0;overflow:hidden}
+.workspace>.card,.workspace>.comparisons{min-height:0;min-width:0;overflow:auto;background:white;border:1px solid var(--fusion-line);border-radius:14px}
+.workspace[data-phase="0"]{grid-template-columns:1fr}
+.workspace[data-phase="0"]>.comparisons{display:none}
+.workspace .comparisons>#encounterLab,.workspace .comparisons>#temperatureWhy{margin:0;padding:12px;background:white;border:0}
+.workspace[data-phase="2"]>.card{display:flex;flex-direction:column}
+.workspace[data-phase="2"] #res2{order:-1;flex:none;margin:0}
+.workspace[data-phase="2"] .stage{flex:none}
+.workspace .stage{background:#091c2c}
+.workspace .canvas-note,.workspace .leak-readout{background:#0b2437ed;border-color:#456275;color:#e1ecf3}
+.workspace .canvas-note b{color:#f3c9ff}.workspace .canvas-note span,.workspace .leak-readout span,.workspace .leak-readout strong,.workspace .leak-readout small{color:#c2edff!important}
+.workspace .stage .legend span{color:#a8e7ff}.workspace .stage .legend span:first-child{color:#ffd69b}
+.workspace .micro-scenes canvas{height:auto}
+.workspace .duel canvas{display:block;width:100%;height:auto}
+
+.shell>header{display:flex;align-items:center;justify-content:flex-start;gap:10px;height:46px;flex:none;border:0}
+.shell>header h1{font-size:24px;flex:1;margin:0;color:#233f49}
+.shell>header button,.shell>header .back{font:inherit;font-size:14px;border:1px solid #d8cce3;border-radius:8px;padding:8px 12px;background:#fff;color:#60477e;cursor:pointer;text-decoration:none}
+.shell .layout{grid-template-rows:minmax(0,1fr)}
+.layout>.card.panel,.workspace,.workspace>.card,.workspace>.comparisons{overflow:visible}
+.workspace[data-phase="0"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.workspace[data-phase="0"]>.comparisons{display:block}
+.workspace[data-phase="0"]>.card{display:flex;flex-direction:column}
+.workspace[data-phase="0"] .stage{flex:1}
+.workspace[data-phase="2"]>.card :is(.card-head,.stage){display:none}
+.workspace .stage{background:#f9faf7}
+.workspace .canvas-note,.workspace .leak-readout{background:#ffffffed;color:#273e48;border-color:#d7dfe3;box-shadow:none}
+.workspace .canvas-note b{color:#654b88}.workspace .canvas-note span,.workspace .leak-readout span,.workspace .leak-readout strong,.workspace .leak-readout small{color:#29576c!important}
+.workspace .stage .legend span{color:#245b7b}.workspace .stage .legend span:first-child{color:#885219}
+.workspace .stage{height:245px}
+.cooling-view{padding:8px}.cool-quiz{margin:6px 0;padding:8px}.cool-answer{padding:5px 8px}
+.cooling-view #coolCurve{height:175px}
+.workspace #res1,.workspace #res2{margin:0;padding:10px 12px;border:0}
+.workspace .results>p,.workspace .factor-head>span,.hero h2,.goal,.micro-heading .micro-tag{display:none}
+.workspace .plot svg{height:240px}
+.workspace #res1 .measure{min-width:0;flex:1}
+.workspace .duel-details[open]~p,.workspace #temperatureWhy:has(.duel-details[open]) .duel{display:none}
+.workspace .comparisons .temp-lead,.workspace .micro-lab>p{margin:4px 0}
+.shell .hero{justify-content:flex-start}
+
+#lawson-guide{max-width:760px;max-height:80vh;border:1px solid #ded2e8;border-radius:12px;color:#233f49}
+.workspace .micro-scenes canvas{max-height:none;object-fit:contain}
+.workspace #res1 .discovery{padding:8px;margin-top:6px}
+.workspace .card-head{padding:9px 12px}
+.workspace .cool-quiz .cool-answer{margin:3px 0}
+.workspace #factorPanel{margin:6px 12px;padding:8px}
+.workspace #balance{margin:6px 12px;padding:7px}
+.workspace .plot{background:#fff}.workspace .plot-axis-top{top:2px}
+
+#coolAssessment{width:min(520px,90vw);max-height:90vh;padding:18px;color:#233f49;background:white;border:1px solid #ded2e8;border-radius:14px}
+#coolAssessment::backdrop{background:rgb(38 34 48 / 28%)}
+#coolAssessment .cool-quiz{background:white;border:0;margin:0;padding:0}
+#coolAssessment>button{margin-top:10px}
+#reviewCooling,#otherCooling{width:100%;margin-top:8px}
+
+#factsPanel>div{display:grid;gap:2px}
+#factsPanel .k{margin:0}
+#coolAssessment{width:min(610px,94vw);font:18px/1.45 "Segoe UI",Arial,sans-serif}
+#coolAssessment .cool-quiz>strong{font-size:21px}
+#coolAssessment :is(p,.help,.cool-answer,.save,.secondary){font-size:18px;line-height:1.4}
+#coolAssessment .cool-answer{padding:9px 12px}
+#lawson-guide :is(.notes,.links,p,button){font-size:18px;line-height:1.5}
+.workspace .micro-scenes canvas{width:100%;height:auto;aspect-ratio:220/138;max-height:none}
+
+.workspace[data-phase="1"] .stage{height:200px}
+.workspace #discovery1 .formula{font-size:17px}
+.workspace #discovery1 .compare-line{margin:2px 0}
+#toTemp{width:100%}
+#nextAction{margin-left:auto;min-width:200px;background:#725198;color:white;font-weight:650}
+
+/* Give recorded measurements their own row across both scientific panels. */
+.workspace[data-phase="1"]{grid-template-rows:minmax(0,1fr) auto}
+.workspace[data-phase="1"]>#res1{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 16px;border:1px solid var(--fusion-line);padding:10px 14px}
+#res1>.results-head{grid-column:1;grid-row:1}
+#res1>#list1{grid-column:1;grid-row:2;display:flex;flex-wrap:nowrap}
+.workspace #res1>#discovery1{grid-column:2;grid-row:1/3;margin:0;align-self:center}
+.workspace[data-phase="1"] .stage{height:185px}
+.workspace[data-phase="1"] #factorPanel{padding:6px 10px}
+#phase1 .choice{display:grid;grid-template-columns:30px minmax(0,1fr) 14px;gap:6px;align-items:center}
+#phase1 .choice .big{width:30px;height:32px;font-size:16px}
+#phase1 .preset-density{white-space:nowrap}
+#phase1 .choice .check{margin:0}
+
+/* Hold the readings in place while the chart and its explanation change. */
+.workspace[data-phase="2"]>.card{
+ display:grid;grid-template-rows:minmax(0,1fr) 58px 184px 60px;
+ align-content:stretch
+}
+.workspace[data-phase="2"] #res2{grid-row:1;min-height:0;display:flex;flex-direction:column}
+.workspace[data-phase="2"] #res2 .plot{flex:1;min-height:110px;display:flex;flex-direction:column}
+.workspace[data-phase="2"] .plot svg{flex:1;min-height:0;width:100%;height:0}
+.workspace[data-phase="2"] .plot-axis-bottom{margin:0}
+.workspace[data-phase="2"] #powerMetrics{grid-row:2}
+.workspace[data-phase="2"] #factorPanel{grid-row:3;display:grid;grid-template-rows:auto auto auto 32px;align-content:space-between}
+.workspace[data-phase="2"] #balance{grid-row:4;align-self:stretch;display:flex;align-items:center;line-height:1.35}
+.workspace[data-phase="2"] .factor-result{flex-wrap:nowrap;margin-top:2px;padding-top:3px}
+.workspace[data-phase="2"] .factor-hint{margin:0;line-height:16px}
+.workspace[data-phase="2"] #analysis{min-height:3em}
+.workspace[data-phase="2"] #factorPanel .factor-line{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr) 14px minmax(0,1fr)}
+
+.workspace:not([data-phase="0"]) #balance{
+ display:grid;grid-template-columns:22px 1fr;align-items:center;gap:8px;
+ background:#fff0ec;border:1px solid #ca8d83;border-inline-start:5px solid #ae4034;
+ color:#762d26;font-weight:650;line-height:1.3
+}
+.workspace:not([data-phase="0"]) #balance:is(.ok,.excess){
+ background:#e2f4e7;border-color:#82ad90;border-inline-start-color:#247044;color:#174f31
+}
+#balance::before{content:'↓';text-align:center;font-size:18px;line-height:1}
+#balance:is(.ok,.excess)::before{content:'✓'}
+.workspace:not([data-phase="0"]) #status{background:#8b382e;color:white;border-color:#8b382e}
+.workspace:not([data-phase="0"]) #status:is(.ok,.excess){background:#24633e;border-color:#24633e}
+
+body[data-phase="2"] .panel #help{display:none}
+#temperatureStep{margin:3px 0;height:34px;line-height:17px;font-size:13px;color:#49355c;white-space:pre-line}
+.workspace .comparisons>#discovery2{margin:12px;padding:14px}
+#discovery2>button{margin:0 0 12px}
+.workspace[data-phase="2"] #res2 .actions{min-height:40px}
+.workspace #balance{min-height:44px}
+body:is([data-phase="1"],[data-phase="2"]) .panel{display:grid;align-content:start;grid-template-rows:240px auto auto auto 44px auto auto;row-gap:5px}
+body:is([data-phase="1"],[data-phase="2"]) #save{grid-row:5;margin:0}
+body:is([data-phase="1"],[data-phase="2"]) #factsHeader{grid-row:2;margin:0}
+body:is([data-phase="1"],[data-phase="2"]) #factsPanel{grid-row:3}
+body:is([data-phase="1"],[data-phase="2"]) #tauControl{grid-row:4;margin:0}
+#phase1,#phase2{grid-row:1}
+.panel .temps button{padding:6px 4px}
+</style>
+<script>(()=>{'use strict';const root=document.documentElement;function fit(){root.style.setProperty('--fusion-fit',String(Math.max(.01,Math.min(((root.clientWidth||innerWidth)-16)/1360,(innerHeight-16)/820))));}fit();addEventListener('resize',fit);document.addEventListener('fullscreenchange',fit);})();</script></head>
+<body data-fusion-page="fu12-lawson"><main class="shell">
+<header><a class="back" href="../index.html#group-area-plasma" target="_top">← Jaderná fúze a tokamaky</a><h1>Lawsonovo kritérium</h1><button id="import-guide">Ovládání a výklad</button><button data-fusion-full>Celá obrazovka</button><span class="version">Verze 1.0</span></header>
+<section class="hero"><h2 id="heroTitle">Co znamená doba udržení energie?</h2><p id="heroIntro">Než budeš hledat Lawsonovo kritérium, ověř si na stejném plazmatu, proč <strong>delší doba udržení energie znamená menší únik energie</strong>. Teprve potom se odemkne další experiment.</p>
+<div class="modes" role="tablist" aria-label="Tři části experimentu"><button class="mode" id="tab0" role="tab" aria-selected="true"><span class="num">0</span> Co je doba udržení energie?</button><button class="mode" id="tab1" role="tab" aria-selected="false" disabled><span class="num">1</span> Proč součin?</button><button class="mode" id="tab2" role="tab" aria-selected="false" disabled><span class="num">2</span> Teplotní závislost</button></div><button id="nextAction" type="button" class="secondary">Spustit chladnutí</button></section>
+<div class="goal"><div class="symbol">◎</div><div><strong id="goalTitle">Úkol: pozoruj, za jak dlouho unikne část vnitřní energie.</strong><small id="goalText">Proveď dvě měření z počátečních 60 MJ. V obou pokusech hledej okamžik, kdy zbývá přibližně 37 % energie.</small></div></div>
+<div class="layout">
+<section class="card"><div class="card-head"><strong id="sceneTitle">Chladnutí plazmatu bez ohřevu</strong><span class="pill" id="status">Plazma chladne</span></div><div class="stage"><canvas id="torus" role="img" aria-label="Animovaný prostorový torus s naznačenými šroubovicovými drahami částic, světelnými projevy fúze a únikem energie"></canvas><div class="canvas-note"><b id="sceneTemp">116 mil. K</b> <span id="sceneKelvin">· 10 keV</span><br><span style="color:#354751">Schéma tokamaku · ne kinetická simulace</span></div><div class="leak-readout" aria-hidden="true"><span>ÚNIK ENERGIE</span><small class="loss-kind">Ztrátový výkon</small><strong id="sceneLoss">— MW</strong><div class="leak-trace"><i id="sceneLeakFill"></i></div></div><div class="legend"><span id="legendHeat">✦ Fúzní reakce uvnitř plazmatu</span><span>↗ Modré stopy = únik energie</span></div></div>
+<div class="energy" id="powerMetrics"><div class="energy-row"><strong style="color:#845219">Výkon samoohřevu</strong><div class="rail"><div class="fill heat" id="heatBar"></div></div><output id="heatValue">– MW</output></div><div class="energy-row"><strong style="color:#285b76">Ztrátový výkon</strong><div class="rail"><div class="fill loss" id="lossBar"></div></div><output id="lossValue">– MW</output></div></div><div class="cooling-metrics" id="coolingMetrics">
+<div class="cool-energy-head"><div><span class="cool-muted">VNITŘNÍ ENERGIE PALIVA</span><strong id="coolEnergy">60,0 MJ</strong><span class="cool-unit">MJ – kolik energie v plazmatu zbývá</span></div><div><span class="cool-muted">OKAMŽITÝ ZTRÁTOVÝ VÝKON</span><strong id="coolPower">30,0 MW</strong><span class="cool-unit">MW = MJ/s – jak rychle energie uniká právě teď</span></div></div>
+<div class="cool-bar"><i id="coolEnergyFill"></i><span class="cool-bar-line" title="37 % původní energie"></span></div>
+<div class="cool-physics-note"><span class="cool-off-label">Ohřev vypnutý – sledujeme jen chladnutí</span>Nastavená hodnota určuje <b>počáteční ztrátový výkon</b>. Během chladnutí ubývá energie <b data-tex="U\;[\mathrm{MJ}]">U [MJ]</b> i okamžitý ztrátový výkon <b data-tex="P_{\mathrm L}\;[\mathrm{MW}]">P_L [MW]</b>, protože v modelu zůstává doba udržení energie konstantní.</div><div class="cool-note"><span>60 MJ při začátku obou pokusů</span><span>Orientační značka: 37 % = 22,1 MJ</span></div>
+<svg id="coolCurve" viewBox="0 0 620 175" role="img" aria-label="Vznikající průběh vnitřní energie plazmatu při chladnutí"></svg>
+<div class="cool-times"><span id="coolClock">Čas: 0,0 s</span><span id="coolCurveNote">Spusť pokus. Sleduj klesající zásobu energie.</span></div>
+</div>
+<div class="factor-panel hide" id="factorPanel">
+<div class="factor-head"><strong id="factorHeading">Co určuje nalezenou hranici?</strong><span>Výkonové lišty nahoře ukazují, kdy platí rovnováha.</span></div>
+<div class="factor-line phase-one" id="factorLine">
+<div class="factor-box factor-density"><small>Hustota paliva</small><span class="factor-symbol math" data-tex="n_{\mathrm f}">n_f</span><span class="factor-value math" id="factorN" data-tex="0{,}6\cdot10^{20}\,\mathrm{m}^{-3}">0,6 × 10²⁰ m⁻³</span></div>
+<div class="factor-times">×</div>
+<div class="factor-box factor-temperature"><small>Teplota plazmatu</small><span class="factor-symbol math" data-tex="T">T</span><span class="factor-value math" id="factorT">116 mil. K</span></div>
+<div class="factor-times multiply-temperature">×</div>
+<div class="factor-box factor-time"><small>Doba udržení energie</small><span class="factor-symbol math" data-tex="\tau_{\mathrm E}">τₑ</span><span class="factor-value math" id="factorTau">2,00 s</span></div>
+</div>
+<div class="factor-result"><span class="result-label" id="productLabel">Jejich součin:</span><span class="result-number math" id="productValue">1,2 × 10²⁰ s m⁻³</span></div>
+<div class="factor-hint" id="factorHint">Posouvej dobu udržení energie. Všímej si, jak se mění součin hustoty a času.</div>
+</div><div class="balance hide" id="balance">Zatím energie uniká rychleji, než ji částice alfa vracejí.</div>
+</section>
+<section class="card panel">
+<div id="phase0">
+<h2>Kam mizí energie plazmatu?</h2>
+<p class="sub">Představ si hrnec s horkou vodou <strong>sundaný z plotny</strong>. Plazma začíná se zásobou <strong>60 MJ</strong>, ale nedostává žádný ohřev – ani od částic alfa. <strong>Nastav, jak velký bude počáteční ztrátový výkon</strong> a proveď dva odlišné pokusy.</p>
+<div class="cool-options" role="group" aria-label="Volba počátečního ztrátového výkonu">
+<button class="cool-choice" type="button" data-cool="fast" aria-pressed="true"><b>Pokus A <span class="cool-swatch a"></span></b><small id="coolTickfast">30 MW · zatím nezměřeno</small></button>
+<button class="cool-choice" type="button" data-cool="slow" aria-pressed="false"><b>Pokus B <span class="cool-swatch b"></span></b><small id="coolTickslow">12 MW · zatím nezměřeno</small></button>
+</div>
+<div class="cool-sliderbox"><label for="coolP0">Nastav počáteční ztrátový výkon <output id="coolP0Value">30 MW</output></label>
+<input id="coolP0" type="range" min="10" max="40" step="1" value="30" aria-label="Počáteční ztrátový výkon plazmatu v megawattech">
+<div class="range-ends"><span>10 MW · menší únik</span><span>40 MW · větší únik</span></div>
+<p>V obou pokusech začínáš se stejnou zásobou <strong>60 MJ</strong>. Výkon nastavuješ jen na začátku; během chladnutí už se sám zmenšuje.</p></div>
+<button id="startCooling" class="save" type="button">▶ Spustit chladnutí</button>
+<button type="button" class="secondary" id="reviewCooling" hidden>Vyhodnotit měření a pokračovat →</button>
+<button type="button" class="secondary" id="otherCooling" hidden></button>
+<p class="help" id="coolHelp" aria-live="polite">Nastav výkon a spusť chladnutí. Sleduj energii a čas, za který zbývá 37 % původní zásoby.</p>
+<div class="cool-results" id="coolResults"><div id="coolResultFast" class="cool-result">Pokus A: zatím nezměřeno</div><div id="coolResultSlow" class="cool-result">Pokus B: zatím nezměřeno</div></div>
+<div id="coolQuiz" class="cool-quiz hide"><strong>Co tedy znamená doba udržení energie?</strong><p>Proveď závěr ze svých dvou měření.</p>
+<button class="cool-answer" type="button" data-answer="all">Za tuto dobu z plazmatu unikne veškerá energie.</button>
+<button class="cool-answer" type="button" data-answer="e-fold">Je to charakteristická doba chladnutí; bez ohřevu zbývá asi 37 % energie.</button>
+<button class="cool-answer" type="button" data-answer="ions">Je to doba, kterou v tokamaku zůstává každý iont.</button>
+<div id="coolQuizFeedback" class="help" aria-live="polite"></div>
+<div class="cool-equation hide" id="coolEquation"><span class="math" data-tex="\tau_{\mathrm E}=\frac{U}{P_{\mathrm L}}">τₑ = U / P_L</span><p>Stejná zásoba energie, menší ztrátový výkon → delší doba udržení energie. Při konstantní době udržení energie je průběh chladnutí exponenciální.</p></div>
+</div>
+<button id="toLawson" type="button" class="save hide">Rozumím. Pokračovat k Lawsonovi →</button>
+</div>
+<div id="phase1" class="hide"><h2>Jak hustota paliva ovlivňuje zapálení?</h2><p class="sub">Nejprve porovnej řidší a hustší DT plazma. Potom zjistíš, jak se tím změní potřebná doba udržení energie.</p><div class="choice-grid">
+<button class="choice" data-case="A" aria-pressed="true"><span class="big">A</span><span><strong>Řidší plazma</strong><small class="preset-density" data-tex="0{,}6\times10^{20}\,\mathrm{m}^{-3}">0,6 × 10²⁰ m⁻³</small></span><span class="check" id="checkA"></span></button>
+<button class="choice" data-case="B" aria-pressed="false"><span class="big">B</span><span><strong>3× vyšší hustota</strong><small class="preset-density" data-tex="1{,}8\times10^{20}\,\mathrm{m}^{-3}">1,8 × 10²⁰ m⁻³</small></span><span class="check" id="checkB"></span>
+</button></div>
+<div class="micro-lab" id="encounterLab" aria-label="Mikroskopický pokus s hustotou">
+  <div class="micro-heading"><h3>Jak hustota paliva ovlivňuje výkon samoohřevu?</h3><span class="micro-tag">Stejná teplota · stejný objem</span></div>
+  <p>V obou výřezech se ionty pohybují se stejným rozdělením rychlostí. Hustší plazma má více <b>deuteronů D</b> i <b>tritonů T</b>. Klikni do obou obrázků a sleduj, s kolika tritony se může setkat jeden deuteron.</p>
+  <div class="micro-scenes">
+    <div class="micro-scene selected" id="microCardA"><div class="micro-label">A · řidší <small>1× hustota</small></div><canvas id="microA" width="220" height="138" role="img" aria-label="Řidší plazma s šesti deuterony a šesti tritony; kliknutím označíš možné dvojice"></canvas><div class="micro-pairs"><span class="math" data-tex="6\,D\times6\,T">6 D × 6 T</span> = <b>36</b> dvojic</div></div>
+    <div class="micro-scene" id="microCardB"><div class="micro-label">B · hustší <small>3× hustota</small></div><canvas id="microB" width="220" height="138" role="img" aria-label="Hustší plazma s osmnácti deuterony a osmnácti tritony; kliknutím označíš možné dvojice"></canvas><div class="micro-pairs"><span class="math" data-tex="18\,D\times18\,T">18 D × 18 T</span> = <b>324</b> dvojic</div></div>
+  </div>
+  <div class="micro-legend"><span><i class="micro-dot d"></i>Deuteron D</span><span><i class="micro-dot t"></i>Triton T</span><span style="color:#845219">✦ α zůstává a ohřívá</span><span style="color:#285b76">↗ neutron odlétá</span></div>
+  <div class="micro-compare">
+    <div class="micro-equation"><span class="math" data-tex="(3n_D)\cdot(3n_T)=9n_Dn_T">3 × nD · 3 × nT = 9 × nD · nT</span><span>→ devítinásobná četnost reakcí</span></div>
+    <div class="micro-heat"><div><small>Výkon samoohřevu A</small><strong id="microPowerA">— MW</strong><div class="micro-heat-rail"><span style="width:11.11%"></span></div></div><div><small>Výkon samoohřevu B</small><strong id="microPowerB">— MW</strong><div class="micro-heat-rail"><span style="width:100%"></span></div></div></div>
+  </div>
+  <div class="micro-feedback" id="microFeedback" aria-live="polite">Vyber A a B nahoře. Pak klikni na oba mikroskopické výřezy: každý deuteron má v hustším plazmatu více možných partnerů.</div>
+  <div class="micro-explainer"><b>Odkud se bere ohřev?</b><div class="micro-reaction math" data-tex="{}^2_1\mathrm H+{}^3_1\mathrm H\rightarrow {}^4_2\mathrm{He}+{}^1_0\mathrm n">D + T → α + neutron</div>Částice <b>alfa (3,5 MeV)</b> předává energii plazmatu; <b>neutron (14,1 MeV)</b> většinou uniká z plazmatu. Počet dvojic názorně ukazuje kvadratické škálování <b>četnosti reakcí</b> při pevné teplotě; jedna dvojice však nezaručuje uskutečnění reakce. Více reakcí znamená větší <b>výkon samoohřevu</b>, nikoliv automaticky vyšší teplotu.</div>
+  <div class="micro-footnote"><b>Zahřát – přiblížit – udržet:</b> teplota ovlivňuje reaktivitu, hustota četnost setkání a doba udržení energie ztrátový výkon. Počet teček i záblesků je názorný. Zobrazené „dvojice“ jsou možné kombinace D–T, nikoli jisté fúzní reakce. Pravděpodobnost reakce při setkání závisí především na energii iontů (teplotě). Zvýšení hustoty samo o sobě nezvyšuje teplotu.</div>
+</div>
+</div>
+<div id="phase2" class="hide"><h2>Vyber teplotu plazmatu</h2><p id="temperatureStep" aria-live="polite"></p><p class="sub">Hustota zůstává stejná. Při každé teplotě překroč hranici zapálení a zaznamenej mezní bod do grafu.</p><div class="temps" id="temperatureButtons"></div>
+<div class="temp-why" id="temperatureWhy" aria-live="polite">
+  <div class="temp-why-head"><strong>Proč má Lawsonova křivka minimum?</strong><small>Nejde o náhodný tvar grafu</small></div>
+  <p class="temp-lead">Zkus postupně <b>70, 162 a 522 milionů K</b>. Dvě průhledné nádoby ukazují, kolik energie během <b>stejného časového úseku</b> částice alfa předají plazmatu a kolik energie unikne. Sleduj, <b>která nádoba se plní rychleji</b>.</p>
+  <div class="duel" id="duel">
+    <div class="duel-header"><strong>Kam během stejné doby přibude více energie?</strong><span class="duel-tag" id="duelTag">Teplotní srovnání · stejný trojný součin</span></div>
+    <canvas id="temperatureDuel" width="740" height="300" role="img" aria-label="Animovaná porovnávací nádoba pro výkon samoohřevu a únik energie. Obě se během stejného času plní odlišnou rychlostí podle výkonu."></canvas>
+    <div class="duel-counter" aria-live="off"><span id="duelTime">Porovnání probíhá…</span><strong id="duelCount">Doplněno 0 MJ · uniklo 0 MJ</strong></div>
+    <div class="duel-readouts">
+      <div class="duel-readout heat"><span>Výkon samoohřevu</span><strong id="duelHeat">— MW</strong></div>
+      <div class="duel-readout loss"><span>Únik energie · ztrátový výkon</span><strong id="duelLoss">— MW</strong></div>
+    </div>
+    <p class="duel-link" id="duelLink">Doba udržení energie: <strong id="duelTau">— s</strong>. Posuvník pod experimentem ovládá modrý únik energie.</p>
+    <div class="duel-outcome" id="duelOutcome">Porovnej energii předanou palivu částicemi alfa s energií, kterou palivo za stejnou dobu ztratilo.</div>
+    <p class="duel-question" id="duelQuestion">Proč se po změně teploty začne plnit rychleji jiná nádoba?</p>
+    <p class="duel-conditions" id="duelConditions">Když vybereš teplotu, aplikace nastaví dobu udržení energie tak, aby byl trojný součin stejný jako v ostatních teplotních pokusech. Když pak pohneš posuvníkem, přejdeš na <b>vlastní nastavení</b>: ihned se změní modrý únik, plnění nádoby i ztrátový výkon. Nádoby jsou názorná energetická počítadla, ne skutečné části reaktoru.</p>
+  </div>
+  <details class="duel-details" id="duelDetails"><summary>Proč se převaha mění? Odkryj až po pozorování</summary>
+  <p class="temp-lead">Při vyšší teplotě mají ionty větší šanci se sloučit, takže přibývá fúzních reakcí. Současně ale v tomto srovnání roste i <b>ztrátový výkon</b>. Rozhoduje, zda s teplotou <b>rychleji přibývá energie od částic alfa, nebo energie unikající z plazmatu</b>.</p>
+  <div class="temp-balance">
+    <div class="temp-case low">
+      <div class="temp-case-title">Chladnější plazma <span>70 → 116 mil. K</span></div>
+      <div class="race-bar"><div class="race-name">Nárůst četnosti reakcí <strong id="coldReact">—</strong></div><div class="race-track"><i class="heat" id="coldReactBar"></i></div></div>
+      <div class="race-bar"><div class="race-name">Nárůst ztrát <span class="math" data-tex="\propto T^2">∝ T²</span> <strong id="coldNeed">—</strong></div><div class="race-track"><i class="need" id="coldNeedBar"></i></div></div>
+      <div class="temp-outcome down" id="coldOutcome">↓ Požadovaný součin klesá</div>
+    </div>
+    <div class="temp-case high">
+      <div class="temp-case-title">Teplejší plazma <span>232 → 348 mil. K</span></div>
+      <div class="race-bar"><div class="race-name">Nárůst četnosti reakcí <strong id="hotReact">—</strong></div><div class="race-track"><i class="heat" id="hotReactBar"></i></div></div>
+      <div class="race-bar"><div class="race-name">Nárůst ztrát <span class="math" data-tex="\propto T^2">∝ T²</span> <strong id="hotNeed">—</strong></div><div class="race-track"><i class="need" id="hotNeedBar"></i></div></div>
+      <div class="temp-outcome up" id="hotOutcome">↑ Požadovaný součin stoupá</div>
+    </div>
+  </div>
+  <div class="temp-live">
+    <div class="temp-live-top"><span class="temp-live-title" id="liveTempHeading">Právě zvolená teplota</span><span class="temp-live-phase" id="liveBranch">—</span></div>
+    <div class="temp-live-rows">
+      <div class="temp-live-row"><span>Četnost reakcí při +1 % teploty</span><output id="liveReactGrowth">—</output><div class="temp-live-track"><i class="heat" id="liveReactBar"></i></div></div>
+      <div class="temp-live-row"><span>Ztrátový výkon při +1 % teploty</span><output id="liveNeedGrowth">+2,01 %</output><div class="temp-live-track"><i class="need" id="liveNeedBar"></i></div></div>
+    </div>
+    <p class="temp-live-note" id="liveTempExplanation">Dokud s teplotou rychleji přibývá energie z fúze než energetických ztrát, zapálení se usnadňuje. Jakmile rostou rychleji ztráty, zapálení se ztěžuje.</p>
+  </div>
+  </details>
+  <p class="temp-footnote">Důležité: v tomto konkrétním srovnání při konstantních <span class="math" data-tex="n_{\mathrm f}">n_f</span> a <span class="math" data-tex="n_{\mathrm f}T\tau_{\mathrm E}">n_f Tτₑ</span> ztrátový výkon roste jako <span class="math" data-tex="T^2">T²</span>. Při jiném provozním zásahu to obecně neplatí.</p>
+</div>
+</div>
+<div class="section-label" id="factsHeader">Právě pozorované plazma</div><div class="facts" id="factsPanel"><div><span>Hustota paliva <span class="math" data-tex="n_{\mathrm f}">n_f</span></span><b id="density" class="math">–</b></div><div><span>Teplota</span><b id="temperature" class="math">–</b><div class="k math" id="temperatureK">–</div></div></div>
+<div class="sliderbox" id="tauControl"><label for="tau">Doba udržení energie <output id="tauLabel" class="math">2,00 s</output></label><input id="tau" type="range" min="0" max="1000" step="1" value="420" aria-label="Doba udržení energie"><div class="range-ends"><span>Rychlejší ztráty</span><span>Pomalejší ztráty</span></div></div><button id="save" class="save" disabled>Zaznamenat mezní stav</button><div id="help" class="help" aria-live="polite">Prodlouž dobu udržení energie, dokud výkon samoohřevu nebude alespoň roven ztrátám. Nemusíš trefit přesnou rovnost.</div>
+</section></div>
+<section class="card results" id="res1"><div class="results-head"><h2>Tvoje měření: proč součin?</h2><span class="subtitle">Při 116 mil. K (10 keV)</span></div><p>Při stejné teplotě porovnej nejmenší potřebné doby udržení energie pro obě plazmata. V obou měřeních se podívej přímo na <span class="math" data-tex="n_{\mathrm f}\tau_{\mathrm E}">n_f τₑ</span> — nejen na výkony.</p><div class="measurements" id="list1"></div><div class="discovery hide" id="discovery1"><h3>Objev: trojnásobná hustota znamená třetinovou potřebnou dobu</h3><p>Na hranici zapálení při stejné teplotě mají oba stavy prakticky stejné číslo — přestože hustoty i doby udržení energie jsou různé:</p><div class="formula math" data-tex="n_{\mathrm f}\,\tau_{\mathrm E}\approx\mathrm{konst.}\quad(T=\mathrm{konst.})">n_f × τₑ ≈ konst.</div><div class="compare-line math" id="comparisonMath">Porovnej součiny obou měření.</div><p>Proč to vyšlo? V mikroskopickém pokusu jsi viděl, že trojnásobek D i T poskytuje devětkrát více možných reagujících dvojic. Proto výkon samoohřevu vzroste devětkrát, ale při stejné teplotě a době udržení energie ztrátový výkon jen třikrát. Na hranici zapálení proto hustšímu plazmatu stačí třetinová doba udržení energie. V druhé části zjistíš, proč se přidává teplota a proč pravá strana není konstantní.</p><button class="secondary" id="toTemp" style="margin-top:11px">Pokračovat experimentem s teplotou →</button></div></section>
+<section class="card results hide" id="res2"><div class="results-head"><h2>Tvá měření vytvářejí křivku</h2><span class="subtitle">Kritérium zapálení DT reakce</span></div><p>Každý uložený bod vychází z hraniční hodnoty trojného součinu a ukazuje, jak velký <strong class="math" data-tex="n_{\mathrm f}T\tau_{\mathrm E}">n_f Tτₑ</strong> je potřeba při zvolené teplotě. Najdeš teplotu v kelvinech, při které je požadavek nejmenší?</p><div class="plot"><div class="plot-axis-top"><span class="math" data-tex="n_{\mathrm f}T\tau_{\mathrm E}\;[10^{28}\,\mathrm K\,\mathrm s\,\mathrm m^{-3}]">n_f Tτₑ [10²⁸ K·s·m⁻³]</span></div><svg id="curve" viewBox="0 0 800 275" aria-label="Graf požadovaného trojného součinu v závislosti na teplotě" role="img"></svg><div class="plot-axis-bottom"><span class="math" data-tex="T\;[10^6\,\mathrm K]">Teplota T [miliony K]</span> · pod čísly jsou hodnoty v keV</div><div class="empty" id="emptyPlot">Zatím žádné body. Překroč první hranici zapálení.</div></div><div class="actions"><button id="theory" class="secondary" disabled>Zobrazit spojitou fyzikální křivku</button><button id="clear" class="secondary">Smazat měření teplot</button><span class="subtitle" id="count">0 ze 6 bodů</span></div><div class="discovery hide" id="discovery2"><h3 id="discovery2Title">Proč má křivka minimum?</h3><div class="formula math" data-tex="n_{\mathrm f}T\tau_{\mathrm E}\ge h(T)">n_f Tτₑ ≥ h(T)</div><div class="minimum-explanation">
+<p><strong>Co porovnáváš?</strong> Každý bod křivky ukazuje, jaký trojný součin právě stačí, aby částice alfa předávaly palivu tolik energie, kolik jí ztrácí. Vyzkoušej stejný trojný součin při dvou teplotách.</p>
+<p><strong>Proč ztráty rostou?</strong> Při stejné hustotě má dvakrát teplejší palivo dvakrát větší vnitřní energii. Aby součin <span data-tex="n_{\mathrm f}T\tau_{\mathrm E}"></span> zůstal stejný, musí být doba udržení energie poloviční. Dvojnásobná energie dělená poloviční dobou znamená <strong>čtyřnásobný ztrátový výkon</strong>.</p>
+<p><strong>Vlevo od minima</strong> má jen málo dvojic jader dostatečně velkou relativní energii, aby s významnou pravděpodobností pronikly coulombovskou bariérou. Zahřátí tento podíl prudce zvětší. V pokusu při zvýšení teploty z <span data-tex="6"></span> na <span data-tex="10\,\mathrm{keV}"></span> vzroste výkon samoohřevu <span data-tex="4{,}45{\times}"></span>, ztrátový výkon jen <span data-tex="2{,}78{\times}"></span>. K zapálení tedy stačí menší trojný součin.</p>
+<p><strong>Vpravo od minima</strong> přibývá rychlých dvojic dál, ale účinný průřez DT reakce už při vyšších energiích neroste tak strmě a má vlastní maximum. Další zahřátí proto přinese menší relativní přírůstek počtu reakcí. Při zvýšení teploty z <span data-tex="20"></span> na <span data-tex="30\,\mathrm{keV}"></span> vzroste výkon samoohřevu <span data-tex="1{,}54{\times}"></span>, ale ztrátový výkon <span data-tex="2{,}25{\times}"></span>. K vyrovnání ztrát je nyní potřeba větší trojný součin.</p>
+<p><strong>Minimum leží tam, kde oba výkony při malém zvýšení teploty rostou stejnou relativní rychlostí.</strong> Pro DT palivo vychází v tomto modelu přibližně při <span data-tex="13{,}5\,\mathrm{keV}"></span>, tedy <span data-tex="157\cdot10^6\,\mathrm K"></span>.</p>
+</div>
+<div class="temperature-steps" role="list" aria-label="Tři oblasti Lawsonovy křivky">
+  <div class="temperature-step low" role="listitem"><strong>↘ Nízká teplota</strong><span>Zahřívání výrazně přidává fúzní reakce. Požadovaný trojný součin klesá.</span></div>
+  <div class="temperature-step optimum" role="listitem"><strong>◉ Nejvýhodnější oblast</strong><span>Plazma může dosáhnout zapálení s nejmenším potřebným trojným součinem.</span></div>
+  <div class="temperature-step high" role="listitem"><strong>↗ Vysoká teplota</strong><span>Další ohřev už nepřidává dost reakcí vzhledem k nárokům na udržení. Požadovaný součin roste.</span></div>
+</div>
+<p class="temperature-takeaway"><strong>Zapamatuj si:</strong> Nejvýhodnější teplota není ta, při které vzniká nejvíce fúzní energie, ale ta, při které je v tomto modelu nejsnazší dosáhnout zapálení.</p><details style="margin-top:10px;color:#354751"><summary style="cursor:pointer;font-weight:800">Ukázat fyzikální vyjádření pravé strany</summary><div class="math" data-tex="h(T)=\frac{12k_{\mathrm B}T^2}{E_{\alpha}\langle\sigma v\rangle(T)}" style="font-size:19px;padding:9px 0;font-weight:750">h(T) = 12 kBT² / (Eα⟨σv⟩)</div><p>Platí pro zde použitý idealizovaný model. V této podobě je teplota <span class="math" data-tex="T">T</span> v kelvinech, <span class="math" data-tex="k_{\mathrm B}">kB</span> v J/K a <span class="math" data-tex="E_{\alpha}">Eα</span> v joulech. Fúzní reaktivita je průměr součinu účinného průřezu reakce a relativní rychlosti jader pro danou teplotu paliva.</p></details></div><div class="analysis" id="analysis">Křivka vzniká z jednotlivých měření. Teplotu sleduj především v milionech kelvinů (keV je doplněk).</div></section>
+<dialog id="lawson-guide" data-guide-fusion-theory><div class="notes"><strong>Kritérium zapálení.</strong> Lawsonovo kritérium zahrnuje vědecké vyrovnání, zapálení a inženýrské vyrovnání. Tento pokus sleduje zapálení. V DT palivu předávají částice alfa svou energii plazmatu. Při splnění podmínky <span data-tex="P_{\mathrm{ch}}\ge P_{\mathrm L}"></span> výkon samoohřevu pokryje ztrátový výkon paliva. Hustota paliva <span data-tex="n_{\mathrm f}=n_{\mathrm D}+n_{\mathrm T}"></span> udává počet jader deuteria a tritia v jednotce objemu. V tomto pokusu značí <span data-tex="T"></span> v grafu teplotu paliva v kelvinech. Kniha uvádí pro kritérium zapálení DT reakce minimum poblíž <span data-tex="14\,\mathrm{keV}"></span> (rovnice 12.34–12.37). <strong>Výukový model.</strong> Předpokládáme homogenní ekvimolární DT plazma, <span class="math" data-tex="T_{\mathrm i}=T_{\mathrm e}">Ti = Te</span>, stálý objem 400 m³, úplné předání energie částic alfa palivu. V úvodním experimentu je veškerý ohřev (včetně výkonu samoohřevu) v modelu nastaven na nulu a doba udržení energie je konstantní. U skutečného reagujícího DT plazmatu výkon samoohřevu po vypnutí vnějšího zdroje sám nezmizí; tento didaktický pokus ho záměrně vylučuje. Ztráty jsou modelovány pouze jako <span class="math" data-tex="U/\tau_{\mathrm E}">U/τₑ</span>. Nezahrnujeme samostatné radiační ztráty, nečistoty ani provozní omezení tokamaku. Hledáme okamžitou hranici při zvolené teplotě, nikoli simulaci samovolného vývoje. Pokud výkon samoohřevu převyšuje ztráty, plazma by se bez regulace dále ohřívalo; není tím zaručen stabilní pracovní bod. Záblesky, víry a únikové světelné stopy v toru jsou názornou symbolickou vizualizací energetických dějů, nikoli kinetickým modelem nebo obrazem jednotlivých fotonů. Mikroskopický výřez zobrazuje pouze ilustrační počty částic a názorně zvýrazňuje možné kombinace D–T; nejde o skutečné srážkové trajektorie ani deterministickou předpověď reakcí.</div>
+<div class="links">S. Entler, V. Kindl, <i>Jaderná fúze a fúzní elektrárny</i>, kap. 1.5.5, str. 22; kap. 1.8, rámeček 1.4, str. 27; kap. 6.6–6.7, str. 131–132; kap. 12.2, rámeček 12.1, str. 327; kap. 12.4–12.5, str. 329 a kap. 12.7, str. 333–334. Fúzní reaktivita DT reakce: <a href="https://doi.org/10.1088/0029-5515/32/4/I07" target="_blank" rel="noopener">Bosch a Hale (1992)</a>. Srovnání kritérií: Wurzel &amp; Hsu (2022), <a href="https://doi.org/10.1063/5.0083990" target="_blank" rel="noopener">Physics of Plasmas, DOI 10.1063/5.0083990</a>. Teplotě paliva v kelvinech odpovídá energie <span class="math" data-tex="k_{\mathrm B}T">kBT</span> v keV.</div></dialog>
+</main>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+function katexStylesReady(){
+ if(!window.katex)return false;
+ // Detect actual computed layout rather than relying on stylesheet link presence.
+ const probe=document.createElement('span');probe.className='katex';probe.style.cssText='position:absolute;visibility:hidden;pointer-events:none';
+ const base=document.createElement('span');base.className='base';probe.appendChild(base);document.body.appendChild(probe);
+ const ready=getComputedStyle(base).display==='inline-block';probe.remove();return ready;
+}
+function typeset(root=document){if(!katexStylesReady())return;let elements=[...root.querySelectorAll('[data-tex]')];if(root.matches&&root.matches('[data-tex]'))elements.unshift(root);for(const e of elements){let tex=e.dataset.tex.replace(/(\d),(\d)/g,'$1{,}$2');if(e.dataset.lastTex===tex)continue;try{window.katex.render(tex,e,{throwOnError:false,strict:'ignore'});e.dataset.lastTex=tex;}catch(err){console.warn('KaTeX:',err)}}}
+function mathSet(id,tex,fallback){const e=$(id);e.dataset.tex=tex;e.textContent=fallback;delete e.dataset.lastTex;typeset(e)}
+window.addEventListener('load',()=>typeset());
+const fmt=(x,d=2)=>new Intl.NumberFormat('cs-CZ',{maximumFractionDigits:d,minimumFractionDigits:d}).format(x), KEVJ=1.602176634e-16, KPERKEV=1e3*1.602176634e-19/1.380649e-23, EA=3500*KEVJ,V=400;
+const REA=[0,1.17302e-9,1.51361e-2,7.51886e-2,4.60643e-3,1.350e-2,-1.06750e-4,1.366e-5];
+function react(T){const c=REA,theta=T/(1-T*(c[2]+T*(c[4]+T*c[6]))/(1+T*(c[3]+T*(c[5]+T*c[7])))),xi=Math.cbrt(34.3827**2/(4*theta));return 1e-6*c[1]*theta*Math.sqrt(xi/(1124656*T**3))*Math.exp(-3*xi)}
+function model(n,T,tau){const heat=n*n/4*react(T)*EA*V/1e6,loss=3*n*T*KEVJ*V/tau/1e6;return {n,T,tau,heat,loss,r:heat/loss,product:n*T*tau}}
+
+// A second, illustrative microscopic layer: a fixed sample volume with a D–T mixture.
+// Each dot represents an illustrative ion; reactions are stochastic visual markers, not collision tracking.
+const MICRON=220,MICROH=138;
+const microScenes={};
+function createMicroScene(id,nPerKind,seed){
+  let x=seed>>>0;const rnd=()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296};
+  const canvas=document.getElementById(id),ctx=canvas.getContext('2d');
+  const particles=[];
+  for(const kind of ['D','T'])for(let i=0;i<nPerKind;i++){
+    particles.push({kind,x:14+rnd()*192,y:16+rnd()*105,vx:(rnd()-.5)*26,vy:(rnd()-.5)*26});
+  }
+  const state={canvas,ctx,particles,nPerKind,highlightUntil:0,elapsed:0,nextFlash:0,flashes:[],seed:seed};
+  // Tapping on a deuteron reveals every possible triton partner, without claiming they all fuse.
+  canvas.addEventListener('click',()=>{state.highlightUntil=performance.now()/1000+2.8;
+    document.getElementById('microFeedback').textContent=nPerKind===6?
+      'A: Jeden deuteron má v ukázce 6 možných tritonových partnerů. Když je stejně D i T, vzniká 36 různých kombinací.':
+      'B: Jeden deuteron má už 18 tritonových partnerů a deuteronů je také třikrát více. Možných kombinací je proto 324 místo 36 — devítinásobek.';
+  });
+  microScenes[id]=state;
+}
+createMicroScene('microA',6,2026);createMicroScene('microB',18,9127);
+// Keep simulation coordinates independent of the scaled lesson and its pixel density.
+function fitDrawingBuffer(canvas,ctx,width,height){
+ const bounds=canvas.getBoundingClientRect(),ratio=window.devicePixelRatio||1;
+ const scale=Math.min(bounds.width/width,bounds.height/height)*ratio;
+ if(!(scale>0))return;
+ const pixelsX=Math.max(1,Math.round(width*scale)),pixelsY=Math.max(1,Math.round(height*scale));
+ if(canvas.width!==pixelsX||canvas.height!==pixelsY){
+  canvas.width=pixelsX;canvas.height=pixelsY;
+ }
+ ctx.setTransform(pixelsX/width,0,0,pixelsY/height,0,0);
+}
+function renderMicro(sec,dt){
+ for(const [id,m] of Object.entries(microScenes)){
+  const c=m.ctx,pps=m.particles,n=m.nPerKind;
+  fitDrawingBuffer(m.canvas,c,MICRON,MICROH);
+  c.clearRect(0,0,MICRON,MICROH);
+  const g=c.createRadialGradient(110,69,10,110,69,125);g.addColorStop(0,'#ffffff');g.addColorStop(1,'#e8edf1');c.fillStyle=g;c.fillRect(0,0,MICRON,MICROH);
+  c.strokeStyle='#d1dbe0';c.lineWidth=.8;for(let xx=24;xx<MICRON;xx+=32){c.beginPath();c.moveTo(xx,0);c.lineTo(xx,MICROH);c.stroke()}
+  for(let yy=22;yy<MICROH;yy+=30){c.beginPath();c.moveTo(0,yy);c.lineTo(MICRON,yy);c.stroke()}
+  for(const p of pps){p.x+=p.vx*dt;p.y+=p.vy*dt;
+   if(p.x<9||p.x>211){p.vx*=-1;p.x=Math.max(9,Math.min(211,p.x))}
+   if(p.y<10||p.y>128){p.vy*=-1;p.y=Math.max(10,Math.min(128,p.y))}
+  }
+  if(sec<m.highlightUntil){const d=pps.find(p=>p.kind==='D'),ts=pps.filter(p=>p.kind==='T');
+   c.strokeStyle='rgba(142,92,32,.55)';c.lineWidth=1;
+   ts.forEach(p=>{c.beginPath();c.moveTo(d.x,d.y);c.lineTo(p.x,p.y);c.stroke()});
+   c.beginPath();c.arc(d.x,d.y,9,0,Math.PI*2);c.strokeStyle='#a26823';c.lineWidth=1.5;c.stroke();
+  }
+  for(const p of pps){c.save();c.shadowColor=p.kind==='D'?'#367baa':'#935fa6';c.shadowBlur=8;
+   c.fillStyle=p.kind==='D'?'#2779a0':'#9851a7';c.beginPath();c.arc(p.x,p.y,3.6,0,Math.PI*2);c.fill();c.restore();}
+  // Illustrative Poisson-like flashes: fixed T, mean rates scale with n_D*n_T.
+  if(!m.nextFlash)m.nextFlash=sec+(id==='microA'?1.0:.16);
+  const interval=id==='microA'?1.5:1.5/9;
+  if(sec>m.nextFlash){const ds=pps.filter(p=>p.kind==='D'),ts=pps.filter(p=>p.kind==='T');
+    const d=ds[Math.floor(Math.random()*ds.length)],t=ts.reduce((a,b)=>(Math.hypot(b.x-d.x,b.y-d.y)<Math.hypot(a.x-d.x,a.y-d.y)?b:a));
+    m.flashes.push({x:(d.x+t.x)/2,y:(d.y+t.y)/2,born:sec,angle:Math.random()*Math.PI*2});m.nextFlash=sec+interval;}
+  m.flashes=m.flashes.filter(f=>sec-f.born<.46);
+  for(const f of m.flashes){const v=(sec-f.born)/.46;
+    c.strokeStyle='rgba(255,208,126,'+(1-v)+')';c.lineWidth=2*(1-v)+.4;c.beginPath();c.arc(f.x,f.y,3+v*14,0,2*Math.PI);c.stroke();
+    c.fillStyle='rgba(255,247,206,'+(1-v)+')';c.beginPath();c.arc(f.x,f.y,3.5*(1-v),0,Math.PI*2);c.fill();
+    // Cyan neutron leaves the interaction while the warm alpha ring stays at the site.
+    c.strokeStyle='rgba(144,230,255,'+(1-v)+')';c.lineWidth=1.8;
+    c.beginPath();c.moveTo(f.x+v*6*Math.cos(f.angle),f.y+v*6*Math.sin(f.angle));
+    c.lineTo(f.x+v*42*Math.cos(f.angle),f.y+v*42*Math.sin(f.angle));c.stroke();}
+ }
+}
+const temperatures=[6,10,14,20,30,45], cases={A:{n:.6e20,T:10},B:{n:1.8e20,T:10}},S={mode:0,key:'A',T:6,tau:2.2,customTau:false,saved1:{},saved2:{},theory:false};
+const COOL_W0=60, COOL_EFOLD=Math.exp(-1), C={key:'fast',elapsed:0,running:false,initialPower:{fast:30,slow:12},completed:{},unlocked:false,correct:false};
+const coolingTau=key=>COOL_W0/C.initialPower[key];
+function coolingEnergy(){return COOL_W0*Math.exp(-C.elapsed/coolingTau(C.key))} 
+// Logarithmic time control: precise even at short confinement times.
+const minTau=.70,maxTau=18;function tauFromSlider(v){return minTau*Math.exp(+v/1000*Math.log(maxTau/minTau))}function sliderFromTau(t){return Math.max(0,Math.min(1000,Math.round(1000*Math.log(t/minTau)/Math.log(maxTau/minTau))))}
+const tauInput=$('tau');
+const getQ=()=>S.mode===0?({n:COOL_W0*1e6/(3*10*KEVJ*V),T:10*coolingEnergy()/COOL_W0,tau:coolingTau(C.key),heat:0,loss:coolingEnergy()/coolingTau(C.key),W:coolingEnergy(),cooling:true,r:0,product:0}):S.mode===1?model(cases[S.key].n,10,S.tau):model(.8e20,S.T,S.tau);
+function coolReset(){C.elapsed=0;C.running=false;updateCooling()}
+// One reachable action beside the phase tabs, including when the control panel is full.
+function offer(label,action){
+ const button=$('nextAction');
+ if(button.textContent!==label)button.textContent=label;
+ button.disabled=!action;
+ button.onclick=action;
+}
+function coolingAction(ready,both){
+ if(C.running)return offer('Probíhá chladnutí…',null);
+ if(C.correct)return offer('Dál k hustotě →',()=>selectMode(1));
+ if(ready)return offer('Vyhodnotit obě měření →',()=>assessment.showModal());
+ if(both)return offer('Změnit počáteční výkon',()=>$('coolP0').focus());
+ if(C.completed[C.key])return offer($('otherCooling').textContent,()=>$('otherCooling').click());
+ offer('Spustit chladnutí '+(C.key==='fast'?'A':'B'),()=>$('startCooling').click());
+}
+function measurementAction(){
+ if(S.mode===2){
+  const recorded=Boolean(S.saved2[S.T]),missing=temperatures.filter(t=>!S.saved2[t]).length;
+  $('temperatureStep').textContent=recorded
+   ? (missing?'Bod je uložený.\nNahoře zvol „Další teplota“.':S.theory?'Měření je hotové.\nV grafu najdi minimum.':'Všech šest bodů je uloženo.\nNahoře zobraz křivku.')
+   : ($('save').disabled?'Prodluž dobu udržení energie\nposuvníkem doprava.':'Pod posuvníkem zvol\n„Zaznamenat mezní stav“.');
+ }
+ const density=S.mode===1, records=density?S.saved1:S.saved2;
+ const key=density?S.key:S.T;
+ if(!records[key]){
+  if($('save').disabled)return offer('Prodloužit dobu udržení energie →',()=>$('tau').focus());
+  return offer('Ulož stav pod posuvníkem',()=>$('save').focus());
+ }
+ const next=(density?['A','B']:temperatures).find(k=>!records[k]);
+ if(next!==undefined){
+  const attr=density?'case':'temp';
+  return offer(density?'Dál k plazmatu '+next+' →':'Další teplota →',()=>document.querySelector('[data-'+attr+'="'+next+'"]').click());
+ }
+ if(density)return offer('Dál k teplotě →',()=>selectMode(2));
+ if(!S.theory)return offer('Zobrazit výslednou křivku',()=>$('theory').click());
+ offer('Všech šest teplot změřeno',null);
+}
+function updateCooling(){
+  if(S.mode!==0)return;
+  const w=coolingEnergy(),p=w/coolingTau(C.key),t=C.elapsed;
+  $('coolEnergy').textContent=fmt(w,1)+' MJ';$('coolPower').textContent=fmt(p,1)+' MW';
+  $('coolP0Value').textContent=fmt(C.initialPower[C.key],0)+' MW';
+  $('coolP0').value=String(C.initialPower[C.key]);$('coolP0').disabled=C.running;
+  for(const key of ['fast','slow']){
+    const done=C.completed[key],name=key==='fast'?'A':'B';
+    $('coolTick'+key).textContent=fmt(C.initialPower[key],0)+' MW · '+(done?'změřeno ✓':'zatím nezměřeno');
+  }
+  $('coolEnergyFill').style.width=(100*w/COOL_W0)+'%';$('coolClock').textContent='Čas: '+fmt(t,1)+' s';
+  $('sceneTemp').textContent=fmt(10*w/COOL_W0*KPERKEV/1e6,1)+' mil. K';
+  $('sceneKelvin').textContent='· ≈ '+fmt(10*w/COOL_W0,1)+' keV';
+  $('sceneLoss').textContent=fmt(p,1)+' MW';$('sceneLeakFill').style.width=Math.max(0,Math.min(100,p/40*100))+'%';
+  $('status').textContent=C.running?'Plazma chladne':(C.elapsed>=coolingTau(C.key)-1e-6?'Pokles na 37 %':'Připraveno');
+  $('status').className='pill'+(C.elapsed>=coolingTau(C.key)-1e-6?' ok':'');
+  document.querySelectorAll('[data-cool]').forEach(b=>{
+   b.setAttribute('aria-pressed',String(C.key===b.dataset.cool)); b.disabled=C.running;
+  });
+  $('startCooling').disabled=C.running;
+  $('startCooling').textContent=C.running?'Probíhá chladnutí…':(C.elapsed>0?'↻ Zopakovat chladnutí':'▶ Spustit chladnutí');
+  for(const key of ['fast','slow']){
+    const measurement=C.completed[key],name=key==='fast'?'A':'B',el=$('coolResult'+(key==='fast'?'Fast':'Slow'));
+    el.classList.toggle('done',Boolean(measurement));
+    el.textContent=measurement?'Pokus '+name+': 60 MJ / '+fmt(measurement.p0,0)+' MW = '+fmt(measurement.tau,2)+' s; při 37 % zbývá 22,1 MJ.':'Pokus '+name+': zatím nezměřeno';
+  }
+  const bothSaved=Boolean(C.completed.fast&&C.completed.slow);
+  const haveBoth=bothSaved&&Math.abs(C.completed.fast.p0-C.completed.slow.p0)>=4;
+  $('coolCurveNote').textContent=bothSaved?'Modrá: pokus A · Oranžová: pokus B':(C.key==='fast'?'Modrá křivka: pokus A':'Oranžová křivka: pokus B');
+  $('coolQuiz').classList.toggle('hide',!haveBoth);$('toLawson').classList.toggle('hide',!C.correct);
+  $('reviewCooling').hidden=!haveBoth&&!C.correct;
+  const other=C.key==='fast'?'slow':'fast';
+  $('otherCooling').hidden=C.running||!C.completed[C.key]||Boolean(C.completed[other]);
+  $('otherCooling').textContent=other==='slow'?'Přejít k pokusu B →':'Přejít k pokusu A →';
+  if(!haveBoth)assessmentOffered=false;
+  if(haveBoth&&!assessmentOffered&&!C.correct){
+    assessmentOffered=true;
+    assessment.showModal();
+  }
+  if(C.running){$('coolHelp').textContent='Sleduj aktuální ztrátový výkon v MW a zbývající energii v MJ. Pokus končí při 37 %.';}
+  else if(haveBoth){
+    const fast=C.completed.fast.p0>C.completed.slow.p0?'A':'B',slow=fast==='A'?'B':'A';
+    $('coolHelp').textContent='Porovnej křivky: v pokusu '+fast+' je vyšší počáteční ztrátový výkon a kratší doba udržení energie než v pokusu '+slow+'.';
+  }
+  else if(bothSaved){$('coolHelp').textContent='Obě nastavení jsou si příliš podobná. Zkus změnit výkon alespoň o 4 MW a měření zopakuj.';}
+  else if(C.completed[C.key]){$('coolHelp').textContent='Tento pokus je změřený. Vyber druhý pokus, nastav jiný počáteční výkon a porovnej výsledky.';}
+  else {$('coolHelp').textContent='Nastav výkon a spusť chladnutí. Sleduj čas, za který energie klesne na 37 %.';}
+  coolingAction(haveBoth,bothSaved);
+  drawCoolingCurve(t,w);
+}
+function drawCoolingCurve(t,w){
+  const el=$('coolCurve'),W=620,H=175,L=32,R=17,T=17,B=18,maxT=6,
+   X=v=>L+(v/maxT)*(W-L-R), Y=v=>T+(1-v/60)*(H-T-B);
+  let a=[`<rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="#f8f8f5"/><path d="M ${L} ${T} V ${Y(0)} H ${X(maxT)}" fill="none" stroke="#485c66" stroke-width="1.5"/>`];
+  for(const z of [0,20,40,60]) a.push(`<line x1="${L}" y1="${Y(z)}" x2="${W-R}" y2="${Y(z)}" stroke="#285b76" opacity=".58"/><text x="${L-7}" y="${Y(z)+4}" fill="#285b76" font-size="11" text-anchor="end">${z}</text>`);
+  for(const z of [0,2,4,6])a.push(`<text x="${X(z)}" y="${H-3}" fill="#285b76" font-size="11" text-anchor="middle">${z} s</text>`);
+  a.push(`<line x1="${L}" y1="${Y(60*COOL_EFOLD)}" x2="${W-R}" y2="${Y(60*COOL_EFOLD)}" stroke="#285b76" stroke-width="1.4" stroke-dasharray="5 5"/><text x="${W-R-6}" y="${Y(60*COOL_EFOLD)-7}" fill="#285b76" font-size="11" text-anchor="end">37 %</text>`);
+  for(const key of ['fast','slow']){
+    if(key!==C.key&&!C.completed[key])continue;
+    const tau=C.completed[key]?C.completed[key].tau:coolingTau(key),end=C.completed[key]?tau:t,pts=[];
+    for(let tt=0;tt<=end+.00001;tt+=.04)pts.push([tt,COOL_W0*Math.exp(-tt/tau)]);
+    pts.push([end,COOL_W0*Math.exp(-end/tau)]);
+    const color=key==='fast'?'#285b76':'#845219';
+    a.push(`<polyline points="${pts.map(z=>X(z[0]).toFixed(1)+','+Y(z[1]).toFixed(1)).join(' ')}" fill="none" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>`);
+    if(C.completed[key]){
+      a.push(`<line x1="${X(tau)}" y1="${Y(COOL_W0*COOL_EFOLD)}" x2="${X(tau)}" y2="${H-B}" stroke="${color}" stroke-dasharray="3 5" opacity=".55"/>`);
+      a.push(`<circle cx="${X(tau)}" cy="${Y(COOL_W0*COOL_EFOLD)}" r="5" fill="${color}"/>`);
+      a.push(`<text x="${X(tau)}" y="${Y(COOL_W0*COOL_EFOLD)-11}" fill="${color}" text-anchor="middle" font-size="11" font-weight="bold">${fmt(tau,2)} s</text>`);
+    }else a.push(`<circle cx="${X(t)}" cy="${Y(w)}" r="5.5" fill="${color}"/>`);
+  }
+  a.push(`<text x="${L}" y="${T-4}" fill="#285b76" font-size="11">Vnitřní energie paliva [MJ]</text>`);
+  el.innerHTML=a.join('');
+}
+
+function update(){
+ if(S.mode===0){updateCooling();return;}
+ let q=getQ(),meets=q.r>=1,near=meets&&q.r<=1.035,st=$('status'),bal=$('balance');
+ mathSet('density',fmt(q.n/1e20,1)+'\\times 10^{20}\\,\\mathrm{m}^{-3}',fmt(q.n/1e20,1)+' × 10²⁰ m⁻³');
+ mathSet('temperature',fmt(q.T*KPERKEV/1e6,1)+'\\,\\mathrm{mil.\\ K}',fmt(q.T*KPERKEV/1e6,1)+' mil. K');
+ mathSet('temperatureK','\\approx '+q.T+'\\,\\mathrm{keV}', '≈ '+q.T+' keV');
+ $('temperature').title=fmt(q.T*KPERKEV,0)+' K';
+ $('sceneTemp').textContent=fmt(q.T*KPERKEV/1e6,1)+' mil. K';$('sceneKelvin').textContent='· '+q.T+' keV';
+ mathSet('tauLabel',fmt(S.tau)+'\\,\\mathrm{s}',fmt(S.tau)+' s');tauInput.value=sliderFromTau(S.tau);
+ $('heatValue').textContent=fmt(q.heat,1)+' MW';$('lossValue').textContent=fmt(q.loss,1)+' MW';
+ let scale=Math.max(q.heat,model(q.n,q.T,minTau).loss,2)*1.07;
+ $('heatBar').style.width=100*q.heat/scale+'%';$('lossBar').style.width=100*q.loss/scale+'%';
+ $('sceneLoss').textContent=fmt(q.loss,1)+' MW';$('sceneLeakFill').style.width=100*q.loss/scale+'%';
+ st.className='pill';bal.className='balance';
+ if(!meets){
+   st.textContent='Kritérium zapálení nesplněno';
+   bal.textContent='Výkon samoohřevu nestačí. Chybí '+fmt(q.loss-q.heat,1)+' MW. Prodlouž dobu udržení energie.';
+ }else if(near){
+   st.textContent='Kritérium zapálení splněno';st.classList.add('ok');bal.classList.add('ok');
+   bal.textContent='Výkon samoohřevu již pokrývá ztráty. Můžeš zaznamenat mezní stav.';
+ }else{
+   st.textContent='Nad hranicí zapálení';st.classList.add('excess');bal.classList.add('excess');
+   bal.textContent='Výkon samoohřevu převyšuje ztráty o '+fmt(q.heat-q.loss,1)+' MW. Podmínka je splněna! Bez regulace by plazma měnilo teplotu.';
+ }
+ $('save').disabled=!meets;
+ $('help').innerHTML=meets?'✓ <b>Podmínka zapálení splněna.</b> Klikni na „Zaznamenat mezní stav“. Uloží se minimální potřebná doba udržení energie, ne tvé vyšší nastavení.':'Posuň ovladač <b>doprava</b>. Nejde o přesné vyrovnání — stačí hranici překročit.';
+ document.querySelectorAll('[data-case]').forEach(b=>{b.setAttribute('aria-pressed',String(S.key===b.dataset.case));$('check'+b.dataset.case).textContent=S.saved1[b.dataset.case]?'✓':''});
+if(S.mode===1){
+ const a=model(cases.A.n,10,2),b=model(cases.B.n,10,2);
+ $('microPowerA').textContent=fmt(a.heat,1)+' MW';$('microPowerB').textContent=fmt(b.heat,1)+' MW';
+ $('microCardA').classList.toggle('selected',S.key==='A');$('microCardB').classList.toggle('selected',S.key==='B');
+}
+
+ document.querySelectorAll('[data-temp]').forEach(b=>{let t=Number(b.dataset.temp);b.setAttribute('aria-pressed',String(t===S.T));b.classList.toggle('done',Boolean(S.saved2[t]))});
+ updateFactors(q,meets);updateTemperatureDuel();updateTemperatureExplanation();updateResults();
+}
+function updateFactors(q,meets){
+ const T_K=q.T*KPERKEV,prim=S.mode===1,pr=prim?q.n*q.tau:q.n*T_K*q.tau;
+ $('factorLine').classList.toggle('phase-one',prim);
+ $('factorHeading').textContent=prim?'Hledej stejný součin při různých hustotách':'Sleduj přímo trojný součin';
+ $('productLabel').textContent=prim?'Součin hustoty a doby udržení energie:':'Dosažený trojný součin:';
+ mathSet('factorN',fmt(q.n/1e20,1)+'\\cdot 10^{20}\\,\\mathrm{m}^{-3}',fmt(q.n/1e20,1)+' × 10²⁰ m⁻³');
+ mathSet('factorT',fmt(T_K/1e6,1)+'\\cdot10^6\\,\\mathrm K',fmt(T_K/1e6,1)+' mil. K');
+ mathSet('factorTau',fmt(q.tau)+'\\,\\mathrm s',fmt(q.tau)+' s');
+ let v=prim?pr/1e20:pr/1e28, tex=fmt(v,2)+(prim?'\\cdot10^{20}\\,\\mathrm{s\\,m^{-3}}':'\\cdot10^{28}\\,\\mathrm{K\\,s\\,m^{-3}}');
+ mathSet('productValue',tex,fmt(v,2)+(prim?' × 10²⁰ s·m⁻³':' × 10²⁸ K·s·m⁻³'));
+ $('factorHint').textContent=meets?(prim?'Hranice překročena. Zaznamenáme nejmenší potřebný součin a porovnáme jej s druhým plazmatem.':'Hranice překročena. Do grafu uložíme mezní, nikoli právě dosažený vyšší součin.'):'Součin zatím nestačí pro tuto teplotu. Při posunu doprava se prodlužuje doba udržení energie a ztráty klesají.';
+}
+// Same attainable triple product for every T: compare the physical competition fairly.
+// We choose a modest margin above the minimum ignition threshold, so both the
+// low- and high-temperature ends lose while the middle may become self-heating.
+const duelN=.8e20;
+const duelKProduct=duelN*14*balanceTau(duelN,14)*1.20;
+const comparisonTau=T=>duelKProduct/(duelN*T);
+const duelPeriod=5.4; // same observation interval for both energy flows
+let duelState={T:14,heat:0,loss:0,ratio:0,elapsed:0};
+function updateTemperatureDuel(){
+ if(S.mode!==2)return;
+ const T=S.T,q=getQ(); // SAME physical state as the main torus and the student's τₑ slider
+ duelState={T,heat:q.heat,loss:q.loss,ratio:q.r,elapsed:0};
+ $('duelHeat').textContent=fmt(q.heat,1)+' MW';
+ $('duelLoss').textContent=fmt(q.loss,1)+' MW';
+ $('duelTau').textContent=fmt(S.tau,2)+' s';
+ $('duel').classList.toggle('manual',S.customTau);
+ $('duelTag').textContent=S.customTau?'Vlastní nastavení · posuvník mění únik':'Teplotní srovnání · stejný trojný součin';
+ $('duelConditions').innerHTML=S.customTau?'Teď sleduješ <b>skutečně nastavenou dobu udržení energie</b>. Posuvník mění ztrátový výkon i modrou nádobu, zatímco výkon samoohřevu při stejné hustotě a teplotě zůstává stejný. Vyber další teplotu pro návrat ke srovnání při stejném trojném součinu.':'Při výběru teploty se automaticky nastaví také <b>doba udržení energie</b>, aby byl trojný součin stejný ve všech teplotních pokusech. Můžeš ale posuvníkem pod experimentem nastavit vlastní dobu: modrý únik se ihned změní. Nádoby jsou názorná energetická počítadla, nikoli části reaktoru.';
+ const e=$('duelOutcome'),v=$('duelQuestion');
+ e.classList.toggle('win',q.r>=1);e.classList.toggle('lose',q.r<1);
+ if(q.r<.98){e.textContent='Modrá nádoba se plní rychleji: energie z plazmatu uniká rychleji, než ji částice alfa dodávají.';
+  v.textContent=T<=10?'Zkus přidat teplotu. Bude oranžová nádoba dohánět modrou?':'Zkus nižší teplotu kolem 162 milionů K. Proč se tam výsledek obrátí?';
+ }else if(q.r>1.025){e.textContent='Zlatá nádoba se plní rychleji: částice alfa dodávají více energie, než kolik uniká.';
+  v.textContent='Zkus zvýšit teplotu ještě víc. Bude se zlatá nádoba plnit stále rychleji než modrá?';
+ }else{e.textContent='Obě nádoby se plní téměř stejně rychle: energetické toky jsou téměř vyrovnané.';
+  v.textContent='Zkus změnit teplotu na obě strany od tohoto bodu.';}
+}
+const duelCanvas=$('temperatureDuel'),duelCtx=duelCanvas.getContext('2d');
+function roundRect(c,x,y,w,h,r){w=Math.max(0,w);if(c.roundRect){c.beginPath();c.roundRect(x,y,w,h,r)}else{c.beginPath();c.rect(x,y,w,h)}}
+function duelDraw(dt){
+ if(S.mode!==2)return;
+ const d=duelState,period=duelPeriod;
+ if(!reduced)d.elapsed=(d.elapsed+dt)%period;
+ const elapsed=d.elapsed,phase=elapsed/period;
+ const now=performance.now()/1000;
+ const c=duelCtx,W=740,H=300;fitDrawingBuffer(duelCanvas,c,W,H);c.clearRect(0,0,W,H);
+ const bg=c.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#ffffff');bg.addColorStop(1,'#eef2f4');c.fillStyle=bg;c.fillRect(0,0,W,H);
+ // The torus physically illustrates where alpha heating and escaping energy originate.
+ c.save();c.translate(126,134);
+ c.shadowColor='#a86ddc';c.shadowBlur=24;c.strokeStyle='#ae6ed7';c.lineWidth=48;
+ c.beginPath();c.ellipse(0,0,83,58,0,0,Math.PI*2);c.stroke();c.shadowBlur=0;
+ c.globalAlpha=.45;c.strokeStyle='#ee91ff';c.lineWidth=22;c.beginPath();c.ellipse(0,3,83,58,0,Math.PI,2*Math.PI);c.stroke();c.globalAlpha=1;
+ c.fillStyle='#f5f6f5';c.beginPath();c.ellipse(0,0,60,37,0,0,Math.PI*2);c.fill();
+ const norm=Math.max(d.heat,d.loss,1),heatRatio=d.heat/norm,lossRatio=d.loss/norm;
+ const sparks=Math.max(2,Math.round(2+14*heatRatio));
+ for(let i=0;i<sparks;i++){
+  const a=i*2.39996+now*(.4+.02*i),x=77*Math.cos(a),y=54*Math.sin(a);
+  const pulse=.5+.5*Math.sin(now*(2.7+i*.12)+i);
+  c.save();c.fillStyle='#fff9cc';c.shadowColor='#ffc57d';c.shadowBlur=5+8*pulse;
+  c.beginPath();c.arc(x,y,2+1.5*pulse,0,2*Math.PI);c.fill();c.restore();
+ }
+ const escapeN=Math.max(3,Math.round(3+14*lossRatio));
+ for(let i=0;i<escapeN;i++){
+  const a=i*2.39996,part=(now*(.25+.3*lossRatio)+i*.27)%1;
+  const x=(91+38*part)*Math.cos(a),y=(65+31*part)*Math.sin(a);
+  c.save();c.globalAlpha=.8*(1-part);c.strokeStyle='#2779a0';c.lineWidth=1.5+lossRatio;
+  c.shadowColor='#39d3ff';c.shadowBlur=8;c.beginPath();c.moveTo(x-10*Math.cos(a),y-8*Math.sin(a));c.lineTo(x,y);c.stroke();c.restore();
+ }
+ c.restore();
+ c.font='700 13px Segoe UI,Arial';c.textAlign='center';c.fillStyle='#5c4377';c.fillText('DT PLAZMA',126,259);
+ // Energy counters: equal counting windows, equal symbolic packet energy WITHIN a chosen T.
+ const cards=[{x:290,color:'#99571b',dark:'#9b602c',rate:heatRatio,amount:d.heat,title:'SAMOOHŘEV'},
+              {x:515,color:'#246483',dark:'#116c95',rate:lossRatio,amount:d.loss,title:'ÚNIK ENERGIE'}];
+ for(let k=0;k<cards.length;k++){
+  const s=cards[k],x=s.x,top=64,width=154,height=180;
+  c.textAlign='center';c.font='700 12px Segoe UI,Arial';c.fillStyle=s.color;c.fillText(s.title,x+width/2,37);
+  c.fillStyle='#ecf1f3';roundRect(c,x,top,width,height,12);c.fill();c.strokeStyle='#4b7084';c.lineWidth=2;c.stroke();
+  // All counters begin empty simultaneously and fill in 5.4 s. The fuller one
+  // represents greater energy transferred over that identical observation time.
+  let frac=Math.min(.96,.90*phase*s.rate);
+  let liquidTop=top+height-5-(height-10)*frac;
+  c.save();roundRect(c,x+4,top+4,width-8,height-8,9);c.clip();
+  let gr=c.createLinearGradient(0,liquidTop,0,top+height);
+  if(k===0){gr.addColorStop(0,'#ffc27a');gr.addColorStop(1,'#9c5226')}
+  else{gr.addColorStop(0,'#79e5ff');gr.addColorStop(1,'#135c85')}
+  c.fillStyle=gr;c.beginPath();c.moveTo(x+4,top+height);c.lineTo(x+4,liquidTop);
+  for(let xx=0;xx<=width-8;xx+=3){let yy=liquidTop+2.4*Math.sin(xx*.075+now*3.4+(k?1:0));c.lineTo(x+4+xx,yy)}
+  c.lineTo(x+width-4,top+height);c.closePath();c.fill();
+  c.restore();
+  for(let q=0;q<Math.round(3+9*s.rate);q++){
+   // Streams of glowing energy packets continuously arrive from the torus to counters.
+   const prog=(now*(.52+.22*s.rate)+q/Math.max(1,Math.round(3+9*s.rate)))%1;
+   const pathStart=226,pathEnd=x+width/2;
+   const px=pathStart+(pathEnd-pathStart)*prog,py=(k===0?88:171)+9*Math.sin(prog*Math.PI);
+   c.save();c.globalAlpha=.3+.65*Math.sin(Math.PI*prog);c.fillStyle=s.color;
+   c.shadowColor=s.color;c.shadowBlur=9;c.beginPath();c.arc(px,py,2.8,0,2*Math.PI);c.fill();c.restore();
+  }
+  c.textAlign='center';c.font='700 14px Segoe UI,Arial';c.fillStyle='#233f49';
+  c.fillText(fmt(s.amount*elapsed,0)+' MJ',x+width/2,top+height+21);
+ }
+ c.textAlign='left';c.font='12px Segoe UI,Arial';c.fillStyle='#4d6170';
+ c.fillText('Stejně dlouhé měření — porovnej, která nádoba se plní rychleji.',16,288);
+ $('duelTime').textContent='Zobrazený interval: '+fmt(elapsed,1)+' / '+fmt(period,1)+' s';
+ $('duelCount').textContent='Částice alfa: '+fmt(d.heat*elapsed,0)+' MJ   ·   Únik: '+fmt(d.loss*elapsed,0)+' MJ';
+}
+function updateTemperatureExplanation(){
+ if(S.mode!==2)return;
+ // We visualize the *growth competition*. At constant n and constant n*T*tau,
+ // transport loss W/tau grows as T² while alpha power grows as <sigma v>(T).
+ const test = (start,end,prefix)=>{
+   const reactivity=react(end)/react(start), required=(end/start)**2;
+   const max=Math.max(reactivity,required)*1.02;
+   $(prefix+'React').textContent=fmt(reactivity,2)+'×';
+   $(prefix+'Need').textContent=fmt(required,2)+'×';
+   $(prefix+'ReactBar').style.width=(100*reactivity/max)+'%';
+   $(prefix+'NeedBar').style.width=(100*required/max)+'%';
+   const delta=required/reactivity;
+   $(prefix+'Outcome').textContent=delta<1
+    ? '↓ Potřebný součin klesne o '+fmt((1-delta)*100,0)+' %'
+    : '↑ Potřebný součin vzroste o '+fmt((delta-1)*100,0)+' %';
+ };
+ test(6,10,'cold');test(20,30,'hot');
+ const T=S.T, K=Math.round(T*KPERKEV/1e6),growthReact=100*(react(T*1.01)/react(T)-1);
+ const growthNeed=100*(1.01**2-1);
+ const relative=growthNeed/growthReact;
+ $('liveTempHeading').textContent='Právě '+K+' mil. K ('+fmt(T,0)+' keV)';
+ $('liveReactGrowth').textContent='+'+fmt(growthReact,2)+' %';
+ $('liveNeedGrowth').textContent='+'+fmt(growthNeed,2)+' %';
+ const scale=Math.max(growthReact,growthNeed)*1.05;
+ $('liveReactBar').style.width=(growthReact/scale*100)+'%';
+ $('liveNeedBar').style.width=(growthNeed/scale*100)+'%';
+ const branch=$('liveBranch'),note=$('liveTempExplanation');
+ if(Math.abs(growthReact-growthNeed)<0.16){
+   branch.textContent='↔ Blízko minima';branch.style.color='#845219';
+   note.textContent='Tady už další zahřívání téměř nesnižuje nároky na zapálení. Jsi blízko teploty, při které stačí nejmenší trojný součin.';
+ }else if(growthReact>growthNeed){
+   branch.textContent='↘ Klesající větev';branch.style.color='#296347';
+   note.textContent='Další zahřátí teď výrazně pomáhá reakcím. Zapálení je snazší a potřebný trojný součin klesá.';
+ }else{
+   branch.textContent='↗ Rostoucí větev';branch.style.color='#913b50';
+   note.textContent='Fúzních reakcí stále přibývá, ale další zahřívání už zvyšuje nároky na udržení rychleji. K zapálení je potřeba vyšší trojný součin.';
+ }
+}
+function updateResults(){let have1=Object.keys(S.saved1).length;$('list1').innerHTML=['A','B'].map(k=>{let q=S.saved1[k];return `<div class="measure"><b>Plazma ${k} ${q?'✓':'—'}</b><span>${q?fmt(q.n/1e20,1)+' × 10²⁰ m⁻³ · '+fmt(q.tau)+' s':'Hranice ještě nezaznamenána'}</span>${q?`<span class="measure-math math" data-tex="n_{\\mathrm f}\\tau_{\\mathrm E}=${fmt(q.n*q.tau/1e20,2)}\\cdot10^{20}\\,\\mathrm{s\\,m^{-3}}">n_f τₑ = ${fmt(q.n*q.tau/1e20,2)} × 10²⁰</span>`:''}</div>`}).join('');$('discovery1').classList.toggle('hide',have1<2);$('toTemp').hidden=S.mode!==1||have1<2;$('tab2').disabled=!C.unlocked||have1<2;if(have1===2){let a=S.saved1.A,b=S.saved1.B;mathSet('comparisonMath',fmt(a.n*a.tau/1e20,2)+'\\cdot10^{20}\\approx '+fmt(b.n*b.tau/1e20,2)+'\\cdot10^{20}\\,\\mathrm{s\\,m^{-3}}',fmt(a.n*a.tau/1e20,2)+' ≈ '+fmt(b.n*b.tau/1e20,2)+' × 10²⁰');}let pts=Object.values(S.saved2).sort((a,b)=>a.T-b.T);$('count').textContent=pts.length+' ze 6 bodů';$('theory').disabled=pts.length<3;$('emptyPlot').classList.toggle('hide',pts.length>0);$('discovery2').classList.toggle('hide',S.mode!==2||!S.theory);
+$('temperatureWhy').classList.toggle('hide',S.mode!==2||S.theory);if(pts.length>0){let best=pts.reduce((a,b)=>b.product<a.product?b:a);$('analysis').innerHTML='Nejmenší zatím naměřený součin má plazma při <b>'+fmt(best.T*KPERKEV/1e6,1)+' mil. K ('+best.T+' keV)</b>. Při další teplotě může být výsledek ještě nižší.';}else{$('analysis').textContent='Křivka vzniká z jednotlivých měření. Teplotu sleduj především v milionech kelvinů (keV je doplněk).';}
+drawGraph(pts);typeset();measurementAction()}
+function productK(q){return q.product*KPERKEV/1e28}
+function drawGraph(pts){
+const svg=$('curve'),W=540,H=265,L=40,R=34,T=35,B=52,maxY=12.0;
+// Internal x coordinate remains energy-equivalent keV; student reads kelvins on the primary axis.
+const x=t=>L+(t-5)/(47-5)*(W-L-R),y=z=>T+(maxY-z)/maxY*(H-T-B),grid=[];
+grid.push(`<rect width="${W}" height="${H}" fill="#ffffff"/>`);
+for(let v=0;v<=12;v+=2){grid.push(`<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#cdd3da" stroke-width="1" opacity=".75"/><text x="${L-11}" y="${y(v)+4}" text-anchor="end" fill="#285b76" font-size="12">${v}</text>`)}
+for(let v of temperatures){let xx=x(v),m=Math.round(v*KPERKEV/1e6);grid.push(`<line x1="${xx}" y1="${T}" x2="${xx}" y2="${H-B}" stroke="#cdd3da" stroke-width="1" opacity=".65"/><text x="${xx}" y="${H-B+20}" text-anchor="middle" fill="#285b76" font-size="13" font-weight="700">${m}</text><text x="${xx}" y="${H-B+35}" text-anchor="middle" fill="#285b76" font-size="10">${v} keV</text>`)}
+
+
+if(S.theory){
+ const bestT=13.539;
+ function segment(low,high){let coords=[];for(let z=low;z<=high;z+=.12){const m=model(.8e20,z,1),exact=productK(m)/m.r;coords.push((coords.length?'L':'M')+x(z).toFixed(1)+','+y(exact).toFixed(1))}const m=model(.8e20,high,1);coords.push('L'+x(high).toFixed(1)+','+y(productK(m)/m.r).toFixed(1));return coords.join(' ')}
+ grid.push(`<path d="${segment(5,bestT)}" fill="none" stroke="#296347" stroke-width="3.2" stroke-linecap="round"/>`);
+ grid.push(`<path d="${segment(bestT,47)}" fill="none" stroke="#913b50" stroke-width="3.2" stroke-linecap="round"/>`);
+ const m=model(.8e20,bestT,1),bestP=productK(m)/m.r;
+ grid.push(`<line x1="${x(bestT)}" y1="${T+14}" x2="${x(bestT)}" y2="${y(bestP)-9}" stroke="#296347" opacity=".55" stroke-width="1.3" stroke-dasharray="4 4"/>`);
+ grid.push(`<text x="${L+8}" y="${T+14}" font-size="11" font-weight="700" fill="#296347">↘ zahřívání pomáhá</text>`);
+ grid.push(`<text x="${x(bestT)+90}" y="${T+14}" font-size="11" font-weight="700" fill="#913b50">↗ zahřívání ztěžuje zapálení</text>`);
+ grid.push(`<circle cx="${x(bestT)}" cy="${y(bestP)}" r="6" fill="#296347" stroke="#ffffff" stroke-width="2"/><text x="${x(bestT)+12}" y="${T+34}" font-size="12" fill="#296347" font-weight="700">minimum ≈ 157 mil. K (13,5 keV)</text>`);
+}
+
+let connected=pts.map((p,i)=>(i?'L':'M')+x(p.T).toFixed(1)+','+y(productK(p)).toFixed(1)).join(' ');if(pts.length>1)grid.push(`<path d="${connected}" fill="none" stroke="#845219" opacity=".6" stroke-width="1.8" stroke-dasharray="5 5"/>`);
+for(let p of pts){grid.push(`<circle cx="${x(p.T)}" cy="${y(productK(p))}" r="6.5" fill="#845219" stroke="#ffffff" stroke-width="2"/><text text-anchor="${p.T>40?'end':'start'}" x="${x(p.T)+(p.T>40?-8:8)}" y="${y(productK(p))-10}" fill="#845219" font-size="11">${fmt(productK(p),2)}</text>`)}
+svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML=grid.join('')}
+
+const workspace=document.createElement('div');
+workspace.className='workspace';
+const scene=document.querySelector('.layout > .card');
+scene.before(workspace);
+const comparisons=document.createElement('section');
+comparisons.className='comparisons';
+workspace.append(scene,comparisons);
+comparisons.append($('encounterLab'),$('temperatureWhy'),$('discovery2'));
+const returnToPowers=document.createElement('button');
+returnToPowers.type='button';
+returnToPowers.className='secondary';
+returnToPowers.textContent='Zpět k porovnání výkonů';
+returnToPowers.onclick=()=>$('theory').click();
+$('discovery2').prepend(returnToPowers);
+scene.append($('res2'));
+workspace.append($('res1'));
+$('save').after($('toTemp'));
+const guide=$('lawson-guide');
+for(const note of document.querySelectorAll('.cool-physics-note,.cool-sliderbox>p,.micro-explainer,#discovery1>p,.micro-footnote,.temp-footnote,.temperature-steps,.temperature-takeaway,.duel-conditions,.duel-question,.panel .sub,.temp-lead,.duel-details>p,.cool-equation p'))guide.append(note);
+const cooling=document.createElement('section');
+cooling.className='cooling-view';
+comparisons.prepend(cooling);
+cooling.append($('coolingMetrics'),$('coolResults'));
+const assessment=document.createElement('dialog');
+assessment.id='coolAssessment';
+assessment.setAttribute('aria-labelledby','coolAssessmentTitle');
+$('coolQuiz').querySelector('strong').id='coolAssessmentTitle';
+assessment.append($('coolQuiz'),$('toLawson'));
+const backToGraph=document.createElement('button');
+backToGraph.type='button';
+backToGraph.className='secondary';
+backToGraph.textContent='Zpět ke křivkám';
+backToGraph.onclick=()=>assessment.close();
+assessment.append(backToGraph);
+document.body.append(assessment);
+let assessmentOffered=false;
+$('reviewCooling').onclick=()=>assessment.showModal();
+$('otherCooling').onclick=()=>{
+ C.key=C.key==='fast'?'slow':'fast';
+ coolReset();
+ $('startCooling').focus();
+};
+$('import-guide').onclick=()=>guide.showModal();
+const closeGuide=document.createElement('button');
+closeGuide.textContent='Zavřít';
+closeGuide.onclick=()=>guide.close();
+guide.prepend(closeGuide);
+guide.addEventListener('click',e=>{if(e.target===guide)guide.close()});
+function selectMode(mode){
+ if(mode===1&&!C.unlocked)return;
+ if(mode===2&&(!C.unlocked||Object.keys(S.saved1).length<2))return;
+ workspace.dataset.phase=String(mode);
+ document.body.dataset.phase=String(mode);
+ $('discovery2').classList.toggle('hide',mode!==2||!S.theory);
+ $('toTemp').hidden=mode!==1||Object.keys(S.saved1).length<2;
+ comparisons.scrollTop=scene.scrollTop=0;
+ cooling.hidden=mode!==0;
+ document.querySelector('.card.panel').scrollTop=0;
+ $('encounterLab').classList.toggle('hide',mode!==1);
+ $('temperatureWhy').classList.toggle('hide',mode!==2);
+ S.mode=mode;document.body.classList.toggle('phase0',mode===0);
+ for(const i of [0,1,2])$('tab'+i).setAttribute('aria-selected',String(mode===i));
+ $('tab1').disabled=!C.unlocked;$('tab2').disabled=!C.unlocked||Object.keys(S.saved1).length<2;
+ for(const i of [0,1,2])$('phase'+i).classList.toggle('hide',mode!==i);
+ $('res1').classList.toggle('hide',mode!==1);$('res2').classList.toggle('hide',mode!==2);
+ $('powerMetrics').classList.toggle('hide',mode===0);$('factorPanel').classList.toggle('hide',mode===0);
+ $('coolingMetrics').classList.toggle('hide',mode!==0);$('balance').classList.toggle('hide',mode===0);
+ $('sceneTitle').textContent=mode===0?'Chladnutí plazmatu bez ohřevu':'Průsvitné plazma v tokamaku';
+ $('legendHeat').textContent=mode===0?'✦ Všechno ohřívání je vypnuté':'✦ Fúzní reakce uvnitř plazmatu';
+ if(mode===0){$('heroTitle').textContent='Co znamená doba udržení energie?';$('heroIntro').innerHTML='Než budeš hledat Lawsonovo kritérium, ověř si, proč <strong>delší doba udržení energie znamená menší únik energie</strong>.';
+  $('goalTitle').textContent='Úkol: porovnej, jak rychle plazma ztrácí energii.';
+  $('goalText').textContent='Proveď dvě měření z počátečních 60 MJ. Pak vysvětli, co znamená doba udržení energie.';
+  updateCooling();return;}
+ $('heroTitle').textContent='Jaké plazma se dokáže samo udržet?';
+ $('heroIntro').innerHTML='Už víš, že delší doba udržení energie znamená menší únik energie při stejné zásobě. Teď zkus dosáhnout toho, aby <strong>výkon samoohřevu alespoň pokryl ztrátový výkon paliva</strong>.';
+ $('goalTitle').textContent=mode===1?'Úkol: překroč hranici zapálení u dvou různě hustých plazmat.':'Úkol: najdi mez zapálení pro různé teploty.';
+ $('goalText').textContent=mode===1?'Nejprve si na mikroskopickém výřezu ověř, proč více paliva znamená více fúzních reakcí. Pak nastav udržení, aby výkon samoohřevu pokryl ztráty.':'Nejdřív sleduj porovnání výkonu samoohřevu a ztrátového výkonu při různých teplotách. Potom hledej mez zapálení a ukládej body do grafu.';
+ S.customTau=false;S.tau=mode===1?2:comparisonTau(S.T);update()
+}
+function balanceTau(n,T){let m=model(n,T,1);return 1/m.r}
+$('tab0').addEventListener('click',()=>selectMode(0));
+$('tab1').addEventListener('click',()=>selectMode(1));$('tab2').addEventListener('click',()=>selectMode(2));
+document.querySelectorAll('[data-cool]').forEach(b=>b.addEventListener('click',()=>{if(C.running)return;C.key=b.dataset.cool;coolReset()}));
+$('coolP0').addEventListener('input',e=>{if(C.running)return;C.initialPower[C.key]=+e.target.value;delete C.completed[C.key];coolReset()});
+$('startCooling').addEventListener('click',()=>{delete C.completed[C.key];C.elapsed=0;C.running=true;flashes=[];updateCooling()});
+document.querySelectorAll('[data-answer]').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('[data-answer]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+ if(b.dataset.answer==='e-fold'){C.correct=true;C.unlocked=true;
+ $('coolQuizFeedback').textContent='Správně. Po jedné době τₑ zbývá asi 37 % počáteční energie. Ve tvých dvou měřeních delší τₑ odpovídá menšímu počátečnímu ztrátovému výkonu.';
+ $('coolEquation').classList.remove('hide');$('tab1').disabled=false;typeset($('coolEquation'));}
+ else{$('coolQuizFeedback').textContent=b.dataset.answer==='all'?'Ne zcela: po jedné době udržení energie nezmizí všechna energie. Ve tvém měření zbývalo 37 %.':'Ne: τₑ popisuje úbytek vnitřní energie, nikoli dobu pobytu každého iontu.';}
+ updateCooling();
+}));
+$('toLawson').addEventListener('click',()=>{assessment.close();selectMode(1);$('tab1').focus();document.querySelector('.modes').scrollIntoView({behavior:'smooth',block:'nearest'})});$('toTemp').addEventListener('click',()=>{selectMode(2);document.querySelector('.modes').scrollIntoView({behavior:'smooth',block:'nearest'})});document.querySelectorAll('[data-case]').forEach(b=>b.addEventListener('click',()=>{S.key=b.dataset.case;S.tau=2;update();$('microFeedback').textContent=S.key==='B'?'Hustota D i T je nyní 3× vyšší. Výkon samoohřevu vzrostl 9×: každý D má třikrát více T partnerů a je zároveň třikrát více D. Ztrátový výkon při stejné době udržení energie vzrostl jen 3×.':'V řidším plazmatu je méně D i T, takže vzniká méně D–T setkání. Zvol B a sleduj rozdíl ve výkonu samoohřevu.';}));$('temperatureButtons').innerHTML=temperatures.map(t=>`<button data-temp="${t}" aria-pressed="false">${Math.round(t*KPERKEV/1e6)} mil. K<small>≈ ${t} keV</small></button>`).join('');document.querySelectorAll('[data-temp]').forEach(b=>b.addEventListener('click',()=>{S.T=+b.dataset.temp;S.customTau=false;S.tau=comparisonTau(S.T);update()}));tauInput.addEventListener('input',e=>{S.tau=tauFromSlider(e.target.value);if(S.mode===2)S.customTau=true;update()});$('save').addEventListener('click',()=>{let q=getQ();if(q.r<1)return;const threshold=model(q.n,q.T,balanceTau(q.n,q.T));if(S.mode===1){S.saved1[S.key]=threshold;}else{S.saved2[S.T]=threshold;}update();$('help').innerHTML='<b>Uložena hraniční hodnota:</b> '+fmt(threshold.tau,2)+' s. Můžeš jít dál nebo zkusit výraznější překročení.';});$('theory').addEventListener('click',()=>{S.theory=!S.theory;$('theory').textContent=S.theory?'Skrýt spojitou fyzikální křivku':'Zobrazit spojitou fyzikální křivku';updateResults()});$('clear').addEventListener('click',()=>{S.saved2={};S.theory=false;$('theory').textContent='Zobrazit spojitou fyzikální křivku';update()});
+// Torus: procedurally drawn 3D mesh in a fixed camera view, atmospheric glow,
+// visible hole, glowing helical traces, symbolic traveling particles and energy fluxes.
+const canvas=$('torus'),cx=canvas.getContext('2d'),reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W=620,H=350,dpr=1,frameN=0,last=0,flashes=[],leaks=[],tA=0,tL=0,geom=[],stars=[];
+const A=1.54,a=.47,elevation=.70,cosE=Math.cos(elevation),sinE=Math.sin(elevation);
+function point(phi,theta,offset=0){let minor=a+offset,rr=A+minor*Math.cos(theta),X=rr*Math.cos(phi),Y=rr*Math.sin(phi),Z=minor*Math.sin(theta);return [X,Y*sinE-Z*cosE,Y*cosE+Z*sinE]}
+function normal(phi,theta){return [Math.cos(phi)*Math.cos(theta),Math.sin(phi)*Math.cos(theta),Math.sin(theta)]}
+const cam={};
+function fit(){W=Math.max(1,canvas.clientWidth);H=Math.max(1,canvas.clientHeight);dpr=Math.min(2,window.devicePixelRatio||1);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);cx.setTransform(dpr,0,0,dpr,0,0);cam.s=.77*Math.min(W/4.9,H/3.40);cam.x=W*.50;cam.y=H*.54;stars=Array.from({length:65},(_,i)=>({x:(i*127.23%100)/100*W,y:(i*74.19%100)/100*H,r:.45+(i%3)*.35}));mesh()}
+function project(p){return [cam.x+p[0]*cam.s,cam.y+p[1]*cam.s]}
+function mesh(){geom=[];const N=120,M=30;for(let i=0;i<N;i++)for(let j=0;j<M;j++){let phi=i*2*Math.PI/N,phi1=(i+1)*2*Math.PI/N,th=j*2*Math.PI/M,th1=(j+1)*2*Math.PI/M,p0=point(phi,th),p1=point(phi1,th),p2=point(phi1,th1),p3=point(phi,th1),nor=normal((phi+phi1)*.5,(th+th1)*.5);geom.push({pts:[p0,p1,p2,p3],z:(p0[2]+p1[2]+p2[2]+p3[2])/4,phi,th,n:nor,front:nor[1]*cosE+nor[2]*sinE})}geom.sort((u,v)=>u.z-v.z)}
+function inkPath(pts){cx.beginPath();pts.forEach((p,i)=>{let s=project(p);i?cx.lineTo(s[0],s[1]):cx.moveTo(s[0],s[1])})}
+function volumePoint(phi,theta,fraction=.55){const radius=a*fraction,rr=A+radius*Math.cos(theta),X=rr*Math.cos(phi),Y=rr*Math.sin(phi),Z=radius*Math.sin(theta);return [X,Y*sinE-Z*cosE,Y*cosE+Z*sinE]}
+// Symbolic plasma glow and heat exchange, not a particle transport simulation.
+const sparks=Array.from({length:76},(_,i)=>({phi:i*2.399963+.6,theta:i*1.47,r:.10+((i*17)%67)/100,phase:i*.97,size:.8+(i%4)*.5}));
+function renderTorus(sec,q,dt){
+  const k=cam.s,cx0=cam.x,cy0=cam.y,ratio=q.loss/Math.max(q.heat,.001),
+        strength=q.cooling?Math.max(.04,Math.min(1,q.loss/40)):.05+.93*Math.pow(Math.max(0,ratio),.7)/(Math.pow(Math.max(0,ratio),.7)+1.2);
+  const coolGlow=q.cooling?.22+.78*(q.W/COOL_W0):1;
+  // Diffuse contact shadow on a light ground gives the plasma volume depth.
+  cx.save();cx.translate(cx0,cy0+k*.68);cx.scale(1,.24);
+  const shadow=cx.createRadialGradient(0,0,0,0,0,k*2);
+  shadow.addColorStop(0,'rgba(58,48,82,.16)');shadow.addColorStop(1,'rgba(58,48,82,0)');
+  cx.fillStyle=shadow;cx.fillRect(-2*k,-2*k,4*k,4*k);cx.restore();
+  // Wisps and fusion micro-events sit INSIDE the plasma and are visible through its shell.
+  for(const v of sparks){let phi=v.phi+sec*(.075+(v.phase%2)*.02),theta=v.theta+sec*.14,
+    p=project(volumePoint(phi,theta,v.r)),flicker=.5+.5*Math.sin(sec*1.4+v.phase);
+    cx.save();cx.globalAlpha=(.10+.28*flicker)*coolGlow;cx.fillStyle=v.phase%3<1?'#ffc1e8':'#b799ff';
+    cx.shadowColor='#e89bff';cx.shadowBlur=5+8*flicker;cx.beginPath();cx.arc(p[0],p[1],v.size,0,2*Math.PI);cx.fill();cx.restore();
+  }
+  // Layered semitransparent surface with subtle turbulence; no opaque orange plastic.
+  for(let c of geom){let n=c.n,l=Math.max(0,n[0]*-.28+n[1]*.68+n[2]*.69),front=Math.max(0,c.front),
+    wave=Math.sin(c.phi*19+sec*2.25+c.th*2.4)*Math.cos(c.th*6-c.phi*5-sec*1.65),
+    sheet=Math.sin(c.th*4+c.phi*9-sec*.9)*.5+.5,
+    lum=Math.min(1,.20+.46*l+.16*front+.045*wave+.047*sheet),
+    hue=252+10*Math.cos(c.th)+6*wave,
+    sat=33+front*15,
+    light=25+62*lum;
+    cx.fillStyle=`hsla(${hue.toFixed(1)},${sat.toFixed(0)}%,${light.toFixed(0)}%,${((.77+.14*front)*(.62+.38*coolGlow)).toFixed(2)})`;
+    inkPath(c.pts);cx.closePath();cx.fill();
+  }
+  // Glass-like plasma sheath: short specular ribbons and helices without distracting grid lines.
+  for(let b=0;b<9;b++){let phase=b*2*Math.PI/9,pts=[];for(let i=0;i<=260;i++){
+    let phi=i*2*Math.PI/260,theta=5*phi+phase+sec*.18,np=normal(phi,theta),f=np[1]*cosE+np[2]*sinE;
+    if(f>.01)pts.push(point(phi,theta,.016));else{if(pts.length>1)line(pts,b);pts=[]}}
+    if(pts.length>1)line(pts,b)}
+  function line(pts,b){cx.save();inkPath(pts);cx.globalAlpha=coolGlow;cx.strokeStyle=b%3===0?'#89def5a1':'#edbaff77';cx.lineWidth=b%3===0?1.45:1.0;
+    cx.shadowBlur=7;cx.shadowColor=b%3===0?'#86dcff':'#dd93ff';cx.stroke();cx.restore()}
+  // Small circulating luminous features (not a literal representation of D/T orbits).
+  for(let i=0;i<24;i++){let phi=(sec*(.20+.04*(i%3))+i*2.39996)%(2*Math.PI),theta=5*phi+i*.71,nn=normal(phi,theta);
+    if(nn[1]*cosE+nn[2]*sinE<0)continue;let p=project(point(phi,theta,-.04)),rr=i%5===0?2.0:1.25;
+    cx.save();cx.globalAlpha=coolGlow;cx.beginPath();cx.fillStyle=i%3===0?'#a5efff':'#ffcded';cx.shadowBlur=8;cx.shadowColor=i%3===0?'#8de7ff':'#edabff';cx.arc(p[0],p[1],rr,0,2*Math.PI);cx.fill();cx.restore()}
+  // Large, stable and clearly observable outbound ENERGY FLOW. The slider changes
+  // its brightness, number of streaks, duration, length and packet rate together.
+  const jets=5+Math.round(13*strength),extent=8+strength*Math.min(W,H)*.32;
+  for(let j=0;j<jets;j++){
+    let phi=.12+j*Math.PI*2/jets, theta=.26*Math.sin(j*2.3),nn=normal(phi,theta);
+    if(nn[1]*cosE+nn[2]*sinE<-.12)continue;
+    let pp=project(point(phi,theta,.08)),dx=nn[0],dy=nn[1]*sinE-nn[2]*cosE,mag=Math.hypot(dx,dy)||1;dx/=mag;dy/=mag;
+    let pulse=.70+.30*Math.sin(sec*(2.4+strength*3)+j*2.3),length=extent*pulse;
+    cx.save();cx.globalAlpha=(.11+strength*.62)*pulse;cx.strokeStyle='#297ea4';cx.lineWidth=1.0+strength*2.7;
+    cx.lineCap='round';cx.shadowColor='#6bdeff';cx.shadowBlur=6+22*strength;
+    cx.beginPath();cx.moveTo(pp[0]+dx*3,pp[1]+dy*3);cx.lineTo(pp[0]+dx*length,pp[1]+dy*length);cx.stroke();cx.restore();
+  }
+  let heatRate=q.cooling?0:Math.min(18,Math.max(.5,q.heat/7)),lossRate=1+strength*strength*92;
+  if(!reduced){
+    tA+=dt*heatRate;tL+=dt*lossRate;
+    while(tA>1){tA--;let phi=Math.random()*2*Math.PI,theta=Math.random()*2*Math.PI,nn=normal(phi,theta);
+      if(nn[1]*cosE+nn[2]*sinE<-.15)continue;
+      flashes.push({p:project(volumePoint(phi,theta,.27+Math.random()*.44)),age:0,life:.38+Math.random()*.32})}
+    while(tL>1){tL--;let phi=Math.random()*2*Math.PI,theta=(Math.random()-.5)*.9,nn=normal(phi,theta);
+      if(nn[1]*cosE+nn[2]*sinE<-.10)continue;
+      let p=project(point(phi,theta,.055)),vx=nn[0],vy=nn[1]*sinE-nn[2]*cosE,len=Math.hypot(vx,vy)||1;
+      const scatter=(Math.random()-.5)*strength*1.45;
+      const angle=Math.atan2(vy/len,vx/len)+scatter;
+      leaks.push({x:p[0],y:p[1],vx:Math.cos(angle),vy:Math.sin(angle),age:0,
+        life:.4+Math.random()*.32,travel:(.07+strength*(.18+.32*Math.random()))*Math.min(W,H),weight:strength})}
+  }
+  for(let i=flashes.length-1;i>=0;i--){let o=flashes[i];o.age+=dt;if(o.age>o.life){flashes.splice(i,1);continue}
+    let z=o.age/o.life;cx.save();cx.globalAlpha=(1-z)*.90;cx.strokeStyle='#bd7219';cx.lineWidth=1.6;
+    cx.shadowBlur=13+12*(1-z);cx.shadowColor='#ffcf82';cx.beginPath();cx.arc(o.p[0],o.p[1],2+z*12,0,Math.PI*2);cx.stroke();
+    if(z<.3){cx.beginPath();cx.arc(o.p[0],o.p[1],2.6,0,2*Math.PI);cx.fillStyle='#fff6da';cx.fill()}
+    cx.restore()}
+  for(let i=leaks.length-1;i>=0;i--){let o=leaks[i];o.age+=dt;if(o.age>o.life){leaks.splice(i,1);continue}
+    let z=o.age/o.life,x=o.x+o.vx*z*o.travel,y=o.y+o.vy*z*o.travel;
+    cx.save();cx.globalAlpha=(1-z)*(.23+.76*o.weight);cx.strokeStyle='#216b94';cx.lineWidth=1.2+o.weight*2.6;
+    cx.lineCap='round';cx.shadowColor='#5ed7ff';cx.shadowBlur=7+o.weight*12;
+    cx.beginPath();cx.moveTo(x-o.vx*(7+9*o.weight),y-o.vy*(7+9*o.weight));cx.lineTo(x,y);cx.stroke();cx.restore()}
+  cx.shadowBlur=0;
+}
+
+function render(now){let dt=Math.min(.05,((now-last)||16)/1000);last=now;frameN+=dt;if(S.mode===0&&C.running){C.elapsed=Math.min(coolingTau(C.key),C.elapsed+dt*1.5);if(C.elapsed>=coolingTau(C.key)-1e-6){C.running=false;C.completed[C.key]={p0:C.initialPower[C.key],tau:coolingTau(C.key)};}updateCooling();}cx.clearRect(0,0,W,H);let bg=cx.createRadialGradient(W*.52,H*.46,10,W*.52,H*.5,Math.max(W,H)*.72);bg.addColorStop(0,'#ffffff');bg.addColorStop(.7,'#fafaf8');bg.addColorStop(1,'#eff2f2');cx.fillStyle=bg;cx.fillRect(0,0,W,H);
+renderTorus(reduced?0:frameN,getQ(),reduced?0:dt);if(S.mode===1)renderMicro(performance.now()/1000,reduced?0:dt);if(S.mode===2)duelDraw(reduced?0:dt);requestAnimationFrame(render)}
+new ResizeObserver(fit).observe(canvas);fit();selectMode(0);requestAnimationFrame(render);
+window.__lawsonDebug={model,react,state:S,cooling:C,coolingEnergy,coolingTau,balanceTau,temperatures,productK,selectMode,updateTemperatureDuel,getDuel:()=>duelState};
+})();
+</script><script defer src="../navigation/page.js"></script></body></html>

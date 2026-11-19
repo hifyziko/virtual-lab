@@ -26,7 +26,7 @@ for(const m of Lab.catalog){
 // Minimal dialog adapter, following the pattern of the project's navigation tests.
 // Check UI lifecycle without mounting, resetting or touching a lesson's DOM/state.
 class Element{
- constructor(tag){this.tagName=tag;this.nodes={};this.events={};this.attributes={};this.open=false;this.children=[];this._html='';}
+ constructor(tag){this.tagName=tag;this.nodes={};this.events={};this.attributes={};this.dataset={};this.open=false;this.children=[];this._html='';}
  set innerHTML(value){this._html=value;this.children=[];}
  get innerHTML(){return this._html+this.children.map(n=>n.outerHTML).join('');}
  get outerHTML(){return '<'+this.tagName+'>'+ (this.textContent||'')+this.innerHTML+'</'+this.tagName+'>';}

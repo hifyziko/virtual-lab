@@ -1,0 +1,29 @@
+<!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>COMPASS-U — sestavení tokamaku</title>
+<link rel="stylesheet" href="../particles/vendor/katex.css"><link rel="stylesheet" href="../navigation/style.css"><link rel="stylesheet" href="style.css">
+<script src="layout.js"></script></head><body data-fusion-page="fu10-compass">
+<main>
+ <header class="modulehead"><a class="back" href="../index.html#group-area-plasma" target="_top">← Jaderná fúze a tokamaky</a><h1>COMPASS-U</h1><button id="help" data-module-guide aria-haspopup="dialog" aria-controls="compass-help">Ovládání a výklad</button><button data-fusion-full>Celá obrazovka</button></header>
+ <section class="workspace" aria-label="Sestavení a plánované parametry tokamaku">
+  <section class="player" aria-label="Animace sestavování">
+   <div class="clipbar" role="group" aria-label="Výběr animace"><button data-video-src="assembly.mp4" data-video-poster="assembly.jpg" data-clip="assembly" aria-pressed="true">Celý tokamak</button><button data-video-src="interior.mp4" data-video-poster="interior.jpg" data-clip="interior" aria-pressed="false">Vnitřek a průlet</button><span id="clipTitle">Sestavení celého tokamaku</span></div>
+   <div class="viewport"><video id="video" preload="metadata" playsinline aria-label="Sestavování tokamaku COMPASS-U"></video>
+    <div id="cover" class="cover"><div><p id="loadText">Načítání náhledu…</p><progress id="loadProgress" aria-label="Načítání videa"></progress><button id="retry" hidden>Zkusit znovu</button></div></div>
+   </div>
+   <div class="transport"><button id="play" aria-label="Přehrát animaci">Přehrát</button><label class="timeline"><span class="sr-only">Průběh sestavování</span><input id="seek" type="range" min="0" max="1000" value="0" step="1" disabled></label><output id="clock" aria-live="off">0:00 / —</output><label class="speed">Rychlost <select id="speed"><option value="0.5">½×</option><option value="1" selected>1×</option><option value="1.5">1½×</option><option value="2">2×</option></select></label></div>
+   <div class="chapters" id="chapters" aria-label="Kapitoly animace"></div>
+  </section>
+  <aside aria-labelledby="parametersTitle"><h2 id="parametersTitle">Plánované parametry</h2><p class="subtle">Návrh zařízení ÚFP AV ČR, Praha</p><dl id="parameters"></dl>
+   <section class="heating"><h3>Pomocný ohřev plazmatu</h3><div class="phase" role="group" aria-label="Etapa ohřevu"><button data-phase="initial" aria-pressed="true">Počáteční fáze</button><button data-phase="extended" aria-pressed="false">Rozšíření</button></div><dl id="heating"></dl><p id="heatingNote" class="subtle"></p></section>
+   <p class="source">Návrhové hodnoty, nikoli naměřený provoz. Ověřeno 19. 11. 2026.<br><a href="https://www.ipp.cas.cz/Compass_U/overview/" target="_blank" rel="noopener">Zdroj: ÚFP — Tokamak overview ↗</a></p>
+  </aside>
+ </section>
+ <footer><span>Vizualizace montáže; drobné konstrukční detaily jsou zjednodušené.</span><span>Hi!Fyziko · 1.0</span></footer>
+</main>
+<dialog id="compass-help" aria-labelledby="helpTitle"><div class="dialoghead"><h2 id="helpTitle">COMPASS-U — ovládání a výklad</h2><button id="closeHelp">Zavřít</button></div><div id="lesson-guide-content">
+<h3>Co sledovat</h3><p>Spusť sestavení celého tokamaku. Sleduj základnu, nosné konstrukce, cívky, vnitřní sestavu a vnější plášť. Posuvníkem můžeš pohyb zastavit v libovolném místě; tlačítka pod videem přeskočí na vybranou část montáže.</p><p>V animaci „Vnitřek a průlet“ uvidíš vakuovou nádobu, ochranné prvky první stěny a divertor zblízka. Kamera je předem vedená; myší se přesouvá čas, nikoli pohled.</p>
+<h3>Jak číst parametry</h3><p>Tabulka uvádí plánované návrhové hodnoty. <span data-math="B_{\mathrm t}"></span> je velikost toroidálního magnetického pole, <span data-math="I_{\mathrm p}"></span> proud plazmatem, <span data-math="R"></span> hlavní poloměr a <span data-math="a"></span> vedlejší poloměr. Prodloužení <span data-math="\kappa"></span> a triangularita <span data-math="\delta"></span> popisují tvar průřezu plazmatu. Uvedená doba je délka ustálené části výboje; delší pulzy vyžadují nižší parametry.</p><p>NBI znamená ohřev vstřikováním neutrálních částic, ECRH ohřev elektronovou cyklotronovou rezonancí. Přepínač ukazuje počáteční fázi a plánované pozdější rozšíření; jejich výkony nejsou současně dosaženým provozním stavem.</p>
+<h3>Podoba a pořadí montáže</h3><p>Animace slouží k názornému představení sestavy. Přílety dílů a oblet kamery jsou režijní stylizace. Vnitřní sestava se usazuje před odkrytím již umístěné nádoby, aby byla viditelná. Kovové odstíny a odlesky jsou výtvarná úprava, nikoli přesná specifikace slitin.</p>
+<h3>Zdroje</h3><p><a href="https://www.ipp.cas.cz/Compass_U/overview/" target="_blank" rel="noopener">ÚFP AV ČR: Tokamak overview</a>, oddíly Main design parameters, Heating power a Plasma facing components; ověřeno 19. 11. 2026. Rozhodující je tento aktuální přehled; starší prezentace uvádějí jiné etapy rozšíření ohřevu.</p><p>Pořadí montáže: Jan Klíma, CU_DOC_TokamakAssembly, snímky 11–82; předmontáž a doprava vnitřní sestavy na snímcích 45–50. Konstrukční podklady COMPASS-U jsou použity pro zjednodušenou vizualizaci.</p>
+</div></dialog>
+<script src="../particles/vendor/katex.js"></script><script src="data.js"></script><script src="app.js"></script><script src="../navigation/page.js"></script>
+</body></html>

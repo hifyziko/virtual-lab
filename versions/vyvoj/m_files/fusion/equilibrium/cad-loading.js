@@ -1,0 +1,2 @@
+/* Visible while the native geometry is being fetched, decoded and uploaded. */
+(()=>{const panel=()=>document.getElementById('cadLoading');window.addEventListener('error',()=>{const p=panel();if(!p||p.hidden)return;p.querySelector('span').textContent='Geometrii se nepodařilo připravit.';p.querySelector('progress').hidden=true;p.querySelector('button').hidden=false;},true);window.TokamakCADLoaded=()=>{const p=panel();if(p)p.hidden=true;};document.addEventListener('DOMContentLoaded',()=>{const p=panel();if(p)p.querySelector('button').onclick=()=>location.reload();});})();

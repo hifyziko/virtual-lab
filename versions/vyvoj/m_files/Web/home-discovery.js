@@ -47,7 +47,7 @@
     const home = document.querySelector('.discovery-home');
     if (!home || home.dataset.ready) return;
     home.dataset.ready = 'true';
-    const groups = [...home.querySelectorAll('.topic-group')];
+    const groups = [...home.querySelectorAll('.topic-group')].filter(group => !group.dataset.fusionSubgroup);
     function remember() { opened = groups.find(group => group.open)?.id || ''; save(); }
     for (const group of groups) group.addEventListener('toggle', () => {
       if (group.open) for (const other of groups) if (other !== group) other.open = false;

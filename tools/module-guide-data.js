@@ -20,6 +20,7 @@
   stiffness:'Bartoš: Teorie elektrických strojů, str. 124–125 (synchronizační moment); Fitzgerald: Electric Machinery, kap. 5.7.',
   regulation:'Chapman: Instructor’s Manual, příklad 5-4(b–e), tištěné str. 115–116. Jde o příručku řešení, nikoli plnou učebnici.',
   model:'Vlastní výukový model projektu a jeho metodika; uvedené knihy elektrických strojů toto téma nepokrývají.',
+  lawson:'S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 1.8, rámeček 1.4, str. 27; kap. 12.2, rámeček 12.1, str. 327; kap. 12.4–12.5, str. 329 a kap. 12.7, str. 333–334.',
   plasma:'S. Entler, V. Kindl: Jaderná fúze a fúzní elektrárny, kap. 2.1–2.2, str. 30–32; rámečky 2.1 a 2.3.',
   drift:'S. Entler, V. Kindl: Jaderná fúze a fúzní elektrárny, kap. 7.3–7.4, str. 141–148 (gyrace a drifty).'
  };
@@ -199,6 +200,9 @@
  add('fu02-galerie','model',
   ['Přepínejte skupiny Vše, částice, jádra a atomy.','Tažením prohlížejte prostorové modely a porovnávejte jejich druhy a popisky.'],
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
+ add('fu12-lawson','lawson',
+  ['Spusť chladnutí a porovnej oba průběhy. Pak pro každou hustotu nastav dobu udržení energie tak, aby výkon samoohřevu pokryl ztrátový výkon paliva, a zaznamenej mezní stav.','Opakuj měření při různých teplotách. V grafu najdi nejmenší potřebný trojný součin hustoty paliva, teploty a doby udržení energie.'],
+  ['Doba udržení energie je poměr vnitřní energie paliva ke ztrátovému výkonu. Při konstantní době udržení energie zbývá po jedné takové době bez ohřevu přibližně 37 % původní energie.','Model zapálení předpokládá homogenní směs stejného počtu jader deuteria a tritia a úplné předání energie částic alfa plazmatu.'],String.raw`\tau_{\mathrm E}=\frac{U}{P_{\mathrm L}}`,['fu01-reakce','fu04-udrzeni']);
  add('fu07-plazma','plasma',
   ['Přidávej atomy a posuvníkem teploty dodávej teplo. Sleduj uvolňování elektronů a pole vzniklých nábojů.','Zapni magnetické pole a porovnej dráhy neutrálních atomů, iontů a elektronů.'],
   ['Plazma může být částečně ionizované. Od samotné ionizace je odlišuje kolektivní chování a kvazineutralita v dostatečně velkém objemu.','Jde o názorný model se zmenšeným poměrem hmotností. Počet zobrazených atomů není hustota skutečného plynu; magnetické pole stáčí i jednotlivý volný náboj.'],String.raw`m\frac{\mathrm d\mathbf v}{\mathrm dt}=q(\mathbf E+\mathbf v\times\mathbf B)`,['fu03-drift','fu02-galerie']);
@@ -214,14 +218,21 @@
  add('fu06-divertor','equilibrium',
   ['Vyberte poloidální cívku a měňte její proud. Ostatní proudy zůstávají pevné. Sledujte změnu osy a separatrix.','Volte Uvnitř, Separatrix a K terčům. Porovnejte tlak, indukci a proudovou hustotu v řezu a prostoru.'],
   ['Poloha plazmatu je výsledkem rovnováhy při zadaných proudech. Nepoužívá se regulátor polohy. Výběr jiné cívky obnoví výchozí stav.','Statické rovnováhy nepopisují vertikální stabilitu ani transport tepla k terčům. Geometrie vychází z ITER; nejde o konkrétní výboj.'],String.raw`-\nabla p_{\mathrm{pl}}+\mathbf J\times\mathbf B=0`,['fu04-udrzeni','fu03-drift']);
+ add('fu09-princip','equilibrium',
+  ['V připraveném řezu skryjte vybrané součásti pomocí přepínačů nad scénou a prohlédněte si vnitřek.','Vyberte konstantní, sinusový nebo lineárně rostoucí proud solenoidu a sledujte napětí i sklon siločar.'],
+  ['Při dosažení meze se proud CS ustálí. Indukované napětí zanikne, proud plazmatem a sklon siločáry postupně klesají.','Poloidální pole proudu plazmatem mění stáčení výsledných siločar. Vnější cívky přidávají vlastní pole.'],null,['fu06-divertor','fu04-udrzeni']);
  sources.emwave='Feynman, Leighton, Sands: The Feynman Lectures on Physics, I, kap. 28; II, kap. 20. Vlastní retardovaný bodový dipólový model; metodika v docs/EM-VLNA.md.';
  add('em06-vlna','emwave',
   ['Začněte před pohybem a zvolte Vznik ohybu. Porovnejte bílé siločáry s původním polem; zelený kruh vyznačuje čelo změny.','Zvolte Vlna odchází. Vpravo sledujte magnetické pole, jeho znaménko a směr. Přepněte na dipólovou anténu nebo prostorový detail.'],
   ['Vzdálené pole odpovídá dřívějšímu pohybu náboje. Změna se šíří konečnou rychlostí světla; siločáry nejsou hmotná vlákna.','Model počítá retardované pole pohybujících se bodových nábojů. Neřeší impedanci ani rezonanci antény; prostorový detail je rovinné přiblížení.'],String.raw`\mathbf S=\frac{1}{\mu_0}\mathbf E\times\mathbf B`,['em01-indukovane-napeti','em03-silove-ucinky']);
- sources.islands='Entler, Kindl: Jaderná fúze a fúzní elektrárny, kap. 7.18, s. 171–172, rámeček 7.10. Výpočetní doplněk: O. Agullo, Resistive MHD Stability Theory, ITER School 2017, snímky 16 a 20–28.';
- add('fu08-ostrovy','islands',
-  ['Spusť úzkou proudovou vrstvu a sleduj vznik ostrova. Pauzou a krokováním prohlédni přepojení siločar.','Přepni na širokou vrstvu a porovnej útlum stejné počáteční amplitudy. Příčný výřez mění pouze zvětšení.'],
-  ['Rozložení proudu určuje výchozí magnetickou konfiguraci. V nestabilním případě se porucha a proudění zesilují; odpor umožňuje změnu propojení pole.','Lineární rezistivní MHD zachycuje počátek nestability v místní rovinné vrstvě. Záznam končí u malého ostrova; nepočítá nasycení, NTM ani disrupci.'],null,['fu04-udrzeni','fu06-divertor']);
- const aliases={'fu05-rovnovaha':'fu06-divertor','fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
+ sources.reconnection='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 7.18, s. 171–172, rámeček 7.10 a kap. 7.19, s. 172–173. Vlastní názorný model helikálního toku.';
+ add('fu11-rekonexe','reconnection',
+  ['Nahoře sleduj rovnoběžné siločáry. Značka pod nimi ukazuje proud plazmatu do řezu. Vnes poruchu a porovnej původní a výsledný směr pole v P.','V kroku Rekonexe najdi ve výseči vlevo bod A. V horním zvětšení sleduj, kam z A vede průsečnice magnetické plochy před průchodem bodem X a po něm.'],
+  ['Před přepojením leží dvě větve stejné hladiny toku na opačných stranách rezonanční plochy. Při průchodu sedlovým bodem se změní jejich návaznost.','Elektrické pole může místně urychlit elektrony podél prstence. Za sekundu pak průřezem projde více náboje a proud zesílí. Pokud změněné magnetické pole pohne plazmatem tak, že se rozdíl v proudu zvětší, porucha může dál růst.'],null,['fu04-udrzeni','fu09-princip']);
+ sources.compass='ÚFP AV ČR: Tokamak overview, Main design parameters a Heating power; ověřeno 19. 11. 2026. Montáž: Jan Klíma, CU_DOC_TokamakAssembly, snímky 11–82.';
+ add('fu10-compass','compass',
+  ['Spusť sestavení celého tokamaku a posuvníkem prohlédni jednotlivé etapy.','Přepni na vnitřní sestavu a sleduj průlet kamerou.'],
+  ['Vedle videa jsou plánované návrhové hodnoty zařízení, nikoli výsledky měření.','Přílety dílů a pohyb kamery jsou názorná stylizace; drobné konstrukční detaily jsou zjednodušené.'],null,['fu09-princip','fu06-divertor']);
+ const aliases={'fu08-ostrovy':'fu11-rekonexe','fu05-rovnovaha':'fu06-divertor','fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
  window.ModuleGuideData={sources,entries,aliases};
 })();

@@ -15,11 +15,24 @@ class Element{
 const Lab={catalog:[{id:'existing',group:'sync'}],modules:new Map(),home(){},route(){},register(module){this.modules.set(module.id,module);}};
 const c={Lab,LabProgress:{value:key=>'<html>'+key+'</html>'},document:{readyState:'loading',createElement:tag=>new Element(tag)},location:{hash:''},setTimeout:fn=>{timers.add(fn);return fn;},clearTimeout:fn=>timers.delete(fn),addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);}};c.window=c;vm.createContext(c);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8'),c);
-assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,11);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,8,'Seven fusion modules are listed');
-assert.equal(Lab.catalog.at(-1).id,'fu02-galerie','Gallery is last');assert.equal(Lab.catalog.find(e=>e.id==='fu03-drift').num,'02');assert.equal(Lab.catalog.at(-1).num,'06');
-assert(!Lab.catalog.some(e=>e.id==='fu05-rovnovaha'));assert.equal(Lab.modules.get('fu05-rovnovaha').sourceId,'fu06-divertor');
+assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,15);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,11,'Ten fusion modules are listed');
+assert.equal(Lab.catalog.at(-1).id,'fu02-galerie','Gallery retains its catalog route');assert.equal(Lab.catalog.find(e=>e.id==='fu03-drift').num,'03');assert.equal(Lab.catalog.at(-1).num,'05');
+assert.deepEqual(Lab.catalog.filter(e=>e.topic==='basics').map(e=>e.id),['fu07-plazma','fu01-reakce','fu03-drift','fu12-lawson','fu02-galerie']);
+assert.deepEqual(Lab.catalog.filter(e=>e.topic==='tokamak').map(e=>e.id),['fu09-princip','fu04-udrzeni','fu06-divertor','fu11-rekonexe','fu10-compass']);
+for(const topic of ['basics','tokamak'])assert.deepEqual(Lab.catalog.filter(e=>e.topic===topic).map(e=>e.num),topic==='basics'?['01','02','03','04','05']:['01','02','03','04','05']);
+assert.equal(Lab.catalog.find(e=>e.id==='fu06-divertor').title,'Tokamak: pole a plazma');
+{
+ const create=c.document.createElement;let injected;const area={querySelector:selector=>selector==='.physics-area-heading'?{after(group){injected=group;}}:null};
+ c.document.createElement=tag=>tag==='template'?{content:{querySelector:selector=>selector==='#group-area-plasma'?area:null},set innerHTML(value){},get innerHTML(){return injected?.markup||'';}}:new Element(tag);
+ c.location.hash='#group-area-plasma';let markup;try{markup=Lab.home();}finally{c.document.createElement=create;c.location.hash='';}
+ assert.equal(injected.id,'group-fusion','Keep historical group links');assert.equal(injected.tagName,'section');
+ const topics=[...markup.matchAll(/<details\b([^>]+)>([\s\S]*?)<\/details>/g)];assert.equal(topics.length,2);
+ for(const [attributes,body]of topics.map(m=>[m[1],m[2]])){const topic=attributes.match(/data-fusion-subgroup="([^"]+)"/)[1],items=Lab.catalog.filter(e=>e.topic===topic);assert(/\bopen\b/.test(attributes),'Both independent topics open in the plasma directory');assert.equal((body.match(/class="card ready fusion-card"/g)||[]).length,items.length);for(const entry of items)assert(body.includes('href="#'+entry.id+'"'));assert(body.includes(topic==='basics'?'Základy plazmatu a fúze':'Magnetické udržení a tokamak'));assert(body.includes('fusion-theme-label'));}
+ for(const entry of Lab.catalog.filter(e=>e.group==='fusion'))assert.equal(markup.split('href="#'+entry.id+'"').length-1,1,'Each module has one tile');
+}
+assert(!Lab.catalog.some(e=>e.id==='fu08-ostrovy'));assert.equal(Lab.modules.get('fu08-ostrovy').sourceId,'fu11-rekonexe');assert(!Lab.catalog.some(e=>e.id==='fu05-rovnovaha'));assert.equal(Lab.modules.get('fu05-rovnovaha').sourceId,'fu06-divertor');
 for(const alias of ['fu02-jadra','fu03-atomy','fu04-castice'])assert.equal(Lab.modules.get(alias).sourceId,'fu02-galerie','Historical aliases keep the gallery');
-const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-ostrovy/index.html','fuze-plazma/index.html','fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html','fuze-udrzeni/index.html','fuze-rovnovaha/divertor.html']);
+const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-lawson/index.html','fuze-ostrovy/vznik.html','compass-u/index.html','fuze-plazma/index.html','fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html','fuze-udrzeni/index.html','fuze-rovnovaha/divertor.html','fuze-rovnovaha/princip.html']);
 let guideRoot,guideHeading;
 c.ModuleGuide={collect(root){guideRoot=root;},prepareHeading(heading,full){guideHeading=heading;assert.equal(full.parentElement,heading);}};
 const windowFit=fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/module-window-fit.js'),'utf8');
@@ -53,11 +66,14 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
  assert(navigationOffset>=0,'Delivered hub includes the fusion navigation, not only its data files');
  assert(navigationOffset>hub.indexOf('<script id="physics-visual">'),'Fusion home extension is installed after the base physics hub');
  assert(manifest.progressive&&hub.includes('id="progressive-web-install"'),'Delivered hub is complete before it becomes current');
+ assert(hub.includes('Základy plazmatu a fúze')&&hub.includes('Magnetické udržení a tokamak'),'Delivered hub contains both fusion topics');
+ assert(hub.includes('fusion-card-fill:#fbf7ed')&&hub.includes('fusion-card-fill:#f0f5fa'),'Both quiet topic palettes are included');
  for(const entry of Lab.catalog.filter(e=>e.group==='fusion'))assert(hub.includes("id:'"+entry.id+"'"),'Delivered hub registers '+entry.id);
  const published=new Set(require('./project/common.cjs').webFiles(manifest));
  for(const entry of Lab.modules.values()){
   if(entry.sourceId){assert.deepEqual(manifest.progressive.dependencies[entry.id],['fusion-'+entry.sourceId]);assert(!manifest.progressive.assets['fusion-'+entry.id],'Aliases must share the gallery payload');continue;}
-  const file=path.join(web,entry.page),html=fs.readFileSync(file,'utf8');assert(html.includes('data-fusion-page="'+entry.id+'"'));assert(html.includes(entry.id==='fu03-drift'?'aria-label="Zpět do skupiny Plazma a fúze">← Zpět':'target="_top">← Plazma a fúze'));
+  const file=path.join(web,entry.page),html=fs.readFileSync(file,'utf8');assert(html.includes('data-fusion-page="'+entry.id+'"'));assert(html.includes(entry.id==='fu03-drift'?'aria-label="Zpět do skupiny Jaderná fúze a tokamaky">← Zpět':'target="_top">← Jaderná fúze a tokamaky'));
+  if(entry.id==='fu06-divertor')assert(html.includes('<h1>Tokamak: pole a plazma</h1>'),'The renamed lesson heading is delivered under its existing route');
   for(const [,ref] of html.matchAll(/(?:src|href)="([^"]+)"/g)){
    const url=new URL(ref,'https://lab.invalid/'+entry.page),rel=decodeURIComponent(url.pathname.slice(1));
    if(url.origin!=='https://lab.invalid'){assert.equal(url.protocol,'https:','External references must use HTTPS');continue;}
@@ -68,7 +84,7 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
   const key='fusion-'+entry.id,asset=manifest.progressive.assets[key];assert(asset);assert.deepEqual(manifest.progressive.dependencies[entry.id],[key]);
   let embedded;vm.runInNewContext(fs.readFileSync(path.join(web,asset.path),'utf8'),{LabProgress:{accept(received,value){assert.equal(received,key);embedded=value;}}});
   assert(!/<script\b[^>]*\bsrc=|<link\b[^>]*\bhref=|href="\.\.\/index.html#/i.test(embedded),'Embedded gallery must need no additional file loads and must link to its parent index');
-  for(const [,ref] of html.matchAll(/data-video-src="([^"]+)"/g)){const rel=new URL(ref,'https://lab.invalid/'+entry.page).pathname.slice(1);assert(embedded.includes('data-video-src="'+rel+'"'),'Video path must resolve from the hub in srcdoc');assert(!/<video[^>]*\ssrc=/.test(embedded),'Do not load video before opening it');const video=manifest.files.find(item=>item.path===rel);assert(video);assert.equal(video.sha256,crypto.createHash('sha256').update(fs.readFileSync(path.join(web,rel))).digest('hex'));}
+  for(const [,attribute,ref] of html.matchAll(/(data-(?:video-src|video-poster))="([^"]+)"/g)){const rel=new URL(ref,'https://lab.invalid/'+entry.page).pathname.slice(1);assert(embedded.includes(attribute+'="'+rel+'"'),'Media path must resolve from the hub in srcdoc');assert(!/<video[^>]*\ssrc=/.test(embedded),'Do not load video before opening it');const media=manifest.files.find(item=>item.path===rel);assert(media);assert.equal(media.sha256,crypto.createHash('sha256').update(fs.readFileSync(path.join(web,rel))).digest('hex'));}
   const originalScripts=[...html.matchAll(/<script\b[^>]*src="([^"]+)"[^>]*>\s*<\/script>/g)].map(m=>new URL(m[1],'https://lab.invalid/'+entry.page).pathname.slice(1));
   const embeddedScripts=[...embedded.matchAll(/<script data-fusion-source="([^"]+)">([\s\S]*?)<\/script>/g)];
   assert.deepEqual(embeddedScripts.map(m=>m[1]),originalScripts,'Preserve deferred script order');

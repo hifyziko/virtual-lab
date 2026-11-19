@@ -113,7 +113,7 @@ function addFusionPages(output,web){
    return '<style data-fusion-source="'+rel+'">'+text+'</style>';
   });
   // Media stays lazy and external; srcdoc inherits the hub base URL.
-  html=html.replace(/data-video-src="([^"]+)"/g,(_,ref)=>{const url=new URL(ref,'https://bundle.invalid/'+page),rel=url.pathname.slice(1);if(url.origin!=='https://bundle.invalid'||!published.has(rel))throw Error('Unexpected fusion video: '+ref);return 'data-video-src="'+rel+'"';});
+  html=html.replace(/(data-(?:video-src|video-poster))="([^"]+)"/g,(_,attribute,ref)=>{const url=new URL(ref,'https://bundle.invalid/'+page),rel=url.pathname.slice(1);if(url.origin!=='https://bundle.invalid'||!published.has(rel))throw Error('Unexpected fusion media: '+ref);return attribute+'="'+rel+'"';});
   const scripts=[];
   html=html.replace(/<script\b[^>]*src="([^"]+)"[^>]*>\s*<\/script>/g,(_,ref)=>{
    const {rel,text}=read(ref);new vm.Script(text);
@@ -129,6 +129,7 @@ function addFusionPages(output,web){
  }
  const aliases=JSON.parse(navigation.match(/const aliases=(\{[^\n]+\});/)[1]);
  for(const id of Object.keys(aliases))output.dependencies[id]=['fusion-fu02-galerie'];
+ output.dependencies['fu08-ostrovy']=['fusion-fu11-rekonexe'];
  output.dependencies['fu05-rovnovaha']=['fusion-fu06-divertor'];
  const install='<script id="progressive-web-install">LabProgress.install('+encode(output.assets)+','+encode(output.dependencies)+');</script>';
  output.html=output.html.replace(/<script id="progressive-web-install">[\s\S]*?<\/script>/,()=>install);

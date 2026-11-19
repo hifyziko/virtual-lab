@@ -1,21 +1,24 @@
-/* Original schematic context. The torus locates the local slab approximation;
- * it is not a toroidal MHD equilibrium or a reconstruction of a discharge. */
+/* Analytic embedding of the computed local small-island amplitude, not global MHD. */
 (function(root){'use strict';
-function line(ctx,points,color,width=1){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.stroke();}
-function arrow(ctx,x,y,dx,dy,color){const len=Math.hypot(dx,dy);if(len<1)return;const ux=dx/len,uy=dy/len,head=Math.min(9,len*.4),neck=len-head;ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x-uy*1.5,y+ux*1.5);ctx.lineTo(x+ux*neck-uy*1.5,y+uy*neck+ux*1.5);ctx.lineTo(x+ux*neck-uy*4,y+uy*neck+ux*4);ctx.lineTo(x+dx,y+dy);ctx.lineTo(x+ux*neck+uy*4,y+uy*neck-ux*4);ctx.lineTo(x+ux*neck+uy*1.5,y+uy*neck-ux*1.5);ctx.lineTo(x+uy*1.5,y-ux*1.5);ctx.closePath();ctx.fill();}
-function draw(ctx,w,h){const cx=w*.37,cy=h*.37,scale=Math.min(w/620,h/440),R=130*scale,a=47*scale;
- const project=(phi,theta,r=a)=>{const x=(R+r*Math.cos(theta))*Math.cos(phi),y=(R+r*Math.cos(theta))*Math.sin(phi),z=r*Math.sin(theta);return [cx+x,cy+.40*y-.91*z];};
- // Transparent flux surfaces with clear nested poloidal sections.
- for(const radius of [a*.35,a*.65,a])for(let j=0;j<12;j++){const phi=j*Math.PI/6,pts=[];for(let i=0;i<=80;i++)pts.push(project(phi,2*Math.PI*i/80,radius));line(ctx,pts,'#b9c9df',.8);}
- for(const theta of [0,Math.PI/2,Math.PI,3*Math.PI/2]){const pts=[];for(let i=0;i<=180;i++)pts.push(project(2*Math.PI*i/180,theta));line(ctx,pts,'#7e9dc7',1);}
- const field=[];for(let i=0;i<=600;i++){const phi=i/600*4*Math.PI;field.push(project(phi,phi/2,a*.65));}line(ctx,field,'#356ac3',2.3);
- // A fixed cross-section is drawn to the right, not mistaken for a new device.
- const sx=w*.80,sy=cy,rad=63*scale;for(const f of [.3,.55,.8,1]){ctx.strokeStyle=f===.8?'#356ac3':'#b9c9df';ctx.lineWidth=f===.8?2.5:1;ctx.beginPath();ctx.arc(sx,sy,rad*f,0,2*Math.PI);ctx.stroke();}
- const src=project(0,0,a*.65);line(ctx,[src,[sx-rad-12,sy]],'#8392a3',1);const box={x:sx-14*scale,y:sy-rad*.8-10*scale,w:28*scale,h:20*scale};ctx.strokeStyle='#805193';ctx.lineWidth=2;ctx.strokeRect(box.x,box.y,box.w,box.h);
- // Magnified local region shown under the section, with opposite helical components.
- const l=w*.18,r=w*.85,t=h*.68,b=h*.89;ctx.fillStyle='#f2f6fc';ctx.fillRect(l,t,r-l,b-t);line(ctx,[[box.x,box.y+box.h],[l,t]],'#9caab8');line(ctx,[[box.x+box.w,box.y+box.h],[r,t]],'#9caab8');
- for(let j=0;j<6;j++){const yy=t+(b-t)*(j+.5)/6;line(ctx,[[l,yy],[r,yy]],'#356ac3',1.2);arrow(ctx,(l+r)/2,yy,j<3?28:-28,0,'#356ac3');}
- ctx.fillStyle='#805193';for(let x=l+12;x<r;x+=26){ctx.beginPath();ctx.arc(x,(t+b)/2,2.3,0,2*Math.PI);ctx.fill();}
+const TAU=2*Math.PI,B='#356ac3';
+function line(c,p,color,width=1){c.strokeStyle=color;c.lineWidth=width;c.beginPath();p.forEach((v,i)=>i?c.lineTo(v[0],v[1]):c.moveTo(v[0],v[1]));c.stroke();}
+function arrow(c,x,y,dx,dy,color){const n=Math.hypot(dx,dy);if(n<1)return;const u=dx/n,v=dy/n,h=Math.min(8,n*.4),s=n-h;c.fillStyle=color;c.beginPath();for(const [a,b]of [[0,-1.3],[s,-1.3],[s,-4],[n,0],[s,4],[s,1.3],[0,1.3]]){const xx=x+a*u-b*v,yy=y+a*v+b*u;if(a===0&&b===-1.3)c.moveTo(xx,yy);else c.lineTo(xx,yy);}c.closePath();c.fill();}
+function point(phi,theta,r){return [(2.6+r*Math.cos(theta))*Math.cos(phi),(2.6+r*Math.cos(theta))*Math.sin(phi),r*Math.sin(theta)];}
+function boundary(phi,u,sign,amp,a){return point(phi,(phi+Math.PI+u)/2,.65+sign*8*Math.sqrt(Math.abs(amp)/a)*Math.cos(u/2));}
+function draw(c,w,h,s,camera,opts){const scale=Math.min(w/8.2,h/6.5)*camera.zoom,cy=Math.cos(camera.yaw),sy=Math.sin(camera.yaw),cp=Math.cos(camera.pitch),sp=Math.sin(camera.pitch);
+ const project=p=>{const x=p[0]*cy-p[1]*sy,y=p[0]*sy+p[1]*cy;return [w/2+x*scale,h/2+(y*sp-p[2]*cp)*scale,y*cp+p[2]*sp];};
+ const curve=(phi,r,color,width)=>{const p=[];for(let j=0;j<=96;j++)p.push(project(point(phi,TAU*j/96,r)));line(c,p,color,width);};
+ if(opts.surfaces){for(let j=0;j<16;j++)curve(TAU*j/16,1,'#d8dfe4',.8);for(const r of [.35,.65,1])for(const theta of [0,Math.PI]){const p=[];for(let j=0;j<=120;j++)p.push(project(point(TAU*j/120,theta,r)));line(c,p,r===.65?'#9fb6d6':'#c4cfd9');}}
+ if(opts.island){const faces=[];for(let i=0;i<80;i++)for(let j=0;j<20;j++)for(const sign of [-1,1]){const ph=i/80*2*TAU,u=-Math.PI+j/20*TAU,p=[[ph,u],[ph+2*TAU/80,u],[ph+2*TAU/80,u+TAU/20],[ph,u+TAU/20]].map(([f,v])=>project(boundary(f,v,sign,s.amplitude,s.c.a)));faces.push({p,z:p.reduce((a,b)=>a+b[2],0)/4});}faces.sort((a,b)=>a.z-b.z);for(const f of faces){c.beginPath();f.p.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fillStyle='rgba(137,79,163,.12)';c.fill();}}
+ // Geometric outlines of the resonant surface and separatrix extrema (not traced field lines).
+ for(const u of [-Math.PI,0,Math.PI])for(const sign of u===0?[-1,1]:[1]){const p=[];for(let i=0;i<=320;i++)p.push(project(boundary(i/320*2*TAU,u,sign,s.amplitude,s.c.a)));line(c,p,B,u===0?1.7:1);}
+ curve(opts.slice,1,'#805193',2.4);const center=project(point(opts.slice,0,0));const rim=project(point(opts.slice,0,1));line(c,[center,rim],'#805193',1.2);
+ return {cut:rim};
 }
-root.IslandContext={draw,arrow};
-})(typeof window==='undefined'?globalThis:window);
+function section(c,w,h,s,phi,opts){const r=Math.min(w/2-18,h/2-10),cx=w/2,cy=h/2;const xy=(theta,radius)=>[cx+r*radius*Math.cos(theta),cy-r*radius*Math.sin(theta)];
+ for(const radius of opts.surfaces?[.35,.65,1]:[1]){c.beginPath();c.arc(cx,cy,r*radius,0,TAU);c.strokeStyle=radius===1?'#aebcc7':'#b9c9df';c.lineWidth=1;c.stroke();}
+ c.beginPath();c.arc(cx,cy,r*.65,0,TAU);c.strokeStyle='#80519355';c.lineWidth=r*.12;c.stroke();
+ for(let k=0;k<2;k++){const pts=[];for(const sign of [1,-1])for(let j=0;j<=100;j++){const u=-Math.PI+TAU*(sign===1?j:100-j)/100,theta=(phi+Math.PI+u)/2+k*Math.PI,rad=.65+sign*8*Math.sqrt(Math.abs(s.amplitude)/s.c.a)*Math.cos(u/2);pts.push(xy(theta,rad));}if(opts.island){c.beginPath();pts.forEach((p,i)=>i?c.lineTo(...p):c.moveTo(...p));c.closePath();c.fillStyle='#8950a34d';c.fill();}line(c,pts,B,1.8);if(opts.marks){const p=xy((phi+Math.PI)/2+k*Math.PI,.65);c.fillStyle='#263d48';c.beginPath();c.arc(...p,2.5,0,TAU);c.fill();c.font='12px Segoe UI';c.fillText('O',p[0]+5,p[1]-4);}}
+}
+root.IslandContext={draw,section,arrow,point,boundary};
+})(typeof window!=='undefined'?window:globalThis);

@@ -6,6 +6,13 @@
 .fusion-module-loading{position:absolute;inset:24px 0 auto;z-index:1}
 .fusion-topic .group-banner{background:linear-gradient(110deg,#f2eafa,#faf7fd);color:#49355c}
 .fusion-topic .badge{color:#60477e;background:#eee7f5}
+.fusion-topic[data-fusion-theme=basics]{--fusion-card-fill:#fbf7ed;--fusion-card-hover:#f8f0df;--fusion-card-line:#d9ccae;--fusion-theme-ink:#6d5732;--fusion-theme-wash:#eee3ca}
+.fusion-topic[data-fusion-theme=tokamak]{--fusion-card-fill:#f0f5fa;--fusion-card-hover:#e8f0f7;--fusion-card-line:#bfd0de;--fusion-theme-ink:#365a76;--fusion-theme-wash:#dce8f1}
+.fusion-topic[data-fusion-theme]>.group-banner{min-height:88px;background:var(--fusion-card-fill);color:var(--fusion-theme-ink)}
+.fusion-topic[data-fusion-theme] .fusion-card{background:var(--fusion-card-fill);border-color:var(--fusion-card-line)}
+.fusion-topic[data-fusion-theme] .fusion-card:hover{background:var(--fusion-card-hover);border-color:var(--fusion-theme-ink)}
+.fusion-topic[data-fusion-theme] .fusion-theme-label{color:var(--fusion-theme-ink);background:var(--fusion-theme-wash)}
+.fusion-topic[data-fusion-theme] .topic-count{color:var(--fusion-theme-ink)}
 .fusion-future{margin:24px 0;color:#69597b}
 .fusion-future>summary{cursor:pointer;font-weight:600;padding:12px 0}
 body[data-fusion-page]{--fusion-accent:#725198;--fusion-ink:#49355c;--fusion-line:#ded2e8;background:#f7f3fa;color:#233f49;font-family:'Segoe UI',Arial,sans-serif}

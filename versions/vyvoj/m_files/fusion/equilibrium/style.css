@@ -26,3 +26,42 @@
 .legend .edgeKey{color:#8d6b1c}.legend .edgeKey:before{border-top-width:5px;border-top-color:#ffd823}
 .mathOverlay>span.activeCoilName{font-weight:700;background:#fff3d9;padding:2px 4px;border-radius:2px}
 .mathOverlay>span.activeCoilOutside{display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:#fff3d9;border:1px solid #b78041;border-radius:3px;font-size:10px}
+
+.cadLoading{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:#edf2f6d9}.cadLoading[hidden]{display:none}.cadLoading>div{width:min(480px,80%);padding:24px;background:#fff;border:1px solid #b6c6d1;border-radius:10px;box-shadow:0 8px 30px #243b5326}.cadLoading span{display:block;margin-bottom:14px;font-size:17px}.cadLoading progress{width:100%;height:24px}.cadLoading button{margin-top:12px}
+
+/* Canvas backing-buffer dimensions must never size the scene or refit its camera. */
+.views{position:absolute;bottom:56px}
+.sectionView>canvas,.spaceView>canvas{display:block;min-width:0;min-height:0}
+.sceneFooter{position:absolute;left:12px;right:12px;bottom:8px;display:grid;gap:5px}
+.sceneFooter .spaceCaption{position:static;padding:0;font-size:10px;line-height:14px}
+.eqScene .sceneFooter .legend{position:static;flex-wrap:wrap;justify-content:center;gap:4px 12px;line-height:14px}
+
+.profileControl{position:absolute;top:26px;left:0;right:0;display:grid;grid-template-columns:1fr auto;gap:0 6px;align-items:center;font-size:10px;line-height:16px}
+.profileControl output{color:#16817c}.profileControl input{grid-column:1/-1;width:100%;height:15px;margin:0;accent-color:#16817c}
+.miniPlot>canvas{inset:64px 0 38px;height:calc(100% - 102px)}
+#profileMath{inset:64px 0 38px}
+.profileKeys{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:10px;font-size:9px;line-height:14px;color:#35424b}
+.profileKeys span:before{content:'';display:inline-block;width:14px;margin-right:4px;border-top:1px dashed;vertical-align:middle}
+.profileKeys .profileWall{color:#9b7044}.profileKeys .profileWall:before{border-top-style:dotted}
+
+/* Compact controls return their saved height to the flexible diagnostic plot. */
+.eqDesk aside{padding:8px;gap:5px}
+.eqDesk .controls{gap:4px}
+.eqDesk .control{line-height:16px}
+.eqDesk .control select{font-size:11px;line-height:15px;padding:3px 6px;margin-top:3px;min-height:23px}
+.eqDesk .control input[type=range]{height:15px;margin:2px 0 0}
+.eqDesk .actions button{font-size:11px;line-height:15px;padding:3px 5px}
+.eqDesk .presets button{font-size:10px;line-height:12px;padding:3px 2px}
+.eqDesk .checks{gap:3px 9px;line-height:17px}
+.eqDesk .checks button{font-size:10px;line-height:15px;padding:2px 7px}
+.eqDesk .readouts{padding-top:5px;gap:2px}
+.eqDesk .readouts>div{min-height:16px}
+.eqDesk .modelNote{line-height:1.25}
+.miniPlot{min-height:200px}
+.mathOverlay>span.sectionCallout{font-size:10px;padding:1px 2px;background:#fff}
+.legend .solKey:before{border-color:#37afd7;background:#37afd755}
+.mathOverlay>span.sectionCoilLabel{font-size:9px;line-height:14px;padding:0;background:transparent}
+.mathOverlay>span.sectionCoilLabel[data-coil-kind=cs]{line-height:11px;transform:translate(-50%,-50%) rotate(-90deg)}
+.mathOverlay>span.sectionCoilLabel[data-coil-kind=tf]{font-weight:700}
+.mathOverlay>span.sectionCoilActive{color:#75451f;background:#fff0ce;outline:1px solid #bb8848;border-radius:2px;padding:0 2px;font-weight:700}
+.scale{bottom:2px}

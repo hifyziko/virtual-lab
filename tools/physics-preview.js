@@ -4,9 +4,9 @@
   const areas = [
     {id:'electricity', title:'Elektřina a magnetismus', intro:'Od základních zákonů k elektrickému a magnetickému poli.', groups:['electromagnetism','materials'], topics:'Elektromagnetická indukce · silové účinky · materiály'},
     {id:'machines', title:'Elektrické stroje', intro:'Využití elektromagnetických principů ve strojích a pohonech.', groups:['transformer','common','induction','sync','dc','drive'], topics:'Transformátory · vinutí · motory · generátory · pohony'},
-    {id:'plasma', title:'Plazma a fúze', intro:'Prozkoumejte jádra a atomy, Coulombovu bariéru a názorné ukázky fúzních reakcí.', groups:['fusion'], topics:'Jádra a atomy · Coulombova bariéra · fúzní reakce'}
+    {id:'plasma', title:'Jaderná fúze a tokamaky', intro:'Od částic a fúzních reakcí k magnetickému udržení a tokamaku.', groups:['fusion'], topics:'Plazma a fúzní reakce · magnetické udržení · tokamak'}
   ];
-  const groupTitles = {electromagnetism:'Základní elektromagnetické principy',materials:'Materiály',transformer:'Transformátory',common:'Vinutí',induction:'Asynchronní stroje',sync:'Synchronní stroje',dc:'Stejnosměrné stroje',drive:'Elektrické pohony vozidel',fusion:'Jádra, atomy a fúzní reakce'};
+  const groupTitles = {electromagnetism:'Základní elektromagnetické principy',materials:'Materiály',transformer:'Transformátory',common:'Vinutí',induction:'Asynchronní stroje',sync:'Synchronní stroje',dc:'Stejnosměrné stroje',drive:'Elektrické pohony vozidel',fusion:'Jaderná fúze a tokamaky'};
   const areaForGroup = group => areas.find(a => a.groups.includes(group)) || areas[0];
   const esc = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function context() {

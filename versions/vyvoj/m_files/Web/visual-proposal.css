@@ -1,0 +1,83 @@
+/* Optional laboratory skin, including the inside of the teaching modules.
+   Dimensions and fitting remain owned by the original lessons. */
+html[data-visual-proposal]{
+ --lab-bg:#070e19;--lab-shell:#0c1626;--lab-panel:#0f1d2e;--lab-panel2:#102338;
+ --lab-line:#24405b;--lab-muted:#9cb6cb;--lab-white:#edf6ff;--lab-cyan:#55cbea;
+ --lab-gold:#ffbb67;--lab-violet:#c49df7;--lab-green:#65dec1;--lab-red:#f8859a;
+ --bg:var(--lab-bg);--paper:var(--lab-panel);--ink:var(--lab-white);--muted:var(--lab-muted);
+ --line:var(--lab-line);
+ --soft:var(--lab-panel2);--green:var(--lab-green);--accent:var(--lab-green);
+ --red:var(--lab-red);--blue:#7fa5ff;--a:var(--lab-red);--b:var(--lab-green);--c:#7fa5ff;
+ color-scheme:dark;background:var(--lab-bg)
+}
+html[data-visual-proposal] body{background:radial-gradient(ellipse at 70% 0,#102338 0,transparent 60%),var(--lab-bg)!important;color:var(--lab-white);font-family:Inter,system-ui,sans-serif}
+html[data-visual-proposal] .top{background:var(--lab-shell);border-color:var(--lab-line);color:var(--lab-white);box-shadow:none}
+html[data-visual-proposal] :is(a,button,input,select,summary):focus-visible{outline:2px solid var(--lab-cyan);outline-offset:3px}
+html[data-visual-proposal] :is(.topnote,.physics-switch-label,.homefooter,.wow-hero-note,.wow-scene-caption){color:var(--lab-muted)}
+html[data-visual-proposal] .laboratory-symbol{background:var(--lab-panel2);color:var(--lab-cyan)}
+html[data-visual-proposal] .wow-home{--wow-ink:var(--lab-white);color:var(--lab-white)}
+html[data-visual-proposal] .wow-home .hero{border:1px solid var(--lab-line);border-radius:16px;background:radial-gradient(ellipse at 88% 25%,#173f5544,transparent 65%),linear-gradient(120deg,var(--lab-shell),var(--lab-panel));box-shadow:0 16px 50px #0002}
+html[data-visual-proposal] .wow-home .hero h1{color:var(--lab-white);font-family:Inter,system-ui,sans-serif;font-weight:600}
+html[data-visual-proposal] .wow-home .hero h1 em{color:var(--lab-cyan);font-family:inherit;font-style:normal;font-weight:600}
+html[data-visual-proposal] .wow-home :is(.hero p,.physics-area-link p,.wow-worlds-heading p,.topic-group summary p,.card p){color:var(--lab-muted)}
+html[data-visual-proposal] .wow-home :is(.eyebrow,.hero .eyebrow,.physics-area-link>.eyebrow){color:var(--lab-cyan)}
+html[data-visual-proposal] .wow-home .hero .wow-partners::before{background:none}
+/* Logos retain their original artwork and readable backing. */
+html[data-visual-proposal] .wow-home .hero .wow-partners{background:#edf6ff;border-radius:12px;box-shadow:0 0 28px #55cbea0b}
+html[data-visual-proposal] .wow-home :is(.physics-area-link,.topic-group,.card,.discovery-toolbar){background:var(--lab-panel);border-color:var(--lab-line);border-radius:14px;box-shadow:none}
+html[data-visual-proposal] .wow-home .physics-area-link{--lab-area:var(--lab-cyan);border-top-color:var(--lab-area);background:linear-gradient(150deg,var(--lab-panel2),var(--lab-panel))}
+html[data-visual-proposal] .wow-home .physics-area-link.area-machines{--lab-area:var(--lab-violet)}
+html[data-visual-proposal] .wow-home .physics-area-link.area-plasma{--lab-area:var(--lab-gold)}
+html[data-visual-proposal] .wow-home .physics-area-link :is(h2,strong){color:var(--lab-white)}
+html[data-visual-proposal] .wow-home .physics-area-link strong{border-color:var(--lab-line);color:var(--lab-area)}
+html[data-visual-proposal] .wow-home :is(.physics-area-link,.card):hover{transform:none;border-color:var(--lab-cyan);background:var(--lab-panel2);box-shadow:0 0 24px #55cbea0b}
+html[data-visual-proposal] .wow-home .wow-machine-art{background:radial-gradient(ellipse,#25435e44,transparent 70%)}
+html[data-visual-proposal] .wow-home .topic-group{--section-line:var(--lab-line);--section-wash:var(--lab-panel);--section-head:var(--lab-panel2)}
+html[data-visual-proposal] .wow-home .topic-group summary{background:linear-gradient(110deg,var(--lab-panel2),var(--lab-panel));color:var(--lab-white)}
+html[data-visual-proposal] .wow-home :is(.topic-count,.badge,.tag){color:var(--lab-muted);background:var(--lab-shell);border-color:var(--lab-line)}
+html[data-visual-proposal] .wow-home :is(.num,.cardhead .num){background:var(--lab-panel2);color:var(--lab-cyan);border-color:var(--lab-line)}
+html[data-visual-proposal] .wow-home :is(.homefooter,.physics-area-heading,.sectionline){border-color:var(--lab-line)}
+html[data-visual-proposal] :is(button,select,input[type=number],input[type=text],input[type=search],.physics-shortcuts a,.physics-up-primary,.wow-primary){background:var(--lab-panel2);color:var(--lab-white);border-color:var(--lab-line);box-shadow:none}
+html[data-visual-proposal] :is(button,.physics-shortcuts a,.physics-up-primary,.wow-primary):hover{background:#17344b;border-color:var(--lab-cyan);color:var(--lab-white)}
+html[data-visual-proposal] input[type=range],html[data-visual-proposal] input[type=checkbox]{accent-color:var(--lab-cyan)}
+html[data-visual-proposal] .wow-home .discovery-search input{background:var(--lab-shell);border-color:var(--lab-line);color:var(--lab-white)}
+html[data-visual-proposal] :is(input::placeholder,.topic-group summary::after){color:var(--lab-muted)}
+html[data-visual-proposal] .physics-proposal{background:var(--lab-shell);border-color:var(--lab-line);color:var(--lab-muted)}
+html[data-visual-proposal] :is(.lab-tree-toggle,.lab-tree-dialog,.module-guide-dialog){background:var(--lab-shell);color:var(--lab-white);border-color:var(--lab-line);box-shadow:0 8px 30px #0003}
+html[data-visual-proposal] :is(.lab-tree-dialog a,.lab-tree-dialog h3){color:var(--lab-muted)}
+html[data-visual-proposal] .lab-tree-dialog a[aria-current=page]{color:var(--lab-white);background:var(--lab-panel2);border-color:var(--lab-cyan)}
+html[data-visual-proposal] :is(.lab-tree-dialog a:hover,.lab-tree-dialog a.lab-tree-home){background:var(--lab-panel2);color:var(--lab-white);border-color:var(--lab-line)}
+html[data-visual-proposal] .workspace::before{background:var(--lab-shell)!important;mask-image:none!important;border-radius:16px!important}
+html[data-visual-proposal] :is(.modulehead,.modulehead h1,.modulehead a.back){color:var(--lab-white)}
+html[data-visual-proposal] :is(.controls,.learning-controls,.toolbar,.metric-picker,.plothead){background:var(--lab-panel);color:var(--lab-white);border-color:var(--lab-line)}
+/* Internal surfaces, plots and results share the same laboratory palette. */
+html[data-visual-proposal] :is(.plotcard,.canvaswrap,.scene,.stage,.learning-panel,.card,.panel,.layout,.workspace,.mapPanel,aside,.graphBox,.antenna,.sceneBox,.controlbox,.periodToolbar,.motional-rod-panel,.rod-graph){color:var(--lab-white);color-scheme:dark;border-color:var(--lab-line)}
+html[data-visual-proposal] :is(.plotcard,.learning-panel,.card,.panel,.graphBox,.antenna,.controlbox,.periodToolbar,.motional-rod-panel,.rod-graph){background:var(--lab-panel)}
+html[data-visual-proposal] :is(.canvaswrap,.sceneBox,.sceneBox[data-mode],.visual,.field-svg,.sceneBox,.graphic,.sceneBox[data-mode=wave],.chart,.sceneBox[data-mode=antenna],#field,#concept){background:var(--lab-shell);border-color:var(--lab-line)}
+html[data-visual-proposal] :is(.learning-stat,.stat,.readout,.result,.rod-readings>div,.phasebox,.miniNote,.referenceNotice,.rod-status,.learning-note,.learning-equation,.rod-relations,.equation,.hfEquations,.event,.signal,.info-box){background:var(--lab-panel2);border-color:var(--lab-line);color:var(--lab-white)}
+html[data-visual-proposal] :is(.learning-panel,.card,.panel,.plotcard,.graphBox) :is(h2,h3,label,small,.readout,.formula,.formula-title,.learning-equation){color:var(--lab-white)}
+html[data-visual-proposal] :is(.legend,.plotlegend,.hint,.ticks,.note,.caption,.carddesc,.energy-caption,.energy-section-note,.rod-note,.rod-graph-title span,.energy-bottom p,.modelNote,.modelnote,.foot,.footer,footer,.desc,.descline,.tiny,.tinyLabel,.meta,.sub,.mathnote,.formula-note,.domain-caption,.learning-stats span){color:var(--lab-muted)}
+html[data-visual-proposal] :is(.learning-workspace,.workspace,.imported-workspace),html[data-visual-proposal] body>main{background:transparent!important}
+html[data-visual-proposal] :is(body>main,body>.workspace)::before{background:var(--lab-shell)!important}
+html[data-visual-proposal] .plothead{color:var(--lab-white)}
+html[data-visual-proposal] .plothead h2{color:var(--lab-white)}
+html[data-visual-proposal] .plotlegend{color:var(--lab-muted)}
+html[data-visual-proposal] :is(.controls,.learning-controls,.toolbar) :is(label,.value,.status,.status strong){color:var(--lab-white)}
+html[data-visual-proposal] :is(#module-guide-dialog,dialog,.energy-help){background:var(--lab-shell);color:var(--lab-white);border-color:var(--lab-line)}
+html[data-visual-proposal] :is(.tab,.mode,.pill,.selector button,.preset){background:var(--lab-panel2);color:var(--lab-white);border-color:var(--lab-line)}
+html[data-visual-proposal] :is(button[aria-pressed=true],.tab.active,.tab[aria-selected=true],.mode.active,.preset.active){background:#173f50;color:var(--lab-cyan);border-color:var(--lab-cyan)}
+html[data-visual-proposal] :is(.energy,.energy-equation,.heat-panel){background:#29231b;border-color:#6a502d}
+html[data-visual-proposal] .heat{color:var(--lab-gold)}
+html[data-visual-proposal] svg text:not([fill]):not([style]){fill:var(--lab-white)}
+html[data-visual-proposal] svg text :is(.katex,.pl-math){color:inherit}
+/* Scene backdrops only; copper, iron and measured field gradients stay intact. */
+html[data-visual-proposal] svg #bgField stop:first-child,html[data-visual-proposal] svg #matrix stop:first-child{stop-color:#102338}
+html[data-visual-proposal] svg #bgField stop:last-child,html[data-visual-proposal] svg #matrix stop:last-child{stop-color:#0c1626}
+html[data-visual-proposal] :is(.sceneHeading p,#sceneScale,.timeline>span){color:var(--lab-muted)}
+html[data-visual-proposal] .timeline{background:var(--lab-shell);color:var(--lab-white)}
+html[data-visual-proposal] :is(.lab-loading,.progressive-loading){background:var(--lab-panel);color:var(--lab-white)}
+.visual-proposal-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin:0 0 18px;font:13px/1.5 system-ui;color:var(--lab-muted)}
+.visual-proposal-note strong{font-weight:600;color:var(--lab-gold)}
+.visual-proposal-note a{color:var(--lab-cyan);text-underline-offset:4px}
+/* This note lives in the directory, never inside the fitted lesson. */
+@media(prefers-reduced-motion:reduce){html[data-visual-proposal] *{transition:none!important}}

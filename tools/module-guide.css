@@ -72,3 +72,6 @@ html:has(#import-guide) #module-guide-launch{display:none}
 #module-guide-dialog #module-guide-content [data-guide-equation] .katex{font-size:1.15em}
 #module-guide-dialog #module-guide-content svg .katex{font-size:1.05em;color:inherit}
 @media(max-width:600px){#module-guide-dialog #module-guide-content [data-guide-equation][data-guide-prose],#module-guide-dialog #module-guide-content div[data-guide-prose]:has(>.katex){font-size:18px;padding:12px 10px;margin:16px 0}}
+
+#module-guide-dialog[data-lesson="fu12-lawson"] #module-guide-content{font-size:19px;line-height:1.55}
+#module-guide-dialog[data-lesson="fu12-lawson"] #module-guide-content :is(.module-guide-source,.module-guide-footnote)[data-guide-prose]{font-size:17px}

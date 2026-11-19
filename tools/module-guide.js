@@ -103,6 +103,7 @@
   }
  }
  function show(content){
+  dialog.dataset.lesson=location.hash.slice(1);
   const value=current();if(!value)return;
   const child=active?.route===location.hash?active.root.ownerDocument:null;
   const host=child?.fullscreenElement?child:document;

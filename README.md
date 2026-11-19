@@ -5,6 +5,12 @@ Virtuální laboratoř fyziky — aplikace 1.0.
 
 Web: https://hifyziko.github.io/virtual-lab/
 
+## Grafické podklady
+
+[Varianty vzhledu a uložený vizuální standard](docs/grafika/README.md).
+Výchozí zůstává původní vzhled; tmavý laboratorní styl je uchovaný návrh
+pro případné budoucí přepnutí, včetně zdrojů a samostatného náhledu.
+
 ## Úpravy na novém počítači
 
 Potřebujete Node.js 24, Git a Git LFS. Nejprve přečtěte `AGENTS.md`,

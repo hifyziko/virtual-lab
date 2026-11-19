@@ -1,8 +1,10 @@
 # Magnetické přepojení a vznik ostrova — rešerše a návrh
 
+Od 19. 11. 2026 obsahuje rozcestník jediný modul **Magnetické přepojení a vznik ostrova** (`fu11-rekonexe`, zdroj `fusion/islands/vznik.html`). Dřívější odkaz `fu08-ostrovy` otevírá tento modul. Následující rešerše popisuje původní výpočetní experiment. Jeho pracovní zdroje slouží k interní referenci.
+
 ## Realizovaná první etapa — 18. listopadu 2026
 
-Modul `fu08-ostrovy` / `fusion/islands` nyní ukazuje počátek rezistivní
+Modul `fu08-ostrovy` / `fusion/islands` v původním provedení ukazoval počátek rezistivní
 ostrůvkové nestability v místní Harrisově proudové vrstvě. Starší návrh
 níže popisuje také dosud nerealizované části: tokamakový řez, prostorový
 ostrov, nelineární vývoj, NTM a ECCD. Nejde o dokončení těchto rozšíření.
@@ -233,3 +235,7 @@ proud k pozorovateli. Šipky jsou společné vyplněné siluety.
 Vizuálně prohlédnuty skutečné canvasové náhledy kontextu a detailu
 před/po přepojení. Test doplněn o průchod čtyřmi kroky a viditelnost
 kontextu, proudu a proudění. Celá HTML stránka v prohlížeči neotevřena.
+
+## Souvislý prostorový pohled (18. 11. 2026)
+Čtyři výkladové kroky nahrazeny jednou scénou: otočný torus, posuvný poloidální řez a současný místní detail přepojení. Kamera a poloha řezu nemění čas. Analytické zasazení módu 2/1 používá stejnou amplitudu jako lineární místní RMHD; nejde o globální toroidální simulaci. Radiální šířka v toru a řezu zvětšena 4×, uvedeno přímo ve scéně. Modré prostorové křivky označeny jako obrysy magnetických ploch, nikoli numericky trasované siločáry.
+Ověření: test-islands (konvergence, energetická bilance, data, KaTeX, ovládání, uzavření šroubovice), test-fusion-navigation, test-progressive, test-module-guide. Canvasové snímky ověřeny samostatně; prohlížeč automaticky neotevřen. Aktivní web obnoven build-particle-library. Bez push.
