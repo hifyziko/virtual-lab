@@ -200,6 +200,10 @@
  add('fu02-galerie','model',
   ['Přepínejte skupiny Vše, částice, jádra a atomy.','Tažením prohlížejte prostorové modely a porovnávejte jejich druhy a popisky.'],
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
+ sources.heating='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 9.3, s. 187–192, vztah (9.5), obr. 9.6–9.7 a kap. 9.3.2, s. 193.';
+ add('fu13-ohrev','heating',
+  ['Změň frekvenci vlny a sleduj polohu vrstvy vůči vyznačenému místu.','Porovnej obě kruhové složky a krokuj po čtvrtinách periody gyrace.'],
+  ['Souhlasně rotující elektrická síla může urychlovat elektron po několik oběhů.','Změnu kolmé energie jedné částice určuje práce elektrické síly.'],String.raw`P=q\mathbf E_\perp\cdot\mathbf v_\perp`,['fu03-drift','fu04-udrzeni']);
  add('fu12-lawson','lawson',
   ['Spusť chladnutí a porovnej oba průběhy. Pak pro každou hustotu nastav dobu udržení energie tak, aby výkon samoohřevu pokryl ztrátový výkon paliva, a zaznamenej mezní stav.','Opakuj měření při různých teplotách. V grafu najdi nejmenší potřebný trojný součin hustoty paliva, teploty a doby udržení energie.'],
   ['Doba udržení energie je poměr vnitřní energie paliva ke ztrátovému výkonu. Při konstantní době udržení energie zbývá po jedné takové době bez ohřevu přibližně 37 % původní energie.','Model zapálení předpokládá homogenní směs stejného počtu jader deuteria a tritia a úplné předání energie částic alfa plazmatu.'],String.raw`\tau_{\mathrm E}=\frac{U}{P_{\mathrm L}}`,['fu01-reakce','fu04-udrzeni']);

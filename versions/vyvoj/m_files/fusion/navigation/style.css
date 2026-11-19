@@ -91,3 +91,71 @@ body.fusion-gallery{margin:0;font-size:17px;line-height:1.4}
 
 /* Outer page backplate follows the host; scientific scene backgrounds stay local. */
 html:has(body[data-fusion-page]),body[data-fusion-page],body[data-fusion-page] main{background:transparent!important}
+
+/* Shared module heading, following the transformer workspace. */
+body[data-fusion-page] header[data-fusion-heading]{
+ /* Match the machine headers in screen pixels while the experiment scales. */
+ zoom:calc(1 / max(.8, var(--fusion-fit, var(--compass-fit, var(--fit, 1)))));
+ box-sizing:border-box;
+ flex:none;
+ display:flex;
+ align-items:center;
+ flex-wrap:wrap;
+ gap:4px 10px;
+ height:auto;
+ min-height:42px;
+ padding:5px 0 8px;
+ border:0;
+}
+body[data-fusion-page] header[data-fusion-heading] > .back{
+ display:inline-flex;
+ align-items:center;
+ box-sizing:border-box;
+ justify-content:center;
+ gap:7px;
+ margin:0;
+ width:88px;
+ height:34px;
+ padding:0;
+ border:1px solid #8ab6a7;
+ border-radius:6px;
+ background:#e4efea;
+ color:#006d5b;
+ font:650 14px/1 system-ui,sans-serif;
+ white-space:nowrap;
+ text-decoration:none;
+}
+body[data-fusion-page] header[data-fusion-heading] > .back span{font-size:20px;line-height:1}
+body[data-fusion-page] header[data-fusion-heading] > h1{
+ flex:1 1 175px;
+ min-width:0;
+ margin:0;
+ color:#142e3d;
+ font:700 24px/1.25 system-ui,sans-serif;
+ letter-spacing:-.6px;
+ overflow-wrap:anywhere;
+}
+body[data-fusion-page] header[data-fusion-heading] > h1::before{
+ content:attr(data-module-number);
+ display:inline-block;
+ margin:0 10px 0 2px;
+ color:#006c5e;
+ font:13px/1 ui-monospace,monospace;
+ vertical-align:middle;
+}
+body[data-fusion-page] header[data-fusion-heading] > button,
+body[data-fusion-page] header[data-fusion-heading] > details > summary{
+ min-height:34px;
+ padding:6px 12px;
+ border:1px solid #d3dedc;
+ border-radius:7px;
+ background:#fff;
+ color:#142e3d;
+ font:500 14px/1.15 'Segoe UI',Arial,sans-serif;
+ white-space:nowrap;
+}
+body[data-fusion-page] header[data-fusion-heading] > button:hover,
+body[data-fusion-page] header[data-fusion-heading] > details > summary:hover{background:#f1f7f4}
+@media(max-width:650px){
+ body[data-fusion-page] header[data-fusion-heading] > h1{font-size:18px}
+}
