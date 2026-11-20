@@ -1,5 +1,17 @@
 # Aktuální stav předání
 
+## Počítání návštěv — 20. listopadu 2026
+
+Do zdrojového rozcestníku přidán GoatCounter pro účet hifyziko. Skript se
+načítá pouze na https://hifyziko.github.io/virtual-lab/ (také index.html),
+nikoli lokálně ani v iframe. Jednotná cesta /virtual-lab/ sčítá příchody
+na web; přepínání modulů nevytváří další návštěvy. Přehled správce:
+https://hifyziko.goatcounter.com/. Aktivace na veřejném webu vyžaduje
+výslovně schválený push a úspěšné nasazení. Zpětná data nejsou k dispozici.
+Ověřeno úplné sestavení a tools/project/check.cjs; izolovaný test potvrdil
+načítání jen na veřejné adrese a jediný loader v aktuální dodávce.
+Žádná zkušební návštěva nebyla odeslána. Uživatel schválil push 20. listopadu 2026; publikace přes GitHub Pages.
+
 ## Elektřina a magnetismus — 20. listopadu 2026
 
 Ovládání je zhuštěné ve společném rozvržení oddílu. Rychlé volby využívají
