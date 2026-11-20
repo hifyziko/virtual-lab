@@ -1,5 +1,7 @@
 # Uživatelské konvence pro výukovou grafiku
 
+- Prostorové harmonické vždy značit řeckým písmenem nu (`\nu`), časové harmonické řeckým písmenem mí (`\mu`). Platí pro ovladače, grafy, rovnice i výklad; prostorový řád neznačit n.
+
 - Rozhodnutí 19. 11. 2026: ponechat původní vzhled jako výchozí. Tmavý laboratorní styl je pouze další možná varianta. Viditelné podklady, původní návrhový standard, zdroje náhledu a postup pro budoucí přepnutí jsou v [docs/grafika/README.md](docs/grafika/README.md). Uchovat je; neaktivovat ani plošně nerozšiřovat bez nového pokynu uživatele. Referenční standard v této složce není aktivní pravidlo pro redesign. Zachovat současné poměry oken.
 
 - V uživatelském výkladu a citacích knihy neuvádět „poskytnutá finální verze rukopisu“ ani obdobné poznámky o stavu či předání rukopisu. Uvádět autory, název knihy a konkrétní kapitoly/strany.

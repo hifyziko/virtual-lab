@@ -98,7 +98,7 @@
 </div></div></main>
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
-  const {experiment,heatCapacity,maxTemperature}=window.HiFyzikoMilestones;
+  const {experiment,heatCapacity,maxTemperature,createAssessment}=window.HiFyzikoMilestones;
   const form=document.getElementById('controls'), plant=document.getElementById('plant');
   const run=document.getElementById('run'), status=document.getElementById('status');
   const initial={
@@ -106,7 +106,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     cold:{temperature:2,externalHeating:120,density:.75,confinement:1.6},
     warm:{temperature:12,externalHeating:50,density:.96,confinement:2.2}
   };
-  const getInput=()=>Object.fromEntries(Array.from(new FormData(form),([key,value])=>[key, key==='heatingOff'?true:Number(value)]));
+  // FormData omits disabled controls; retain the fixed density.
+  const getInput=()=>({...Object.fromEntries(Array.from(new FormData(form),([key,value])=>[key, key==='heatingOff'?true:Number(value)])),density:Number(form.elements.density.value)});
+  let assess=createAssessment();
   const readings={
     plasma:[['fusion','Fúzní výkon','MW'],['heating','Výkon vnějšího ohřevu','MW'],['q','Zesílení Q',''],
       ['temperature','Teplota','keV']],
@@ -168,7 +170,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     indicators.forEach((el,i)=>{
       const active=current[i];
       el.classList.toggle('active',active);
-      const status=el.querySelector('small'), label=active?'Dosaženo':'Nedosaženo';
+      const status=el.querySelector('small');
+      const trial={observing:'Zkouška probíhá',failed:'Zkouška neudržena',supported:'Udrženo po dobu zkoušky',limit:'Mez modelu – bez závěru'};
+      const label=i===1 ? (active?'Ustálené vyrovnání':state.engineeringInstant?'Pouze okamžitě':'Nesplněno') :
+        i===2 ? (state.ignitionTrial==='pending' ? (active?'Podmínka nyní splněna':'Podmínka nesplněna') : trial[state.ignitionTrial]) :
+        active?'Nerovnost nyní splněna':'Nesplněno';
       if(status.textContent!==label)status.textContent=label;
       if(previousMilestones && previousMilestones[i]!==active){
         const name=el.querySelector('strong').textContent;
@@ -177,7 +183,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
     if(reached.length || lost.length){
       feedback.textContent=[
-        ...reached.map(name=>name+' dosaženo.'),
+        ...reached.map(name=>name+' – podmínka nyní splněna.'),
         ...lost.map(name=>name+' už neplatí.')
       ].join(' ');
       feedback.classList.toggle('reached',reached.length>0);
@@ -195,17 +201,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   function guide(state){
     if(atLimit)return 'Obnov výchozí stav a zkus kratší dobu udržení.';
+    if(state.engineeringInstant && state.delta < -1)return 'Dodávka je jen okamžitá: plazma chladne a uvolňuje vnitřní energii. Sleduj další vývoj.';
     if(state.heating===0){
       return state.ignition?'Samoohřev stačí na ztráty. Sleduj vývoj teploty.':'Porovnej samoohřev se ztrátami. Zkus delší dobu udržení.';
     }
     if(!state.science)return 'Zkus mírně prodloužit dobu udržení energie. Při běžícím pokusu porovnej fúzní výkon s externím ohřevem.';
+    if(state.engineeringInstant && !state.engineering)return 'Síť má kladnou bilanci. Vyčkej na ověření ustálení při pevných parametrech.';
     if(!state.engineering)return 'Zkus zvýšit účinnosti nebo snížit vlastní spotřebu. Sleduj, co se děje s bilancí sítě a co s fúzním výkonem.';
     if(!state.ignition)return 'Zkus snížit ztráty dalším prodloužením doby udržení. Porovnej je se samoohřevem.';
     return 'Vypni externí ohřev a sleduj, zda se plazma dál samo udrží.';
   }
   let energy,time,running=false,frame,last=0,lastDraw=0,atLimit=false,shaftRunning;
   function render(){
-    const state=experiment(getInput(),energy);
+    const state=assess(getInput(),energy,0,atLimit);
     const step=guide(state);
     if(nextStep.textContent!==step)nextStep.textContent=step;
     const burn=Math.min(1,state.fusion/2500),thermal=Math.min(1,state.thermal/3000);
@@ -248,6 +256,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   function setRunning(value){
     running=value;
+    if(running)form.elements.density.disabled=true;
     cancelAnimationFrame(frame);
     last=0;
     run.textContent=running?'Pauza':'Start';
@@ -265,6 +274,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       energy=Math.max(0,energy+dt*experiment(input,midpoint).delta);
       remaining-=dt;
       time+=dt;
+      assess(input,Math.min(energy,limit),dt,energy>=limit);
       if(energy>=limit){
         energy=limit;
         atLimit=true;
@@ -289,6 +299,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     for(const [key,value] of Object.entries(values))form.elements[key].value=value;
     energy=temperature*heatCapacity(values.density);
     time=0;
+    form.elements.density.disabled=false;
+    assess=createAssessment();
     previousMilestones=null;
     feedback.textContent='';
     atLimit=false;
@@ -299,10 +311,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   form.addEventListener('input',event=>{
     if(event.target.name==='initial')return;
     if(event.target.name==='density'){
-      // Adjust the particle inventory at fixed temperature (idealized fueling).
-      energy*=Number(event.target.value)/lastDensity;
+      // Only a fresh experiment may change its particle inventory.
+      if(form.elements.density.disabled){event.target.value=lastDensity;return;}
       lastDensity=Number(event.target.value);
+      energy=initial[form.elements.initial.value].temperature*heatCapacity(lastDensity);
     }
+    assess=createAssessment();
     atLimit=false;
     updateControls();
     render();
@@ -311,7 +325,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function restart(){reset();lastDensity=Number(form.elements.density.value);}
   form.elements.initial.addEventListener('change',restart);
   document.getElementById('reset-experiment').addEventListener('click',restart);
-  run.addEventListener('click',()=>{atLimit=false;setRunning(!running);render();});
+  run.addEventListener('click',()=>{if(atLimit)return;setRunning(!running);render();});
   document.getElementById('open-hint').addEventListener('click',()=>document.getElementById('hint').showModal());
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',()=>{
     shaftRunning=undefined;
@@ -324,10 +338,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 <dialog id="guide"><form method="dialog"><button>Zavřít</button></form><h2>Ovládání a výklad</h2>
 <p>Posuvník nastavuje celkový výkon předaný plazmatu. V tomto modelu připadá 60 % na NBI a 40 % na vlnový ohřev. Elektrický příkon každého systému se získá dělením jeho výkonu příslušnou účinností. Symboly ⊙ a ⊗ označují toroidální proud. Ohmický ohřev je v řezu znázorněný samostatně a do této bilance se nezapočítává.</p>
-<p>Teplota je společná pro ionty a elektrony. V homogenním objemu 830 m³ je stejný počet iontů deuteria a tritia a stejná hustota elektronů jako celková hustota iontů. Vnitřní energie <span data-tex="U=3nV k_{\mathrm B}T"></span> se mění podle <span data-tex="\dot U=P_{\mathrm H}+0{,}2P_{\mathrm F}-P_{\mathrm L}"></span>, kde <span data-tex="P_{\mathrm L}=U/\tau_{\mathrm E}"></span>. Vyšší hustotu znázorňuje více světlých bodů v levém řezu spolu s vnějším ohřevem. Pravý řez téhož plazmatu ukazuje samoohřev částicemi alfa a přenos energie neutrony do blanketu. Hustotu měníme při stejné okamžité teplotě. Tím se skokově změní množství energie v plazmatu. Vývoj paliva, popela a prostorových profilů je zjednodušen.</p>
+<p>Teplota je společná pro ionty a elektrony. V homogenním objemu 830 m³ je stejný počet iontů deuteria a tritia a stejná hustota elektronů jako celková hustota iontů. Vnitřní energie <span data-tex="U=3nV k_{\mathrm B}T"></span> se mění podle <span data-tex="\dot U=P_{\mathrm H}+0{,}2P_{\mathrm F}-P_{\mathrm L}"></span>, kde <span data-tex="P_{\mathrm L}=U/\tau_{\mathrm E}"></span>. Vyšší hustotu znázorňuje více světlých bodů v levém řezu spolu s vnějším ohřevem. Pravý řez téhož plazmatu ukazuje samoohřev částicemi alfa a přenos energie neutrony do blanketu. Hustotu nastav před startem. Po startu zůstává zamčená i při pauze; odemkne ji Reset. Změna před startem přepočítá počáteční energii ze zvolené výchozí teploty a hustoty. Vývoj paliva, popela a prostorových profilů je zjednodušen.</p>
 <p>Fúzní výkon je součin objemu, hustot obou palivových složek, Maxwellovy reaktivity a energie 17,6 MeV na reakci. Aproximace Bosch–Hale platí od 0,2 do 100 keV. Pod dolní mezí je v modelu reaktivita nulová a na horní mezi se pokus zastaví. <a href="https://doi.org/10.1088/0029-5515/32/4/i07" target="_blank" rel="noopener">Bosch a Hale, Nuclear Fusion 32 (1992), rovnice (12) a tabulka VII</a>.</p>
 <p>Oběh dostává neutronový výkon, přírůstek tepla v blanketu podle součinitele multiplikace 1,1 a ztráty plazmatu. Předpokládáme jejich úplné využití v tepelném okruhu bez prodlevy. Energie právě akumulovaná v plazmatu se do tepelného výkonu nepočítá. Čistý výkon sítě je hrubý výkon generátoru po odečtení příkonu ohřevu a ostatní vlastní spotřeby. V ustáleném stavu je změna vnitřní energie přibližně nulová. Otáčení soustrojí je názorně zpomalené.</p>
 <p>Vědecké vyrovnání nastává při <span data-tex="P_{\mathrm F}\ge P_{\mathrm H}"></span>, inženýrské při <span data-tex="P_{\mathrm{NET}}\ge 0"></span> a zapálení při <span data-tex="0{,}2P_{\mathrm F}\ge P_{\mathrm L}"></span>. Kontrolky se vyhodnocují samostatně od fúzního výkonu 1 MW. Faktor <span data-tex="Q=P_{\mathrm F}/P_{\mathrm H}"></span> má při nulovém ohřevu a kladném fúzním výkonu nekonečnou limitu.</p>
+<p>Pro ustálený stav platí <span data-tex="Q_{\mathrm B}=(1-\eta_{\mathrm{REC}})/(M_{\mathrm R}\eta_{\mathrm{REC}})"></span>, kde <span data-tex="\eta_{\mathrm{REC}}=\eta_{\mathrm{GR}}(1-f_{\mathrm{SC}})\eta_{\mathrm H}"></span>. Zde <span data-tex="M_{\mathrm R}"></span> je multiplikace blanketu, <span data-tex="\eta_{\mathrm{GR}}"></span> elektrická konverze, <span data-tex="f_{\mathrm{SC}}"></span> podíl ostatní vlastní spotřeby a <span data-tex="\eta_{\mathrm H}"></span> poměr tepla dodaného ohřevem k jeho elektrickému příkonu. Kladná dodávka při chladnutí může čerpat vnitřní energii a sama nedokazuje udržitelné vyrovnání.</p>
+<p>Časové ověření je doplněk tohoto modelu: „Ustálené vyrovnání“ vyžaduje nezáporný čistý výkon, <span data-tex="Q\ge Q_{\mathrm B}"></span> a po dobu <span data-tex="3\tau_{\mathrm E}"></span> odchylku tepelné bilance nejvýše <span data-tex="0{,}1\,\%"></span> většího z výkonů ohřevu se samoohřevem a ztrát (nejméně <span data-tex="1\,\mathrm{MW}"></span>). Malá změna energie musí vyvolávat návrat k rovnováze: <span data-tex="\partial\dot U/\partial U&lt;0"></span>. Jde o lokální tepelnou stabilitu při pevných parametrech, nikoli důkaz stability skutečného tokamaku.</p>
+<p>Zapálení stále znamená <span data-tex="P_\alpha=P_{\mathrm{ch}}\ge P_{\mathrm L}"></span>. Po vypnutí ohřevu sleduj samostatnou zkoušku: podmínka musí nepřetržitě platit po <span data-tex="5\tau_{\mathrm E}"></span>. „Udrženo po dobu zkoušky“ neznamená ustálení ani neomezenou udržitelnost. Pokles pod mez znamená neudržení; dosažení horní meze modelu nedovoluje závěr. Změna parametrů spouští nové časové ověření; pauza nepřidává čas.</p>
 <p>S. Entler a V. Kindl, <em>Jaderná fúze a fúzní elektrárny</em>, kap. 9, s. 181 a násl., kap. 12.6–12.7 a 12.9–12.11, s. 330–339, kap. 13.9–13.12, s. 366–373.</p><p>Obrazové podklady pro podélné řezy soustrojí: Ansaldo Energia, <a href="https://www.ansaldoenergia.com/fileadmin/Brochure/Review_2023/Steam_turbines_01.pdf" target="_blank" rel="noopener">Steam Turbines, řez MT10</a> a <a href="https://www.ansaldoenergia.com/fileadmin/Brochure/AnsaldoEnergia-AirCooledturbogenerators-20220731.pdf" target="_blank" rel="noopener">Air Cooled Turbogenerators</a>. Proporce a počet zobrazených stupňů jsou výukové.</p></dialog>
 <dialog id="hint"><form method="dialog"><button>Zavřít</button></form><h2>Jak dosáhnout milníků</h2>
 <ol>

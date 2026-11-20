@@ -1,5 +1,61 @@
 # Aktuální stav předání
 
+## Vinutí — kompaktní ovládání a všechny fáze, 20. listopadu 2026
+
+Následná úprava: fázory všech tří fází v Činiteli rozlohy mají společný
+osový kříž a vedle něj délky výslednic a činitel rozlohy. Pro násobky tří
+výslednice skutečně splývají; odlišeny tloušťkou a výslovným popiskem.
+Statické náhledy a výpočtové testy opět ověřeny. Přímý odkaz na Činitel
+vinutí je index.html#04-cinitel; samotný index.html vede na rozcestník.
+
+Činitel kroku: Spustit přesunuto vlevo od Tempa, uvolněná výška připadá grafům.
+Činitel rozlohy: všechny tři fáze v drážkách, samostatné fázorové součty
+(Re nahoru, Im doleva), porovnání výslednic a společné spektrum.
+Činitel rozlohy i Činitel vinutí mají pevné dvě řady grafů v dostupné výšce.
+Činitel vinutí výslovně ukazuje součin obou činitelů a násobení amplitudou
+1/nu, se zachovaným výběrem harmonických pro jednu nebo tři fáze.
+V drážkových harmonických odstraněna neúčinná volba pólových dvojic;
+graf zobrazuje jednu elektrickou periodu, Q/p=6q. Ve čtyřech upravených
+modulech jsou prostorové řády označeny nu. Obecná konvence nu/mu v AGENTS.md.
+Cíleně aktualizovány nativní moduly a CSS aktuální dodávky i její manifesty.
+Ověřeno 49 třífázových nastavení a 2352 součinů/amplitud, KaTeX, test kroku
+a navigace. Statické canvasové náhledy rozlohy prohlédnuté; skutečný
+prohlížeč nebyl kontrolován. Bez push.
+
+## Fyzikální doladění energetických milníků — 20. listopadu 2026
+
+Bosch–Hale, výkonové bilance a midpoint integrátor zachovány. Okamžitá
+kladná dodávka se odlišuje od ustáleného vyrovnání: diagnostika požaduje
+Q >= Q_B, lokálně návratovou tepelnou odezvu a relativní odchylku bilance
+do 0,1 % po 3 dobách udržení při pevných parametrech. Jde o výukové
+časové ověření modelu, nikoli obecný důkaz stability tokamaku.
+Hustota je po startu zamčená i v pauze, odemkne ji reset; před startem
+přepočítává počáteční energii ze zvolené výchozí teploty. Knižní podmínka
+zapálení zůstává okamžitá, samostatná zkouška bez ohřevu vyžaduje její
+nepřetržité plnění po 5 dobách udržení. Horní mez modelu nedává závěr.
+Změna parametrů ruší časové ověření. Testy používají skutečnou funkci
+advance ze stránky a ověřují i integrální zachování energie.
+Ověřeno: cílené testy, syntaxe a KaTeX, úplné sestavení a celá sada
+tools/project/check.cjs včetně progressive a veřejného auditu prošly.
+Aktivní dodávka aktualizována. Prohlížeč nebyl otevřen; bez push.
+
+
+## Počítání návštěv — 20. listopadu 2026
+
+Do zdrojového rozcestníku přidán GoatCounter pro účet hifyziko. Skript se
+načítá pouze na https://hifyziko.github.io/virtual-lab/ (také index.html),
+nikoli lokálně ani v iframe. Jednotná cesta /virtual-lab/ sčítá příchody
+na web; přepínání modulů nevytváří další návštěvy. Přehled správce:
+https://hifyziko.goatcounter.com/. Aktivace na veřejném webu vyžaduje
+výslovně schválený push a úspěšné nasazení. Zpětná data nejsou k dispozici.
+Ověřeno úplné sestavení a tools/project/check.cjs; izolovaný test potvrdil
+načítání jen na veřejné adrese a jediný loader v aktuální dodávce.
+Žádná zkušební návštěva nebyla odeslána.
+Na výslovný pokyn uživatele odeslán commit 9d3b2a6 do origin/main.
+Push obsahuje pouze počítadlo a jeho dokumentaci; ostatní rozpracované
+změny zůstaly místní. Publikaci dokončuje GitHub Pages.
+
+
 ## Elektřina a magnetismus — 20. listopadu 2026
 
 Ovládání je zhuštěné ve společném rozvržení oddílu. Rychlé volby využívají

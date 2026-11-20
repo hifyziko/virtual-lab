@@ -101,3 +101,93 @@ assert.equal(paths.length,new Set(paths).size);
 for(const id of ['primary-hot','primary-return','steam','exhaust','feedwater','shaft','grid','own-use','recirculation','alpha','ecrh','nbi','induced-current'])assert(paths.includes(id),id);
 assert(roots.reactor.children.length>100);
 console.log('PASS: CAD cutaway and separately addressable demonstration flows.');
+
+
+// Exercise the actual UI integrator without opening a browser.
+const {createAssessment}=require('../versions/vyvoj/m_files/fusion/milniky/model.js');
+const html=fs.readFileSync('versions/vyvoj/m_files/fusion/milniky/index.html','utf8');
+const advanceSource=html.match(/  function advance\(now\)\{[\s\S]*?\n  function updateControls/)[0].replace(/\n  function updateControls$/,'');
+function trajectory(input, temperature, duration) {
+  let deposited=0, recovered=0;
+  const context={
+    energy:temperature*heatCapacity(input.density),time:0,last:1,lastDraw:0,
+    running:true,frame:0,atLimit:false,maxTemperature:100,heatCapacity,
+    getInput:()=>input,assess:createAssessment(),render(){},
+    requestAnimationFrame(){},setRunning(value){context.running=value;},
+    experiment(i,u){
+      const s=experiment(i,u);
+      // The integrator calls endpoint then midpoint each substep.
+      if(context.midpointCall) {
+        deposited+=.02*(1.1*s.fusion+s.heating);
+        recovered+=.02*s.thermal;
+      }
+      context.midpointCall=!context.midpointCall;
+      return s;
+    },midpointCall:false
+  };
+  vm.createContext(context);
+  vm.runInContext(advanceSource,context);
+  const start=context.energy;
+  for(let k=1;k<=Math.round(duration/.02)&&context.running;k++){
+    // Exact 20 ms frames preserve the integrator's original midpoint method.
+    context.last=1;
+    context.advance(21);
+  }
+  if(!context.atLimit)assert(Math.abs(context.energy-start-(deposited-recovered))<1e-6);
+  return {...context,result:context.assess(input,context.energy,0,context.atLimit)};
+}
+const refRun=trajectory(referenceControls,5,120);
+assert(refRun.result.sustained && !refRun.result.engineering);
+const coolingInput={...controls,heatingOff:true};
+const coolAssessment=createAssessment()(coolingInput,energy);
+assert(coolAssessment.engineeringInstant && !coolAssessment.engineering);
+assert.equal(coolAssessment.ignitionTrial,'failed');
+assert(!trajectory(coolingInput,6,20).result.engineering);
+const efficientInput={...controls,confinement:1.8,grossEfficiency:50,beamEfficiency:85,waveEfficiency:85,ownShare:5};
+const stableRun=trajectory(efficientInput,5,120);
+assert(stableRun.result.engineering && stableRun.result.sustained);
+assert(stableRun.result.q>=stableRun.result.qBreak);
+// Finite observation, pause and parameter changes cannot become instant success.
+const monitor=createAssessment(), stableEnergy=stableRun.energy;
+assert(!monitor(efficientInput,stableEnergy).engineering);
+for(let i=0;i<100;i++)assert(!monitor(efficientInput,stableEnergy).engineering);
+assert(monitor(efficientInput,stableEnergy,6).engineering);
+assert(!monitor({...efficientInput,ownShare:6},stableEnergy).engineering);
+const ignitionInput={...controls,density:.96,confinement:3,heatingOff:true};
+assert(experiment(ignitionInput,12*heatCapacity(.96)).ignition);
+const trial=trajectory(ignitionInput,12,16);
+assert.equal(trial.result.ignitionTrial,'supported');
+const limitTrial=trajectory(ignitionInput,12,120);
+assert.equal(limitTrial.result.ignitionTrial,limitTrial.atLimit?'limit':'supported');
+// An exact ignition boundary is still the book's instantaneous condition.
+const ignitionEnergy=12*heatCapacity(.96);
+const pf=experiment(ignitionInput,ignitionEnergy).fusion;
+const boundary={...ignitionInput,confinement:ignitionEnergy/(.2*pf)};
+assert(experiment(boundary,ignitionEnergy).ignition);
+assert.equal(createAssessment()(boundary,ignitionEnergy).ignitionTrial,'observing');
+// Inventory changes only initialize an experiment; pause never unlocks density.
+assert(html.includes('if(running)form.elements.density.disabled=true'));
+assert(html.includes('form.elements.density.disabled=false'));
+assert(!html.includes('energy*='));
+const densityHandler=html.match(/if\(event.target.name==='density'\)\{([\s\S]*?)\n    \}/)[1];
+const densityContext={event:{target:{value:'1.1'}},form:{elements:{density:{disabled:false},initial:{value:'reference'}}},
+  initial:{reference:{temperature:5}},heatCapacity,lastDensity:.85,energy:100};
+vm.createContext(densityContext);
+vm.runInContext('(function(){'+densityHandler+'})()',densityContext);
+close(densityContext.energy,5*heatCapacity(1.1));
+densityContext.form.elements.density.disabled=true;
+densityContext.event.target.value='0.6';
+vm.runInContext('(function(){'+densityHandler+'})()',densityContext);
+close(densityContext.energy,5*heatCapacity(1.1));
+assert.equal(densityContext.event.target.value,1.1);
+console.log('PASS: actual midpoint integrator, integrated energy conservation, sustained engineering, ignition trial, pause and fixed density.');
+
+const unstable=createAssessment()(boundary,ignitionEnergy,100);
+assert(unstable.engineeringInstant && unstable.ignition && !unstable.sustained && !unstable.engineering);
+const trialMonitor=createAssessment();
+assert.equal(trialMonitor(ignitionInput,ignitionEnergy,16).ignitionTrial,'supported');
+assert.equal(trialMonitor(ignitionInput,heatCapacity(.96),.02).ignitionTrial,'failed');
+assert.equal(trialMonitor({...ignitionInput,heatingOff:false},ignitionEnergy).ignitionTrial,'pending');
+assert.equal(trialMonitor(ignitionInput,ignitionEnergy).ignitionTrial,'observing');
+assert.equal(trialMonitor(ignitionInput,100*heatCapacity(.96),0,true).ignitionTrial,'limit');
+console.log('PASS: unstable equilibrium rejected; ignition success, loss, restart and range limit distinguished.');

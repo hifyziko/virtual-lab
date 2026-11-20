@@ -76,7 +76,33 @@
       science:active && balance.science,engineering:active && balance.engineering,
       ignition:active && balance.ignition};
   }
-  const model = {defaults, presets, solve, volume, maxTemperature, reactivity, heatCapacity, experiment};
+  // Diagnostic only: do not modify the power balance or the integrator.
+  // A finite observation is evidence within this fixed-parameter 0D model,
+  // not a guarantee of tokamak operating stability.
+  function createAssessment() {
+    let signature, settled = 0, unheated = 0, failed = false;
+    return (input, energy, dt = 0, atLimit = false) => {
+      const next = JSON.stringify(Object.keys(input).sort().map(key => [key,input[key]]));
+      if (next !== signature) { signature = next; settled = 0; unheated = 0; failed = false; }
+      const s = experiment(input, energy);
+      const tolerance = .001 * Math.max(1,s.plasmaLoss,s.alpha+s.heating);
+      const h = Math.max(1e-5,energy*1e-5);
+      const slope = (experiment(input,energy+h).delta-experiment(input,Math.max(0,energy-h)).delta)/(2*h);
+      const balanced = Math.abs(s.delta) <= tolerance && slope < 0 && !atLimit;
+      settled = balanced ? settled + dt : 0;
+      const sustained = settled >= 3*input.confinement;
+      // Q_B is the book's steady-state criterion, never a transient test.
+      const engineering = sustained && s.engineering && s.q !== null && s.q >= s.qBreak;
+      if (s.heating === 0) {
+        unheated += dt;
+        if (!s.ignition) failed = true;
+      } else { unheated = 0; failed = false; }
+      const ignitionTrial = s.heating > 0 ? 'pending' : atLimit ? 'limit' : failed ? 'failed' :
+        unheated >= 5*input.confinement ? 'supported' : 'observing';
+      return {...s, engineeringInstant:s.engineering, engineering, sustained, ignitionTrial};
+    };
+  }
+  const model = {defaults, presets, solve, volume, maxTemperature, reactivity, heatCapacity, experiment, createAssessment};
   if (typeof module === 'object' && module.exports) module.exports = model;
   else root.HiFyzikoMilestones = model;
 })(globalThis);
