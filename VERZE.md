@@ -1,5 +1,18 @@
 # Pracovní projekt · verze 1.0
 
+## Převzetí aktuálního projektu — 20. listopadu 2026
+
+Na pokyn uživatele převzat soukromý archiv `virtual-lab-2026-11-20.zip`.
+Aktivní větev: `prace/predani-2026-11-20`, převzatý commit
+`c3f9924cd006b1632de03fc2c8e93344256ae0b6`. Ověřeno všech 1 793 souborů
+podle SHA-256 manifestu a obnovena historie i LFS data. Původní `main`
+zachována a aktualizována fast-forward na `567a598`. Aktuální výuka je
+v `versions/aktualni/web/index.html`; zdroje v `versions/vyvoj/m_files`.
+Soukromé podklady a chráněné zálohy zachovány. Push nebyl proveden.
+Úplné sestavení prošlo; všechny části tools/project/check.cjs ověřeny.
+Starší pomocná dodávka byla sestavením sjednocena s aktuálními zdroji.
+Vizuální ověření ostrosti při změně velikosti okna nadále zbývá podle předání.
+
 ## Jediný aktuální stav — 18. listopadu 2026
 
 Na výslovný pokyn uživatele byl převzat soukromý balíček
