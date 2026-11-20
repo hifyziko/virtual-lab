@@ -81,7 +81,7 @@ function mount(app,kind){
 }
 // Preserve the complete existing explanation under a secondary route.
 const previous=Lab.modules.get('em04-premena');
-Lab.register({...previous,id:'em04-pohybove-napeti',mount(app){previous.mount(app);const button=document.createElement('button');button.textContent='← Vodič se zátěží';button.onclick=()=>{location.hash='em04-premena';};app.querySelector('.modulehead').append(button);}});
+Lab.register({...previous,id:'em04-pohybove-napeti',mount(app){previous.mount(app);const button=document.createElement('button');button.type='button';button.textContent='← Vodič se zátěží';button.onclick=()=>{location.hash='em04-premena';};(app.querySelector('.sp-transition .learning-controls')||app.querySelector('.modulehead')).append(button);}});
 for(const [id,title,description,kind,num]of [['em05-reluktance','Reluktanční síla a moment','Železná kotvička v pevném poli jediné cívky. Proud, vratný moment, setrvačnost a tlumení.','rotor','11'],['em04-premena','Elektromechanická přeměna energie','Vodič na kolejnicích: napětí naprázdno, proud zátěží, brzdná síla a přeměna pohybové energie na teplo.','rod','09']]){
  const entry={id,title,description,group:'electromagnetism',num};Lab.catalog=Lab.catalog.filter(x=>x.id!==id);Lab.catalog.push(entry);Lab.register({...entry,mount:app=>mount(app,kind)});
 }

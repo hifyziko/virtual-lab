@@ -246,5 +246,22 @@
   ['Spusť sestavení celého tokamaku a posuvníkem prohlédni jednotlivé etapy.','Přepni na vnitřní sestavu a sleduj průlet kamerou.'],
   ['Vedle videa jsou plánované návrhové hodnoty zařízení, nikoli výsledky měření.','Přílety dílů a pohyb kamery jsou názorná stylizace; drobné konstrukční detaily jsou zjednodušené.'],null,['fu09-princip','fu06-divertor']);
  const aliases={'fu08-ostrovy':'fu11-rekonexe','fu05-rovnovaha':'fu06-divertor','fu02-jadra':'fu02-galerie','fu03-atomy':'fu02-galerie','fu04-castice':'fu02-galerie'};
- window.ModuleGuideData={sources,entries,aliases};
+ const subpages={
+  'em04-pohybove-napeti':{
+   title:'Od transformačního k pohybovému napětí',source:'energy',
+   controls:['Nastavte výchozí polohu tažením za modrý vodič nebo tlačítky předvoleb. Po zaměření scény lze úhel měnit šipkami. Rotor zůstane v nastavené poloze. Sledujte napětí při nulové rychlosti.','Postrčte rotor v obou směrech. Porovnejte příspěvky v grafu napětí a sledujte směr středního momentu.'],
+   points:['Při stojícím rotoru vzniká transformační napětí časovou změnou pole. Pohyb rotoru přidává pohybovou složku napětí.','Graf sil ukazuje okamžité síly na dva vodiče. Pravá osa patří střednímu momentu celého souměrného rotoru.'],
+   equation:String.raw`u_i=u_{i,\mathrm{tr}}+u_{i,\mathrm p}`,
+   model:{
+    title:'Vztahy a fyzikální model',
+    equation:String.raw`\psi=\widehat\psi\cos(\omega t)\cos\alpha,\quad u_{i,\mathrm{tr}}=-\left.\frac{\partial\psi}{\partial t}\right|_\alpha,\quad u_{i,\mathrm p}=-\frac{\partial\psi}{\partial\alpha}\dot\alpha`,
+    paragraphs:["Napětí patří jednomu sledovanému obvodu a jsou normalizována k amplitudě napětí stojícího obvodu. Mechanika odpovídá souměrnému jednofázovému rotoru: dvě stejná protiběžná pole mají v klidu opačné, stejně velké střední momenty. Druhý rotorový obvod není zakreslen.",
+     "Pravý graf zobrazuje vodorovné složky sil (kladně doprava), normalizované k součinu referenčního proudu, délky a indukce; jejich stupnice je vlevo. Střední moment celého rotoru má samostatnou fialovou stupnici vpravo. Síly na dvojici vodičů nelze sečíst a zaměnit za moment. Fialový oblouk kolem středu ukazuje směr výsledného středního momentu celého rotoru; jeho délka je pro názornost zvýrazněna. Nejde o trvalé mechanické postrkování. Růžové a oranžové šipky ukazují okamžité síly na vodiče sledovaného obvodu od idealizovaného vnějšího pole; nejsou to momenty celého rotoru. Nulový výsledný střední moment neznamená nulový průměr každé jednotlivé síly.",
+     "Samostatný nesouměrný závit může mít i ustavující moment; nulový rozběhový moment zde platí pro souměrný rotor. Po postrčení se skluzy liší a motor se rozbíhá ve zvoleném směru. Model středního momentu má poměr odporu a reaktance 0,2, ilustrační setrvačnost a malé tření. Elektrické zapínací přechody nejsou zahrnuty.",
+     "Siločáry jsou ilustrací Biotova–Savartova pole dlouhých přímých vodičů bez železa; výpočet napětí používá idealizované harmonické vnější pole. Graf zachovává posledních 24 sekund modelového času. Čárka označuje zásah do pohybu."]
+   },
+   related:['em04-premena','em01-indukovane-napeti']
+  }
+ };
+ window.ModuleGuideData={sources,entries,aliases,subpages};
 })();

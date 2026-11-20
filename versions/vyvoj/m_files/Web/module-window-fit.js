@@ -404,7 +404,7 @@
       // Native and embedded lessons share the same unscaled navigation row.
       // The lesson remains a direct app child so its renderers and CSS keep working.
       native.style.zoom='1';
-      const fill=winding||native.classList.contains('energy-workspace')||native.classList.contains('dc-workspace')||!!native.querySelector(':scope > .gridplots');
+      const fill=winding||['energy-workspace','dc-workspace','sp-transition'].some(name=>native.classList.contains(name))||!!native.querySelector(':scope > .gridplots');
       native.toggleAttribute('data-native-fill',fill);
       const naturalWidth=Math.max(1,native.offsetWidth);
       const style=getComputedStyle(native);

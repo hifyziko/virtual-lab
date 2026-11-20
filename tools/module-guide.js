@@ -17,6 +17,8 @@
  document.body.append(launch,dialog);
  function current(){
   const id=location.hash.slice(1),entry=window.Lab?.catalog.find(m=>m.id===id);
+  const subpage=data.subpages?.[id];
+  if(subpage)return {module:{title:subpage.title},guide:subpage};
   const canonical=data.aliases[id]||id;
   // Historical gallery routes are registered but deliberately absent from the catalog.
   const module=entry||(data.aliases[id]&&window.Lab?.catalog.find(m=>m.id===canonical));
@@ -38,6 +40,7 @@
   'mag04-virive-proudy':'main > .sources,.controls .button-note',
   'hf-skin-proximity':'main > .modelNotes,#hfMatrix > .matrix-note',
   'em04-premena':'.energy-grid .energy-caption:not([id]),.energy-section-note',
+  'em04-pohybove-napeti':'.sp-rod-demo p,.sp-cause p',
   'em05-reluktance':'.energy-grid .energy-caption:not([id]),.energy-bottom > p'
  };
  let active=null;
@@ -133,7 +136,9 @@
   dialog.querySelector('#module-guide-content').innerHTML=
    '<section><h3>Ovládání a pokusy</h3><ol>'+guide.controls.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol></section>'+
    '<section><h3>Co si odnést</h3><ul>'+guide.points.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>'+
-   (guide.equation?'<div class="module-guide-equation" data-tex="'+esc(guide.equation)+'"></div>':'')+'</section>';
+   (guide.equation?'<div class="module-guide-equation" data-tex="'+esc(guide.equation)+'"></div>':'')+'</section>'+
+   (guide.model?'<section><h3>'+esc(guide.model.title)+'</h3><div class="module-guide-equation" data-tex="'+esc(guide.model.equation)+'"></div>'+
+    guide.model.paragraphs.map(s=>'<p>'+esc(s)+'</p>').join('')+'</section>':'');
   appendTheory(dialog.querySelector('#module-guide-content'));
   if(typeof content==='string')dialog.querySelector('#module-guide-content').innerHTML=content;
   else{

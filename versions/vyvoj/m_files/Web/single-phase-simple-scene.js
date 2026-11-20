@@ -11,5 +11,6 @@ window.SinglePhaseSimpleScene=function({phase,angle,speed,currentX,currentY,show
  h+='<circle cx="350" cy="235" r="3" fill="#8a9caa"/>';
  if(Math.abs(meanTorque)>.0005){const sign=Math.sign(meanTorque),span=.85+3.5*Math.min(1,Math.abs(meanTorque)/.1),rad=70,start=.7,end=start-sign*span,sx=cx+rad*Math.cos(start),sy=cy+rad*Math.sin(start),ex=cx+rad*Math.cos(end),ey=cy+rad*Math.sin(end);h+='<defs><marker id="sp-moment-tip" markerUnits="userSpaceOnUse" markerWidth="19" markerHeight="18" refX="1" refY="9" orient="auto"><path d="M0 1L18 9L0 17Z" fill="#7656ae"/></marker></defs><g data-mean-torque data-value="'+meanTorque+'"><path data-torque-shaft d="M'+sx+' '+sy+'A'+rad+' '+rad+' 0 '+(span>Math.PI?1:0)+' '+(sign>0?0:1)+' '+ex+' '+ey+'" fill="none" stroke="#7656ae" stroke-width="5" stroke-linecap="butt" marker-end="url(#sp-moment-tip)"/></g>';
  }
+ for(const {x,y} of wires.slice(2))h+=`<circle data-rotor-handle cx="${x}" cy="${y}" r="26" fill="transparent"/>`;
  return h;
 };
