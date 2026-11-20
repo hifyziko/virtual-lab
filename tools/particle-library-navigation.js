@@ -11,7 +11,8 @@
   {id:'fu10-compass',group:'fusion',topic:'tokamak',num:'05',title:'COMPASS-U',description:'Sestavení celého tokamaku, průlet vnitřní sestavou a plánované parametry pražského zařízení.',page:'compass-u/index.html',kind:'Animace a parametry'},
   {id:'fu13-ohrev',group:'fusion',topic:'tokamak',num:'06',title:'Vlnový ohřev plazmatu',description:'Nalaď mikrovlnný svazek na rezonanci a sleduj přenos energie do gyrace elektronu.',page:'fuze-ohrev/index.html',kind:'Interaktivní experiment'},
   {id:'fu12-lawson',group:'fusion',topic:'basics',num:'04',title:'Lawsonovo kritérium',description:'Změř dobu chladnutí plazmatu a zjisti, jak hustota a teplota paliva ovlivňují podmínku zapálení.',page:'fuze-lawson/index.html',kind:'Interaktivní experiment'},
-  {id:'fu02-galerie',group:'fusion',topic:'basics',num:'05',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
+  {id:'fu14-milniky',group:'fusion',topic:'basics',num:'05',title:'Energetické milníky fúze',description:'Měň bilanci plazmatu a účinnosti elektrárny. Sleduj, kdy se tok elektřiny v síti obrátí.',page:'fuze-milniky/index.html',kind:'Interaktivní experiment'},
+  {id:'fu02-galerie',group:'fusion',topic:'basics',num:'06',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
  ];
  const topics=[
   {id:'basics',title:'Základy plazmatu a fúze',label:'Základy',description:'Částice, plazma, pohyb v poli a principy fúzních reakcí.'},

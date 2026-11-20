@@ -1,5 +1,15 @@
 # Aktuální stav předání
 
+## Energetické milníky fúze — 20. listopadu 2026
+
+Prototyp první etapy je pod #fu14-milniky, v tématu Základy plazmatu a fúze
+hned za Lawsonovým kritériem. Prostorový SVG řez inspirovaný ITER, toky výkonu,
+předvolby, vypnutí ohřevu a samostatné indikátory jsou funkční. Bilanční model
+předepisuje fúzní výkon a ztráty. Mimo rovnováhu ukazuje okamžitou bilanci
+s idealizovaným zachycením tepla, bez časového vývoje teploty. Indukční rozběh
+je názorný. Pro výchozí parametry a ztráty 200 MW jsou meze 166,67 MW, 424,11 MW
+a 1 000 MW. Druhá etapa čeká na schválení grafiky a ovládání.
+
 ## Převzetí aktuálního projektu — 20. listopadu 2026
 
 Na pokyn uživatele převzat soukromý archiv `virtual-lab-2026-11-20.zip`.

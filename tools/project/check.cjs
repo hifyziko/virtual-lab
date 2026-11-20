@@ -25,6 +25,7 @@ const commands=[
  ['tools/test-tokamak-equilibrium.cjs'],
  ['tools/test-iter-blanket.cjs'],
  ['tools/test-fusion-navigation.cjs'],
+ ['tools/test-fusion-milestones.cjs'],
  ['tools/test-compass-u.cjs'],
  ['tools/test-fusion-controls.cjs'],
  ['tools/test-fusion-render-lifecycle.cjs'],

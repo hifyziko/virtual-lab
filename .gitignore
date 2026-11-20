@@ -72,6 +72,7 @@
 !/tools/test-fusion-controls.cjs
 !/tools/test-fusion-dt.cjs
 !/tools/test-fusion-field-worker.cjs
+!/tools/test-fusion-milestones.cjs
 !/tools/test-fusion-navigation.cjs
 !/tools/test-fusion-reactions.cjs
 !/tools/test-fusion-render-lifecycle.cjs
@@ -565,6 +566,11 @@
 !/versions/vyvoj/m_files/fusion/islands/vznik.html
 !/versions/vyvoj/m_files/fusion/islands/vznik.js
 !/versions/vyvoj/m_files/fusion/lawson/index.html
+!/versions/vyvoj/m_files/fusion/milniky/app.js
+!/versions/vyvoj/m_files/fusion/milniky/index.html
+!/versions/vyvoj/m_files/fusion/milniky/model.js
+!/versions/vyvoj/m_files/fusion/milniky/scene.js
+!/versions/vyvoj/m_files/fusion/milniky/style.css
 !/versions/vyvoj/m_files/fusion/navigation/page.js
 !/versions/vyvoj/m_files/fusion/navigation/style.css
 !/versions/vyvoj/m_files/fusion/particle-list/CTETE.txt

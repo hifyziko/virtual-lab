@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HiFyziko Virtual Lab | Energetické milníky fúze</title>
+<link rel="stylesheet" href="../particles/vendor/katex.css">
+<link rel="stylesheet" href="../navigation/style.css">
+<link rel="stylesheet" href="style.css">
+<script defer src="../particles/vendor/katex.js"></script>
+<script defer src="model.js"></script>
+<script defer src="scene.js"></script>
+<script defer src="app.js"></script>
+<script defer src="../navigation/page.js"></script>
+</head>
+<body data-fusion-page="fu14-milniky">
+<main>
+<header data-fusion-heading><a class="back" href="../index.html#group-area-plasma" target="_top" aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a><h1 data-module-number="05">Energetické milníky fúze</h1><button id="guide-open">Ovládání a výklad</button><button data-fusion-full>Celá obrazovka</button><span class="version">Verze 1.0</span></header>
+<section class="milestones" aria-label="Energetické milníky">
+<button data-milestone="science" aria-pressed="false"><i></i><strong>Vědecké vyrovnání</strong><span data-tex="P_{\mathrm F}\ge P_{\mathrm H}"></span><small></small></button>
+<button data-milestone="engineering" aria-pressed="false"><i></i><strong>Inženýrské vyrovnání</strong><span data-tex="P_{\mathrm{NET}}\ge0"></span><small></small></button>
+<button data-milestone="ignition" aria-pressed="false"><i></i><strong>Zapálení plazmatu</strong><span data-tex="P_{\mathrm{ch}}\ge P_{\mathrm L}"></span><small></small></button>
+</section>
+<div class="workspace">
+<section class="experiment" aria-label="Modelová fúzní elektrárna">
+<div class="scene-top"><strong>Modelová fúzní elektrárna</strong><span id="regime"></span></div>
+<div class="drawing">
+<svg id="plant" viewBox="0 0 1040 454" role="img" aria-labelledby="plant-title">
+<title id="plant-title">Řez tokamakem, ohřev, tepelný okruh, turbína, generátor a elektrická síť</title>
+<defs>
+ <linearGradient id="steel" x2="0" y2="1"><stop stop-color="#f7fbfc"/><stop offset=".27" stop-color="#c8d8df"/><stop offset=".53" stop-color="#91a9b7"/><stop offset=".76" stop-color="#c9d6dc"/><stop offset="1" stop-color="#688292"/></linearGradient>
+ <linearGradient id="bronze" x2="0" y2="1"><stop stop-color="#f6dda8"/><stop offset=".55" stop-color="#c18c59"/><stop offset="1" stop-color="#79523f"/></linearGradient>
+ <linearGradient id="motor" x2="0" y2="1"><stop stop-color="#a9c0cf"/><stop offset=".52" stop-color="#5a8096"/><stop offset="1" stop-color="#36576d"/></linearGradient>
+ <radialGradient id="ground"><stop stop-color="#456171" stop-opacity=".23"/><stop offset="1" stop-color="#456171" stop-opacity="0"/></radialGradient>
+ <pattern id="floor" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M0 32V0H32" fill="none" stroke="#dce6e9" stroke-width="1"/></pattern>
+</defs>
+<path d="M34 346H995L1031 405H3Z" fill="url(#floor)" opacity=".73"/>
+<g fill="url(#ground)"><ellipse cx="289" cy="349" rx="190" ry="35"/><ellipse cx="650" cy="323" rx="170" ry="27"/><ellipse cx="866" cy="320" rx="144" ry="25"/></g>
+<g id="rear-flows"></g>
+<g id="tokamak"></g>
+<g stroke="#617f8d" stroke-width="1.5" stroke-linejoin="round">
+ <g transform="translate(62 169)">
+  <path d="M-34 16H45V28H-34Z" fill="#bccbd2"/><path d="M-33 -10L-19 -21H25L37 -10V14L25 22H-19L-33 14Z" fill="url(#steel)"/>
+  <ellipse cx="35" cy="2" rx="9" ry="13" fill="#466272"/><path d="M31 -6H54V10H31Z" fill="url(#bronze)"/><path d="M-21 -18V17M-9 -20V18M17 -19V17" fill="none"/>
+ </g>
+ <g transform="translate(62 272)">
+  <path d="M-34 17H45V28H-34Z" fill="#bccbd2"/><path d="M-29 -12L-12 -24H19L37 -12V16H-29Z" fill="url(#motor)"/>
+  <ellipse cx="-1" cy="-13" rx="17" ry="8" fill="#dde8ed"/><path d="M-18 -13V2C-18 13 16 13 16 2V-13" fill="url(#steel)"/>
+  <path d="M20 -3H57V9H20Z" fill="#88b1b6"/>
+ </g>
+ <g transform="translate(532 221)">
+  <path d="M-29 58H30V66H-29Z" fill="#a8bbc4"/><path d="M-20 40V59M20 40V59" stroke-width="8"/>
+  <path d="M-35 -53C-31 -75 31 -75 35 -53V45C18 62 -22 62 -35 45Z" fill="url(#steel)"/>
+  <ellipse cy="-52" rx="35" ry="16" fill="#eaf0f3"/><path d="M-22 -29H24V33H-22Z" fill="#eef3f5"/>
+  <path d="M-14 24V-21H-5V23H4V-21H13V23H20V-21" fill="none" stroke="#bd7140" stroke-width="3"/>
+  <path d="M-36 34Q0 50 36 34" fill="none"/><path d="M-8 -71V-82H8V-71" fill="url(#steel)"/>
+ </g>
+ <g transform="translate(677 222)">
+  <path d="M-57 76H61L70 84H-65Z" fill="#a4b9c5"/><path d="M-48 19V77M48 33V77" stroke-width="10"/>
+  <path d="M-48 -32L52 -56L66 -38V46L52 53L-48 29Z" fill="url(#steel)"/>
+  <path d="M-45 -16L53 -35V29L-45 14Z" fill="#405868"/><path d="M-52 0H86" stroke="#dce7ec" stroke-width="6"/>
+  <g fill="url(#steel)"><ellipse cx="-29" rx="6" ry="14"/><ellipse cx="-9" rx="8" ry="18"/><ellipse cx="13" rx="9" ry="22"/><ellipse cx="35" rx="11" ry="26"/></g>
+  <path d="M-50 27L50 53H63" fill="none"/><path d="M2 53V65H37V49" fill="url(#steel)"/>
+ </g>
+ <g transform="translate(800 223)">
+  <path d="M-39 60H53L64 70H-47Z" fill="#a4b9c5"/><path d="M-29 27V63M30 27V63" stroke-width="10"/>
+  <path d="M-34 -32H42V33H-34Z" fill="url(#motor)"/><ellipse cx="-34" rx="14" ry="33" fill="url(#steel)"/>
+  <ellipse cx="42" rx="16" ry="33" fill="url(#steel)"/><ellipse cx="42" rx="11" ry="26" fill="#435d70"/>
+  <path d="M-19 -26H27M-19 -18H25M-19 18H25M-19 26H27" stroke="#afc8d4"/>
+  <path d="M-47 -3H-26V4H-47Z" fill="#c5d4dd"/>
+  <path d="M-9 -32V-47H22V-33Z" fill="url(#steel)"/>
+  <path d="M39 -19L32 3H41L37 20L52 -4H43L47 -19Z" stroke="none" fill="#e8d5a7"/>
+ </g>
+ <g transform="translate(962 227)" fill="none" stroke-width="2">
+  <path d="M-26 58L-7 -41L0 -54L8 -41L26 58M-21 37H21M-16 13H16M-11 -15H11M-25 56L21 37L-15 13L11 -15L-7 -41M25 56L-21 37L15 13L-11 -15L7 -41"/>
+  <path d="M-37 -26H37L10 -39H-10ZM-44 0H44L15 -13H-15Z"/><path d="M-35 -26V-15M35 -26V-15M-41 0V11M41 0V11" stroke="#91a9b7" stroke-width="4"/>
+ </g>
+ <g transform="translate(876 374)">
+  <path d="M-34 -7L-23 -17H23L34 -7V17H-34Z" fill="url(#steel)"/>
+  <path d="M-26 1H-14M-26 7H-14M-7 1H5M-7 7H5M12 1H24M12 7H24"/>
+ </g>
+</g>
+<g id="front-flows"></g>
+<g id="plant-labels" class="plant-labels">
+ <text x="19" y="134">Injektor NBI</text><text x="19" y="241">Vlnový ohřev</text>
+ <text x="175" y="42">Centrální solenoid</text><path d="M242 50L268 92"/>
+ <text x="349" y="48">Toroidální cívky</text><path d="M371 56L365 106"/>
+ <text x="160" y="361">Tokamak v řezu</text>
+ <text x="365" y="139">Plazma D–T</text><path d="M398 146L380 187"/>
+ <text x="399" y="184">Neutrony</text><path d="M425 189L403 212"/>
+ <text x="375" y="299" class="minor">Teplo z plazmatu</text><path d="M419 286L414 264"/>
+ <text x="555" y="102">Pára</text>
+ <text x="339" y="361">Blanket</text><path d="M361 348L350 284"/>
+ <text x="205" y="319">Divertor</text><path d="M260 315L293 288"/>
+ <text x="488" y="308">Výměník</text><text x="646" y="319">Turbína</text><text x="764" y="319">Generátor</text>
+ <text x="962" y="151" text-anchor="middle">Elektrická síť</text>
+ <text x="876" y="410" text-anchor="middle">Ostatní spotřeba</text>
+ <text x="420" y="418">Elektrický příkon ohřevu</text>
+ <text x="702" y="362">Odpadní teplo</text>
+</g>
+</svg>
+</div>
+<p class="compact-key">NBI a vlnový ohřev → tokamak → výměník → turbína → generátor ↔ síť</p>
+<div class="ledger" aria-label="Výkony v energetických tocích">
+<div class="tag heat" data-tag="thermal">Teplo pro výměník <b id="thermal"></b></div>
+<div class="tag electric" data-tag="recirc">Příkon ohřevu <b id="recirc"></b></div>
+<div class="tag alpha" data-tag="alpha">Samoohřev <b id="alpha"></b></div>
+<div class="tag electric" data-tag="grid"><span id="grid-label"></span> <b id="grid"></b></div>
+</div>
+<p class="comment" id="comment" aria-live="polite"></p>
+</section>
+<aside class="controls" aria-label="Ovládání experimentu">
+<label for="scenario">Scénář</label>
+<select id="scenario"><option value="low">Fúze se ztrátou</option><option value="science">Vědecké vyrovnání</option><option value="engineering">Elektřina bez zapálení</option><option value="ignition">Mez zapálení</option><option value="off">Bez výkonu</option><option value="custom" disabled>Vlastní nastavení</option></select>
+<div class="sliders" id="plasma-controls"></div>
+<button id="heating" aria-pressed="false">Vypnout vnější ohřev</button>
+<details><summary>Způsoby ohřevu</summary>
+<div class="sliders" id="heating-controls"></div>
+<div class="readout" id="heating-readout"></div>
+<button id="ohmic" aria-pressed="false">Ukázat indukční rozběh</button>
+<p id="ohmic-note" hidden>Solenoid indukuje proud v plazmatu. Jeho elektrický odpor mění energii proudu na teplo. Změna magnetického toku je omezená a při vysoké teplotě odpor klesá. V této bilanci je rozběh pouze názorný.</p>
+</details>
+<details><summary>Technologie elektrárny</summary>
+<div class="sliders" id="tech-controls"></div>
+<div class="readout" id="tech-readout"></div>
+</details>
+<button class="reset" id="reset">Obnovit výchozí nastavení</button>
+</aside>
+</div>
+</main>
+<dialog id="guide" aria-labelledby="guide-title">
+<div class="guide-head"><h2 id="guide-title">Ovládání a výklad</h2><form method="dialog"><button>Zavřít</button></form></div>
+<p>Zvyšuj fúzní výkon při stejných ztrátách plazmatu. Kliknutím na milník zvýrazni jeho toky. Zkus nejprve poslat výkon do sítě a pak vypni vnější ohřev. Porovnej bilanci plazmatu s bilancí elektrárny.</p>
+<p>Oranžová sleduje neutrony a teplo, modrá elektřinu, fialová samoohřev, jantarová neutrální svazek NBI, tyrkysová vlnový ohřev a šedá teplo odvedené mimo pracovní oběh. Šířka tras roste s výkonem. Šipky ukazují směr přenosu, jejich rychlost neměří rychlost částic ani chladiva.</p>
+<p>Základ zapálení si můžeš vyzkoušet v <a href="../index.html#fu12-lawson" target="_top">Lawsonově kritériu</a>.</p>
+<details><summary>Rozšířený výklad a rovnice</summary>
+<div id="equations"></div>
+</details>
+<p class="sources">S. Entler, V. Kindl, <cite>Jaderná fúze a fúzní elektrárny</cite> <span id="book-pages"></span>. Tvar modelového tokamaku vychází z podkladů ITER Organization. ITER je experimentální zařízení bez výroby elektřiny pro síť. <a href="https://www.iter.org/machine/vacuum-vessel" target="_blank" rel="noopener">Vakuová nádoba</a> · <a href="https://www.iter.org/machine/blanket" target="_blank" rel="noopener">Blanket</a> · <a href="https://www.iter.org/machine/supporting-systems/external-heating-systems" target="_blank" rel="noopener">Systémy ohřevu</a> · <a href="https://www.iter.org/sites/default/files/media/a1_iter_fusion_machinev2.pdf" target="_blank" rel="noopener">Řez strojem</a></p>
+</dialog>
+</body>
+</html>
