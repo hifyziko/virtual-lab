@@ -21,11 +21,11 @@ for(const id of ['am01-princip','sm01-princip','sm02-schema','sm03-torque','sm04
    assert.equal(parseFloat(frame.style.width),extent);
    const scale=+frame.style.transform.match(/scale\(([^)]+)/)[1];enlarged ||= scale>1;
    assert(extent*scale<=w-44+.01,'no right clipping');
-   assert(1000*scale+heading.offsetHeight+12<=h-80-4+.1,'navigation, lesson and credit fit vertically');
-   assert(Math.abs(parseFloat(heading.style.width)-extent*scale)<.01,'heading follows complete lesson width');
+   assert((1000+heading.offsetHeight+12)*scale<=h-80-4+.1,'navigation, lesson and credit fit vertically');
+   assert(Math.abs(parseFloat(heading.style.width)*Number(heading.style.zoom)-extent*scale)<.01,'heading follows complete lesson width');
    assert(Math.abs(parseFloat(stage.style.height)-1000*scale)<.01,'stage reserves only the displayed height');
    assert.equal(frame.style.position,'absolute','unscaled iframe does not enlarge page layout');
-   const ideal=Math.min((w-44)/extent,(h-80-4-heading.offsetHeight-12)/1000);
+   const ideal=Math.min((w-44)/extent,(h-80-4)/(1000+heading.offsetHeight+12));
    assert(Math.abs(scale-ideal)<.0002,'scale uses the actual lesson width and wrapped heading height');
    const snapshot=JSON.stringify([frame.style,heading.style]);if(prior)assert.equal(snapshot,prior,'repeated fitting stable');prior=snapshot;count++;
   }

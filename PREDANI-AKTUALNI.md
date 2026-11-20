@@ -4125,3 +4125,11 @@ jsou ve výkladu. Aktuální místní výstup je ve versions/aktualni/web.
 Kontroly načítání, škálování a veřejného seznamu souborů prošly.
 Plošná vizuální kontrola v prohlížeči zůstává otevřená.
 GitHub Pages se sestaví po odeslání.
+
+### Škálování tlačítek v hlavičce
+
+Hlavička dříve přebírala pouze výslednou šířku modulu. Nyní se měří
+v návrhové šířce a celá se škáluje společně s obsahem, včetně tlačítek
+a textu. Testy měřítka, synchronních modulů a načítání prošly.
+Vizuální ověření při 1920 × 1080 a 125 % zbývá.
+Balení na druhý počítač zůstává pozastavené. Tato oprava je součástí odeslání na origin/main.

@@ -7,16 +7,16 @@
   function boundedScale(width,height,available,designWidth=DESIGN_WIDTH){
     return Math.max(.0001,Math.floor(Math.min(width/designWidth,Math.max(1,available)/height)*10000)/10000);
   }
+  function measureHeading(heading,width){
+    if(!heading)return 0;
+    heading.style.width=width+'px';
+    const style=getComputedStyle(heading);
+    return heading.offsetHeight+(parseFloat(style.marginTop)||0)+(parseFloat(style.marginBottom)||0);
+  }
   function layoutScale(width,height,available,heading,designWidth=DESIGN_WIDTH,headingWidth=designWidth){
-    let scale=boundedScale(width,height,available,designWidth),headingHeight=0;
-    for(let pass=0;pass<4;pass++){
-      if(heading){
-        heading.style.width=(headingWidth*scale)+'px';
-        const hs=getComputedStyle(heading);
-        headingHeight=heading.offsetHeight+(parseFloat(hs.marginTop)||0)+(parseFloat(hs.marginBottom)||0);
-      }
-      scale=boundedScale(width,height,available-headingHeight,designWidth);
-    }
+    const headingHeight=measureHeading(heading,headingWidth);
+    const scale=boundedScale(width,height+headingHeight,available,designWidth);
+    if(heading)heading.style.zoom=String(scale);
     return {scale,headingHeight};
   }
   const lifted=new WeakMap();
@@ -162,10 +162,8 @@
       // it from the host, never from the previously fitted child viewport.
       const heading=frameHost(frame).querySelector(':scope > .modulehead');
       if(heading){
-        heading.style.width=available+'px';
-        const style=getComputedStyle(heading);
-        const head=heading.offsetHeight+(parseFloat(style.marginTop)||0)+(parseFloat(style.marginBottom)||0);
-        height=Math.max(1000,Math.min(1400,Math.floor((availableHeight(heading)-head)/(available/DESIGN_WIDTH))));
+        const head=measureHeading(heading,width)*available/width;
+        height=Math.max(1000,Math.min(1400,Math.floor((availableHeight(heading)-head)/(available/width))));
       }
     }
     const root=doc.documentElement.style;
@@ -297,7 +295,8 @@
         for(const property of ['transform','left','position'])heading.style.removeProperty(property);
         heading.style.marginLeft='auto';
         heading.style.marginRight='auto';
-        heading.style.width=(fittedWidth*zoom)+'px';
+        heading.style.width=fittedWidth+'px';
+        heading.style.zoom=String(zoom);
       }
     }else{
       // CSS transforms do not resize the child viewport, unlike CSS zoom.
@@ -316,7 +315,8 @@
         heading.style.transform='translateX(-50%)';
         heading.style.marginLeft='0px';
         heading.style.marginRight='0px';
-        const headingWidth=(fittedWidth*zoom)+'px';
+        const headingWidth=fittedWidth+'px';
+        heading.style.zoom=String(zoom);
         if(heading.style.width!==headingWidth)heading.style.width=headingWidth;
       }
 
@@ -411,9 +411,7 @@
       const inset=(parseFloat(style.paddingLeft)||0)+(parseFloat(style.paddingRight)||0);
       if(fill){
         const widthScale=width/naturalWidth;
-        heading.style.width=((naturalWidth-inset)*widthScale)+'px';
-        const hs=getComputedStyle(heading);
-        const head=heading.offsetHeight+(parseFloat(hs.marginTop)||0)+(parseFloat(hs.marginBottom)||0);
+        const head=measureHeading(heading,naturalWidth-inset)*widthScale;
         const logicalHeight=Math.max(DESIGN_HEIGHT,Math.min(1400,Math.floor((availableHeight(heading)-head)/widthScale)));
         native.style.setProperty('height',logicalHeight+'px','important');
         native.style.setProperty('--native-viewport-height',logicalHeight+'px');
@@ -421,22 +419,21 @@
       const naturalHeight=Math.max(native.offsetHeight,native.scrollHeight);
       const result=layoutScale(width,naturalHeight,availableHeight(heading),heading,naturalWidth,naturalWidth-inset);
       native.style.zoom=String(result.scale);
-      heading.style.width=((naturalWidth-inset)*result.scale)+'px';
       heading.style.marginLeft='auto';heading.style.marginRight='auto';
       return;
     }
     // Measure at natural zoom. CSS zoom can change viewport units, wrapping and
     // scroll overflow, so measuring the fitted box feeds its output back in.
     if(winding){
-      // Same contract as imported lessons: 1600 x 1000 content plus an
-      // unscaled heading above it. Keep the DOM intact for module handlers.
+      // Same contract as imported lessons: 1600 x 1000 content plus a
+      // heading at the same scale. Keep the DOM intact for module handlers.
       const heading=native.querySelector(':scope > .modulehead');
       native.style.zoom='1';
       if(heading)heading.style.zoom='1';
       const {scale,headingHeight}=layoutScale(width,DESIGN_HEIGHT,available,heading);
-      native.style.setProperty('height',(1000+headingHeight/scale)+'px','important');
+      native.style.setProperty('height',(1000+headingHeight)+'px','important');
       native.style.zoom=String(scale);
-      if(heading){heading.style.zoom=String(1/scale);heading.style.width=(1600*scale)+'px';}
+      if(heading)heading.style.zoom='1';
       return;
     }
     const fittedZoom=native.style.zoom;
