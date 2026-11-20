@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="style.css">
 <script defer src="../particles/vendor/katex.js"></script>
 <script defer src="model.js"></script>
+<script defer src="../equilibrium/cad-parameters.js"></script>
 <script defer src="scene.js"></script>
 <script defer src="app.js"></script>
 <script defer src="../navigation/page.js"></script>
@@ -32,6 +33,7 @@
  <linearGradient id="steel" x2="0" y2="1"><stop stop-color="#f7fbfc"/><stop offset=".27" stop-color="#c8d8df"/><stop offset=".53" stop-color="#91a9b7"/><stop offset=".76" stop-color="#c9d6dc"/><stop offset="1" stop-color="#688292"/></linearGradient>
  <linearGradient id="bronze" x2="0" y2="1"><stop stop-color="#f6dda8"/><stop offset=".55" stop-color="#c18c59"/><stop offset="1" stop-color="#79523f"/></linearGradient>
  <linearGradient id="motor" x2="0" y2="1"><stop stop-color="#a9c0cf"/><stop offset=".52" stop-color="#5a8096"/><stop offset="1" stop-color="#36576d"/></linearGradient>
+ <radialGradient id="port-plasma"><stop stop-color="#eab1d7"/><stop offset=".65" stop-color="#a65c9b"/><stop offset="1" stop-color="#655476"/></radialGradient>
  <radialGradient id="ground"><stop stop-color="#456171" stop-opacity=".23"/><stop offset="1" stop-color="#456171" stop-opacity="0"/></radialGradient>
  <pattern id="floor" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M0 32V0H32" fill="none" stroke="#dce6e9" stroke-width="1"/></pattern>
 </defs>
@@ -39,22 +41,60 @@
 <g fill="url(#ground)"><ellipse cx="289" cy="349" rx="190" ry="35"/><ellipse cx="650" cy="323" rx="170" ry="27"/><ellipse cx="866" cy="320" rx="144" ry="25"/></g>
 <g id="rear-flows"></g>
 <g id="tokamak"></g>
+<!-- Local cuts through the injector and launcher ports, shown open to the plasma. -->
+<g stroke-linejoin="round">
+ <path d="M146 167L166 170L247 205Q253 214 248 224L158 187L142 181Z" fill="#304d61" stroke="#bacbd4" stroke-width="2.5"/>
+ <path d="M183 180L245 206Q251 213 247 222L179 194Z" fill="url(#port-plasma)"/>
+ <path d="M160 248L229 229Q237 230 243 239L236 248L167 271Z" fill="#304d61" stroke="#bacbd4" stroke-width="2.5"/>
+ <path d="M184 244L232 231Q239 234 241 239L235 247L184 261Z" fill="url(#port-plasma)"/>
+ <path d="M408 209H422V227H408ZM400 243H416V257H400Z" fill="url(#steel)" stroke="#6e8999"/>
+ <path d="M419 211V225M414 245V255" stroke="#536e7f" stroke-width="2"/>
+</g>
 <g stroke="#617f8d" stroke-width="1.5" stroke-linejoin="round">
- <g transform="translate(62 169)">
-  <path d="M-34 16H45V28H-34Z" fill="#bccbd2"/><path d="M-33 -10L-19 -21H25L37 -10V14L25 22H-19L-33 14Z" fill="url(#steel)"/>
-  <ellipse cx="35" cy="2" rx="9" ry="13" fill="#466272"/><path d="M31 -6H54V10H31Z" fill="url(#bronze)"/><path d="M-21 -18V17M-9 -20V18M17 -19V17" fill="none"/>
+ <!-- NBI cutaway: ion source, extraction grids, neutralizer and duct. -->
+ <g>
+  <path d="M20 188H119L127 194H18Z" fill="#a6bac4"/>
+  <path d="M22 145H59L68 153V175L58 184H22Z" fill="url(#steel)"/>
+  <path d="M27 152H56V177H27Z" fill="#425c6b"/>
+  <path d="M36 157Q50 160 42 165Q36 169 49 172" fill="none" stroke="#d8a565" stroke-width="2"/>
+  <path d="M57 150V179M63 153V175M70 153V175" stroke="#39596a" stroke-width="2"/>
+  <path d="M71 154H106V175H71Z" fill="url(#motor)"/><path d="M74 159H103V170H74Z" fill="#edf1ec"/>
+  <path d="M82 154V175M96 154V175" stroke="#9bb2be"/>
+  <path d="M107 154L130 160L151 168L148 180L127 172L106 175Z" fill="url(#steel)"/>
+  <path d="M127 159L124 173M140 163L137 177" stroke="#7d98a8" stroke-width="2"/>
+  <path d="M146 166L164 172L159 185L143 179Z" fill="url(#steel)"/>
  </g>
- <g transform="translate(62 272)">
-  <path d="M-34 17H45V28H-34Z" fill="#bccbd2"/><path d="M-29 -12L-12 -24H19L37 -12V16H-29Z" fill="url(#motor)"/>
-  <ellipse cx="-1" cy="-13" rx="17" ry="8" fill="#dde8ed"/><path d="M-18 -13V2C-18 13 16 13 16 2V-13" fill="url(#steel)"/>
-  <path d="M20 -3H57V9H20Z" fill="#88b1b6"/>
+ <!-- ECRH gyrotron, corrugated transmission line and steerable mirror. -->
+ <g>
+  <path d="M22 293H82L91 300H20Z" fill="#a6bac4"/>
+  <path d="M31 278V291H68V278M31 247V274H68V247Z" fill="url(#motor)"/>
+  <ellipse cx="49.5" cy="248" rx="19" ry="9" fill="#deeaef"/>
+  <ellipse cx="49.5" cy="277" rx="19" ry="9" fill="url(#steel)"/>
+  <path d="M36 237V264Q50 277 63 264V237Z" fill="url(#steel)"/>
+  <ellipse cx="49.5" cy="237" rx="14" ry="7" fill="#f0f6f8"/>
+  <path d="M63 243H81Q95 243 95 255V261H150" fill="none" stroke="#698895" stroke-width="10"/>
+  <path d="M63 243H81Q95 243 95 255V261H150" fill="none" stroke="#c0d6dc" stroke-width="6"/>
+  <path d="M103 256V266M111 256V266M119 256V266M127 256V266M135 256V266" stroke="#829da9"/>
+  <path d="M143 252L155 246L166 252V269L155 275L141 268Z" fill="url(#steel)"/>
+  <path d="M151 267L163 251" stroke="#306675" stroke-width="3"/>
+  <path d="M161 250L174 247L178 262L164 269Z" fill="#9bb5bc"/>
  </g>
- <g transform="translate(532 221)">
-  <path d="M-29 58H30V66H-29Z" fill="#a8bbc4"/><path d="M-20 40V59M20 40V59" stroke-width="8"/>
-  <path d="M-35 -53C-31 -75 31 -75 35 -53V45C18 62 -22 62 -35 45Z" fill="url(#steel)"/>
-  <ellipse cy="-52" rx="35" ry="16" fill="#eaf0f3"/><path d="M-22 -29H24V33H-22Z" fill="#eef3f5"/>
-  <path d="M-14 24V-21H-5V23H4V-21H13V23H20V-21" fill="none" stroke="#bd7140" stroke-width="3"/>
-  <path d="M-36 34Q0 50 36 34" fill="none"/><path d="M-8 -71V-82H8V-71" fill="url(#steel)"/>
+ <!-- Primary coolant stays in the U-tube bundle. Steam forms in the shell. -->
+ <g>
+  <path d="M501 283H570L578 292H494Z" fill="#a8bbc4"/>
+  <path d="M510 256V284M558 256V284" stroke-width="7"/>
+  <path d="M499 174C499 147 570 147 570 174V260C559 278 510 278 499 260Z" fill="url(#steel)"/>
+  <path d="M511 180Q534 164 558 180V250Q536 263 511 250Z" fill="#f0f7fa"/>
+  <path d="M511 206Q535 199 558 206V250Q536 263 511 250Z" fill="#b3d6e3" stroke="#83aabf"/>
+  <path d="M499 218H512M499 250H512M521 208H538C565 208 565 248 538 248H521M521 214H536C555 214 555 242 536 242H521M521 220H534C545 220 545 236 534 236H521"
+   fill="none" stroke="#885238" stroke-width="5"/>
+  <path d="M499 218H512M499 250H512M521 208H538C565 208 565 248 538 248H521M521 214H536C555 214 555 242 536 242H521M521 220H534C545 220 545 236 534 236H521"
+   fill="none" stroke="#e7ad75" stroke-width="2.6"/>
+  <path d="M512 204H522V222H512Z" fill="#dda274" stroke="#885238"/><path d="M512 234H522V253H512Z" fill="#a4c6d5" stroke="#648596"/>
+  <path d="M527 154V139H542V154M563 257H578V267H565" fill="url(#steel)"/>
+  <path d="M492 212H502V224H492ZM492 244H502V256H492Z" fill="url(#steel)"/>
+  <path d="M511 209H558" stroke="#6093aa" stroke-dasharray="2 2"/>
+  <g fill="#f5fcff" stroke="#76a4b8" stroke-width=".8"><circle cx="516" cy="200" r="2.5"/><circle cx="545" cy="200" r="2"/><circle cx="551" cy="191" r="2.8"/><circle cx="534" cy="179" r="2.2"/></g>
  </g>
  <g transform="translate(677 222)">
   <path d="M-57 76H61L70 84H-65Z" fill="#a4b9c5"/><path d="M-48 19V77M48 33V77" stroke-width="10"/>
@@ -72,6 +112,22 @@
   <path d="M-9 -32V-47H22V-33Z" fill="url(#steel)"/>
   <path d="M39 -19L32 3H41L37 20L52 -4H43L47 -19Z" stroke="none" fill="#e8d5a7"/>
  </g>
+ <g>
+  <path d="M650 365H738L744 371H643Z" fill="#a8bbc4"/>
+  <path d="M659 350V365M725 350V365" stroke-width="5"/>
+  <path d="M644 325Q644 314 658 314H724Q741 314 741 326V348Q741 360 726 360H658Q644 360 644 347Z" fill="url(#steel)"/>
+  <path d="M655 326H727V347H655Z" fill="#e1edf2"/>
+  <path d="M657 343H730M657 337H730M657 331H730" stroke="#6c9cb1" stroke-width="2"/>
+  <path d="M688 314V305H710V314M662 360V369H674V360M741 327H752V345H741" fill="url(#steel)"/>
+ </g>
+ <g transform="translate(613 385)">
+  <circle r="9" fill="url(#steel)"/><path d="M4-5L-5 0L4 5Z" fill="#547e95"/><path d="M-11 8H11" stroke-width="2"/>
+ </g>
+ <g id="heating-fields" stroke="none">
+  <path class="beam-envelope" d="M157 172L248 209L244 218L154 183Z" fill="#d8a254"/>
+  <path class="wave-fronts" d="M178 246Q185 254 182 264M189 241Q198 251 195 263M201 236Q210 247 207 260M213 231Q223 244 221 256M227 227Q236 239 235 251"
+    fill="none" stroke="#16858a" stroke-width="1.7"/>
+ </g>
  <g transform="translate(962 227)" fill="none" stroke-width="2">
   <path d="M-26 58L-7 -41L0 -54L8 -41L26 58M-21 37H21M-16 13H16M-11 -15H11M-25 56L21 37L-15 13L11 -15L-7 -41M25 56L-21 37L15 13L-11 -15L7 -41"/>
   <path d="M-37 -26H37L10 -39H-10ZM-44 0H44L15 -13H-15Z"/><path d="M-35 -26V-15M35 -26V-15M-41 0V11M41 0V11" stroke="#91a9b7" stroke-width="4"/>
@@ -83,21 +139,27 @@
 </g>
 <g id="front-flows"></g>
 <g id="plant-labels" class="plant-labels">
- <text x="19" y="134">Injektor NBI</text><text x="19" y="241">Vlnový ohřev</text>
- <text x="175" y="42">Centrální solenoid</text><path d="M242 50L268 92"/>
- <text x="349" y="48">Toroidální cívky</text><path d="M371 56L365 106"/>
- <text x="160" y="361">Tokamak v řezu</text>
- <text x="365" y="139">Plazma D–T</text><path d="M398 146L380 187"/>
- <text x="399" y="184">Neutrony</text><path d="M425 189L403 212"/>
- <text x="375" y="299" class="minor">Teplo z plazmatu</text><path d="M419 286L414 264"/>
- <text x="555" y="102">Pára</text>
- <text x="339" y="361">Blanket</text><path d="M361 348L350 284"/>
- <text x="205" y="319">Divertor</text><path d="M260 315L293 288"/>
- <text x="488" y="308">Výměník</text><text x="646" y="319">Turbína</text><text x="764" y="319">Generátor</text>
+ <text x="20" y="107">Injektor NBI</text>
+ <text class="minor" x="20" y="125">Iontový zdroj · neutralizátor</text>
+ <text x="20" y="220">Gyrotron ECRH</text><text class="minor" x="40" y="344">Vlnovod a zrcadlo</text><path d="M137 337L146 273"/>
+ <text x="186" y="76">Centrální solenoid</text><path d="M253 81L274 124"/>
+ <text x="334" y="64">Toroidální cívky</text><path d="M374 70L377 118"/>
+ <text x="181" y="381">Tokamak v řezu</text>
+ <text x="365" y="130">Plazma D–T</text><path d="M392 137L377 184"/>
+ <text x="431" y="175" class="minor">Neutrony</text><path d="M447 181L404 206"/>
+ <text x="438" y="274" class="minor">Primární chladivo</text>
+ <text x="554" y="106" class="minor">Pára</text>
+ <text x="342" y="333">Blanket</text><path d="M366 319L359 295"/>
+ <text x="297" y="365">Divertor</text><path d="M333 353L339 307"/>
+ <text x="527" y="309" text-anchor="middle">Parogenerátor</text>
+ <text x="688" y="153" text-anchor="middle">Turbína</text>
+ <text x="798" y="309" text-anchor="middle">Generátor</text>
+ <text x="692" y="381" text-anchor="middle">Kondenzátor</text>
+ <text x="610" y="404" text-anchor="middle" class="minor">Napájecí voda</text>
  <text x="962" y="151" text-anchor="middle">Elektrická síť</text>
- <text x="876" y="410" text-anchor="middle">Ostatní spotřeba</text>
- <text x="420" y="418">Elektrický příkon ohřevu</text>
- <text x="702" y="362">Odpadní teplo</text>
+ <text x="876" y="407" text-anchor="middle">Ostatní spotřeba</text>
+ <text x="341" y="416">Elektrický příkon ohřevu</text>
+ <text x="786" y="366" text-anchor="middle" class="minor">Odpadní teplo</text>
 </g>
 </svg>
 </div>
@@ -135,9 +197,10 @@
 <p>Oranžová sleduje neutrony a teplo, modrá elektřinu, fialová samoohřev, jantarová neutrální svazek NBI, tyrkysová vlnový ohřev a šedá teplo odvedené mimo pracovní oběh. Šířka tras roste s výkonem. Šipky ukazují směr přenosu, jejich rychlost neměří rychlost částic ani chladiva.</p>
 <p>Základ zapálení si můžeš vyzkoušet v <a href="../index.html#fu12-lawson" target="_top">Lawsonově kritériu</a>.</p>
 <details><summary>Rozšířený výklad a rovnice</summary>
+<p>V injektoru NBI se nejprve urychlí ionty. Po neutralizaci letí svazek portem do plazmatu. Gyrotron vytváří mikrovlny, které vlnovod vede k zrcadlu. Zrcadlo směruje záření přes topný port. Primární chladivo blanketu proudí uvnitř trubek parogenerátoru. Na jejich vnější straně vzniká pára, která roztáčí turbínu. V kondenzátoru se mění zpět na vodu a čerpadlo ji vrací do parogenerátoru.</p>
 <div id="equations"></div>
 </details>
-<p class="sources">S. Entler, V. Kindl, <cite>Jaderná fúze a fúzní elektrárny</cite> <span id="book-pages"></span>. Tvar modelového tokamaku vychází z podkladů ITER Organization. ITER je experimentální zařízení bez výroby elektřiny pro síť. <a href="https://www.iter.org/machine/vacuum-vessel" target="_blank" rel="noopener">Vakuová nádoba</a> · <a href="https://www.iter.org/machine/blanket" target="_blank" rel="noopener">Blanket</a> · <a href="https://www.iter.org/machine/supporting-systems/external-heating-systems" target="_blank" rel="noopener">Systémy ohřevu</a> · <a href="https://www.iter.org/sites/default/files/media/a1_iter_fusion_machinev2.pdf" target="_blank" rel="noopener">Řez strojem</a></p>
+<p class="sources">S. Entler, V. Kindl, <cite>Jaderná fúze a fúzní elektrárny</cite> <span id="book-pages"></span>. Řez tokamakem využívá profily projektu odvozené z CAD modelu ITER. Blanket, plazma a topné porty jsou schematické. ITER je experimentální zařízení bez výroby elektřiny pro síť. <a href="https://www.iter.org/machine/vacuum-vessel" target="_blank" rel="noopener">Vakuová nádoba</a> · <a href="https://www.iter.org/machine/blanket" target="_blank" rel="noopener">Blanket</a> · <a href="https://www.iter.org/machine/supporting-systems/external-heating-systems" target="_blank" rel="noopener">Systémy ohřevu</a> · <a href="https://www.iter.org/sites/default/files/media/a1_iter_fusion_machinev2.pdf" target="_blank" rel="noopener">Řez strojem</a></p>
 </dialog>
 </body>
 </html>

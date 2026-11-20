@@ -52,17 +52,19 @@ class Element {
     this.children=[];
     this.attrs={};
     this.style={};
-    this.classList={toggle(){}};
+    this.classes=new Set();
+    this.classList={toggle:(name,on)=>on ? this.classes.add(name) : this.classes.delete(name)};
   }
   setAttribute(key,value) {this.attrs[key]=value;}
   append(child) {this.children.push(child);}
   getTotalLength() {return 100;}
   getPointAtLength(x) {return {x,y:0};}
 }
-const roots=Object.fromEntries(['plant','tokamak','rear-flows','front-flows'].map(id=>[id,new Element()]));
+const roots=Object.fromEntries(['plant','tokamak','rear-flows','front-flows','heating-fields'].map(id=>[id,new Element()]));
 const window={};
 const context={window,document:{getElementById:id=>roots[id],createDocumentFragment:()=>new Element(),
   createElementNS:()=>new Element()},matchMedia:()=>({matches:true,addEventListener(){}}),cancelAnimationFrame(){}};
+vm.runInNewContext(fs.readFileSync('versions/vyvoj/m_files/fusion/equilibrium/cad-parameters.js','utf8'),context);
 vm.runInNewContext(fs.readFileSync(require.resolve('../versions/vyvoj/m_files/fusion/milniky/scene.js'),'utf8'),context);
 const grid=roots['front-flows'].children.find(node=>node.attrs['data-flow']==='grid');
 const gridView=v=>{
@@ -73,4 +75,15 @@ const gridView=v=>{
 assert.match(gridView(at(100)).rotation,/rotate\(180\)$/,'Grid import reverses the rendered arrows');
 assert.match(gridView(at(550)).rotation,/rotate\(0\)$/,'Grid export points out of the plant');
 assert.equal(gridView(at(0,{plasmaLoss:0})).width,'0px');
-console.log('PASS: grid import, export and zero flow in the SVG renderer.');
+const heatingFields=roots['heating-fields'];
+const scene=window.HiFyzikoMilestoneScene;
+scene.update(at(100,{beamShare:100}),null,false,String);
+assert(heatingFields.classes.has('beam-on'));
+assert(!heatingFields.classes.has('wave-on'));
+scene.update(at(100,{beamShare:0}),null,false,String);
+assert(!heatingFields.classes.has('beam-on'));
+assert(heatingFields.classes.has('wave-on'));
+scene.update(at(100,{heatingOff:true}),null,false,String);
+assert.equal(heatingFields.classes.size,0);
+assert(roots.tokamak.children[0].children.length>1000,'The CAD-derived sections generate the tokamak cutaway');
+console.log('PASS: rendered tokamak CAD profiles, active heating fields, grid import, export and zero flow.');

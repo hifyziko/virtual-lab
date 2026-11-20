@@ -8,7 +8,10 @@ předvolby, vypnutí ohřevu a samostatné indikátory jsou funkční. Bilančn�
 předepisuje fúzní výkon a ztráty. Mimo rovnováhu ukazuje okamžitou bilanci
 s idealizovaným zachycením tepla, bez časového vývoje teploty. Indukční rozběh
 je názorný. Pro výchozí parametry a ztráty 200 MW jsou meze 166,67 MW, 424,11 MW
-a 1 000 MW. Druhá etapa čeká na schválení grafiky a ovládání.
+a 1 000 MW. Grafika nově přímo používá CAD odvozené profily ITER ze stávajícího modulu.
+NBI a ECRH mají samostatné řezy portů. Parogenerátor odděluje primární
+chladivo a parní oběh s kondenzátorem a čerpadlem. Velikost okna používá
+stejný přepočet jako Lawsonovo kritérium. Druhá etapa čeká na schválení.
 
 ## Převzetí aktuálního projektu — 20. listopadu 2026
 

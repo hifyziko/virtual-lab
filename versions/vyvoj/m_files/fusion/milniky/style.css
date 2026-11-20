@@ -24,7 +24,11 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 .drawing{background:linear-gradient(165deg,#fff 18%,#f3f7f9)}
 #plant{display:block;width:100%;height:auto}
 .plant-labels{font:600 15px 'Segoe UI',sans-serif;fill:#2a4655}
+.plant-labels .minor{font-size:12px;font-weight:550;fill:#4b6878}
 .plant-labels path{fill:none;stroke:#8395a0;stroke-width:1}
+#heating-fields .beam-envelope,#heating-fields .wave-fronts{opacity:0;transition:opacity .2s}
+#heating-fields.beam-on .beam-envelope{opacity:.36}
+#heating-fields.wave-on .wave-fronts{opacity:.93}
 .flow{transition:opacity .2s}
 .flow.dim{opacity:.19}
 .flow .pipe{stroke:#dbe4e8;stroke-width:6;fill:none;stroke-linecap:round;stroke-linejoin:round}
