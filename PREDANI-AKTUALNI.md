@@ -1,5 +1,14 @@
 # Aktuální stav předání
 
+## Soukromé předání na druhý počítač — 20. listopadu 2026
+
+Pracovní větev `prace/predani-2026-11-20` zachycuje místní úpravy ostrosti
+grafů a scén při změně měřítka a na displejích s vyšší hustotou pixelů.
+Zahrnuje výpočtové prohlížeče strojů, nativní grafy a vybrané fúzní scény.
+Aktuální web byl sestaven včetně 51 souborů načítaných při otevření modulů.
+Vzhled a chování při skutečné změně velikosti okna zbývá ověřit v prohlížeči.
+Přesný commit, větev a stav vůči vzdálené větvi jsou v `_handoff/state.json`.
+
 ## COMPASS-U: sjednocené černé pozadí, světlá záloha zachovaná — 19. listopadu 2026
 
 Obě videa v modulu fu10-compass i výchozím soukromém HTML přehrávači

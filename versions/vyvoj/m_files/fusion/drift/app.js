@@ -51,7 +51,7 @@
   tex($('bValue'),quantity(config.B,'T'));tex($('energyValue'),quantity(config.energy,'eV'));tex($('pitchValue'),num(config.pitch,0)+'^\\circ');tex($('angleValue'),num(config.angle,0)+'^\\circ');tex($('electricValue'),quantity(config.electric,'V\\,m^{-1}'));tex($('gradientValue'),quantity(config.gradient/config.length,'m^{-1}'));tex($('radiusValue'),quantity(config.R,'m'));
   $('sceneMath').replaceChildren();$('graphMath').replaceChildren();render();
  }
- function size(c){const w=c.clientWidth,h=c.clientHeight,d=Math.min(devicePixelRatio||1,2)*Math.min(2,c.getBoundingClientRect().width/w);const nw=Math.max(1,Math.round(w*d)),nh=Math.max(1,Math.round(h*d));if(c.width!==nw||c.height!==nh){c.width=nw;c.height=nh;}const g=c.getContext('2d');g.setTransform(nw/w,0,0,nh/h,0,0);g.clearRect(0,0,w,h);return [w,h];}
+ function size(c){const w=c.clientWidth,h=c.clientHeight,d=Math.min((devicePixelRatio||1)*c.getBoundingClientRect().width/(w||1),Math.sqrt(8000000/(w*h)));const nw=Math.max(1,Math.round(w*d)),nh=Math.max(1,Math.round(h*d));if(c.width!==nw||c.height!==nh){c.width=nw;c.height=nh;}const g=c.getContext('2d');g.setTransform(nw/w,0,0,nh/h,0,0);g.clearRect(0,0,w,h);return [w,h];}
  function viewBasis(){return {right:[Math.cos(gyaw),-Math.sin(gyaw),0],up:[Math.sin(gyaw)*Math.cos(gtilt),Math.cos(gyaw)*Math.cos(gtilt),Math.sin(gtilt)]};}
  function projectionFrame(){
   const curved=config.mode==='curvature',basis=curved?{right:[Math.cos(yaw),-Math.sin(yaw),0],up:[-Math.sin(yaw)*Math.sin(tilt),-Math.cos(yaw)*Math.sin(tilt),Math.cos(tilt)]}:config.mode==='gyration'?viewBasis():{right:[1,0,0],up:[0,1,0]};

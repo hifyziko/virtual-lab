@@ -1,6 +1,6 @@
 // Presentation of the vehicle model. All physical values come from WMath.vehicle.
 Lab.vehicleContributions=(canvas,values,colors,unit)=>{
- const r=canvas.getBoundingClientRect(),dpi=Math.min(devicePixelRatio||1,2),w=r.width,h=r.height;if(!w||!h)return;
+ const r=canvas.getBoundingClientRect(),dpi=Math.min(devicePixelRatio||1,Math.sqrt(8000000/(r.width*r.height))),w=r.width,h=r.height;if(!w||!h)return;
  canvas.width=Math.round(w*dpi);canvas.height=Math.round(h*dpi);const c=canvas.getContext('2d');c.setTransform(dpi,0,0,dpi,0,0);c.clearRect(0,0,w,h);
  const narrow=w<420,left=narrow?76:102,right=narrow?88:115,top=22,row=Math.min(64,(h-42)/4),pw=Math.max(30,w-left-right),lo=Math.min(0,...values),hi=Math.max(1,...values),extent=hi-lo,X=v=>left+(v-lo)/extent*pw,zero=X(0),names=['Valení','Vzduch','Svah','Celkem'];
  const text=(t,x,y,size,color,align='left')=>{c.font=(size>=16?'650 ':'500 ')+size+'px system-ui';c.fillStyle=color;c.textAlign=align;c.fillText(t,x,y)};

@@ -58,10 +58,24 @@ function paint(canvas,x,y,span,frame){const ctx=canvas.getContext('2d'),sz=canva
 function draw(){const f=cache.get(shown);if(!f)return;refreshDetail(f);paint($('whole'),0,0,2*r,f);paint($('detail'),cx,cy,2*r/zoom,f);const c=$('whole'),ctx=c.getContext('2d'),w=c.width/zoom,x=c.width*(cx/r+1)/2-w/2,y=c.height*(1-cy/r)/2-w/2;ctx.strokeStyle='#a56a00';ctx.lineWidth=2;ctx.setLineDash([7,4]);ctx.strokeRect(x,y,w,w);ctx.setLineDash([]);
  const root=$('guide').getBoundingClientRect(),source=$('whole').parentElement.getBoundingClientRect(),target=$('detail').parentElement.getBoundingClientRect(),sy=source.top-root.top+18;for(const p of $('guide').querySelectorAll('.guide-halo,.guide-line'))p.setAttribute('d',`M${source.right-root.left-5} ${sy}H${target.left-root.left+5}`);$('zoomTag').textContent='Výřez '+zoom+'×';
  $('readout').textContent=(m.times[shown]*1000).toFixed(1)+' ms · '+m.speed_rpm[shown].toFixed(0)+' min⁻¹';$('time').value=shown;$('status').textContent=playing?'Přehrávání':'Připraveno';}
-function resize(){for(const id of ['whole','detail']){const c=$(id),size=Math.max(160,Math.min(c.parentElement.clientWidth-20,innerWidth>650?innerHeight-230:600));c.style.width=size+'px';c.style.height=size+'px';c.style.margin='auto';c.width=c.height=Math.round(size*Math.min(devicePixelRatio,2));}draw();}
+function resize(){for(const id of ['whole','detail']){const c=$(id),size=Math.max(160,Math.min(c.parentElement.clientWidth-20,innerWidth>650?innerHeight-230:600));c.style.width=size+'px';c.style.height=size+'px';c.style.margin='auto';const frame=window.frameElement;
+ const frameScale=frame?.offsetWidth ? frame.getBoundingClientRect().width/frame.offsetWidth : 1;
+ const pixels=Math.max(1,Math.min(2828,Math.round(c.getBoundingClientRect().width*frameScale*(devicePixelRatio||1))));
+ if(c.width!==pixels||c.height!==pixels)c.width=c.height=pixels;}draw();}
 function tick(now){if(playing&&now-last>=1000/40){const next=shown+1;if(next>=N){playing=false;$('play').textContent='Přehrát';}else if(cache.has(next)){current=shown=next;last=now;draw();prefetch();}else{$('status').textContent='Načítání dalšího kroku…';prefetch();}}requestAnimationFrame(tick);}
 function move(e){const b=$('whole').getBoundingClientRect(),half=r/zoom;cx=Math.max(-r+half,Math.min(r-half,((e.clientX-b.left)/b.width*2-1)*r));cy=Math.max(-r+half,Math.min(r-half,(1-(e.clientY-b.top)/b.height*2)*r));draw();}
 $('whole').onpointerdown=e=>{drag=true;e.currentTarget.setPointerCapture(e.pointerId);move(e)};$('whole').onpointermove=e=>{if(drag)move(e)};$('whole').onpointerup=()=>drag=false;$('whole').onpointercancel=()=>drag=false;
 $('zoom').onchange=()=>{zoom=+$('zoom').value;draw()};$('play').onclick=()=>{if(shown===N-1){current=0;shown=-1;prefetch()}playing=!playing;$('play').textContent=playing?'Pozastavit':'Přehrát';};$('time').max=N-1;$('time').oninput=()=>{playing=false;$('play').textContent='Přehrát';current=+$('time').value;if(cache.has(current)){shown=current;draw()}else $('status').textContent='Načítání vybraného okamžiku…';prefetch()};document.onvisibilitychange=()=>{if(document.hidden){playing=false;$('play').textContent='Přehrát'}};window.onpagehide=()=>{worker.terminate();decoder.terminate()};window.onresize=resize;
+const hostFrame=window.frameElement;
+if(hostFrame){
+ let lastTransform=hostFrame.style.transform;
+ const observer=new MutationObserver(()=>{
+  if(lastTransform===hostFrame.style.transform)return;
+  lastTransform=hostFrame.style.transform;
+  resize();
+ });
+ observer.observe(hostFrame,{attributes:true,attributeFilter:['style']});
+ window.addEventListener('pagehide',()=>observer.disconnect(),{once:true});
+}
 $('play').textContent='Pozastavit';$('scales').textContent='|B|: 0–'+m.peaks[0].toFixed(2)+' T · |J|: 0–'+m.peaks[2].toFixed(2)+' A/mm²';resize();prefetch();requestAnimationFrame(tick);
 })();

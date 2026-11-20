@@ -1,6 +1,8 @@
 /* Canvas presentation shared by the original modules; no model parameters. */
 Lab.chart=function(canvas,xlim,ylim,xlabel='',ylabel='',options={}){
- const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2),w=r.width,h=r.height;
+ const r=canvas.getBoundingClientRect(),logical=!!canvas.closest?.('[data-winding-viewport],[data-native-viewport]');
+ const w=logical?canvas.clientWidth:r.width,h=logical?canvas.clientHeight:r.height;
+ const d=Math.min((devicePixelRatio||1)*r.width/(w||1),Math.sqrt(8000000/(w*h)));
  if(!w||!h)return null;
  if(canvas.width!==Math.round(w*d)||canvas.height!==Math.round(h*d)){canvas.width=Math.round(w*d);canvas.height=Math.round(h*d)}
  const c=canvas.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);
