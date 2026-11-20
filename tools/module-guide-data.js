@@ -207,6 +207,10 @@
  add('fu12-lawson','lawson',
   ['Spusť chladnutí a porovnej oba průběhy. Pak pro každou hustotu nastav dobu udržení energie tak, aby výkon samoohřevu pokryl ztrátový výkon paliva, a zaznamenej mezní stav.','Opakuj měření při různých teplotách. V grafu najdi nejmenší potřebný trojný součin hustoty paliva, teploty a doby udržení energie.'],
   ['Doba udržení energie je poměr vnitřní energie paliva ke ztrátovému výkonu. Při konstantní době udržení energie zbývá po jedné takové době bez ohřevu přibližně 37 % původní energie.','Model zapálení předpokládá homogenní směs stejného počtu jader deuteria a tritia a úplné předání energie částic alfa plazmatu.'],String.raw`\tau_{\mathrm E}=\frac{U}{P_{\mathrm L}}`,['fu01-reakce','fu04-udrzeni']);
+ sources.milestones='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 9, s. 181 a násl.; kap. 12.6–12.7 a 12.9–12.11, s. 330–339; kap. 13.9–13.12, s. 366–373.';
+ add('fu14-milniky','milestones',
+  ['Měň fúzní výkon a ztráty plazmatu. Kliknutím na milník zvýrazni rozhodující toky.','Vyber scénář Elektřina bez zapálení, vypni ohřev a sleduj bilanci plazmatu a výměnu výkonu se sítí.'],
+  ['Zapálení nastává, když výkon částic alfa pokrývá ztráty plazmatu. Inženýrské vyrovnání vyžaduje pokrytí veškeré vlastní spotřeby elektřiny.','Pokus používá předepsané výkony. Vypnutí ohřevu zobrazí okamžitou změnu bilance plazmatu.'],String.raw`P_{\mathrm{NET}}=P_{\mathrm{GR}}-P_{\mathrm{SC}}^{\mathrm{NH}}-P_{\mathrm{HC}}`,['fu12-lawson','fu13-ohrev']);
  add('fu07-plazma','plasma',
   ['Přidávej atomy a posuvníkem teploty dodávej teplo. Sleduj uvolňování elektronů a pole vzniklých nábojů.','Zapni magnetické pole a porovnej dráhy neutrálních atomů, iontů a elektronů.'],
   ['Plazma může být částečně ionizované. Od samotné ionizace je odlišuje kolektivní chování a kvazineutralita v dostatečně velkém objemu.','Jde o názorný model se zmenšeným poměrem hmotností. Počet zobrazených atomů není hustota skutečného plynu; magnetické pole stáčí i jednotlivý volný náboj.'],String.raw`m\frac{\mathrm d\mathbf v}{\mathrm dt}=q(\mathbf E+\mathbf v\times\mathbf B)`,['fu03-drift','fu02-galerie']);
