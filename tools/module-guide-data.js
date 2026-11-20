@@ -42,7 +42,7 @@
   ['Porovnejte proudové smyčky v plném a děleném jádře pomocí dostupných voleb.','Měňte frekvenci a sledujte velikost ztrát.'],
   ['Proměnný tok indukuje uzavřené proudy i v samotném vodivém železe.','Izolované plechy omezují proudové cesty. Neodstraňují hysterezní ztráty; jde o dva různé mechanismy.'],null,['mag03-hysterezni-ztraty','hf-skin-proximity']);
  add('hf-skin-proximity','skin',
-  ['Zvyšujte frekvenci a porovnávejte rozložení proudu uvnitř vodičů.','Porovnejte samostatný vodič se soustavou blízkých vodičů.'],
+  ['Zvyšujte frekvenci a porovnávejte rozložení proudu uvnitř vodičů.','Porovnejte samostatný vodič se soustavou blízkých vodičů. Schéma Princip natočíte tažením nebo šipkami. Dvojklik nebo Home obnoví původní pohled.'],
   ['Skin efekt souvisí s vlastním proměnným polem, proximity efekt s polem okolních vodičů.','Nerovnoměrné rozložení proudu zvyšuje střídavý odpor a ztráty. Hloubka vniku je měřítko útlumu, nikoli ostrá hranice vedení.'],String.raw`\delta=\sqrt{\frac{2\rho}{\omega\mu}}`,['mag04-virive-proudy','tr05-rozptylova-reaktance']);
  add('em01-indukovane-napeti','energy',
   ['Měňte pohyb vodiče a orientaci magnetického pole.','Obraťte směr pohybu a porovnejte polaritu napětí.'],
@@ -53,6 +53,10 @@
  add('em03-silove-ucinky','energy',
   ['Obracejte směr proudu v jednom vodiči a porovnávejte směr sil.','Měňte vzdálenost vodičů a sledujte sílu i tvar pole.'],
   ['U rovnoběžných vodičů se stejně orientované proudy přitahují a opačně orientované odpuzují.','Síla působí i bez pohybu. Mechanický výkon ale vyžaduje pohyb ve směru její složky.'],String.raw`p_{\mathrm{mech}}=\mathbf F\cdot\mathbf v`,['em04-premena','dc01-princip']);
+ add('em05-reluktance','energy',
+  ['Při zapnutém proudu vychylte kotvičku a pusťte ji. Sledujte úhel a moment.','Obraťte proud cívky a porovnejte moment při stejném úhlu. Nastavením tlumení měňte dobu, po kterou kotvička kmitá.'],
+  ['Reluktanční moment je úměrný druhé mocnině proudu a závisí na natočení kotvičky.','Souosé natočení kotvičky odpovídá větší indukčnosti a menší reluktanci magnetického obvodu.'],
+  String.raw`M=\tfrac12 I^2\frac{\mathrm dL}{\mathrm d\vartheta}`,['em02-vzajemna-indukcnost','em04-premena']);
  add('em04-premena','energy',
   ['Projděte jednotlivé experimenty a vždy porovnejte sílu, pohyb a elektrický výkon.','Zastavte pohyb a odlište nenulovou sílu či moment od mechanického výkonu.'],
   ['Přivedená energie se může rozdělit na energii pole, mechanickou práci a ztráty.','Indukované napětí nelze obecně ztotožnit jen s pohybovým napětím; existuje také transformační složka.'],String.raw`p_{\mathrm{mech}}=M\omega`,['em01-indukovane-napeti','dc03-schema']);

@@ -89,6 +89,39 @@ const payload=modules.map(m=>{let source=cleanLegacyBanner(fs.readFileSync(path.
 } if(['tr04-pricna-vetev','tr05-rozptylova-reaktance'].includes(m.id))source=require('./energy-experiments/integrate-transformer.cjs')(source);source=source.replace(/<header>[\s\S]*?<\/header>/,'').replace(/<div class="actions"><a class="button primary" href="nahradni_schema.html">Náhradní schéma<\/a><\/div>/,'');let style=m.fem?'':m.group==='sync'?'main{padding:8px 0 16px}':m.group==='induction'?'.hero{display:none}.project-credit{display:none}main{padding:8px 0 16px}':m.id==='tr06-hodinove-cislo'?'.top,main>h1{display:none}main{padding:8px 0 16px}':m.id.startsWith('em')?'.top{display:none}main{padding-top:8px}.hero{display:none}':m.id==='hf-skin-proximity'?'.top{display:none}main{padding-top:8px}':(m.id==='mag02-hystereze'||m.id==='mag03-hysterezni-ztraty'||m.id==='mag04-virive-proudy')?'.hero h1{display:none}.hero p{max-width:none;text-align:left}main{padding:8px 0 20px}#launchInfo{display:none}':m.id==='mag01-magnetizace'?'.top{display:none}main{max-width:1440px;padding:8px 0 20px}.heading h1{display:none}.heading .hint{max-width:none;text-align:left}.heading{margin-bottom:12px}':css;if(m.id==='tr06-hodinove-cislo'||m.group==='electromagnetism')style+='\n'+css;source=source.replace('</head>',()=>'<style>'+style+'</style></head>');return {...m,group:m.group||'transformer',source};});
 const script=`\n<!-- transformer-modules:start -->\n<style></style>\n<script>\n(function(){\nconst entries=${JSON.stringify(payload).replace(/</g,'\\u003c')};\nfor(const entry of entries){Lab.register({id:entry.id,title:entry.title,mount(app){\napp.innerHTML='<div class="workspace imported-workspace'+''+'"><div class="modulehead"><a class="back" href="#group-'+entry.group+'">← '+(entry.group==='induction'?'Asynchronní stroje':entry.group==='sync'?'Synchronní stroje':entry.group==='electromagnetism'?'Účinky elektrického proudu a elektromagnetická indukce':'Transformátory')+'</a><span class="num">'+(Lab.catalog.find(item=>item.id===entry.id)?.num||entry.num)+'</span><h1>'+entry.title+'</h1>'+(entry.draft?'<span class="badge">Rozpracováno</span>':'')+'<div class="actions">'+(entry.id==='am02-momentova-charakteristika'?'<button id="import-guide" type="button" aria-haspopup="dialog" aria-controls="module-guide-dialog">Ovládání a výklad</button>':'')+'<button id="import-fullscreen">Celá obrazovka</button></div></div><iframe id="transformer-frame" class="transformer-frame" title="'+entry.title+'"></iframe></div>';\nif(window.__schemaReturnTarget===entry.id){const back=document.createElement('a');back.className='back';back.href='#tr03-schema';back.textContent='← Zpět k náhradnímu schématu';app.querySelector('.modulehead').after(back);}
 const frame=document.getElementById('transformer-frame');
+let modeObserver=null;
+if(entry.id==='hf-skin-proximity'){
+ frame.addEventListener('load',()=>{
+  modeObserver?.disconnect();
+  const tabs=frame.contentDocument?.querySelector('main > .tabs');
+  const actions=app.querySelector('.imported-workspace > .modulehead > .actions');
+  if(!tabs||!actions)return;
+  actions.querySelector('.hf-heading-modes')?.remove();
+  const modes=document.createElement('div');
+  modes.className='hf-heading-modes';
+  modes.setAttribute('role','group');
+  modes.setAttribute('aria-label','Režim pokusu');
+  const originals=Array.from(tabs.querySelectorAll('button'));
+  const buttons=originals.map(original=>{
+   const button=document.createElement('button');
+   button.type='button';
+   button.textContent=original.textContent;
+   button.onclick=()=>original.click();
+   modes.append(button);
+   return button;
+  });
+  function syncModes(){
+   originals.forEach((original,i)=>buttons[i].setAttribute('aria-pressed',
+    String(original.getAttribute('aria-selected')==='true'||original.classList.contains('active'))));
+  }
+  modeObserver=new MutationObserver(syncModes);
+  modeObserver.observe(tabs,{subtree:true,attributes:true,attributeFilter:['aria-selected','class']});
+  tabs.hidden=true;
+  frame.contentDocument.documentElement.classList.add('hf-host-modes');
+  actions.prepend(modes);
+  syncModes();
+ },{once:true});
+}
 const guideButton=document.getElementById('import-guide');if(guideButton)guideButton.onclick=()=>{const content=frame.contentDocument?.getElementById('lesson-guide-content');if(content&&window.ModuleGuide)window.ModuleGuide.open(content.innerHTML);};
 // Set the final logical viewport before the child parses responsive styles.
 frame.style.width='1600px';
@@ -116,7 +149,7 @@ if(true){
  frame.addEventListener('load',()=>{if(disposed||!frame.isConnected)return;if(contentObserver)contentObserver.disconnect();resizeModule();const main=frame.contentDocument.querySelector('main');if(main){contentObserver=new ResizeObserver(resizeModule);contentObserver.observe(main);}for(const event of ['input','change','click','toggle'])frame.contentDocument.addEventListener(event,resizeModule,true);frame.contentDocument.fonts.ready.then(()=>{fontsReady=true;resizeModule();});});
  window.addEventListener('resize',resizeModule);
 }
-\nconst framePositionObserver=new MutationObserver(resizeModule);\nframePositionObserver?.observe(document.body,{attributes:true,attributeFilter:['class']});\ndocument.getElementById('import-fullscreen').onclick=()=>{document.body.classList.toggle('fullscreen');resizeModule();};\nLab.dispose=()=>{disposed=true;cancelAnimationFrame(resizeFrame);window.removeEventListener('resize',resizeModule);framePositionObserver?.disconnect();if(contentObserver)contentObserver.disconnect();document.body.classList.remove('fullscreen')};\n}})}\nLab.catalog=Lab.catalog.filter(item=>!entries.some(entry=>entry.id===item.id));\nLab.catalog.unshift(...entries.map(({source,file,...entry})=>({...entry})));\nLab.catalog.find(item=>item.id==='11-transformator').num='06';\nLab.catalog.find(item=>item.id==='10-asynchronni').num='03';\nif(location.hash==='#group-materials')history.replaceState(null,'','#group-electromagnetism');\nLab.route();\n})();\n</script>\n<!-- transformer-modules:end -->\n`;
+\nconst framePositionObserver=new MutationObserver(resizeModule);\nframePositionObserver?.observe(document.body,{attributes:true,attributeFilter:['class']});\ndocument.getElementById('import-fullscreen').onclick=()=>{document.body.classList.toggle('fullscreen');resizeModule();};\nLab.dispose=()=>{disposed=true;cancelAnimationFrame(resizeFrame);window.removeEventListener('resize',resizeModule);framePositionObserver?.disconnect();modeObserver?.disconnect();if(contentObserver)contentObserver.disconnect();document.body.classList.remove('fullscreen')};\n}})}\nLab.catalog=Lab.catalog.filter(item=>!entries.some(entry=>entry.id===item.id));\nLab.catalog.unshift(...entries.map(({source,file,...entry})=>({...entry})));\nLab.catalog.find(item=>item.id==='11-transformator').num='06';\nLab.catalog.find(item=>item.id==='10-asynchronni').num='03';\nif(location.hash==='#group-materials')history.replaceState(null,'','#group-electromagnetism');\nLab.route();\n})();\n</script>\n<!-- transformer-modules:end -->\n`;
 html=html.replace(/C\.mount\(app,\{num:'\d+',title:'Zapínací proud transformátoru'/,"C.mount(app,{num:'06',title:'Zapínací proud transformátoru'");
 html=html.replace('Od integrace napětí k sycení jádra a zapínacímu proudu.','Od matematického modelu přes magnetizační proud a náhradní schéma k zapínání.');
 html=html.replace('<span class="badge">Interaktivní modul</span>','<span class="badge">${item.draft?\'Rozpracováno\':\'Interaktivní modul\'}</span>');

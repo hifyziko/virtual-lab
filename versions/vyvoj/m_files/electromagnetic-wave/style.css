@@ -5,3 +5,7 @@
 
 /* Keep the timeline outside both panels and contain the source preview. */
 .desk{grid-template-rows:minmax(0,1fr)}aside{min-height:0;gap:6px;padding:9px}.controls{flex:none;gap:3px}.controls button{padding:4px 5px}.controls select{padding:2px 4px}.controls fieldset{padding:3px 6px;gap:2px}#fieldOptions{gap:2px;padding-top:3px}.moments button{padding:4px 2px}.antenna{min-height:0;flex:1;overflow:hidden}.antenna canvas{height:calc(100% - 22px);top:22px}.antenna #antennaMath{top:22px}.antenna .mathlabel{font-size:10px}.timeline{height:30px;min-height:30px;background:#f4f7f8;position:relative;gap:10px}.timeline input{min-width:0;margin:0}.timeline output{flex:none;width:100px}.timeline>span{flex:none}.sceneBox[data-mode=antenna]{background:#f8fafb;border-color:#c9d8dc}.sceneBox[data-mode=antenna] .sceneHeading h2{color:#233f49}.sceneBox[data-mode=antenna] .sceneHeading p{color:#627a83}
+
+body[data-fusion-page="em06-vlna"] main{gap:5px}
+body[data-fusion-page="em06-vlna"] aside{padding:6px;gap:5px}
+body[data-fusion-page="em06-vlna"] .timeline{min-height:0;padding:3px 9px}

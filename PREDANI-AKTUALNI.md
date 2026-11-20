@@ -1,17 +1,24 @@
 # Aktuální stav předání
 
+## Elektřina a magnetismus — 20. listopadu 2026
+
+Ovládání je zhuštěné ve společném rozvržení oddílu. Rychlé volby využívají
+stávající horní panel. Skin, Proximity a Matice vodičů se přepínají z hlavičky
+vedle „Ovládání a výklad“. Schéma Princip lze natočit v rovině obrázku tažením
+nebo šipkami. Svislý prostor uvolněný z ovládání a výkladu využívají scény
+a grafy. V prostředním panelu hystereze má proměnná zpráva rezervovanou výšku.
+Tlačítko „Moduly“ má původní plovoucí polohu.
+
 ## Energetické milníky fúze — 20. listopadu 2026
 
-Prototyp první etapy je pod #fu14-milniky, v tématu Základy plazmatu a fúze
-hned za Lawsonovým kritériem. Prostorový SVG řez inspirovaný ITER, toky výkonu,
-předvolby, vypnutí ohřevu a samostatné indikátory jsou funkční. Bilanční model
-předepisuje fúzní výkon a ztráty. Mimo rovnováhu ukazuje okamžitou bilanci
-s idealizovaným zachycením tepla, bez časového vývoje teploty. Indukční rozběh
-je názorný. Pro výchozí parametry a ztráty 200 MW jsou meze 166,67 MW, 424,11 MW
-a 1 000 MW. Grafika nově přímo používá CAD odvozené profily ITER ze stávajícího modulu.
-NBI a ECRH mají samostatné řezy portů. Parogenerátor odděluje primární
-chladivo a parní oběh s kondenzátorem a čerpadlem. Velikost okna používá
-stejný přepočet jako Lawsonovo kritérium. Druhá etapa čeká na schválení.
+Modul #fu14-milniky je v tématu Základy plazmatu a fúze za Lawsonovým
+kritériem. Ovládání vlevo nastavuje celkový externí ohřev, hustotu, dobu
+udržení a účinnosti. Ohřev se dělí v poměru 60 % NBI a 40 % vlnový ohřev. Model integruje tepelnou energii plazmatu a počítá
+fúzní výkon z reaktivity D–T podle Bosch–Hale. Tři milníky vyhodnocuje
+samostatně. Pod scénou jsou živé výkony, které řídí také animaci toků.
+Zvýrazněné tlačítko „Jak na to“ vede čtyřmi pokusy včetně ověření zapálení.
+Tokamak využívá profily ITER ze stávajícího modulu. Rozměry okna vycházejí
+z modulu Magnetické udržení.
 
 ## Převzetí aktuálního projektu — 20. listopadu 2026
 

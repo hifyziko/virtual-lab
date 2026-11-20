@@ -1,9 +1,30 @@
 /* Electromagnetism shares the same logical frame and host scale. */
 main.uniform-module-layout{--module-flexible-height:1;min-height:var(--module-host-height,1000px)!important}
 /* Skin/proximity: reserve controls, spend the remaining height on three panels. */
-.hf-embedded main.uniform-module-layout{--hf-controls:120px;--hf-gap:8px;--hf-stage:calc(var(--module-host-height,1000px) - 328px);height:var(--module-host-height,1000px)!important;max-height:none;grid-template-rows:0 36px var(--hf-controls) var(--hf-stage) 44px 64px}
+.hf-embedded main.uniform-module-layout{--hf-controls:70px;--hf-mode-width:350px;--hf-gap:8px;--hf-stage:calc(var(--module-host-height,1000px) - var(--hf-controls) - 69px);height:var(--module-host-height,1000px)!important;max-height:none;grid-template-rows:var(--hf-controls) var(--hf-stage) 44px;padding:4px 0}
+.hf-embedded main.uniform-module-layout>.tabs{grid-row:1;z-index:1;align-self:center;justify-self:end;margin:0 10px 0 0;gap:4px}
+.hf-embedded main.uniform-module-layout>.tabs .tab{padding:4px 6px;font-size:12px;white-space:nowrap}
+.hf-host-modes main.uniform-module-layout>.tabs[hidden]{display:none!important}
+.hf-host-modes.hf-embedded main.uniform-module-layout{--hf-mode-width:9px}
+.hf-embedded main.uniform-module-layout>#hfPanel{padding:5px var(--hf-mode-width) 5px 9px;display:flex;align-items:center;gap:10px}
+.hf-embedded #hfPanel #ctrlGrid{flex:1;display:flex;align-items:start;gap:8px}
+.hf-embedded #ctrlGrid .ctrl{flex:1 1 0}
+.hf-embedded #ctrlGrid .ctrl:has(.selector){flex:0 0 auto}
+.hf-embedded #hfPanel .ctrl label{font-size:12px;margin-bottom:2px}
+.hf-embedded #hfPanel .selector{margin-top:2px;gap:3px}
+.hf-embedded #hfPanel .pill,.hf-embedded #hfPanel .pill[data-setting="sign"]{padding:3px 4px;font-size:11px}
+.hf-embedded #hfPanel .barline{flex:none;align-self:center;border:0;padding:0}
+.hf-embedded #hf-presets{display:flex;align-items:center;gap:4px}
+.hf-embedded #hfPanel .preset{padding:4px 6px;font-size:11px;white-space:nowrap;background:#fff0db;color:#713c13;border-color:#e0a463}
+.hf-embedded #hfPanel .preset:hover{background:#ffddb5}
+.hf-embedded main.uniform-module-layout #hfMatrix .matrix-input{padding:5px var(--hf-mode-width) 5px 9px;display:flex;align-items:center}
+.hf-embedded #hfMatrix .matrix-advanced summary{white-space:normal;line-height:1.2}
+.hf-embedded main.uniform-module-layout #hfMatrix .matrix-controls{width:100%;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-auto-rows:auto;gap:5px}
+.hf-embedded main.uniform-module-layout #hfMatrix .matrix-controls label.matrix-frequency{grid-column:span 2;grid-template-columns:minmax(0,1fr) 55px}
+.hf-embedded main.uniform-module-layout>#hfPanel,.hf-embedded main.uniform-module-layout #hfMatrix .matrix-input{grid-row:1}
+.hf-embedded main.uniform-module-layout>.layout,.hf-embedded main.uniform-module-layout #hfMatrix #mx-results{grid-row:2}
+.hf-embedded main.uniform-module-layout>.periodToolbar,.hf-embedded main.uniform-module-layout #hfMatrix .periodToolbar{grid-row:3}
 .hf-embedded main>.periodToolbar{height:44px;min-height:44px}
-.hf-embedded main>.modelNotes{height:64px;min-height:64px}
 .hf-embedded main>.layout>.card{padding:8px;gap:4px}
 .hf-embedded #concept{height:240px!important;min-height:240px;max-height:240px;margin-top:0}
 .hf-embedded .couplingCycle{height:180px;max-height:180px}
@@ -15,7 +36,7 @@ main.uniform-module-layout{--module-flexible-height:1;min-height:var(--module-ho
 /* Graphs yield height to equations; no fixed child may protrude into the footer. */
 .hf-embedded main>.layout>.card #field,.hf-embedded main>.layout>.card #profile,.hf-embedded main>.layout>.card #concept{height:0!important;min-height:100px;max-height:none;flex:1 1 0}
 .hf-embedded main>.layout>.card #concept{min-height:140px}
-.hf-embedded .couplingCycle{height:150px;max-height:150px}
+.hf-embedded .couplingCycle{height:205px;max-height:205px}
 /* Hysteresis losses: controls and equations stay compact, both drawings fill the remainder. */
 main.uniform-module-layout:has(#hardness){height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:8px}
 main.uniform-module-layout:has(#hardness)>*{flex-shrink:0;margin-top:0;margin-bottom:0}
@@ -58,7 +79,6 @@ main[data-foundation-module="mag04-virive-proudy"]>.layout{flex:1 1 0;height:0;m
 .hf-embedded #hfMatrix #mx-results,.hf-embedded #hfMatrix #mx-results[hidden],.hf-embedded #hfMatrix .matrix-results,.hf-embedded #hfMatrix figure.card,.hf-embedded #hfMatrix figure.card:last-child{height:var(--hf-stage);min-height:var(--hf-stage);max-height:var(--hf-stage)}
 .hf-embedded #hfMatrix figure.card svg{height:0!important;min-height:100px;max-height:none;flex:1 1 0}
 .hf-embedded #hfMatrix .periodToolbar{height:44px;min-height:44px}
-.hf-embedded #hfMatrix>.matrix-note{height:64px;min-height:64px}
 .hf-embedded #hfMatrix .matrix-controls{grid-auto-rows:46px;gap:4px 10px}
 .hf-embedded #hfMatrix .matrix-controls label{grid-template-rows:18px 26px;gap:2px;font-size:12px;line-height:18px}
 .hf-embedded #hfMatrix .matrix-controls input:not([type=range]),.hf-embedded #hfMatrix .matrix-controls select{height:26px}
@@ -77,3 +97,70 @@ main>.periodToolbar>.instant-control:has(input:checked){background:#007e6c;borde
 main>.periodToolbar>.instant-control:hover{border-color:#005f52;box-shadow:0 0 0 1px #007e6c33}
 main>.periodToolbar>.instant-control:focus-within{outline:3px solid #c99d3c;outline-offset:2px}
 main>.periodToolbar>.instant-control input{accent-color:#007e6c}
+
+/* Explanatory rows are collected into the shared guide. Do not reserve their tracks. */
+main[data-foundation-module="mag01-magnetizace"]>.heading{display:none}
+main[data-foundation-module="mag03-hysterezni-ztraty"]>.equations:not(:has(>.card:not([data-guide-source]))){display:none}
+
+/* Use the same compact control rhythm across the foundation lessons. */
+main.uniform-module-layout[data-foundation-module]:not([data-foundation-module="hf-skin-proximity"]){
+  padding:4px 0 8px!important;
+}
+main[data-foundation-module]:is([data-foundation-module^="mag"],[data-foundation-module^="em"]) :is(.toolbar,.controls) button{
+  padding:4px 8px;
+}
+main[data-foundation-module] :is(.toolbar,.controls) input[type="range"]{height:16px;margin:2px 0}
+main[data-foundation-module] :is(.toolbar,.controls) .ticks{margin:0}
+main[data-foundation-module]:is([data-foundation-module="mag01-magnetizace"],[data-foundation-module="mag02-hystereze"],[data-foundation-module="mag04-virive-proudy"])>.controls{
+  grid-template-columns:auto repeat(var(--foundation-sliders),minmax(0,1fr));
+  padding:6px 10px;gap:10px;align-items:center;margin:0;
+}
+main[data-foundation-module="mag01-magnetizace"]{--foundation-sliders:2}
+main.uniform-module-layout[data-foundation-module="mag02-hystereze"]:has(#zoomWall){
+  --foundation-sliders:1;grid-template-rows:auto minmax(0,1fr)!important;gap:8px;
+  padding:4px 0 8px!important;
+}
+main.uniform-module-layout[data-foundation-module="mag02-hystereze"]:has(#zoomWall)>.controls{
+  grid-template-columns:auto minmax(0,1fr);padding:6px 10px;
+}
+main.uniform-module-layout[data-foundation-module="mag02-hystereze"] .card #event{
+  min-height:calc(3 * 1.4em + 20px);
+}
+main[data-foundation-module="mag02-hystereze"] #contactCount{
+  display:inline-block;min-width:2ch;text-align:right;font-variant-numeric:tabular-nums;
+}
+main[data-foundation-module="mag04-virive-proudy"]{--foundation-sliders:3}
+main[data-foundation-module="mag03-hysterezni-ztraty"]>.controls{padding:6px 10px}
+main[data-foundation-module="em02-vzajemna-indukcnost"]>.toolbar{padding:6px 10px}
+main[data-foundation-module="em02-vzajemna-indukcnost"] .control{padding:4px 7px}
+
+/* The two induction-mode switches share the toolbar instead of using stacked bars. */
+body.em-lesson main[data-foundation-module="em01-indukovane-napeti"]>.toolbar{
+  display:flex;align-items:center;gap:10px;padding:6px 10px!important;margin:0 0 8px;
+}
+main[data-foundation-module="em01-indukovane-napeti"]>.toolbar>.tabs{flex:none;gap:5px;margin:0}
+main[data-foundation-module="em01-indukovane-napeti"]>.toolbar>.controls{flex:1;min-width:0;gap:6px}
+main[data-foundation-module="em01-indukovane-napeti"]>.toolbar>.controls>.control{padding:4px 6px}
+main[data-foundation-module="em01-indukovane-napeti"]:has(>.rod-view-switch:not([hidden]))>.toolbar{padding-right:335px!important}
+main[data-foundation-module="em01-indukovane-napeti"]>.rod-view-switch:not([hidden]){
+  position:absolute;top:9px;right:10px;z-index:2;border:0;padding:0;margin:0;gap:5px;
+}
+main[data-foundation-module="em01-indukovane-napeti"]>.rod-view-switch button{padding:4px 8px}
+
+/* Place the force experiment's quick choices next to its live wire controls. */
+main[data-foundation-module="em03-silove-ucinky"]>.toolbar{
+  display:flex;align-items:center;gap:12px;padding:6px 10px;
+}
+main[data-foundation-module="em03-silove-ucinky"] .presets{
+  flex:0 0 250px;display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0;padding:0;border:0;
+}
+main[data-foundation-module="em03-silove-ucinky"] .presets>strong{display:none}
+main[data-foundation-module="em03-silove-ucinky"] .presets button{font-size:12px;min-height:0;padding:2px 5px}
+main[data-foundation-module="em03-silove-ucinky"] .wireControls{flex:1;min-width:0;gap:8px}
+main[data-foundation-module="em03-silove-ucinky"] .wireControl{padding-left:7px;gap:2px 7px}
+main[data-foundation-module="em03-silove-ucinky"] .wireControl>.rangeLabel{margin:0;font-size:12px}
+main[data-foundation-module="em03-silove-ucinky"] .positionSliders{margin:0;gap:2px 4px}
+main[data-foundation-module] :is(.presets button[data-preset],#preset.btn){
+  background:#fff0db;color:#713c13;border-color:#e0a463;
+}
+main[data-foundation-module] :is(.presets button[data-preset],#preset.btn):hover{background:#ffddb5}

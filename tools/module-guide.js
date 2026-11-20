@@ -28,6 +28,18 @@
  }
  function sync(){close();launch.hidden=true;}
  const roots=new WeakMap();
+ const experimentNotes={
+  'mag01-magnetizace':'main > .heading .hint,main > .foot,.controls > .status',
+  'mag02-hystereze':'.controls > .referenceNotice',
+  'em01-indukovane-napeti':'main .modelnote',
+  'em02-vzajemna-indukcnost':'main .modelnote,.toolbar .tabs,.toolbar .control > .note',
+  'em03-silove-ucinky':'main > .modelNote,.mapPanel > .help',
+  'mag03-hysterezni-ztraty':'main > .equations > .card,.controls .hint',
+  'mag04-virive-proudy':'main > .sources,.controls .button-note',
+  'hf-skin-proximity':'main > .modelNotes,#hfMatrix > .matrix-note',
+  'em04-premena':'.energy-grid .energy-caption:not([id]),.energy-section-note',
+  'em05-reluktance':'.energy-grid .energy-caption:not([id]),.energy-bottom > p'
+ };
  let active=null;
  // Keep original nodes and IDs alive for the lesson's renderers. Only the
  // explanatory document is copied, on demand, with its current values.
@@ -47,7 +59,8 @@
    }
   }
   for(const row of scope.querySelectorAll('.statusline')){if(!row.querySelector('button,input,select,canvas,svg'))row.style.setProperty('display','none','important');}
-  const candidates=scope.querySelectorAll('main > .footer,main > .footnote,main > .footerbar,main > .mathnote,.sceneFoot,details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]');
+  const lessonNotes=experimentNotes[location.hash.slice(1)];
+  const candidates=scope.querySelectorAll('main > .footer,main > .footnote,main > .footerbar,main > .mathnote,.sceneFoot,details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]'+(lessonNotes?','+lessonNotes:''));
   for(const node of candidates){
    if(nodes.includes(node)||node.closest('[data-guide-source]'))continue;
    if(node.matches('details')){
@@ -59,7 +72,7 @@
    node.style.setProperty('display','none','important');
    nodes.push(node);
   }
-  for(const [content,button]of [['dialog#theory','#help'],['dialog#guide','#help'],['dialog#explanation','button#theory'],['dialog.arm-explanation','#arm-explain'],['dialog.energy-help','#ee-help'],['section.explain#help','#explain'],['#dd-theory-panel','#dd-theory-toggle']]){
+  for(const [content,button]of [['dialog#theory','#help'],['dialog#guide','#help'],['dialog#explanation','button#theory'],['dialog.arm-explanation','#arm-explain'],['dialog.energy-help','.energy-bottom'],['section.explain#help','#explain'],['#dd-theory-panel','#dd-theory-toggle']]){
    const trigger=scope.querySelector(button);
    if(scope.querySelector(content)?.hasAttribute('data-guide-source')&&trigger&&trigger.style.display!=='none')trigger.style.setProperty('display','none','important');
   }

@@ -3,12 +3,12 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const html=fs.readFileSync('versions/aktualni/web/index.html','utf8');
 const catalog=JSON.parse(html.match(/Lab\.catalog=(\[[\s\S]*?\]);/)[1]);
 const imported=JSON.parse(html.match(/const entries=(\[.*?\]);\nfor\(const entry of entries\)/s)[1]);
-const Lab={catalog:[...imported,...catalog.filter(m=>!imported.some(e=>e.id===m.id))],groupArt:{},register(){},route(){},home(){}};
+const Lab={catalog:[...imported,...catalog.filter(m=>!imported.some(e=>e.id===m.id))],modules:new Map(),groupArt:{},register(){},route(){},home(){}};
 for(const m of html.matchAll(/const entry=\{id:'([^']+)',group:'([^']+)'[^;]*?title:'([^']+)'/g)){
  if(!Lab.catalog.some(e=>e.id===m[1]))Lab.catalog.push({id:m[1],group:m[2],title:m[3]});
 }
-const c={Lab,document:{readyState:'loading'}};c.window=c;vm.createContext(c);
-for(const file of ['versions/vyvoj/m_files/Web/direct-current/lessons.js','tools/particle-library-navigation.js','tools/module-guide-data.js'])vm.runInContext(fs.readFileSync(file,'utf8'),c);
+const c={Lab,EnergyExperiments:{},document:{readyState:'loading'}};c.window=c;vm.createContext(c);
+for(const file of ['versions/vyvoj/m_files/Web/direct-current/lessons.js','versions/vyvoj/m_files/Web/energy-experiments/ui.js','tools/particle-library-navigation.js','tools/module-guide-data.js'])vm.runInContext(fs.readFileSync(file,'utf8'),c);
 const {entries,sources,aliases}=c.ModuleGuideData;
 assert(!/STEJNOSMERNE|SYNCHRONNI_|prezentac|TEs|TES kni/i.test(Object.values(sources).join(' ')),'no presentation or working scan-folder citations in the guide');
 assert(Object.values(sources).some(s=>s.includes('Bartoš: Teorie elektrických strojů')),'use the correct book identity');

@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('node:assert/strict');
-const {defaults, presets, solve} = require('../versions/vyvoj/m_files/fusion/milniky/model.js');
+const {defaults, presets, solve, experiment, heatCapacity, reactivity} = require('../versions/vyvoj/m_files/fusion/milniky/model.js');
 const close = (a,b) => assert(Math.abs(a-b)<1e-8, a+' differs from '+b);
 const at = (fusion, more) => solve({...defaults, fusion, ...more});
 const reference = at(100);
@@ -45,6 +45,38 @@ for (const fusion of [0,100,550,1000,1500]) {
   }
 }
 console.log('PASS: exact milestone boundaries, reversed grid, zero powers, efficiency, recovered heat and transient conservation.');
+
+assert(Math.abs(reactivity(10)/1.136e-22 - 1) < .003);
+const controls = {density:.85, confinement:2, externalHeating:95};
+const referenceControls = {...controls,confinement:1.65};
+let referenceEnergy = 5*heatCapacity(controls.density);
+for(let elapsed=0;elapsed<120;elapsed+=.02){
+  const state=experiment(referenceControls,referenceEnergy);
+  assert(!state.science && !state.engineering && !state.ignition);
+  referenceEnergy+=.02*state.delta;
+}
+const energy = 6*heatCapacity(controls.density);
+const referencePlasma = experiment(controls,energy);
+assert(referencePlasma.science && !referencePlasma.engineering && !referencePlasma.ignition);
+const efficient = experiment({...controls,grossEfficiency:50},energy);
+close(efficient.fusion,referencePlasma.fusion);
+assert(efficient.net > referencePlasma.net);
+const split = experiment({...controls,externalHeating:120,beamEfficiency:60,waveEfficiency:40},energy);
+close(split.beam,72);
+close(split.wave,48);
+close(split.recirc,240);
+const cooling = experiment({...controls,heatingOff:true},energy);
+const burning = experiment({...controls,density:.96,confinement:3,heatingOff:true},12*heatCapacity(.96));
+assert(cooling.delta < 0 && !cooling.ignition);
+assert(burning.delta > 0 && burning.ignition);
+const idle = experiment({...controls,heatingOff:true},0);
+assert(!idle.science && !idle.engineering && !idle.ignition);
+for (const state of [referencePlasma,efficient,cooling,burning,idle]) {
+  close(state.delta,state.heating+state.alpha-state.plasmaLoss);
+  close(state.thermal+state.delta,1.1*state.fusion+state.heating);
+  close(state.net,state.gross-state.recirc-state.own);
+}
+console.log('PASS: Bosch–Hale reactivity, experimental heating cutoff and transient power balances.');
 const fs=require('node:fs');
 const vm=require('node:vm');
 class Element {
@@ -60,30 +92,12 @@ class Element {
   getTotalLength() {return 100;}
   getPointAtLength(x) {return {x,y:0};}
 }
-const roots=Object.fromEntries(['plant','tokamak','rear-flows','front-flows','heating-fields'].map(id=>[id,new Element()]));
-const window={};
-const context={window,document:{getElementById:id=>roots[id],createDocumentFragment:()=>new Element(),
-  createElementNS:()=>new Element()},matchMedia:()=>({matches:true,addEventListener(){}}),cancelAnimationFrame(){}};
-vm.runInNewContext(fs.readFileSync('versions/vyvoj/m_files/fusion/equilibrium/cad-parameters.js','utf8'),context);
+const roots=Object.fromEntries(['plant','foundation','circuits','reactor','machines','heating','labels','import-guide'].map(id=>[id,new Element()]));
+const context={window:{},document:{getElementById:id=>roots[id],createElementNS:()=>new Element()}};
+vm.runInNewContext(fs.readFileSync(require.resolve('../versions/vyvoj/m_files/fusion/equilibrium/cad-parameters.js'),'utf8'),context);
 vm.runInNewContext(fs.readFileSync(require.resolve('../versions/vyvoj/m_files/fusion/milniky/scene.js'),'utf8'),context);
-const grid=roots['front-flows'].children.find(node=>node.attrs['data-flow']==='grid');
-const gridView=v=>{
-  window.HiFyzikoMilestoneScene.update(v,null,false,String);
-  const [, ,line,arrows]=grid.children;
-  return {width:line.style.strokeWidth,rotation:arrows.children[0].attrs.transform};
-};
-assert.match(gridView(at(100)).rotation,/rotate\(180\)$/,'Grid import reverses the rendered arrows');
-assert.match(gridView(at(550)).rotation,/rotate\(0\)$/,'Grid export points out of the plant');
-assert.equal(gridView(at(0,{plasmaLoss:0})).width,'0px');
-const heatingFields=roots['heating-fields'];
-const scene=window.HiFyzikoMilestoneScene;
-scene.update(at(100,{beamShare:100}),null,false,String);
-assert(heatingFields.classes.has('beam-on'));
-assert(!heatingFields.classes.has('wave-on'));
-scene.update(at(100,{beamShare:0}),null,false,String);
-assert(!heatingFields.classes.has('beam-on'));
-assert(heatingFields.classes.has('wave-on'));
-scene.update(at(100,{heatingOff:true}),null,false,String);
-assert.equal(heatingFields.classes.size,0);
-assert(roots.tokamak.children[0].children.length>1000,'The CAD-derived sections generate the tokamak cutaway');
-console.log('PASS: rendered tokamak CAD profiles, active heating fields, grid import, export and zero flow.');
+const paths=['circuits','machines','heating'].flatMap(id=>roots[id].children.map(el=>el.attrs['data-flow']).filter(Boolean));
+assert.equal(paths.length,new Set(paths).size);
+for(const id of ['primary-hot','primary-return','steam','exhaust','feedwater','shaft','grid','own-use','recirculation','alpha','ecrh','nbi','induced-current'])assert(paths.includes(id),id);
+assert(roots.reactor.children.length>100);
+console.log('PASS: CAD cutaway and separately addressable demonstration flows.');

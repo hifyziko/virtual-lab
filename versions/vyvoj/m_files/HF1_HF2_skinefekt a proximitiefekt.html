@@ -105,7 +105,7 @@ main>.periodToolbar>.instant-control input{accent-color:#007e6c}
 <div class="tabs" role="tablist" aria-label="Výukový modul"><button class="tab" id="tab1" role="tab" aria-selected="true" aria-controls="hfPanel">HF1 · Skin efekt</button><button class="tab" id="tab2" role="tab" aria-selected="false" aria-controls="hfPanel">HF2 · Proximity efekt</button></div>
 <section class="controlbox" id="hfPanel" aria-label="Ovládání modulu">
 <div class="ctrlgrid" id="ctrlGrid"></div>
-<div class="barline"><div class="presets"><span class="tiny">UKÁZKY:</span><span id="presetButtons"></span></div></div>
+<div class="barline"><div id="hf-presets" class="presets" role="group" aria-label="Ukázky"></div></div>
 </section>
 <div class="layout">
   <section class="card"><h2>Princip <small>prostorový vektorový řez · schéma</small></h2><svg id="concept" class="visual canvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 650" role="img" aria-label="Technický řez vodičem s vypočtenými vektory proudové hustoty">
@@ -391,6 +391,42 @@ function uniformRectangle(p,c){const N=c.nx,centers=p.pair?[-c.distance/2,c.dist
 <script>
 'use strict';
 const $=id=>document.getElementById(id),SVG='http://www.w3.org/2000/svg',MU0=4*Math.PI*1e-7;
+// Rotate the technical drawing in its plane, leaving the calculated maps and
+// profiles in their original coordinate systems.
+{
+ const drawing=$('concept'), scenes=[$('skinScene'),$('proximityScene')];
+ const {x,y,width,height}=drawing.viewBox.baseVal;
+ const cx=x+width/2,cy=y+height/2;
+ let angle=0,drag=null;
+ function rotate(value){
+  angle=Math.max(-25,Math.min(25,value));
+  const t=Math.abs(angle)*Math.PI/180;
+  const scale=Math.min(1,width/(width*Math.cos(t)+height*Math.sin(t)),
+   height/(height*Math.cos(t)+width*Math.sin(t)));
+  for(const scene of scenes)scene.setAttribute('transform','translate('+cx+' '+cy+') rotate('+angle+') scale('+scale+') translate('+(-cx)+' '+(-cy)+')');
+ }
+ drawing.tabIndex=0;
+ drawing.setAttribute('aria-label','Princip. Tažením nebo šipkami otočíš kresbu. Home obnoví původní natočení.');
+ drawing.style.touchAction='none';
+ drawing.style.cursor='grab';
+ drawing.addEventListener('pointerdown',event=>{
+  if(event.button!==0||drag)return;
+  drag={id:event.pointerId,x:event.clientX,angle};
+  drawing.setPointerCapture(event.pointerId);
+  drawing.style.cursor='grabbing';
+ });
+ drawing.addEventListener('pointermove',event=>{
+  if(drag?.id===event.pointerId)rotate(drag.angle+120*(event.clientX-drag.x)/drawing.getBoundingClientRect().width);
+ });
+ drawing.addEventListener('lostpointercapture',()=>{drag=null;drawing.style.cursor='grab';});
+ drawing.addEventListener('dblclick',()=>rotate(0));
+ drawing.addEventListener('keydown',event=>{
+  const rotations={ArrowLeft:angle-5,ArrowRight:angle+5,Home:0};
+  if(!(event.key in rotations))return;
+  event.preventDefault();
+  rotate(rotations[event.key]);
+ });
+}
 const fmt=(n,d=2)=>Number(n).toLocaleString('cs-CZ',{minimumFractionDigits:d,maximumFractionDigits:d});
 const mats={Cu:{sigma:58e6},Al:{sigma:35e6}};
 if(window.self!==window.top)document.documentElement.classList.add('hf-embedded');
@@ -419,7 +455,7 @@ function ctrlRenderer(){
  (st.shape==='circle'?(pair?range('radius1','Poloměr a₁',st.a1,.2,5,.05,fmt(st.a1)+' mm')+range('radius2','Poloměr a₂',st.a2,.2,5,.05,fmt(st.a2)+' mm'):range('radius','Poloměr a',st.a,.2,5,.05,fmt(st.a)+' mm')):range('widthCtl','Šířka w',st.w,1,4,.05,fmt(st.w)+' mm')+range('heightCtl','Výška h',st.h,.5,2,.05,fmt(st.h)+' mm'))+
  (pair?range('gapCtl','Mezera povrchů g',st.g,.1,8,.05,fmt(st.g)+' mm')+toggle('sign','Směr I₂ vůči I₁',[[-1,'I₁ →  ← I₂'],[1,'I₁ →  → I₂']],st.sign):'')+toggle('supply','Napájení',[['ac','AC'],['dc','DC']],st.f?'ac':'dc')+
  toggle('mat','Materiál',[['Cu','Cu'],['Al','Al']],st.mat);
- $('presetButtons').innerHTML=(pair?[['closeOpp','Blízko · opačné'],['closeSame','Blízko · stejné'],['farOpp','Daleko']]:[['0','DC'],['20000','20 kHz'],['100000','100 kHz']]).map(([k,t])=>'<button class="preset" data-preset="'+k+'">'+t+'</button>').join('');
+ $('hf-presets').innerHTML=(pair?[['closeOpp','Blízko · opačné'],['closeSame','Blízko · stejné'],['farOpp','Daleko']]:[['0','DC'],['20000','20 kHz'],['100000','100 kHz']]).map(([k,t])=>'<button type="button" class="preset" data-preset="'+k+'">'+t+'</button>').join('');
  $('heroTitle').textContent=pair?'Proximity efekt ve dvou vodičích':'Skin efekt v jednom vodiči';
  $('tab1').setAttribute('aria-selected',!pair);$('tab2').setAttribute('aria-selected',pair);
  document.querySelectorAll('#ctrlGrid input').forEach(e=>e.oninput=()=>{const key={radius:'a',radius1:'a1',radius2:'a2',widthCtl:'w',heightCtl:'h',gapCtl:'g'}[e.id];if(e.id==='frequency'){st.f=50*Math.exp(+e.value/120*Math.log(max/50));$('frequencyValue').textContent=niceF(st.f);document.querySelectorAll('[data-setting=supply]').forEach(b=>b.classList.toggle('active',b.dataset.value==='ac'))}else{st[key]=+e.value;$(e.id+'Value').textContent=fmt(+e.value)+' mm'}clearTimeout(controlTimer);requestId++;if(job){job.terminate();job=null}if(jobUrl){URL.revokeObjectURL(jobUrl);jobUrl=null}solved=null;$('status').textContent='Nastavuji parametry…';$('status').dataset.state='busy';controlTimer=setTimeout(drawAll,220)});
@@ -609,7 +645,7 @@ setupResults();
 
 
 $('tab1').onclick=()=>{S.mode='HF1';ctrlRenderer()};$('tab2').onclick=()=>{S.mode='HF2';ctrlRenderer()};
-$('presetButtons').onclick=e=>{const b=e.target.closest('[data-preset]');if(b)applyPreset(b.dataset.preset)};
+$('hf-presets').onclick=e=>{const button=e.target.closest('[data-preset]');if(button)applyPreset(button.dataset.preset);};
 
 ctrlRenderer();
 function renderMath(){if(!window.katex)return;document.querySelectorAll('[data-tex]').forEach(n=>window.katex.render(n.dataset.tex,n,{throwOnError:false,output:'html',displayMode:!!n.closest('.hfEquations,.equation')}))}
