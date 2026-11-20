@@ -1,6 +1,9 @@
 'use strict';
 const C=require('./common.cjs'),{cp,root}=C;
 const commands=[
+ ['tools/test-pitch-selection.cjs'],
+ ['tools/test-winding-control-effects.cjs'],
+ ['tools/test-pmsm-parameter-scope.cjs'],
  ['versions/vyvoj/tools/test-navigation.cjs','versions/aktualni/web/index.html'],
  ['tools/test-progressive.cjs'],
  ['tools/test-em-wave.cjs'],

@@ -55,3 +55,5 @@
 - Sjednocení výkladu (17. 11. 2026): uživatel schválil pilot Momentové charakteristiky AM a rozšíření na celý projekt. Společný vzor je jedno tlačítko „Ovládání a výklad“ vlevo vedle „Celá obrazovka“. Sdružovat návod k ovládání, doporučený pokus a teorii/model do společného dialogu, zachovat vztahy a zdroje. Matematiku i čísla s jednotkami sázet KaTeXem, české slovní indexy přes \text. Otevření nemění stav pokusu ani rozměry modulu. Uvolněnou plochu po výkladových pruzích přidělit grafům. Rozbalovací nastavení a živé popisky grafů nejsou výklad; zachovat jejich funkci u pokusu.
 
 - Ovládání prostorových scén myší (18. 11. 2026): při tažení doprava snižovat azimut kamery; při tažení dolů zvyšovat její elevaci (oprava svislé osy podle uživatele). Tuto konvenci zachovat v nových a upravovaných prostorových modulech.
+
+- Upřesnění 20. 11. 2026: ve všech modulech odstranit neúčelné prázdné okraje a rezervované řádky po skrytém či přesunutém obsahu. Uvolněnou šířku a výšku přidělit scéně a grafům, nikoli prázdné výplni panelů. Ponechat pouze malé funkční odstupy pro čitelnost a zabránění překryvům; neodstraňovat je plošným nulováním všech mezer.

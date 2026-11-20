@@ -102,3 +102,22 @@ console.log('PASS: transient vertical/horizontal scrollbars cannot alter viewpor
  assert(source.includes("e.stopImmediatePropagation();toggle();"),'one central capture handler prevents double toggles');
  console.log('PASS: fullscreen toggle with native API, missing API and rejected request; exit remains available.');
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+// HF header: modes/actions have their own row, so narrowing cannot collapse the title.
+const shellCss=fs.readFileSync(__dirname+'/uniform-module-layout.css','utf8');
+assert(shellCss.includes('.modulehead:has(.hf-heading-modes){grid-template-columns:88px auto minmax(0,1fr)!important}'));
+assert(shellCss.includes('.modulehead:has(.hf-heading-modes)>.actions{grid-column:1/-1!important;grid-row:2!important;'));
+const fitSource=fs.readFileSync(__dirname+'/module-window-fit.js','utf8'),geometry={getComputedStyle:()=>({marginTop:'0',marginBottom:'12'})};
+vm.runInNewContext('const DESIGN_WIDTH=1600;'+fitSource.slice(fitSource.indexOf('  function boundedScale'),fitSource.indexOf('  const lifted'))+'this.fit=layoutScale;',geometry);
+// Approximate wrapped text metrics; this is a geometry regression, not browser rendering.
+for(const height of [864,780,740]){
+ const heading={style:{},get offsetHeight(){const w=parseFloat(this.style.width);return Math.ceil(500/Math.max(1,w-165))*30+48*Math.ceil(620/Math.max(1,w))+4;}};
+ for(let pass=0;pass<30;pass++){
+  const result=geometry.fit(1492,1000,height-130,heading);
+  assert(result.scale>.49,'125% Full HD layout must retain a usable scene');
+  assert(result.scale*1000+heading.offsetHeight+12<=height-130+.2,'header and scene fit the height');
+ }
+}
+const windingCss=fs.readFileSync(__dirname+'/winding-window-layout.css','utf8');
+assert(windingCss.includes('.rf-workspace[data-winding-viewport]:not(:has(>.modulehead)){grid-template-rows:minmax(0,1fr) auto}'));
+console.log('PASS: HF two-row header and 125% Full HD geometry model; rotating field has no reserved hidden status track. Not a browser visual test.');

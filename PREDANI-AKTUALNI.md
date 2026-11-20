@@ -1,5 +1,254 @@
 # Aktuální stav předání
 
+## Předání k publikaci — 20. listopadu 2026
+
+Uživatel obnovil souhlas s pushem na origin/main. Tento záznam nahrazuje
+starší poznámky o pozastaveném pushi. GitHub Pages sestavuje web po pushi.
+
+Dodávka zahrnuje kompaktní ovládání Hodinového čísla transformátoru,
+přesun poznámky k modelu do výkladu a opravu rozbalení vlastního zapojení.
+U PMSM jsou momenty vedle zvětšeného řezu a rozjezd má nižší ovládací panel.
+Přibývají dříve popsané opravy okrajů, ovladačů vinutí a hodnocení milníků.
+Celá regresní sada prošla při auditu rozložení. Po posledních úpravách
+prošla kontrola balíčků a načítání. Vizuální ověření v prohlížeči zůstává otevřené.
+
+
+## Plošný zdrojový audit prostoru — 20. listopadu 2026
+
+Závěrečná kontrola: celá sada `node tools/project/check.cjs` prošla;
+po posledním doladění CSS PMSM znovu prošly progressive a synchronní
+geometrické kontroly. Bez skutečného prohlížeče.
+
+Rozsah inventury: 71 cest modulů v aktuální dodávce (včetně aliasů),
+45 samostatných CSS souborů a vložené styly v 67 zdrojových HTML.
+Vyhledány pevné výšky, maximální velikosti scén, spodní odsazení a
+explicitní řádky; kandidáti porovnáni s konečnými přepisy společných
+rámců a s přesouváním výkladu do dialogu. Nejde o skutečné měření
+vykreslených obdélníků v prohlížeči. Vizuální kontrola všech modulů,
+záložek, fullscreen a zoomu je nadále NEPROVEDENA.
+
+Potvrzené nové opravy: větší řez PMSM při zachování sloupce textu,
+kompaktní ovládání pohonu PMSM a tři prázdné řádky u transformátorů.
+U ostatních cest zdrojový průchod neprokázal další bezpečně odstranitelnou
+rezervu; to není záruka, že za všech rozměrů nevzniká viditelná mezera.
+Pevné rezervy pro živé popisky, vzorce a neměnné rozměry při přepínání
+režimů nebyly plošně rušeny. Modely ani integrátory se nemění.
+
+| Modul / cesta | Kontrolované rozložení | Výsledek zdrojové kontroly |
+| --- | --- | --- |
+| 01-drazky | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 02-rozloha | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 03-pohyb | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 04-cinitel | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 05-drazkove | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 06-casoprostor | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 07-vinuti | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 08-vozidla | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 08-zesikmeni | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 09-synchronni | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| 10-asynchronni | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| 11-transformator | Nativní transformátorový rámec | Odstraněn skrytý stavový řádek: 40 + 12 px |
+| 12-krok | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| am01-princip | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| am02-momentova-charakteristika | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| am04-trakcni | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| am05-odpor-rotoru | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| dc01-princip | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| dc02-kotva | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| dc03-schema | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| dc06-komutace | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| dc15-bldc | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| dc16-bldc-poloha | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| dc17-rozvinuti | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| dc18-dve-pole | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| dc19-vinuti-komutace | DC rámec + layout příslušného pokusu | Bez další prokázané vady; vizuálně neověřeno |
+| em01-indukovane-napeti | Základy: společný rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| em02-vzajemna-indukcnost | Základy: společný rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| em03-silove-ucinky | Základy: společný rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| em04-pohybove-napeti | Energetický/vlnový rámec + scéna | Bez další prokázané vady; vizuálně neověřeno |
+| em04-premena | Energetický/vlnový rámec + scéna | Bez další prokázané vady; vizuálně neověřeno |
+| em06-vlna | Energetický/vlnový rámec + scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu01-reakce | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu02-galerie | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu03-drift | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu04-udrzeni | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu05-rovnovaha | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu06-divertor | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu07-plazma | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu08-ostrovy | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu09-princip | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu10-compass | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu11-rekonexe | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu12-lawson | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu13-ohrev | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| fu14-milniky | Fúzní rámec + vlastní layout/scéna | Bez další prokázané vady; vizuálně neověřeno |
+| hf-skin-proximity | Základy: společný rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| mag01-magnetizace | Základy: společný rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| mag02-hystereze | Základy: společný rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| mag03-hysterezni-ztraty | Základy: společný rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| mag04-virive-proudy | Základy: společný rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm01-princip | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm02-schema | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm03-torque | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm04-transients | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm05-isolated | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm06-torque-origin | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm07-dq | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm08-rotor-dq | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm09-pmsm-phasor | Strojový rámec + vlastní layout | Zvětšen řez podle panelu; bez limitu 110 px |
+| sm10-pmsm-drive | Strojový rámec + vlastní layout | Kompaktní parametry a přehrávání, 106 místo 132 px |
+| sm11-v-curves | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| sm12-synchronizing | Strojový rámec + vlastní layout | Bez další prokázané vady; vizuálně neověřeno |
+| tocive-pole | Nativní rámec + layout modulu | Bez další prokázané vady; vizuálně neověřeno |
+| tr01-matematicky | Společný transformátorový rámec | Bez další prokázané vady; vizuálně neověřeno |
+| tr02-magnetizacni | Společný transformátorový rámec | Bez další prokázané vady; vizuálně neověřeno |
+| tr03-schema | Společný transformátorový rámec | Odstraněn řádek přesunutého výkladu: 36 + 12 px |
+| tr04-pricna-vetev | Společný transformátorový rámec | Bez další prokázané vady; vizuálně neověřeno |
+| tr05-rozptylova-reaktance | Společný transformátorový rámec | Bez další prokázané vady; vizuálně neověřeno |
+| tr06-hodinove-cislo | Společný transformátorový rámec | Bez další prokázané vady; vizuálně neověřeno |
+| tr08-zkratovy-proud | Společný transformátorový rámec | Odstraněn řádek přesunutého výkladu: 38 + 12 px |
+
+Aktuální zdrojový a uživatelský výstup aktualizován; předchozí místní
+lazy balíčky ponechány pro otevřené relace. Push zůstává pozastavený.
+
+## Spodní rezerva Dynamické stability — 20. listopadu 2026
+
+Podle uživatelova snímku odstraněn prázdný 24px řádek po poznámce
+přesunuté do výkladu a jeho 8px mezera. Spodní padding snížen ze 16
+na 4 logické pixely. Celkem 44 px navíc připadá experimentu. Pravidlo
+platí jen při skutečném přesunutí poznámky (data-guide-source); samostatná
+stránka s viditelnou poznámkou ji zachovává. Fyzika a ovládání beze změny.
+Globální zákaz neúčelných okrajů doplněn do AGENTS.md; nejde o plošné
+nulování funkčních mezer ani tvrzení o vizuálním auditu všech modulů.
+Aktuální dodávka aktualizována, předchozí lazy balíček ponechán pro
+otevřené relace. Progressive a synchronní geometrické testy prošly.
+Bez vizuálního testu v prohlížeči, bez pushe.
+
+## Kompaktní ovládání statického PMSM — 20. listopadu 2026
+
+Podle uživatelova snímku zmenšen pouze panel modulu „PMSM: proud, tok
+a moment“. Čtyři parametry jsou vlevo, přepínače zobrazení a Nastavit
+MTPA v kompaktní mřížce vpravo. Záložky mají šířku podle textu.
+Logická výška panelu klesla ze 132 na 78 px; rozdíl 54 px dostává
+grafická plocha. Zachovány vstupy, výpočty, barvy a režimy rozjezdu.
+Aktuální místní dodávka a manifesty aktualizovány. Předchozí místní PMSM
+balíčky tentokrát zachovány pro již otevřené stránky; změna vzhledu
+se projeví po obnovení celé stránky. Testy progressive načítání,
+synchronního měřítka a parametrů PMSM prošly; vizuální test neproveden.
+Bez pushe.
+
+## Otevřená místní stránka PMSM — 20. listopadu 2026
+
+Uživatel potvrdil chybu při „Ověřit bod v měniči“ v místní verzi.
+Po aktualizaci PMSM zůstala otevřená stránka s předchozími názvy lazy
+balíčků; běžný úklid sestavení je odstranil. Aktuální cílová trasa,
+předání pracovního bodu a oba aktuální balíčky prošly samostatným testem.
+Pro zachování rozpracované otevřené relace byly místně obnoveny přesné
+předchozí balíčky sm09 (1b62c558c9deafa1) a sm10 (2051fb96472b7624).
+Nejsou součástí nového manifestu ani veřejné dodávky; další sestavení
+je může uklidit. Čerstvé načtení indexu používá aktuální balíčky.
+Bez změny modelu či odkazu, bez pushe.
+
+## Rozšířená kontrola zadávání mimo Vinutí — 20. listopadu 2026
+
+Potvrzená chyba: společné nastavení PMSM nabízelo setrvačnost J také
+ve statickém modulu „PMSM: proud, tok a moment“. J je použitá pouze
+v dynamice rozjezdu. Seznam parametrů nyní J obsahuje jen v modulu pohonu;
+model a integrátor se nemění. Test test-pmsm-parameter-scope.cjs spouští
+skutečnou konstrukci nastavení v obou režimech, ověřuje zachování blokace
+Lq pro SPM a vliv J na zrychlení v původním modelu. Zařazen do check.cjs.
+
+Rozsah a meze auditu:
+- Statická inventura 30 vložených lekcí a 11 fúzních indexů: 345 nalezených
+  vstupních polí/selectů, žádné bez textové vazby na obslužný JavaScript.
+  To je pouze vyhledání kandidátů, nikoli důkaz účinku každého parametru.
+- Ručně prověřené podmíněné vazby: tlumení v synchronizaci a stabilitě,
+  Xq u hladkého rotoru ve V-křivkách a výkladu momentu, úhel čisté R/L/C
+  zátěže, režimy PMSM, zdroj/brzdný odpor u DC brzdění, omezení regulačních
+  parametrů DC, kruhový/obdélníkový průřez a styl pole v matici vodičů,
+  zamykání počátečních podmínek Lawsonova pokusu.
+- Nad rámec nalezené setrvačnosti není v tomto průchodu další potvrzená
+  trvale neúčinná volba. Nejde o vyčerpávající funkční audit všech režimů,
+  dynamicky vytvářených vstupů a krajních kombinací celé aplikace.
+- Skutečný prohlížeč nebyl použit; neoznačovat toto za vizuální ověření.
+
+PMSM zdroj, oba generované moduly, vložené lekce, aktuální lazy balíčky
+včetně manifestů aktualizovány. Regrese PMSM, synchronizace, milníků,
+progressive kontrola a veřejný audit prošly. Push stále pozastavený.
+
+## Kontrola účinku ovladačů Vinutí — 20. listopadu 2026
+
+Počet pólů odstraněn z Činitele rozlohy i Činitele vinutí, včetně stavu
+parametru a resetu. Při pevném q měnil pouze skrytý počet drážek; grafy
+ukazují elektrickou periodu nebo normalizované činitele. Rovnice zachovány.
+U Drážkových harmonických se vstup přidaného řádu povolí až po zapnutí
+„Další harmonická“; inicializace, změna i reset drží tento stav shodně.
+
+Rozsah kontroly: skupina Vinutí, nikoli všechny fyzikální moduly aplikace.
+- Činitel rozlohy, Pohyb harmonických, Činitel vinutí, Drážkové harmonické,
+  Časové a prostorové harmonické: nový test spouští skutečné vykreslovací
+  funkce a porovnává kreslicí příkazy při změně parametrů, bez skrytého statusu.
+- Činitel kroku: test výběru základní harmonické včetně vysvětlujícího pohledu.
+- Točivé pole: kontrola obsluh ovládání a existující modelové/layout testy;
+  ruční výběr pólové roviny správně vypíná automatický detail.
+- Od drážek k MMF: kontrola vazeb geometrie, vrstev, kroku, spektra a režimu
+  vykreslení; přídavná harmonická již měla správné podmíněné povolení.
+- Třífázové vinutí a MMF: počet pólů vstupuje do konstrukce, počtu drážek
+  a mechanického rozložení; zachován. Ostatní volby jsou použity ve výpočtu
+  nebo kresbě jednotlivých panelů.
+- Činitel zešikmení: Q a p mění elektrické zešikmení a základní složku;
+  zachovány spolu s řádem harmonické a polohou řezu.
+
+Další trvale neúčinnou volbu jsem v této kontrole nenašel. Parametr může
+mít nulový účinek ve zvláštním fyzikálním stavu (např. nulová amplituda)
+a některé volby platí jen v odpovídajícím režimu; to není zbytečný parametr.
+Nové testy jsou zahrnuty v tools/project/check.cjs. Aktivní dodávka a
+manifesty aktualizovány, cílené testy a progressive kontrola prošly.
+Vizuální test v prohlížeči zůstává neproveden. Push nadále pozastaven.
+
+## Odeslání k uživatelské kontrole — 20. listopadu 2026
+
+Uživatel výslovně schválil push aktuálních oprav na `origin/main`, následně
+jej pozastavil kvůli kontrole významu počtu pólů v Činiteli rozlohy.
+Změny jsou připravené v indexu, zatím bez commitu a bez nového pushe.
+Tento commit zahrnuje níže popsané kompaktní rozložení, základní harmonickou
+a didaktické hodnocení milníků. Výchozí vzdálený stav: `b0ae8ca`.
+GitHub Pages po pushi sestaví a nasadí web automaticky; dokončení nasazení
+je potřeba ověřit v Actions. Označení aplikace zůstává 1.0.
+Ke kontrole na monitoru 1920 × 1080 při 125 %: Skin/Proximity (čitelnost
+hlavičky a velikost scény), Činitel kroku (řád 1 v „Proč harmonická zmizí?“)
+a Točivé pole (využití výšky grafů). Automatické geometrické testy
+nenahrazují tuto uživatelskou vizuální kontrolu.
+
+## Kompaktní okno a základní harmonická — 20. listopadu 2026
+
+Skin/Proximity: přepínače a akce hlavičky mají samostatný řádek, aby při
+přizpůsobování výšce nezůstával názvu úzký sloupec a následně miniaturní
+scéna. Oprava je omezena na hlavičku tohoto modulu. Geometrický regresní
+model pokrývá Full HD při 125 % a několik výšek po odečtení lišt.
+Činitel kroku dovoluje řád 1 i v pohledu „Proč harmonická zmizí?“;
+nenulový krok základní harmonickou nevynuluje, příslušné tlačítko proto
+zůstává neaktivní. Test ověřuje výběr, tok a popisky i původní nulování
+páté harmonické. Točivé pole po vyjmutí hlavičky nerezervuje prázdné řádky
+pro hlavičku a skrytý status; získanou výšku dostávají grafy.
+Aktivní dodávka aktualizována cíleně, manifesty přepočteny. Testy měřítka,
+volby harmonické, Točivého pole, progressive balíčků a audit prošly.
+Skutečné vizuální ověření v prohlížeči nebylo dostupné (ovládání prohlížeče
+odmítnuto zásadou prostředí); geometrické testy je nenahrazují. Zahrnuto do aktuálního odeslání.
+
+## Milníky — pouze didaktické hodnocení, 20. listopadu 2026
+
+Při nulovém externím ohřevu je vědecký milník „Nehodnoceno – zkouška bez
+externího ohřevu“, bez zelené kontrolky a bez nového či přetrvávajícího
+oznámení jeho dosažení. Fyzikální nerovnost i Q v modelu zůstávají stejné;
+výklad a tooltip vysvětlují nedefinovaný podíl při nule a formální limitu.
+Od 40 keV nebo 3000 MW se ve stávajícím stavovém řádku zobrazí upozornění
+na idealizovaný 0D model (bez vyčerpání paliva, helia a úplného transportu
+a stability). Jde jen o didaktické prahy, nikoli regulaci nebo omezení.
+Model, integrátor a grafické soubory beze změny; regresní testy ověřují
+skutečnou prezentační funkci, vypnutí, obnovení ohřevu a ostatní milníky.
+Aktuální dodávka a lazy balíčky aktualizovány. Zahrnuto do aktuálního odeslání.
+
 ## Vinutí — kompaktní ovládání a všechny fáze, 20. listopadu 2026
 
 Následná úprava: fázory všech tří fází v Činiteli rozlohy mají společný
@@ -3839,3 +4088,10 @@ Po zpětné vazbě ze snímku: výchozí příčný rozsah zmenšen na ±0,07a, 
 
 ### Ostrovy — svislé ovládání (18. 11. 2026)
 Podle dalšího upřesnění uživatele obrácena pouze svislá osa vůči předchozí opravě: tažení dolů zvyšuje elevaci, doprava snižuje azimut. AGENTS.md i test upraveny. Test-islands prošel, aktivní web přestavěn.
+
+### Hodinové číslo transformátoru — kompaktní ovládání
+
+Předvolby a sbalená volba vlastního zapojení sdílejí řádek. Otevřený editor
+využívá celou šířku. Ve vloženém modulu odpadl samostatný úvodní řádek.
+Aktuální místní balíčky aktualizovány, kontrola načítání prošla.
+Vizuální kontrola v prohlížeči neproběhla. Bez pushe.

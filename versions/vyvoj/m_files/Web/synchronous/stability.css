@@ -30,3 +30,6 @@ main[data-machine-viewport="sm-stability"] .card>svg{height:0;flex:1 1 0;min-hei
 main[data-machine-viewport="sm-stability"] .card>:not(svg){flex-shrink:0}
 main[data-machine-viewport="sm-stability"] .plots{grid-template-rows:minmax(0,1.08fr) minmax(0,.92fr)}
 main[data-machine-viewport="sm-stability"] .graph-view .plots{grid-template-rows:minmax(0,1fr)}
+
+/* The guide owns the footnote; its former row must return to the experiment. */
+main.uniform-module-layout[data-machine-viewport="sm-stability"]:has(>.footnote[data-guide-source]){grid-template-rows:82px 40px minmax(0,1fr) 48px;padding-bottom:4px!important}

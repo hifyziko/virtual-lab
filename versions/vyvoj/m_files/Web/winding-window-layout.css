@@ -26,6 +26,11 @@
 #app>.rf-workspace[data-winding-viewport]>.gridplots{grid-column:2;grid-row:2;min-height:0!important;height:100%!important;margin:0}
 #app>.rf-workspace[data-winding-viewport]>#pole-info{grid-column:2;grid-row:3;margin:0!important;height:50px;font-size:13px;line-height:1.35!important}
 #app>.rf-workspace[data-winding-viewport]>.statusline{grid-column:2;grid-row:4;margin:0;font-size:12px;line-height:1.3}
+/* The heading is lifted above the workspace and the status row is hidden. */
+#app>.rf-workspace[data-winding-viewport]:not(:has(>.modulehead)){grid-template-rows:minmax(0,1fr) auto}
+#app>.rf-workspace[data-winding-viewport]:not(:has(>.modulehead))>.controls{grid-row:1/3}
+#app>.rf-workspace[data-winding-viewport]:not(:has(>.modulehead))>.gridplots{grid-row:1}
+#app>.rf-workspace[data-winding-viewport]:not(:has(>.modulehead))>#pole-info{grid-row:2}
 #app>.rf-workspace[data-winding-viewport] .rf-transport{display:flex;flex-wrap:wrap;gap:8px}
 #app>.rf-workspace[data-winding-viewport] .rf-transport .time{flex:1 0 100%;order:2;min-width:0}
 #app>.rf-workspace[data-winding-viewport] .rf-primary{display:flex;flex-direction:column;align-items:stretch;gap:9px}

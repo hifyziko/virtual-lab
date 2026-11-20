@@ -82,13 +82,16 @@
 !/tools/test-iter-blanket.cjs
 !/tools/test-module-guide.cjs
 !/tools/test-particle-library.cjs
+!/tools/test-pitch-selection.cjs
 !/tools/test-plasma.cjs
+!/tools/test-pmsm-parameter-scope.cjs
 !/tools/test-progressive.cjs
 !/tools/test-scene-loading.cjs
 !/tools/test-surface-unroll.cjs
 !/tools/test-tokamak-equilibrium.cjs
 !/tools/test-tunneling-wave.cjs
 !/tools/test-vehicle-art.cjs
+!/tools/test-winding-control-effects.cjs
 !/tools/tokamak-requirements.txt
 !/tools/update-version-index.cjs
 !/versions/AGENTS.md

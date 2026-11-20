@@ -59,6 +59,11 @@ function configure(){
  $('mapTitle').textContent=drive?'Co dovolí proud a napětí?':'Proud v rotorových souřadnicích';
  $('mapMode').innerHTML=drive?'Proudové souřadnice d/q':math(String.raw`d=\operatorname{Re},\quad q=\operatorname{Im}`);
  $('machinePanel').hidden=drive;$('lower').hidden=!drive;
+ if(!drive){
+  const explanation=$('machinePanel').querySelector('.explain');
+  const moments=$('lowerLegend');
+  if(moments.parentElement!==explanation)explanation.append(moments);
+ }
  $('lowerTitle').textContent=drive?(step===3?'Proud zůstává, moment se blíží nule':step===2?'Rozjezd: moment podle otáček':'Výkon a stejné otáčky'):'Rotor a vznik momentu';
  $('upperTitle').textContent=drive?(step===3?'Podélný tok: úplná kompenzace':step===2?(torqueMode?'Otáčky a nastavená mez':'Skutečné a požadované otáčky'):'Dosažitelný a požadovaný moment'):'Stejný proud, různý moment';
  if(drive){legend('mapLegend',[[C.limit,'Proudová mez'],[C.u,'Napěťová mez'],[C.i,'Pracovní bod'],[C.d,'MTPA'],[C.ink,'MTPV']]);}
@@ -216,7 +221,7 @@ function render(){
  if(drive&&step===2){const reason=startProblem();$('play').disabled=!!reason&&!playing;$('play').textContent=run.finished?'Spustit znovu':playing?'Pozastavit':run.t>0?'Pokračovat':'Spustit';$('runState').textContent=reason|| (run.finished?'Dokončeno · bod na obálce':playing?(a.speedLimited?'Omezení otáček':a.torqueLimited?'Moment omezen':'Probíhá'):run.t>0?'Pozastaveno':'Připraveno · stiskněte Spustit');}
  $('statusTitle').textContent=title;$('statusText').textContent=message;dirty=false;window.pmsmState=()=>({s:{...s},step,drive,config:runConfig(),point:getPoint(),run:{t:run.t,n:run.n,finished:run.finished},playing,preview:preview?{done:preview.done,equilibrium:preview.equilibrium,points:preview.rows.length,end:preview.rows.at(-1)}:null,map:{...mapTransform}});
 }
-const specs=[['Imax','Proudový limit',40,150,1,'A',0],['Udc','Napětí meziobvodu',120,450,5,'V',0],['psi','Toková vazba magnetů',.08,.3,.005,'Wb',3],['Ld','Podélná indukčnost',.0015,.006,.0001,'mH',1],['Lq','Příčná indukčnost',.0015,.009,.0001,'mH',1],['R','Odpor fáze',0,.3,.01,'\\Omega',2],['J','Setrvačnost',.04,.6,.01,'kg\\,m^2',2]];
+const specs=[['Imax','Proudový limit',40,150,1,'A',0],['Udc','Napětí meziobvodu',120,450,5,'V',0],['psi','Toková vazba magnetů',.08,.3,.005,'Wb',3],['Ld','Podélná indukčnost',.0015,.006,.0001,'mH',1],['Lq','Příčná indukčnost',.0015,.009,.0001,'mH',1],['R','Odpor fáze',0,.3,.01,'\\Omega',2],['J','Setrvačnost',.04,.6,.01,'kg\\,m^2',2]].filter(([key])=>drive||key!=='J');
 function refreshSettings(){for(const [key,,,,,unit,n]of specs){const v=key==='J'?J:key==='ramp'?ramp:s[key],el=$('param-'+key);if(!el)continue;el.value=v;put('param-'+key+'-out',key==='R'?fmt(v,n)+'\\,\\Omega':val(v*(key==='Ld'||key==='Lq'?1000:1),unit,n));}put('characteristic','I_c=\\Psi_{\\mathrm{PM}}/L_d='+val(s.psi/s.Ld,'A')+'\\qquad I_{\\max}='+val(s.Imax,'A',0));}
 function settings(){ $('parameterControls').innerHTML=specs.map(([key,title,min,max,inc,unit,n])=>`<label class="control"><span>${title}<output id="param-${key}-out"></output></span><input id="param-${key}" type="range" min="${min}" max="${max}" step="${inc}" value="${key==='J'?J:key==='ramp'?ramp:s[key]}"></label>`).join('');
  for(const [key,, , , ,unit,n] of specs){const input=$('param-'+key);input.disabled=key==='Lq'&&s.type==='spm';const show=()=>{const v=key==='J'?J:key==='ramp'?ramp:s[key];put('param-'+key+'-out',key==='R'?fmt(v,n)+'\\,\\Omega':val(v*(key==='Ld'||key==='Lq'?1000:1),unit,n));};show();input.oninput=()=>{incoming=null;if(key==='J')J=+input.value;else if(key==='ramp')ramp=+input.value;else{s[key]=+input.value;if(s.type==='spm')s.Lq=s.Ld;else if(s.Lq<s.Ld)s.Lq=s.Ld;stop();amp=Math.min(amp,s.Imax);}stop();show();refreshSettings();rebuild();configure();render();};}

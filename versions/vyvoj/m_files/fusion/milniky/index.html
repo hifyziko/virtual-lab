@@ -166,17 +166,23 @@ document.addEventListener('DOMContentLoaded',()=>{
   let previousMilestones=null;
   function showMilestones(state){
     const reached=[], lost=[];
-    const current=milestoneKeys.map(key=>state[key]);
+    // null means didactically not assessed; the physical inequality is untouched.
+    const current=milestoneKeys.map(key=>key==='science' && state.heating===0 ? null : state[key]);
+    if(current[0]===null && previousMilestones?.[0]!==null){
+      feedback.textContent='';
+      feedback.classList.toggle('reached',false);
+    }
     indicators.forEach((el,i)=>{
-      const active=current[i];
+      const active=current[i]===true;
       el.classList.toggle('active',active);
       const status=el.querySelector('small');
       const trial={observing:'Zkouška probíhá',failed:'Zkouška neudržena',supported:'Udrženo po dobu zkoušky',limit:'Mez modelu – bez závěru'};
-      const label=i===1 ? (active?'Ustálené vyrovnání':state.engineeringInstant?'Pouze okamžitě':'Nesplněno') :
+      const label=i===0 && current[i]===null ? 'Nehodnoceno – zkouška bez externího ohřevu' :
+        i===1 ? (active?'Ustálené vyrovnání':state.engineeringInstant?'Pouze okamžitě':'Nesplněno') :
         i===2 ? (state.ignitionTrial==='pending' ? (active?'Podmínka nyní splněna':'Podmínka nesplněna') : trial[state.ignitionTrial]) :
         active?'Nerovnost nyní splněna':'Nesplněno';
       if(status.textContent!==label)status.textContent=label;
-      if(previousMilestones && previousMilestones[i]!==active){
+      if(previousMilestones && current[i]!==null && previousMilestones[i]!==null && previousMilestones[i]!==active){
         const name=el.querySelector('strong').textContent;
         (active?reached:lost).push(name);
       }
@@ -211,6 +217,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!state.ignition)return 'Zkus snížit ztráty dalším prodloužením doby udržení. Porovnej je se samoohřevem.';
     return 'Vypni externí ohřev a sleduj, zda se plazma dál samo udrží.';
   }
+  function modelCaution(state){
+    // Informational thresholds only; never alter the state or power balance.
+    return state.temperature>=40 || state.fusion>=3000 ?
+      'Idealizovaný 0D model: bez vyčerpávání paliva a hromadění helia, bez úplného popisu transportu a stability.' : '';
+  }
   let energy,time,running=false,frame,last=0,lastDraw=0,atLimit=false,shaftRunning;
   function render(){
     const state=assess(getInput(),energy,0,atLimit);
@@ -244,13 +255,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     plant.classList.toggle('paused',!running);
     showMilestones(state);
     for(const [key,,unit] of metrics)show(document.getElementById('result-'+key),state[key],unit);
+    document.getElementById('result-q').title=state.heating===0 ?
+      'Při nulovém externím ohřevu není podíl definován. ∞ značí pouze formální limitu při kladném fúzním výkonu a ohřevu blížícím se k nule.' :
+      'Poměr fúzního výkonu k externímu ohřevu.';
     const kelvinText=kelvinFormat.format(state.temperature*1.602176634e-16/1.380649e-23);
     if(kelvin.dataset.reading!==kelvinText){
       kelvin.dataset.reading=kelvinText;
       katex.render(String.raw`\approx `+kelvinText.replace(/\s/g,String.raw`\,`)+String.raw`\,\mathrm K`,kelvin,{throwOnError:false});
     }
     const trend=Math.abs(state.delta)<1?'přibližně ustálená':state.delta>0?'roste':'klesá';
-    const message=atLimit?'Dosažena horní mez modelu 100 keV. Uprav podmínky nebo obnov výchozí stav.':
+    const caution=modelCaution(state);
+    const message=caution ? (atLimit?'Horní mez modelu. ':'')+caution : atLimit?'Dosažena horní mez modelu 100 keV. Uprav podmínky nebo obnov výchozí stav.':
       format.format(Math.floor(time*10)/10)+' s · Teplota '+trend+(state.heating===0?' · externí ohřev vypnut':'');
     if(status.textContent!==message)status.textContent=message;
   }
@@ -340,8 +355,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 <p>Posuvník nastavuje celkový výkon předaný plazmatu. V tomto modelu připadá 60 % na NBI a 40 % na vlnový ohřev. Elektrický příkon každého systému se získá dělením jeho výkonu příslušnou účinností. Symboly ⊙ a ⊗ označují toroidální proud. Ohmický ohřev je v řezu znázorněný samostatně a do této bilance se nezapočítává.</p>
 <p>Teplota je společná pro ionty a elektrony. V homogenním objemu 830 m³ je stejný počet iontů deuteria a tritia a stejná hustota elektronů jako celková hustota iontů. Vnitřní energie <span data-tex="U=3nV k_{\mathrm B}T"></span> se mění podle <span data-tex="\dot U=P_{\mathrm H}+0{,}2P_{\mathrm F}-P_{\mathrm L}"></span>, kde <span data-tex="P_{\mathrm L}=U/\tau_{\mathrm E}"></span>. Vyšší hustotu znázorňuje více světlých bodů v levém řezu spolu s vnějším ohřevem. Pravý řez téhož plazmatu ukazuje samoohřev částicemi alfa a přenos energie neutrony do blanketu. Hustotu nastav před startem. Po startu zůstává zamčená i při pauze; odemkne ji Reset. Změna před startem přepočítá počáteční energii ze zvolené výchozí teploty a hustoty. Vývoj paliva, popela a prostorových profilů je zjednodušen.</p>
 <p>Fúzní výkon je součin objemu, hustot obou palivových složek, Maxwellovy reaktivity a energie 17,6 MeV na reakci. Aproximace Bosch–Hale platí od 0,2 do 100 keV. Pod dolní mezí je v modelu reaktivita nulová a na horní mezi se pokus zastaví. <a href="https://doi.org/10.1088/0029-5515/32/4/i07" target="_blank" rel="noopener">Bosch a Hale, Nuclear Fusion 32 (1992), rovnice (12) a tabulka VII</a>.</p>
+<p>Upozornění na extrémní stav se zobrazí od <span data-tex="40\,\mathrm{keV}"></span> nebo fúzního výkonu <span data-tex="3000\,\mathrm{MW}"></span>. Jde pouze o didaktické prahy upozornění, nikoli fyzikální meze. Idealizovaný 0D model neřeší vyčerpávání paliva, hromadění helia ani úplný transport a stabilitu; vysoké výkony nejsou předpovědí reálného provozu.</p>
 <p>Oběh dostává neutronový výkon, přírůstek tepla v blanketu podle součinitele multiplikace 1,1 a ztráty plazmatu. Předpokládáme jejich úplné využití v tepelném okruhu bez prodlevy. Energie právě akumulovaná v plazmatu se do tepelného výkonu nepočítá. Čistý výkon sítě je hrubý výkon generátoru po odečtení příkonu ohřevu a ostatní vlastní spotřeby. V ustáleném stavu je změna vnitřní energie přibližně nulová. Otáčení soustrojí je názorně zpomalené.</p>
-<p>Vědecké vyrovnání nastává při <span data-tex="P_{\mathrm F}\ge P_{\mathrm H}"></span>, inženýrské při <span data-tex="P_{\mathrm{NET}}\ge 0"></span> a zapálení při <span data-tex="0{,}2P_{\mathrm F}\ge P_{\mathrm L}"></span>. Kontrolky se vyhodnocují samostatně od fúzního výkonu 1 MW. Faktor <span data-tex="Q=P_{\mathrm F}/P_{\mathrm H}"></span> má při nulovém ohřevu a kladném fúzním výkonu nekonečnou limitu.</p>
+<p>Vědecké vyrovnání nastává při <span data-tex="P_{\mathrm F}\ge P_{\mathrm H}"></span>, inženýrské při <span data-tex="P_{\mathrm{NET}}\ge 0"></span> a zapálení při <span data-tex="0{,}2P_{\mathrm F}\ge P_{\mathrm L}"></span>. Kontrolky se vyhodnocují samostatně od fúzního výkonu 1 MW. Faktor <span data-tex="Q=P_{\mathrm F}/P_{\mathrm H}"></span> není při nulovém jmenovateli definován. Údaj <span data-tex="\infty"></span> je pouze formální limitou pro kladný fúzní výkon a externí ohřev blížící se k nule. Při vypnutém ohřevu matematická nerovnost vědeckého vyrovnání nadále platí, ale didakticky tento milník nehodnotíme.</p>
 <p>Pro ustálený stav platí <span data-tex="Q_{\mathrm B}=(1-\eta_{\mathrm{REC}})/(M_{\mathrm R}\eta_{\mathrm{REC}})"></span>, kde <span data-tex="\eta_{\mathrm{REC}}=\eta_{\mathrm{GR}}(1-f_{\mathrm{SC}})\eta_{\mathrm H}"></span>. Zde <span data-tex="M_{\mathrm R}"></span> je multiplikace blanketu, <span data-tex="\eta_{\mathrm{GR}}"></span> elektrická konverze, <span data-tex="f_{\mathrm{SC}}"></span> podíl ostatní vlastní spotřeby a <span data-tex="\eta_{\mathrm H}"></span> poměr tepla dodaného ohřevem k jeho elektrickému příkonu. Kladná dodávka při chladnutí může čerpat vnitřní energii a sama nedokazuje udržitelné vyrovnání.</p>
 <p>Časové ověření je doplněk tohoto modelu: „Ustálené vyrovnání“ vyžaduje nezáporný čistý výkon, <span data-tex="Q\ge Q_{\mathrm B}"></span> a po dobu <span data-tex="3\tau_{\mathrm E}"></span> odchylku tepelné bilance nejvýše <span data-tex="0{,}1\,\%"></span> většího z výkonů ohřevu se samoohřevem a ztrát (nejméně <span data-tex="1\,\mathrm{MW}"></span>). Malá změna energie musí vyvolávat návrat k rovnováze: <span data-tex="\partial\dot U/\partial U&lt;0"></span>. Jde o lokální tepelnou stabilitu při pevných parametrech, nikoli důkaz stability skutečného tokamaku.</p>
 <p>Zapálení stále znamená <span data-tex="P_\alpha=P_{\mathrm{ch}}\ge P_{\mathrm L}"></span>. Po vypnutí ohřevu sleduj samostatnou zkoušku: podmínka musí nepřetržitě platit po <span data-tex="5\tau_{\mathrm E}"></span>. „Udrženo po dobu zkoušky“ neznamená ustálení ani neomezenou udržitelnost. Pokles pod mez znamená neudržení; dosažení horní meze modelu nedovoluje závěr. Změna parametrů spouští nové časové ověření; pauza nepřidává čas.</p>

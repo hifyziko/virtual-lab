@@ -30,6 +30,43 @@ main[data-pmsm="phasor"] .rightplots{grid-template-rows:minmax(0,1.35fr) minmax(
 .map-actions,.map-tools{display:flex;align-items:center;gap:12px}.map-actions label{display:flex;align-items:center;gap:8px}.run-state{margin-left:auto;color:#007e6c;font-size:14px}.map-tools{gap:8px}#plotSettings .layerbar{display:grid;gap:16px;margin:20px 0}.load-kind-setting{display:flex;gap:12px;align-items:center;margin:16px 0}[hidden]{display:none!important}
 
 main[data-run-controls="true"]>.parameter-panel>.controls{grid-template-columns:1.1fr 1fr 1fr 1fr .85fr;gap:14px}.ramp-control{display:grid;grid-template-columns:110px 90px;gap:0 8px;align-items:center;font-size:12px}.ramp-control>span{grid-column:1/3}.ramp-control input{width:110px}.ramp-control output{text-align:right;font-size:13px}.run-state{max-width:330px;line-height:1.2}
+
+/* Static PMSM: one compact parameter row, with view switches alongside it. */
+main[data-pmsm="phasor"]{grid-template-rows:38px 78px minmax(0,1fr) 100px}
+main[data-pmsm="phasor"]>.tabs{width:auto;justify-self:start;gap:6px}
+main[data-pmsm="phasor"]>.tabs button{flex:0 0 auto;padding:6px 14px}
+main[data-pmsm="phasor"]>.parameter-panel{grid-template-columns:minmax(0,1fr) 420px;grid-template-rows:minmax(0,1fr);align-items:center;gap:18px;padding:7px 12px}
+main[data-pmsm="phasor"]>.parameter-panel>.controls{grid-template-columns:1.15fr 1fr 1.2fr 1fr;gap:14px;align-items:center}
+main[data-pmsm="phasor"]>.parameter-panel .control{min-width:0;gap:3px}
+main[data-pmsm="phasor"]>.parameter-panel .control>span{font-size:14px;gap:6px}
+main[data-pmsm="phasor"]>.parameter-panel .control output{min-width:0;white-space:nowrap}
+main[data-pmsm="phasor"]>.parameter-panel select{padding:5px 8px;font-size:14px;min-height:32px}
+main[data-pmsm="phasor"]>.parameter-panel .layerbar{display:grid;grid-template-columns:1.1fr 1fr;gap:5px 12px;align-items:center;margin:0}
+main[data-pmsm="phasor"]>.parameter-panel .layerbar label{font-size:14px;white-space:nowrap;gap:6px}
+main[data-pmsm="phasor"]>.parameter-panel .layerbar button{justify-self:start;padding:4px 10px;font-size:14px;min-height:30px}
+
+/* Let the existing machine cutaway use its panel height; text keeps its own column. */
+main[data-pmsm="phasor"] .rightplots .machine-row{display:grid;grid-template-columns:minmax(0,.55fr) minmax(0,.45fr);gap:14px;align-items:center}
+main[data-pmsm="phasor"] .machine-row .mini-machine{width:100%;height:100%;max-height:none;min-width:0;min-height:0;object-fit:contain}
+
+/* Drive: compact controls and transport, with no full-width slider stretching. */
+main[data-pmsm="drive"]{grid-template-rows:38px 106px minmax(0,1fr) 100px}
+main[data-pmsm="drive"]>.tabs{width:auto;justify-self:start;gap:6px}
+main[data-pmsm="drive"]>.tabs button{flex:0 0 auto;padding:6px 14px}
+main[data-pmsm="drive"]>.parameter-panel{grid-template-rows:52px 34px;gap:6px;padding:6px 12px}
+main[data-pmsm="drive"]>.parameter-panel>.controls{grid-template-columns:260px minmax(200px,260px) minmax(200px,280px) minmax(180px,250px);gap:16px;justify-content:start;align-items:center}
+main[data-pmsm="drive"][data-run-controls="true"]>.parameter-panel>.controls{grid-template-columns:260px minmax(200px,260px) minmax(200px,280px) minmax(180px,250px) 180px}
+main[data-pmsm="drive"]>.parameter-panel .control{gap:2px}
+main[data-pmsm="drive"]>.parameter-panel .control>span{font-size:14px;gap:6px}
+main[data-pmsm="drive"]>.parameter-panel .control output{min-width:0;white-space:nowrap}
+main[data-pmsm="drive"]>.parameter-panel select{padding:4px 8px;font-size:14px;min-height:30px}
+main[data-pmsm="drive"]>.parameter-panel .mode-options,main[data-pmsm="drive"]>.parameter-panel .simulation{min-height:0}
+main[data-pmsm="drive"]>.parameter-panel .simulation{gap:8px;flex-wrap:nowrap}
+main[data-pmsm="drive"]>.parameter-panel .simulation button{padding:4px 9px;min-height:30px}
+main[data-pmsm="drive"]>.parameter-panel .control:has(#speed[hidden])>span{flex-direction:column;align-items:flex-start;gap:2px}
+
+main[data-pmsm="phasor"] .rightplots .card:has(>#machinePanel){grid-template-rows:auto minmax(0,1fr)}
+main[data-pmsm="phasor"] #lowerLegend{margin-top:6px;min-height:0}
 </style></head><body><main data-pmsm="drive">
 <div class="topline"><p class="hint" id="intro"></p><div class="toolbar"><button id="transfer">← Bod ve fázorovém diagramu</button><button id="parameters">Motor a zátěž</button><button id="theory">Vztahy a výklad</button></div></div>
 <nav class="tabs" aria-label="Kroky výkladu" id="tabs"></nav>
@@ -470,6 +507,11 @@ function configure(){
  $('mapTitle').textContent=drive?'Co dovolí proud a napětí?':'Proud v rotorových souřadnicích';
  $('mapMode').innerHTML=drive?'Proudové souřadnice d/q':math(String.raw`d=\operatorname{Re},\quad q=\operatorname{Im}`);
  $('machinePanel').hidden=drive;$('lower').hidden=!drive;
+ if(!drive){
+  const explanation=$('machinePanel').querySelector('.explain');
+  const moments=$('lowerLegend');
+  if(moments.parentElement!==explanation)explanation.append(moments);
+ }
  $('lowerTitle').textContent=drive?(step===3?'Proud zůstává, moment se blíží nule':step===2?'Rozjezd: moment podle otáček':'Výkon a stejné otáčky'):'Rotor a vznik momentu';
  $('upperTitle').textContent=drive?(step===3?'Podélný tok: úplná kompenzace':step===2?(torqueMode?'Otáčky a nastavená mez':'Skutečné a požadované otáčky'):'Dosažitelný a požadovaný moment'):'Stejný proud, různý moment';
  if(drive){legend('mapLegend',[[C.limit,'Proudová mez'],[C.u,'Napěťová mez'],[C.i,'Pracovní bod'],[C.d,'MTPA'],[C.ink,'MTPV']]);}
@@ -627,7 +669,7 @@ function render(){
  if(drive&&step===2){const reason=startProblem();$('play').disabled=!!reason&&!playing;$('play').textContent=run.finished?'Spustit znovu':playing?'Pozastavit':run.t>0?'Pokračovat':'Spustit';$('runState').textContent=reason|| (run.finished?'Dokončeno · bod na obálce':playing?(a.speedLimited?'Omezení otáček':a.torqueLimited?'Moment omezen':'Probíhá'):run.t>0?'Pozastaveno':'Připraveno · stiskněte Spustit');}
  $('statusTitle').textContent=title;$('statusText').textContent=message;dirty=false;window.pmsmState=()=>({s:{...s},step,drive,config:runConfig(),point:getPoint(),run:{t:run.t,n:run.n,finished:run.finished},playing,preview:preview?{done:preview.done,equilibrium:preview.equilibrium,points:preview.rows.length,end:preview.rows.at(-1)}:null,map:{...mapTransform}});
 }
-const specs=[['Imax','Proudový limit',40,150,1,'A',0],['Udc','Napětí meziobvodu',120,450,5,'V',0],['psi','Toková vazba magnetů',.08,.3,.005,'Wb',3],['Ld','Podélná indukčnost',.0015,.006,.0001,'mH',1],['Lq','Příčná indukčnost',.0015,.009,.0001,'mH',1],['R','Odpor fáze',0,.3,.01,'\\Omega',2],['J','Setrvačnost',.04,.6,.01,'kg\\,m^2',2]];
+const specs=[['Imax','Proudový limit',40,150,1,'A',0],['Udc','Napětí meziobvodu',120,450,5,'V',0],['psi','Toková vazba magnetů',.08,.3,.005,'Wb',3],['Ld','Podélná indukčnost',.0015,.006,.0001,'mH',1],['Lq','Příčná indukčnost',.0015,.009,.0001,'mH',1],['R','Odpor fáze',0,.3,.01,'\\Omega',2],['J','Setrvačnost',.04,.6,.01,'kg\\,m^2',2]].filter(([key])=>drive||key!=='J');
 function refreshSettings(){for(const [key,,,,,unit,n]of specs){const v=key==='J'?J:key==='ramp'?ramp:s[key],el=$('param-'+key);if(!el)continue;el.value=v;put('param-'+key+'-out',key==='R'?fmt(v,n)+'\\,\\Omega':val(v*(key==='Ld'||key==='Lq'?1000:1),unit,n));}put('characteristic','I_c=\\Psi_{\\mathrm{PM}}/L_d='+val(s.psi/s.Ld,'A')+'\\qquad I_{\\max}='+val(s.Imax,'A',0));}
 function settings(){ $('parameterControls').innerHTML=specs.map(([key,title,min,max,inc,unit,n])=>`<label class="control"><span>${title}<output id="param-${key}-out"></output></span><input id="param-${key}" type="range" min="${min}" max="${max}" step="${inc}" value="${key==='J'?J:key==='ramp'?ramp:s[key]}"></label>`).join('');
  for(const [key,, , , ,unit,n] of specs){const input=$('param-'+key);input.disabled=key==='Lq'&&s.type==='spm';const show=()=>{const v=key==='J'?J:key==='ramp'?ramp:s[key];put('param-'+key+'-out',key==='R'?fmt(v,n)+'\\,\\Omega':val(v*(key==='Ld'||key==='Lq'?1000:1),unit,n));};show();input.oninput=()=>{incoming=null;if(key==='J')J=+input.value;else if(key==='ramp')ramp=+input.value;else{s[key]=+input.value;if(s.type==='spm')s.Lq=s.Ld;else if(s.Lq<s.Ld)s.Lq=s.Ld;stop();amp=Math.min(amp,s.Imax);}stop();show();refreshSettings();rebuild();configure();render();};}

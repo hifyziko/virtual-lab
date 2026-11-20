@@ -191,3 +191,39 @@ assert.equal(trialMonitor({...ignitionInput,heatingOff:false},ignitionEnergy).ig
 assert.equal(trialMonitor(ignitionInput,ignitionEnergy).ignitionTrial,'observing');
 assert.equal(trialMonitor(ignitionInput,100*heatCapacity(.96),0,true).ignitionTrial,'limit');
 console.log('PASS: unstable equilibrium rejected; ignition success, loss, restart and range limit distinguished.');
+
+// Run the actual presentation logic: mathematical science != didactic success.
+function classFlags(){const values=new Set();return {toggle(key,on){on?values.add(key):values.delete(key);},contains:key=>values.has(key)};}
+const names=['Vědecké vyrovnání','Inženýrské vyrovnání','Zapálení'];
+const indicators=names.map(name=>{const small={textContent:''};return {small,classList:classFlags(),querySelector:selector=>selector==='small'?small:{textContent:name}};});
+const feedback={textContent:'',classList:classFlags()};
+const presentation={indicators,feedback,milestoneKeys:['science','engineering','ignition'],comparisons:[]};
+vm.createContext(presentation);
+const milestoneSource=html.slice(html.indexOf('  function showMilestones(state){'),html.indexOf('  function guide(state){'));
+vm.runInContext('let previousMilestones=null;'+milestoneSource,presentation);
+const display=state=>{const before=JSON.stringify(state);presentation.showMilestones(Object.freeze(state));assert.equal(JSON.stringify(state),before);};
+const base={heating:95,science:false,engineering:false,engineeringInstant:false,ignition:false,ignitionTrial:'pending'};
+display({...base});
+display({...base,science:true});assert(feedback.textContent.includes(names[0]));
+display({...base,heating:0,science:true,ignitionTrial:'failed'});
+assert.equal(indicators[0].small.textContent,'Nehodnoceno – zkouška bez externího ohřevu');
+assert(!indicators[0].classList.contains('active'));assert.equal(feedback.textContent,'');
+display({...base,heating:0,science:true,engineering:true,engineeringInstant:true,ignition:true,ignitionTrial:'supported'});
+assert(!feedback.textContent.includes(names[0]));
+assert.equal(indicators[1].small.textContent,'Ustálené vyrovnání');
+assert.equal(indicators[2].small.textContent,'Udrženo po dobu zkoušky');
+assert(indicators[1].classList.contains('active') && indicators[2].classList.contains('active'));
+display({...base});display({...base,heating:0,science:true,ignitionTrial:'failed'});
+assert(!feedback.textContent.includes(names[0]));assert(!indicators[0].classList.contains('active'));
+display({...base,heating:0,science:false,ignitionTrial:'failed'});
+assert.equal(indicators[0].small.textContent,'Nehodnoceno – zkouška bez externího ohřevu');
+display({...base,heating:.001,science:true});assert(indicators[0].classList.contains('active'));
+assert(experiment({...controls,externalHeating:0},energy).science,'physical inequality is unchanged with a zero slider');
+assert(experiment({...controls,heatingOff:true},energy).science,'physical inequality is unchanged with the cutoff switch');
+const cautionSource=html.slice(html.indexOf('  function modelCaution(state){'),html.indexOf('  let energy,time'));
+vm.runInContext(cautionSource,presentation);
+assert.equal(presentation.modelCaution({temperature:39.99,fusion:2999.99}),'');
+for(const state of [{temperature:40,fusion:100},{temperature:10,fusion:3000},{temperature:100,fusion:6000}]){
+ const before=JSON.stringify(state);assert(presentation.modelCaution(Object.freeze(state)).includes('bez vyčerpávání paliva'));assert.equal(JSON.stringify(state),before);
+}
+console.log('PASS: no false science announcement at zero heating, no stale success, positive-heating recovery, unchanged engineering/ignition and informational extreme-state warning.');

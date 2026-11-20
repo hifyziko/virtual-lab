@@ -1,0 +1,10 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root='../versions/vyvoj/m_files/Web/';let cfg,mod,options;
+const Lab={register:m=>mod=m,mount:(_,c)=>cfg=c,linspace:()=>[],control:(_,__,html)=>html,select:(_,opts)=>{options=opts;return ''},legend:()=>''};
+vm.runInNewContext(fs.readFileSync(require.resolve(root+'pitch-module.js'),'utf8'),{Lab,katex:{render(){}}});mod.mount({});cfg.controls(cfg.defaults);assert.deepEqual(Array.from(options),Array.from({length:11},(_,i)=>i+1));
+const nodes={},ctx={state:{...cfg.defaults,view:1},$:id=>nodes[id]??={dataset:{},setAttribute(){}},app:{querySelector:()=>({classList:{toggle(){}}})},canvases:[],dirty(){},chart:()=>null,equal:()=>null};
+cfg.init(ctx);cfg.change(ctx,'n',{value:'1'});assert.equal(ctx.state.n,1);assert.equal(ctx.state.view,1);assert.equal(nodes.cancelOrder.disabled,true);
+const beta=ctx.state.beta;nodes.cancelOrder.onclick();assert.equal(ctx.state.beta,beta);cfg.draw(ctx);assert(nodes.pitchReadout.dataset.tex.includes('k_{p,1}'));assert(nodes.pitchLegend0.innerHTML.includes('Celkový tok'));
+cfg.change(ctx,'n',{value:'5'});assert.equal(nodes.cancelOrder.disabled,false);nodes.cancelOrder.onclick();assert.equal(ctx.state.beta,.8);cfg.draw(ctx);assert(nodes.pitchLegend0.innerHTML.includes('přesně vyruší'));
+for(const value of ['0','12','1.5'])assert.throws(()=>cfg.change(ctx,'n',{value}));
+console.log('PASS: fundamental selectable in harmonic-cancellation view; flux/readout renders; impossible cancellation disabled; fifth-order cancellation unchanged.');

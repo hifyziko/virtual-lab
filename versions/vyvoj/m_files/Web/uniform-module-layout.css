@@ -106,6 +106,9 @@ body:has(>main.uniform-module-layout){margin:0!important;padding:0!important}
 #app .hf-heading-modes{display:flex;gap:5px;align-items:center}
 #app .hf-heading-modes button{min-height:40px;font-size:15px;font-weight:650;padding:7px 11px;white-space:nowrap}
 #app .hf-heading-modes button[aria-pressed="true"]{background:#007e6c;color:#fff;border-color:#007e6c}
+/* HF modes must not squeeze the title while the frame fits by height. */
+#app .modulehead:has(.hf-heading-modes){grid-template-columns:88px auto minmax(0,1fr)!important}
+#app .modulehead:has(.hf-heading-modes)>.actions{grid-column:1/-1!important;grid-row:2!important;justify-self:end;max-width:100%}
 #app>.energy-workspace[data-native-fill]>.energy-grid{flex:1 1 0;min-height:0}
 #app>.energy-workspace[data-native-fill] .energy-scene{height:0;min-height:160px;flex:1 1 0}
 

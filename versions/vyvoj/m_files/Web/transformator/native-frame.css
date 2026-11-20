@@ -28,3 +28,6 @@
 
 #app>.workspace:has(>.gridplots.transformer) #conversionControls .control label{font-size:13px;line-height:1.3}
 #app>.workspace:has(>.gridplots.transformer) #conversionControls :is(select,input[type=number]){padding:4px 6px}
+
+/* The shared guide hides the status line; do not reserve its former track. */
+#app>.workspace.uniform-module-layout:has(>.gridplots.transformer){grid-template-rows:128px minmax(0,1fr)}
