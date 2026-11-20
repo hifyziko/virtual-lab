@@ -4,8 +4,8 @@
 
 Ovládání je zhuštěné ve společném rozvržení oddílu. Rychlé volby využívají
 stávající horní panel. Skin, Proximity a Matice vodičů se přepínají z hlavičky
-vedle „Ovládání a výklad“. Schéma Princip lze natočit v rovině obrázku tažením
-nebo šipkami. Svislý prostor uvolněný z ovládání a výkladu využívají scény
+vedle „Ovládání a výklad“. Schéma Princip je statická perspektivní kresba.
+Svislý prostor uvolněný z ovládání a výkladu využívají scény
 a grafy. V prostředním panelu hystereze má proměnná zpráva rezervovanou výšku.
 Tlačítko „Moduly“ má původní plovoucí polohu.
 

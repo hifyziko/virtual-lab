@@ -391,42 +391,6 @@ function uniformRectangle(p,c){const N=c.nx,centers=p.pair?[-c.distance/2,c.dist
 <script>
 'use strict';
 const $=id=>document.getElementById(id),SVG='http://www.w3.org/2000/svg',MU0=4*Math.PI*1e-7;
-// Rotate the technical drawing in its plane, leaving the calculated maps and
-// profiles in their original coordinate systems.
-{
- const drawing=$('concept'), scenes=[$('skinScene'),$('proximityScene')];
- const {x,y,width,height}=drawing.viewBox.baseVal;
- const cx=x+width/2,cy=y+height/2;
- let angle=0,drag=null;
- function rotate(value){
-  angle=Math.max(-25,Math.min(25,value));
-  const t=Math.abs(angle)*Math.PI/180;
-  const scale=Math.min(1,width/(width*Math.cos(t)+height*Math.sin(t)),
-   height/(height*Math.cos(t)+width*Math.sin(t)));
-  for(const scene of scenes)scene.setAttribute('transform','translate('+cx+' '+cy+') rotate('+angle+') scale('+scale+') translate('+(-cx)+' '+(-cy)+')');
- }
- drawing.tabIndex=0;
- drawing.setAttribute('aria-label','Princip. Tažením nebo šipkami otočíš kresbu. Home obnoví původní natočení.');
- drawing.style.touchAction='none';
- drawing.style.cursor='grab';
- drawing.addEventListener('pointerdown',event=>{
-  if(event.button!==0||drag)return;
-  drag={id:event.pointerId,x:event.clientX,angle};
-  drawing.setPointerCapture(event.pointerId);
-  drawing.style.cursor='grabbing';
- });
- drawing.addEventListener('pointermove',event=>{
-  if(drag?.id===event.pointerId)rotate(drag.angle+120*(event.clientX-drag.x)/drawing.getBoundingClientRect().width);
- });
- drawing.addEventListener('lostpointercapture',()=>{drag=null;drawing.style.cursor='grab';});
- drawing.addEventListener('dblclick',()=>rotate(0));
- drawing.addEventListener('keydown',event=>{
-  const rotations={ArrowLeft:angle-5,ArrowRight:angle+5,Home:0};
-  if(!(event.key in rotations))return;
-  event.preventDefault();
-  rotate(rotations[event.key]);
- });
-}
 const fmt=(n,d=2)=>Number(n).toLocaleString('cs-CZ',{minimumFractionDigits:d,maximumFractionDigits:d});
 const mats={Cu:{sigma:58e6},Al:{sigma:35e6}};
 if(window.self!==window.top)document.documentElement.classList.add('hf-embedded');
@@ -1048,7 +1012,6 @@ onmessage = ({data:p}) => {
 #hfMatrix .matrix-table td::before{content:attr(data-label);color:#617780;font-weight:400;font-size:12px}
 #hfMatrix .matrix-pages{margin-top:0;gap:8px}#hfMatrix #mx-status{font-size:13px;color:#007e6c}
 `;
- style.textContent+=`#hfMatrix .matrix-advanced{position:relative;align-self:start;font-size:13px}#hfMatrix .matrix-advanced summary{cursor:pointer;padding:6px 0;color:#617780}#hfMatrix .matrix-advanced[open]>label{position:absolute;z-index:5;top:30px;right:0;min-width:190px;padding:10px 12px;background:white;border:1px solid #cbdcd6;border-radius:8px;box-shadow:0 4px 14px #19374118}#hfMatrix .matrix-advanced select{width:100%}`;
  document.head.append(style);
  panel.innerHTML=`<button id="mx-back" hidden>← Jeden nebo dva vodiče</button><div class="periodToolbar"><label>Zobrazení<select id="mx-display"><option value="rms">RMS</option><option value="instant">Okamžitá hodnota</option></select></label><button id="mx-play">▶ Animovat periodu</button><label>ωt<input id="mx-phase" type="range" min="0" max="360" step="1" value="0"></label><output id="mx-phase-value">0°</output></div><section class="controlbox matrix-input"><h2>Zadání matice</h2><div class="matrix-controls">
  <label>Řádky<input id="mx-rows" type="number" min="1" max="6" step="1" value="3"></label>
@@ -1060,7 +1023,7 @@ onmessage = ({data:p}) => {
  <label>Mezera povrchů x [mm]<input id="mx-gap-x" type="number" min="0.01" step="any" value="1"></label><label>Mezera povrchů y [mm]<input id="mx-gap-y" type="number" min="0.01" step="any" value="1"></label>
  <label class="matrix-frequency"><span>Frekvence f [Hz]</span><input id="mx-frequency-slider" aria-label="Frekvence" type="range" min="0" max="1000" step="1" value="500"><input id="mx-frequency" type="number" min="0" max="1000000" step="any" value="1000"></label>
  <label>Materiál<select id="mx-sigma"><option value="58000000">Měď · 58 MS/m</option><option value="35000000">Hliník · 35 MS/m</option></select></label>
- <details class="matrix-advanced"><summary>Pokročilé nastavení</summary><label>Jemnost sítě<select id="mx-mesh"><option value="1">Hrubá</option><option value="2">Základní</option><option value="3" selected>Jemná</option><option value="4">Velmi jemná</option></select></label></details></div>
+ <label>Jemnost sítě<select id="mx-mesh"><option value="1">Hrubá</option><option value="2">Základní</option><option value="3" selected>Jemná</option><option value="4">Velmi jemná</option></select></label></div>
  </section><div id="mx-results" class="layout matrix-layout" hidden><div class="matrix-maps"><figure class="card"><h2>Mapa pole v matici</h2><div class="fieldControls"><select id="mx-kind" aria-label="Proudová veličina"><option value="J">J · celková</option><option value="Jsrc">J₀ · referenční</option><option value="Jind">Jind · indukovaná</option><option value="B">B · magnetická indukce</option></select></div><p id="mx-caption" class="tiny"></p><svg id="mx-j" class="hf-field" role="img" aria-label="Pole v příčném řezu"></svg><p id="mx-depth" hidden></p><p id="mx-j-scale"></p></figure><figure class="card"><h2>Průběh řezem maticí</h2><div class="fieldControls"><label>Poloha řezu y [mm]<input id="mx-cut" type="range" min="-5" max="5" step="0.01" value="0"><output id="mx-cut-value">0 mm</output></label><label>Řada<select id="mx-profile-row"><option value="1">1</option></select></label><select id="mx-style" aria-label="Směr magnetického pole"><option value="lines">Siločáry</option><option value="vectors">Šipky</option><option value="none">Bez směrových značek</option></select></div><div class="fieldControls"><label><input id="mx-decompose" type="checkbox" checked> Porovnat J₀, Jind a J</label></div><svg id="mx-b" class="hf-profile" role="img" aria-label="Profil pole řezem maticí"></svg><p id="mx-b-scale"></p></figure></div><section class="card matrix-results"><h2>Proudy a výsledky vodičů</h2> <p class="matrix-note">Proudy [A RMS], řady shora a sloupce zleva. 1@120 = 1 A ∠120°, −1 = opačný směr, 0 = nulový celkový proud.</p>
  <textarea id="mx-currents" aria-label="Matice proudů"></textarea><p><button id="mx-uniform">Všechny 1 A</button> <button id="mx-alternate">Střídavě +1 / −1 A</button> <button id="mx-run">Spočítat matici</button> <button id="mx-cancel" disabled>Zrušit výpočet</button></p>
  <p id="mx-status" role="status">Změny zadání se přepočítávají automaticky.</p><p id="mx-error" role="alert"></p>

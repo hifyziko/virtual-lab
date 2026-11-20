@@ -103,8 +103,8 @@ body:has(>main.uniform-module-layout){margin:0!important;padding:0!important}
 #app :is(.modulehead,.module-window-heading)>a.back::after{display:flex;align-items:center;height:20px;line-height:20px}
 
 /* Energy experiments use the same viewport budget as the other lessons. */
-#app .hf-heading-modes{display:flex;gap:4px;align-items:center}
-#app .hf-heading-modes button{font-size:12px;padding:5px 7px;white-space:nowrap}
+#app .hf-heading-modes{display:flex;gap:5px;align-items:center}
+#app .hf-heading-modes button{min-height:40px;font-size:15px;font-weight:650;padding:7px 11px;white-space:nowrap}
 #app .hf-heading-modes button[aria-pressed="true"]{background:#007e6c;color:#fff;border-color:#007e6c}
 #app>.energy-workspace[data-native-fill]>.energy-grid{flex:1 1 0;min-height:0}
 #app>.energy-workspace[data-native-fill] .energy-scene{height:0;min-height:160px;flex:1 1 0}

@@ -18,8 +18,7 @@ main.uniform-module-layout{--module-flexible-height:1;min-height:var(--module-ho
 .hf-embedded #hfPanel .preset{padding:4px 6px;font-size:11px;white-space:nowrap;background:#fff0db;color:#713c13;border-color:#e0a463}
 .hf-embedded #hfPanel .preset:hover{background:#ffddb5}
 .hf-embedded main.uniform-module-layout #hfMatrix .matrix-input{padding:5px var(--hf-mode-width) 5px 9px;display:flex;align-items:center}
-.hf-embedded #hfMatrix .matrix-advanced summary{white-space:normal;line-height:1.2}
-.hf-embedded main.uniform-module-layout #hfMatrix .matrix-controls{width:100%;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-auto-rows:auto;gap:5px}
+.hf-embedded main.uniform-module-layout #hfMatrix .matrix-controls{width:100%;display:grid;grid-template-columns:repeat(11,minmax(0,1fr));grid-auto-rows:auto;gap:5px}
 .hf-embedded main.uniform-module-layout #hfMatrix .matrix-controls label.matrix-frequency{grid-column:span 2;grid-template-columns:minmax(0,1fr) 55px}
 .hf-embedded main.uniform-module-layout>#hfPanel,.hf-embedded main.uniform-module-layout #hfMatrix .matrix-input{grid-row:1}
 .hf-embedded main.uniform-module-layout>.layout,.hf-embedded main.uniform-module-layout #hfMatrix #mx-results{grid-row:2}
@@ -149,17 +148,34 @@ main[data-foundation-module="em01-indukovane-napeti"]>.rod-view-switch button{pa
 
 /* Place the force experiment's quick choices next to its live wire controls. */
 main[data-foundation-module="em03-silove-ucinky"]>.toolbar{
-  display:flex;align-items:center;gap:12px;padding:6px 10px;
+  display:flex;align-items:flex-start;gap:12px;padding:6px 10px;
 }
 main[data-foundation-module="em03-silove-ucinky"] .presets{
-  flex:0 0 250px;display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0;padding:0;border:0;
+  flex:0 0 250px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(32px,1fr)) auto;align-items:stretch;gap:4px;margin:0;padding:0;border:0;
 }
 main[data-foundation-module="em03-silove-ucinky"] .presets>strong{display:none}
 main[data-foundation-module="em03-silove-ucinky"] .presets button{font-size:12px;min-height:0;padding:2px 5px}
+main[data-foundation-module="em03-silove-ucinky"] .presets #reset{grid-column:1/-1}
 main[data-foundation-module="em03-silove-ucinky"] .wireControls{flex:1;min-width:0;gap:8px}
-main[data-foundation-module="em03-silove-ucinky"] .wireControl{padding-left:7px;gap:2px 7px}
+main[data-foundation-module="em03-silove-ucinky"] .wireControl{
+  grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:3px 9px;
+  padding:6px 8px;border:1px solid #dbe4e1;border-left:3px solid var(--wire);
+  border-radius:7px;background:#f8fbfa;
+}
+main[data-foundation-module="em03-silove-ucinky"] .wireTitle{
+  min-height:26px;gap:6px;padding-bottom:3px;border-bottom:1px solid #e1ebe7;
+}
+main[data-foundation-module="em03-silove-ucinky"] .wireActions{
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+main[data-foundation-module="em03-silove-ucinky"] .wireActions button{padding:2px 6px;font-size:12px}
 main[data-foundation-module="em03-silove-ucinky"] .wireControl>.rangeLabel{margin:0;font-size:12px}
-main[data-foundation-module="em03-silove-ucinky"] .positionSliders{margin:0;gap:2px 4px}
+main[data-foundation-module="em03-silove-ucinky"] .wireControl output{white-space:nowrap;font-variant-numeric:tabular-nums}
+main[data-foundation-module="em03-silove-ucinky"] .wireControl input[type=range]{width:100%;height:16px;margin:2px 0}
+main[data-foundation-module="em03-silove-ucinky"] .positionSliders{
+  margin:0;gap:2px 6px;grid-template-columns:max-content minmax(0,1fr) max-content minmax(0,1fr);
+}
 main[data-foundation-module] :is(.presets button[data-preset],#preset.btn){
   background:#fff0db;color:#713c13;border-color:#e0a463;
 }

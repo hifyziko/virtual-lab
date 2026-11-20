@@ -42,7 +42,7 @@
   ['Porovnejte proudové smyčky v plném a děleném jádře pomocí dostupných voleb.','Měňte frekvenci a sledujte velikost ztrát.'],
   ['Proměnný tok indukuje uzavřené proudy i v samotném vodivém železe.','Izolované plechy omezují proudové cesty. Neodstraňují hysterezní ztráty; jde o dva různé mechanismy.'],null,['mag03-hysterezni-ztraty','hf-skin-proximity']);
  add('hf-skin-proximity','skin',
-  ['Zvyšujte frekvenci a porovnávejte rozložení proudu uvnitř vodičů.','Porovnejte samostatný vodič se soustavou blízkých vodičů. Schéma Princip natočíte tažením nebo šipkami. Dvojklik nebo Home obnoví původní pohled.'],
+  ['Zvyšujte frekvenci a porovnávejte rozložení proudu uvnitř vodičů.','Porovnejte samostatný vodič se soustavou blízkých vodičů.'],
   ['Skin efekt souvisí s vlastním proměnným polem, proximity efekt s polem okolních vodičů.','Nerovnoměrné rozložení proudu zvyšuje střídavý odpor a ztráty. Hloubka vniku je měřítko útlumu, nikoli ostrá hranice vedení.'],String.raw`\delta=\sqrt{\frac{2\rho}{\omega\mu}}`,['mag04-virive-proudy','tr05-rozptylova-reaktance']);
  add('em01-indukovane-napeti','energy',
   ['Měňte pohyb vodiče a orientaci magnetického pole.','Obraťte směr pohybu a porovnejte polaritu napětí.'],
