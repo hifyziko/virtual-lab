@@ -105,8 +105,8 @@ console.log('PASS: transient vertical/horizontal scrollbars cannot alter viewpor
 
 // HF header: modes/actions have their own row, so narrowing cannot collapse the title.
 const shellCss=fs.readFileSync(__dirname+'/uniform-module-layout.css','utf8');
-assert(shellCss.includes('.modulehead:has(.hf-heading-modes){grid-template-columns:88px auto minmax(0,1fr)!important}'));
-assert(shellCss.includes('.modulehead:has(.hf-heading-modes)>.actions{grid-column:1/-1!important;grid-row:2!important;'));
+assert(shellCss.includes('.modulehead:has(.hf-heading-modes){display:flex!important;flex-wrap:wrap;align-items:center}'));
+assert(shellCss.includes('.modulehead:has(.hf-heading-modes)>.actions{margin-left:auto;max-width:100%'));
 const fitSource=fs.readFileSync(__dirname+'/module-window-fit.js','utf8'),geometry={getComputedStyle:()=>({marginTop:'0',marginBottom:'12'})};
 vm.runInNewContext('const DESIGN_WIDTH=1600;'+fitSource.slice(fitSource.indexOf('  function boundedScale'),fitSource.indexOf('  const lifted'))+'this.fit=layoutScale;',geometry);
 // Approximate wrapped text metrics; this is a geometry regression, not browser rendering.
@@ -120,4 +120,4 @@ for(const height of [864,780,740]){
 }
 const windingCss=fs.readFileSync(__dirname+'/winding-window-layout.css','utf8');
 assert(windingCss.includes('.rf-workspace[data-winding-viewport]:not(:has(>.modulehead)){grid-template-rows:minmax(0,1fr) auto}'));
-console.log('PASS: HF two-row header and 125% Full HD geometry model; rotating field has no reserved hidden status track. Not a browser visual test.');
+console.log('PASS: HF wrapping header and 125% Full HD geometry model; rotating field has no reserved hidden status track. Not a browser visual test.');

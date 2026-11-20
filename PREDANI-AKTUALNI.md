@@ -4095,3 +4095,33 @@ Předvolby a sbalená volba vlastního zapojení sdílejí řádek. Otevřený e
 využívá celou šířku. Ve vloženém modulu odpadl samostatný úvodní řádek.
 Aktuální místní balíčky aktualizovány, kontrola načítání prošla.
 Vizuální kontrola v prohlížeči neproběhla. Bez pushe.
+
+### Menší mezery a graf rozběhu
+
+Společná mezera v hlavních skupinách panelů a transformátorovém rámci
+snížena z 12 na 8 px. Kresby příčné větve a rozptylové reaktance využívají
+volnou výšku. Graf momentu v pokusu s odporem rotoru přepočítává osy a
+křivky podle skutečné velikosti SVG, takže necentruje pevný obdélník.
+Místní balíčky a manifesty aktualizovány. Kontrola načítání prošla.
+Vizuální ověření zbývá. Bez pushe.
+
+### Vizuální kontrola využití plochy
+
+Otevřené okno Chrome s Matematickým transformátorem bylo nalezeno.
+Prostředí zamítlo přístup k oknu, takže vizuální průchod neproběhl.
+Pro každou cestu v tabulce výše ověřit běžné okno a celou obrazovku
+při nastavení 1920 × 1080 a 125 %. Zkontrolovat mezeru mezi panely,
+výšku ovládání, okraje uvnitř SVG a využití plochy při změně režimu.
+U každého nálezu zaznamenat modul, režim a snímek před opravou a po ní.
+### Předání k publikaci — 20. listopadu 2026
+
+Odeslání na origin/main schváleno. Tato dávka navazuje na commit 43a2998.
+Obsahuje menší mezery a okraje, kompaktnější ovládání Matematického
+transformátoru a Vlastní a vzájemné indukčnosti, pružnou výšku grafiky
+u Ztrát vířivými proudy a zalamování hlavičky Skin a proximity podle místa.
+U odporu rotoru je větší řez a momentová charakteristika přepočítává
+souřadnice podle velikosti panelu. Stav je pod grafem a pokyny k pohybu
+jsou ve výkladu. Aktuální místní výstup je ve versions/aktualni/web.
+Kontroly načítání, škálování a veřejného seznamu souborů prošly.
+Plošná vizuální kontrola v prohlížeči zůstává otevřená.
+GitHub Pages se sestaví po odeslání.

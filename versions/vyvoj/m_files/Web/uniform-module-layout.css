@@ -1,11 +1,11 @@
 /* One width and one visual language across all lessons; SVG coordinate systems stay intact. */
 html:has(:is(main,.workspace).uniform-module-layout){scrollbar-gutter:auto;overflow-anchor:none}
-:is(main,.workspace).uniform-module-layout{box-sizing:border-box;width:100%;max-width:1600px!important;min-width:0;margin:0 auto!important;padding:8px 0 16px!important;overflow-anchor:none}
+:is(main,.workspace).uniform-module-layout{box-sizing:border-box;width:100%;max-width:1600px!important;min-width:0;margin:0 auto!important;padding:5px 0 6px!important;overflow-anchor:none}
 .workspace.imported-workspace{max-width:none}
-#app>.workspace.uniform-module-layout{max-width:none!important;padding:14px 22px 10px!important}
+#app>.workspace.uniform-module-layout{max-width:none!important;padding:6px 10px 6px!important}
 @media(max-width:650px){#app>.workspace.uniform-module-layout{padding:10px!important}}
 :is(main,.workspace).uniform-module-layout .card{border-radius:12px;box-shadow:none}
-:is(main,.workspace).uniform-module-layout :is(.layout,.lab,.plotrow,.gridplots){gap:12px}
+:is(main,.workspace).uniform-module-layout :is(.layout,.lab,.plotrow,.gridplots){gap:var(--lesson-gap)}
 :is(main,.workspace).uniform-module-layout :is(.tabs,.schema-tabs){gap:6px;flex-wrap:wrap}
 :is(main,.workspace).uniform-module-layout :is(.tab,.tabs button,.schema-tabs button){font:600 14px/1.4 system-ui,"Segoe UI",sans-serif;border-radius:6px;padding:6px 10px;box-sizing:border-box}
 :is(main,.workspace).uniform-module-layout :is(.tab.active,.tab[aria-selected=true],.tabs button.active,.schema-tabs button[aria-pressed=true]){background:#007e6c;color:#fff;border-color:#007e6c}
@@ -16,7 +16,7 @@ body.em-lesson #sceneExplain{min-height:4.2em}
 body.em-lesson #modeExpl{min-height:5.6em}
 
 /* Shared typography applies to HTML labels, not SVG geometry or KaTeX internals. */
-:root{--lesson-width:1600px;--lesson-gap:12px;--lesson-text:14px;--lesson-heading:16px;--lesson-math:1.12em}
+:root{--lesson-width:1600px;--lesson-gap:5px;--lesson-text:14px;--lesson-heading:16px;--lesson-math:1.12em}
 :is(main,.workspace).uniform-module-layout{font-family:system-ui,"Segoe UI",sans-serif;font-size:var(--lesson-text);line-height:1.45;max-width:var(--lesson-width)!important}
 :is(main,.workspace).uniform-module-layout :is(.card,.panel)>h2{font-size:var(--lesson-heading);line-height:1.35}
 :is(main,.workspace).uniform-module-layout :is(.controls,.controlbox,.ctrlgrid,.fieldControls,.phaseControls) :is(label,button,select,input,output){font-size:var(--lesson-text);line-height:1.35}
@@ -32,7 +32,7 @@ body.em-lesson #modeExpl{min-height:5.6em}
 
 /* Hysteresis: reserve text/control rows and let the drawings use the remaining
    height. Preserve each SVG viewBox; no cropped content or internal scrolling. */
-main.uniform-module-layout:has(#zoomWall){display:grid;grid-template-rows:100px minmax(0,1fr) 64px 36px;gap:12px;overflow:visible;padding:8px 0 16px!important}
+main.uniform-module-layout:has(#zoomWall){display:grid;grid-template-rows:100px minmax(0,1fr) 64px 36px;gap:12px;overflow:visible;padding:5px 0 6px!important}
 main.uniform-module-layout:has(#zoomWall)>.hero,main.uniform-module-layout:has(#zoomWall)>#launchInfo{display:none!important}
 main.uniform-module-layout:has(#zoomWall)>.controls{grid-row:1;margin:0;padding:10px 12px;min-height:0;grid-template-columns:minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1fr);align-items:center}
 main.uniform-module-layout:has(#zoomWall)>.layout{grid-row:2;min-height:0;height:100%;grid-template-columns:minmax(0,1.05fr) minmax(0,.73fr) minmax(0,1.2fr);align-items:stretch}
@@ -56,7 +56,7 @@ main.uniform-module-layout:has(#zoomWall){--module-flexible-height:1;height:var(
 
 /* The host is the available window; only its lesson has a 1600px design width. */
 #app>.workspace.imported-workspace{width:100%!important;min-width:0!important;max-width:none!important;box-sizing:border-box}
-#app.module-window-host{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;align-items:start;padding:14px 22px 0;box-sizing:border-box}
+#app.module-window-host{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;align-items:start;padding:6px 10px 0;box-sizing:border-box}
 @media(max-width:650px){#app.module-window-host{padding:10px 10px 0}}
 #app>.module-window-expanded{zoom:1!important}
 /* An embedded fixed-width canvas must not lose space to a reserved scrollbar. */
@@ -103,12 +103,12 @@ body:has(>main.uniform-module-layout){margin:0!important;padding:0!important}
 #app :is(.modulehead,.module-window-heading)>a.back::after{display:flex;align-items:center;height:20px;line-height:20px}
 
 /* Energy experiments use the same viewport budget as the other lessons. */
-#app .hf-heading-modes{display:flex;gap:5px;align-items:center}
+#app .hf-heading-modes{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 #app .hf-heading-modes button{min-height:40px;font-size:15px;font-weight:650;padding:7px 11px;white-space:nowrap}
 #app .hf-heading-modes button[aria-pressed="true"]{background:#007e6c;color:#fff;border-color:#007e6c}
 /* HF modes must not squeeze the title while the frame fits by height. */
-#app .modulehead:has(.hf-heading-modes){grid-template-columns:88px auto minmax(0,1fr)!important}
-#app .modulehead:has(.hf-heading-modes)>.actions{grid-column:1/-1!important;grid-row:2!important;justify-self:end;max-width:100%}
+#app .workspace>.modulehead:has(.hf-heading-modes){display:flex!important;flex-wrap:wrap;align-items:center}
+#app .modulehead:has(.hf-heading-modes)>.actions{margin-left:auto;max-width:100%}
 #app>.energy-workspace[data-native-fill]>.energy-grid{flex:1 1 0;min-height:0}
 #app>.energy-workspace[data-native-fill] .energy-scene{height:0;min-height:160px;flex:1 1 0}
 
@@ -128,3 +128,6 @@ html:not(:has(body[data-fusion-page])) body>main,html:not(:has(body[data-fusion-
 /* Status summaries belong in the guide; reserve the workspace for the experiment. */
 .workspace>.statusline{display:none!important}
 main.uniform-module-layout:has(#zoomWall){grid-template-rows:100px minmax(0,1fr)}
+
+/* Tighten the gutters of the principal panel groups, including custom layouts. */
+:is(main,.workspace).uniform-module-layout :is(.layout,.lab,.views,.plots,.gridplots,.duo,.workarea,.rightplots,.experiment,.learning-grid):has(> :is(.card,.panel,.plotcard,.learning-panel)){gap:var(--lesson-gap)!important}

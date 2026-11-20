@@ -3,7 +3,7 @@
 main.uniform-module-layout[data-transformer-lesson]{--module-flexible-height:1;height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;max-height:none!important;display:flex;flex-direction:column;gap:12px;position:relative}
 main[data-transformer-lesson]>*{flex-shrink:0;margin-top:0;margin-bottom:0;min-width:0}
 main[data-transformer-lesson] :is(.card,.panel){box-sizing:border-box;padding:12px;border:1px solid #d9e2e1!important;border-radius:12px!important;background:#fff;min-width:0}
-main[data-transformer-lesson] :is(.layout,.lab,.duo,.grid,.bottom,.footerrow){gap:12px!important}
+main[data-transformer-lesson] :is(.layout,.lab,.duo,.grid,.bottom,.footerrow){gap:5px!important}
 main[data-transformer-lesson] :is(h2,.paneltitle){font-size:16px!important;line-height:1.35;margin:0 0 6px}
 main[data-transformer-lesson] :is(button,select,input,label,.controlunit label){font-size:14px!important;line-height:1.35}
 main[data-transformer-lesson] :is(.small,.foot,.lead,.intro,.note-line,.link-detail,.insight){font-size:13px!important;line-height:1.4}
@@ -56,9 +56,9 @@ main[data-transformer-lesson]>details>summary{box-sizing:border-box;padding:8px 
 .transformer-explanation::backdrop{background:#19313b55}
 .transformer-explanation .explanation-close{display:block;margin:0 0 12px auto;padding:6px 12px}
 .transformer-explanation details{display:block!important}.transformer-explanation summary{display:none}
-main[data-transformer-lesson="tr01-matematicky"]>.compact-lab{flex:1;min-height:0;grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr);grid-template-rows:150px minmax(0,1fr);align-items:stretch}
-main[data-transformer-lesson="tr01-matematicky"] .control-panel{grid-column:1/-1}
-main[data-transformer-lesson="tr01-matematicky"] .control-panel-grid{grid-template-columns:170px minmax(0,1fr) 260px!important;gap:12px;width:100%;min-width:0}
+main[data-transformer-lesson="tr01-matematicky"]>.compact-lab{flex:1;min-height:0;grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr);grid-template-rows:max-content minmax(0,1fr);align-items:stretch}
+main[data-transformer-lesson="tr01-matematicky"] .control-panel{grid-column:1/-1;padding:6px 10px}
+main[data-transformer-lesson="tr01-matematicky"] .control-panel-grid{grid-template-columns:185px minmax(0,1fr) 245px!important;gap:8px;width:100%;min-width:0}
 main[data-transformer-lesson="tr01-matematicky"] .control-panel .controls{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 main[data-transformer-lesson="tr01-matematicky"] :is(.stage-panel,.plots-panel){display:flex;flex-direction:column;gap:8px;min-height:0}
 main[data-transformer-lesson="tr01-matematicky"] .stage{flex:1;min-height:0}
@@ -149,7 +149,7 @@ main.uniform-module-layout[data-transformer-lesson]{width:calc(100% - 24px)!impo
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.lead{min-height:0;margin:0;line-height:1.4;font-size:13px}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.controlpanel{height:112px;min-height:112px;padding:8px 12px;align-items:start}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.duo{grid-template-rows:minmax(0,1fr) 240px}
-main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .duo>.panel>.figurebox{height:320px;min-height:320px;max-height:320px;flex:0 0 320px!important}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .duo>.panel>.figurebox{height:auto;min-height:210px;max-height:none;flex:1 1 0!important}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .duo>.panel>.circuit-links{height:90px;min-height:90px;gap:8px;margin:0!important}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .circuit-link{grid-template-rows:18px 32px minmax(0,1fr);padding:6px 8px!important;gap:2px}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .linked-equation{height:32px;margin:0!important}
@@ -284,3 +284,6 @@ main[data-transformer-lesson="tr03-schema"] .diagram>#diagram{display:block;flex
 /* Closed explanations live in the guide, so their grid rows return to drawings. */
 main.uniform-module-layout[data-transformer-lesson="tr03-schema"]:has(>details[data-guide-source]){grid-template-rows:20px 76px minmax(340px,1fr) 156px}
 main.uniform-module-layout[data-transformer-lesson="tr08-zkratovy-proud"]:has(>details[data-guide-source]){grid-template-rows:auto minmax(0,1fr)}
+
+main[data-transformer-lesson="tr01-matematicky"] .control-panel-grid{align-items:start}
+main[data-transformer-lesson="tr01-matematicky"] .control-panel .actions button{padding-block:4px}

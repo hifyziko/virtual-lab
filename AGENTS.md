@@ -57,3 +57,5 @@
 - Ovládání prostorových scén myší (18. 11. 2026): při tažení doprava snižovat azimut kamery; při tažení dolů zvyšovat její elevaci (oprava svislé osy podle uživatele). Tuto konvenci zachovat v nových a upravovaných prostorových modulech.
 
 - Upřesnění 20. 11. 2026: ve všech modulech odstranit neúčelné prázdné okraje a rezervované řádky po skrytém či přesunutém obsahu. Uvolněnou šířku a výšku přidělit scéně a grafům, nikoli prázdné výplni panelů. Ponechat pouze malé funkční odstupy pro čitelnost a zabránění překryvům; neodstraňovat je plošným nulováním všech mezer.
+
+- Ve všech modulech používat malé funkční mezery mezi panely. Grafy a scény mají růst podle dostupné plochy panelu. U grafů přepočítat kreslicí oblast podle rozměrů, u technických řezů zachovat poměr stran. Pevný rozměr ponechat jen tam, kde jej vyžaduje čitelnost nebo funkce ovladače.
