@@ -1,6 +1,7 @@
 *{box-sizing:border-box}
 body[data-fusion-page]{margin:0;background:radial-gradient(ellipse at top,#f3f5f9,#fff 75%);font-size:14px}
-main{width:min(100% - 28px, min(1540px,max(1120px, calc((100dvh - 230px) * 2.22 + 235px))));padding:8px 0 16px}
+.shell{position:absolute;left:50%;top:8px;width:1360px;height:820px;padding:8px;transform:translateX(-50%) scale(var(--fusion-fit,1));transform-origin:top center}
+body[data-fusion-page]{overflow:hidden}
 header[data-fusion-heading]{margin:0 0 10px}
 button,select,input{font:inherit}
 button,select,.back{border:1px solid #ded2e8;border-radius:8px;background:#fff;color:#433756;padding:7px 10px}
@@ -60,6 +61,10 @@ dialog::backdrop{background:#25324559}
 .sources{font-size:12px;color:#435b68}
 .sources a,dialog a{color:#285b76}
 #equations p>span:first-child{display:block;margin-bottom:3px;overflow-wrap:anywhere}
-@media(max-width:920px){.workspace{grid-template-columns:minmax(0,1fr)}.controls{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.controls>label{grid-column:1/-1}.controls details{grid-row:auto}.controls .reset{justify-self:start}}
-@media(max-width:590px){main{width:calc(100% - 16px)}.milestones{gap:4px}.milestones button{grid-template-columns:8px minmax(0,1fr);gap:3px 4px;padding:6px;min-height:86px;font-size:11px}.milestones button>span,.milestones small{grid-column:1/-1}.milestones small{font-size:10px}.plant-labels{display:none}.compact-key{display:block;margin:0;padding:5px 9px 8px;font-size:11px;color:#405662;background:#f5f8fa}.ledger{grid-template-columns:repeat(2,minmax(0,1fr))}.scene-top,.comment{font-size:12px}}
+@media(max-width:680px) and (orientation:portrait){
+ body[data-fusion-page]{overflow:auto}
+ .shell{position:static;width:calc(100% - 24px);height:auto;transform:none;padding:8px 0 16px}
+ body[data-fusion-page] header[data-fusion-heading]{zoom:1}
+ .workspace{grid-template-columns:minmax(0,1fr)}.controls{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.controls>label{grid-column:1/-1}.controls details{grid-row:auto}.controls .reset{justify-self:start}}
+@media(max-width:590px) and (orientation:portrait){.shell{width:calc(100% - 16px)}.milestones{gap:4px}.milestones button{grid-template-columns:8px minmax(0,1fr);gap:3px 4px;padding:6px;min-height:86px;font-size:11px}.milestones button>span,.milestones small{grid-column:1/-1}.milestones small{font-size:10px}.plant-labels{display:none}.compact-key{display:block;margin:0;padding:5px 9px 8px;font-size:11px;color:#405662;background:#f5f8fa}.ledger{grid-template-columns:repeat(2,minmax(0,1fr))}.scene-top,.comment{font-size:12px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}

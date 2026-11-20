@@ -12,9 +12,10 @@
 <script defer src="scene.js"></script>
 <script defer src="app.js"></script>
 <script defer src="../navigation/page.js"></script>
+<script>(()=>{'use strict';const root=document.documentElement;function fit(){root.style.setProperty('--fusion-fit',String(Math.max(.01,Math.min(((root.clientWidth||innerWidth)-16)/1360,(innerHeight-16)/820))));}fit();addEventListener('resize',fit);document.addEventListener('fullscreenchange',fit);})();</script>
 </head>
 <body data-fusion-page="fu14-milniky">
-<main>
+<main class="shell">
 <header data-fusion-heading><a class="back" href="../index.html#group-area-plasma" target="_top" aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a><h1 data-module-number="05">Energetické milníky fúze</h1><button id="guide-open">Ovládání a výklad</button><button data-fusion-full>Celá obrazovka</button><span class="version">Verze 1.0</span></header>
 <section class="milestones" aria-label="Energetické milníky">
 <button data-milestone="science" aria-pressed="false"><i></i><strong>Vědecké vyrovnání</strong><span data-tex="P_{\mathrm F}\ge P_{\mathrm H}"></span><small></small></button>
@@ -114,13 +115,13 @@
 <select id="scenario"><option value="low">Fúze se ztrátou</option><option value="science">Vědecké vyrovnání</option><option value="engineering">Elektřina bez zapálení</option><option value="ignition">Mez zapálení</option><option value="off">Bez výkonu</option><option value="custom" disabled>Vlastní nastavení</option></select>
 <div class="sliders" id="plasma-controls"></div>
 <button id="heating" aria-pressed="false">Vypnout vnější ohřev</button>
-<details><summary>Způsoby ohřevu</summary>
+<details name="advanced-controls"><summary>Způsoby ohřevu</summary>
 <div class="sliders" id="heating-controls"></div>
 <div class="readout" id="heating-readout"></div>
 <button id="ohmic" aria-pressed="false">Ukázat indukční rozběh</button>
 <p id="ohmic-note" hidden>Solenoid indukuje proud v plazmatu. Jeho elektrický odpor mění energii proudu na teplo. Změna magnetického toku je omezená a při vysoké teplotě odpor klesá. V této bilanci je rozběh pouze názorný.</p>
 </details>
-<details><summary>Technologie elektrárny</summary>
+<details name="advanced-controls"><summary>Technologie elektrárny</summary>
 <div class="sliders" id="tech-controls"></div>
 <div class="readout" id="tech-readout"></div>
 </details>
