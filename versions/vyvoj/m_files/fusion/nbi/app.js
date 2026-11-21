@@ -3,6 +3,7 @@
   const $=id=>document.getElementById(id), canvas=$('scene'),ctx=canvas.getContext('2d');
   const fmt=(n,d=2)=>n.toFixed(d).replace('.', '{,}');
   function math(node,tex){if(node.dataset.rendered!==tex){katex.render(tex,node);node.dataset.rendered=tex;}}
+  function setText(node,value){if(node.textContent!==value)node.textContent=value;}
   document.querySelectorAll('[data-tex]').forEach(el=>math(el,el.dataset.tex));
   $('import-guide').onclick=()=>$('guide').showModal();$('close').onclick=()=>$('guide').close();
   let data=null,worker=null,workerURL='',progress=0,playing=false,raf=0,last=0,busyTimer=0,calculateTimer=0;
@@ -93,19 +94,35 @@
     g.beginPath();g.arc(x,y,7+25*t,0,2*Math.PI);g.stroke();
     g.restore();
   }
-  function shadedParticle(g,x,y,electron,r){
+  const speciesStyles={
+    electron:{color:'#4de4ee',trail:'#849da8',dash:[],stride:7},
+    deuteron:{color:'#ff9c52',trail:'#a59387',dash:[9,4],stride:5},
+    triton:{color:'#e093ff',trail:'#9a8ea9',dash:[5,3,1,3],stride:5},
+    alpha:{color:'#ffe459',trail:'#a6a08a',dash:[1,4],stride:2}
+  };
+  const particleSprites=new Map();
+  function particleSprite(species){
     const style=window.HiFyzikoParticleStyle;
-    const atoms=style.connected.atoms[electron?'electron':'deuteron'];
+    const atoms=style.connected.atoms[species];
+    const sprite=document.createElement('canvas'),x=64,y=64,r=16;
+    sprite.width=sprite.height=128;
+    const g=sprite.getContext('2d');
     const halo=g.createRadialGradient(x,y,r*.4,x,y,r*3.6);
-    halo.addColorStop(0,electron?'#6ebbff70':'#ffd3aa64');halo.addColorStop(1,'#accfff00');
+    halo.addColorStop(0,speciesStyles[species].color+'70');halo.addColorStop(1,'#accfff00');
     g.fillStyle=halo;g.fillRect(x-r*3.6,y-r*3.6,r*7.2,r*7.2);
-    for(const [offset,,,type] of atoms){
-      const px=x+offset*r,py=y+offset*r*.36;
+    for(const [dx,dy,,type] of atoms){
+      const px=x+dx*r,py=y+(dy+dx*.18)*r;
       const base='#'+style.colors[type<0?'e':type?'p':'n'].toString(16).padStart(6,'0');
       const coat=g.createRadialGradient(px-r*.37,py-r*.43,0,px,py,r);
       coat.addColorStop(0,'#fff');coat.addColorStop(.32,base);coat.addColorStop(1,'#29334c');
       g.beginPath();g.arc(px,py,r,0,2*Math.PI);g.fillStyle=coat;g.fill();
     }
+    particleSprites.set(species,sprite);
+    return sprite;
+  }
+  function shadedParticle(g,x,y,species,r){
+    const sprite=particleSprites.get(species)??particleSprite(species),halfSize=4*r;
+    g.drawImage(sprite,x-halfSize,y-halfSize,2*halfSize,2*halfSize);
   }
   const number=(v,d=2)=>v.toLocaleString('cs',{minimumFractionDigits:d,maximumFractionDigits:d});
   function arrow(g,x,y,ux,uy,length,color){
@@ -121,77 +138,143 @@
     node.hidden=false;node.style.left=x+'px';node.style.top=y+'px';
     math(node,tex);
   }
-  function drawEncounter(g,x,y,w,h,time){
-    const cases=data.bundle.encounters,index=cases.findLastIndex(sample=>sample.time<=time);
-    if(index<0)return;
-    const sample=cases[index],end=cases[index+1]?.time??(data.flight+data.energy.at(-1)[0]);
-    const u=(time-sample.time)/((end-sample.time)*.8);
-    if(u>=1)return;
-    const fade=Math.min(1,u/.12,(1-u)/.42);
-    if(fade<=0)return;
-    const opacity=fade*fade*(3-2*fade),ion=sample.selected===1,states=sample.pairs[sample.selected];
-    const start=79,stop=150,closest=states[120],approachShare=.66;
-    const t=u<approachShare
-      ?lerp(states[start].time,closest.time,u/approachShare)
-      :lerp(closest.time,states[stop].time,(u-approachShare)/(1-approachShare));
-    let lo=start,hi=stop;
+  function backgroundGyro(p,omegaD,phaseD){
+    const chargeMassRatio=p.charge*3.3435838e-27/p.mass;
+    const displayRatio=p.species==='electron'?-1.6:chargeMassRatio;
+    return {
+      omega:omegaD*chargeMassRatio,
+      displayOmega:omegaD*displayRatio,
+      phase:phaseD*displayRatio
+    };
+  }
+  function gyroDisplacement(p,omega,phase){
+    const sine=Math.sin(-phase),oneMinusCosine=1-Math.cos(phase);
+    return [
+      (p.vy*sine+p.vz*oneMinusCosine)/omega,
+      (p.vz*sine-p.vy*oneMinusCosine)/omega
+    ];
+  }
+  function encounterState(states,time){
+    let lo=0,hi=states.length-1;
     while(hi-lo>1){
       const mid=(lo+hi)>>1;
-      if(states[mid].time<=t)lo=mid;else hi=mid;
+      if(states[mid].time<=time)lo=mid;else hi=mid;
     }
-    const a=states[lo],b=states[hi],v=(t-a.time)/(b.time-a.time);
-    const cos=Math.cos(sample.rotation),sin=Math.sin(sample.rotation);
-    const rotate=(dx,dy)=>[cos*dx+sin*dy,sin*dx-cos*dy];
-    const relative=s=>[s.p.x-s.d.x,s.p.y-s.d.y];
-    const [startX,startY]=rotate(...relative(states[start]));
-    const extent=Math.hypot(startX,startY);
-    const availableX=(startX<0?x:w-x)-18,availableY=(startY<0?y:h-y)-18;
-    const factor=Math.min(w*.34/extent,h*.32/extent,
-      availableX/Math.abs(startX),availableY/Math.abs(startY));
-    const project=(dx,dy)=>{
-      const [rx,ry]=rotate(dx,dy);
-      return [x+rx*factor,y+ry*factor];
+    const a=states[lo],b=states[hi],u=Math.max(0,Math.min(1,(time-a.time)/(b.time-a.time)));
+    return {
+      x:lerp(a.p.x-a.d.x,b.p.x-b.d.x,u),
+      y:lerp(a.p.y-a.d.y,b.p.y-b.d.y,u),
+      fx:lerp(a.fx,b.fx,u),fy:lerp(a.fy,b.fy,u),energy:lerp(a.p.E,b.p.E,u)
     };
-    const [ax,ay]=relative(a),[bx,by]=relative(b);
-    const [tx,ty]=project(lerp(ax,bx,v),lerp(ay,by,v));
-    const color=ion?'#efb37e':'#78d9c9';
-    g.save();
-    g.globalAlpha=opacity;
-    if(ion){
-      const first=states[start],dt=states[stop].time-first.time,[rx,ry]=relative(first);
-      g.setLineDash([4,5]);g.strokeStyle='rgba(237,191,148,.55)';g.lineWidth=1.2;
-      g.beginPath();g.moveTo(...project(rx,ry));
-      g.lineTo(...project(rx+(first.p.vx-first.d.vx)*dt,ry+(first.p.vy-first.d.vy)*dt));
-      g.stroke();g.setLineDash([]);
-    }
-    g.strokeStyle=color;g.lineWidth=1.7;
-    g.beginPath();g.moveTo(...project(...relative(states[start])));
-    for(let n=start+1;n<=lo;n++)g.lineTo(...project(...relative(states[n])));
-    g.lineTo(tx,ty);g.stroke();
-    shadedParticle(g,tx,ty,!ion,ion?4.6:3.7);
-    const target=$('lensTarget');
-    target.style.color=color;target.style.opacity=opacity;
-    lensLabel('lensTarget',ion?'\\mathrm{D}^{+}':'\\mathrm{e}^{-}',tx+8,ty-15);
-    const [fx,fy]=rotate(lerp(a.fx,b.fx,v),lerp(a.fy,b.fy,v));
-    const force=Math.hypot(fx,fy),peakForce=Math.hypot(closest.fx,closest.fy);
-    const length=27*Math.sqrt(Math.min(1,force/peakForce));
-    if(length>3){
-      for(const [ox,oy,sign] of [[x,y,1],[tx,ty,-1]]){
-        const ux=sign*fx/force,uy=sign*fy/force;
-        arrow(g,ox+ux*8,oy+uy*8,ux,uy,length,'#ff958a');
+  }
+  function drawEncounters(g,x,y,w,h,time){
+    const cases=data.bundle.encounters;
+    const end=data.flight+data.energy.at(-1)[0];
+    const interval=(end-data.flight)/cases.length*.23;
+    const ready=data.flight+slowingTime(easedDistance(ionizationDuration,ionizationDuration)/
+      easedDistance(1-ionizationAt,ionizationDuration));
+    let focus;
+    for(const sample of cases){
+      if(sample.time<ready+4*interval||sample.time>end-4*interval)continue;
+      const age=(time-sample.time)/interval;
+      const ion=sample.selected===1,states=sample.pairs[sample.selected];
+      const incoming=states[79],closest=states[120];
+      const separation=Math.hypot(incoming.p.x-incoming.d.x,incoming.p.y-incoming.d.y);
+      const factor=Math.min(w*.27,h*.34)/separation;
+      const cos=Math.cos(sample.rotation),sin=Math.sin(sample.rotation);
+      const rotate=(dx,dy)=>[cos*dx+sin*dy,sin*dx-cos*dy];
+      const project=(dx,dy)=>{
+        const [rx,ry]=rotate(dx,dy);
+        return [x+rx*factor,y+ry*factor];
+      };
+      // Use one clock and one magnification for the whole relative trajectory.
+      const timeScale=-incoming.time;
+      const pose=encounterState(states,age*timeScale);
+      const [tx,ty]=project(pose.x,pose.y);
+      if(tx<-18||tx>w+18||ty<-18||ty>h+18)continue;
+      const color=speciesStyles[ion?'deuteron':'electron'].color;
+      g.save();
+      if(ion){
+        const [rx,ry]=[incoming.p.x-incoming.d.x,incoming.p.y-incoming.d.y];
+        const vx=incoming.p.vx-incoming.d.vx,vy=incoming.p.vy-incoming.d.vy;
+        g.setLineDash([4,5]);g.strokeStyle='rgba(194,204,218,.58)';g.lineWidth=1.2;
+        g.beginPath();g.moveTo(...project(rx-3*timeScale*vx,ry-3*timeScale*vy));
+        g.lineTo(...project(rx+5*timeScale*vx,ry+5*timeScale*vy));g.stroke();g.setLineDash([]);
+      }
+      g.strokeStyle=color;g.lineWidth=1.7;g.beginPath();
+      for(let i=0;i<=16;i++){
+        const tail=encounterState(states,(age-.42*(1-i/16))*timeScale);
+        g[i?'lineTo':'moveTo'](...project(tail.x,tail.y));
+      }
+      g.stroke();
+      shadedParticle(g,tx,ty,ion?'deuteron':'electron',ion?5.4:4.7);
+      g.strokeStyle=color;g.lineWidth=1.5;
+      g.beginPath();g.arc(tx,ty,10,0,2*Math.PI);g.stroke();
+      const [fx,fy]=rotate(pose.fx,pose.fy),force=Math.hypot(fx,fy);
+      const length=27*Math.sqrt(Math.min(1,force/Math.hypot(closest.fx,closest.fy)));
+      if(length>3){
+        for(const [ox,oy,sign] of [[x,y,1],[tx,ty,-1]]){
+          const ux=sign*fx/force,uy=sign*fy/force;
+          arrow(g,ox+ux*8,oy+uy*8,ux,uy,length,'#ff958a');
+        }
+      }
+      g.restore();
+      const distance=Math.hypot(tx-x,ty-y);
+      if(tx>=0&&tx<=w&&ty>=0&&ty<=h&&(!focus||distance<focus.distance)){
+        focus={distance,ion,pose,sample,initialEnergy:states[0].p.E};
       }
     }
-    g.restore();
-    const delta=lerp(a.p.E,b.p.E,v)-states[start].p.E;
+    if(!focus)return;
+    const {ion,pose,sample,initialEnergy}=focus;
+    const delta=pose.energy-initialEnergy;
     return ion
       ? ['Odpuzování · odklon iontu',fmt(sample.ionDeflectionDeg,1)+'^{\\circ}']
       : ['Přitažlivost · změna energie elektronu','\\Delta E_k='+(delta>0?'+':'')+fmt(delta,1)+'\\,\\mathrm{eV}'];
+  }
+  function drawThermalParticle(g,p,pos,trail,w,h,alpha,powerShare){
+    const {x,y,depth}=pos;
+    const electron=p.species==='electron',style=speciesStyles[p.species];
+    const margin=20;
+    let minX=x-margin,maxX=x+margin,minY=y-margin,maxY=y+margin;
+    for(const pt of trail){
+      minX=Math.min(minX,pt.x);maxX=Math.max(maxX,pt.x);
+      minY=Math.min(minY,pt.y);maxY=Math.max(maxY,pt.y);
+    }
+    // Clip periodic copies to the view. The visible part of a trail keeps moving at the edge.
+    for(let col=Math.ceil(-maxX/w);col<=Math.floor((w-minX)/w);col++){
+      for(let row=Math.ceil(-maxY/h);row<=Math.floor((h-minY)/h);row++){
+        g.save();g.translate(col*w,row*h);g.globalAlpha=alpha;
+        if(powerShare!==null){
+          const breath=.79+.21*Math.sin(2*Math.PI*(progress*(2+4*p.depth)+p.x));
+          const intensity=(.055+.43*Math.pow(powerShare,.8))*breath;
+          const r=(electron?13:16)*(.8+.25*powerShare);
+          const glow=g.createRadialGradient(x,y,0,x,y,r);
+          const rgb=electron?'77,237,222':'255,172,97';
+          glow.addColorStop(0,`rgba(${rgb},${intensity.toFixed(3)})`);
+          glow.addColorStop(.4,`rgba(${rgb},${(intensity*.4).toFixed(3)})`);
+          glow.addColorStop(1,`rgba(${rgb},0)`);
+          g.fillStyle=glow;g.fillRect(x-r,y-r,2*r,2*r);
+        }
+        if(trail.length){
+          g.save();g.globalAlpha=alpha*.72;
+          g.strokeStyle=style.trail;g.lineWidth=1.45;g.lineCap='round';g.setLineDash(style.dash);
+          g.beginPath();
+          trail.forEach((pt,i)=>g[i?'lineTo':'moveTo'](pt.x,pt.y));
+          g.stroke();g.restore();
+        }
+        const perspective=.72+.48*p.depth+Math.max(-.14,Math.min(.14,depth));
+        shadedParticle(g,x,y,p.species,(electron?2.2:3.1)*perspective);
+        g.strokeStyle=style.color;g.lineWidth=p.species==='alpha'?1.1:.7;
+        g.beginPath();g.arc(x,y,electron?3.2:4.7,0,Math.PI*2);g.stroke();g.restore();
+      }
+    }
   }
   function drawLens(f,dpr){
     for(const [id,power] of [['electronPower',f.electronPower],['ionPower',f.ionPower]])
       $(id).style.width=(f.neutral?0:100*power/peakPower)+'%';
     if($('lens').hidden)return;
     const view=$('micro'),g=view.getContext('2d'),w=view.clientWidth,h=view.clientHeight;
+    if(w<=0||h<=0)return;
     if(view.width!==Math.round(w*dpr)||view.height!==Math.round(h*dpr)){view.width=Math.round(w*dpr);view.height=Math.round(h*dpr);}
     g.setTransform(dpr,0,0,dpr,0,0);
     const background=g.createRadialGradient(w*.55,h*.48,0,w*.5,h*.5,w*.8);
@@ -200,91 +283,70 @@
     const ion=!f.neutral,first=data.ion?kinematics(data.energy[0]):null;
     const k=ion?kinematics(f.row):null;
     const scale=Math.min(w*.21,h*.19)/Math.max(.002,first?.radius??.015);
-    const axial=.045,transverse=Math.sqrt(1-axial*axial);
-    const center=w*.54,mid=h*.49,axisY=mid+(first?.radius??0)*scale;
+    const axial=.085,transverse=.84;
+    const center=w/2,mid=h/2,axisY=mid,initialAngle=-Math.PI/2;
+    const birthX=center-transverse*(first?.radius??0)*scale;
     const angle=f.row[5]??0,travel=f.row[6]??0;
     const duration=data.bundle.end-data.flight;
     const localTime=ion?f.row[0]*3.2e-7/duration:0;
     const flight=f.neutral?f.flight:1,approach=(data.stop-data.start)*.035;
-    const entering=Math.max(0,Math.min(1,(f.point[1]-data.entry)/.45));
-    const density=ion?1:entering*Math.max(0,Math.min(1,(data.exit-f.point[1])/.45));
+    const clamp=value=>Math.max(0,Math.min(1,value));
+    const ingress=clamp((f.point[1]-data.entry)/Math.max(.001,data.ion?data.stop-data.entry:.75));
+    const exitOpacity=data.ion?1:clamp((data.exit-f.point[1])/.75);
     const ePower=ion?f.electronPower:0;
     const iPower=ion?f.ionPower:0;
     const powerSum=ePower+iPower;
     const eShare=powerSum>0?ePower/powerSum:0;
     const iShare=powerSum>0?iPower/powerSum:0;
     const electronDragRatio=ePower>0?Math.min(1,ePower/(k.v*initialElectronForce)):0;
-    const wrap=v=>v-Math.floor(v);
-    const electronOpticalScale=8;
-    // Use signed cyclotron frequencies and the integrated local magnetic phase.
-    const electronToDeuteronMass=3.3435838e-27/9.1093837e-31;
+    const electronOpticalScale=20;
     const thermalTime=localTime+flight*2e-9;
-    const thermalPose=(p,atTime=thermalTime,gyroAngle=null)=>{
-      const omegaD=k?.omega??first?.omega??2.5e8;
-      const omega=p.electron?-omegaD*electronToDeuteronMass:omegaD;
-      const phase=gyroAngle??(p.electron?-angle*electronToDeuteronMass:angle);
-      const sn=Math.sin(-phase),co=Math.cos(phase);
-      const yOrbit=(p.vy*sn+p.vz*(1-co))/omega;
-      const zOrbit=(p.vz*sn-p.vy*(1-co))/omega;
-      const optical=p.electron?electronOpticalScale:1;
-      const drift=ion?travel:approach*(flight-1);
+    const omegaD=k?.omega??first?.omega??2.5e8;
+    const thermalPhase=angle-(first?.omega??omegaD)*flight*2e-9;
+    const drift=ion?travel:approach*(flight-1);
+    // Use the physical frequency for orbit size and a slower clock for the electron display.
+    const thermalPose=(p,gyro,atTime=thermalTime,phase=gyro.phase)=>{
+      const [yOrbit,zOrbit]=gyroDisplacement(p,gyro.omega,phase);
+      const electron=p.species==='electron';
+      const optical=electron?electronOpticalScale:1;
+      const parallelScale=electron?.035:1;
+      const depth=zOrbit*optical*scale/h;
       return {
-        x:w*wrap(p.x+((p.vx*atTime-drift)*axial+transverse*zOrbit*optical)*scale/w),
-        y:h*wrap(p.y-yOrbit*optical*scale/h),
-        omega,phase
+        x:w*p.x+((parallelScale*p.vx*atTime-drift)*axial+transverse*zOrbit*optical)*scale,
+        y:h*p.y-yOrbit*optical*scale,
+        depth
       };
     };
+    const population={electron:0,deuteron:0,triton:0,alpha:0};
     for(let j=0;j<data.bundle.thermal.length;j++){
-      const p=data.bundle.thermal[j],pos=thermalPose(p);
-      const {x,y}=pos;
-      const edgeOpacity=Math.min(1,x/12,(w-x)/12,y/12,(h-y)/12);
-      g.save();g.globalAlpha=density*(.35+.6*p.depth)*edgeOpacity;
-      // Fixed representatives pulse in proportion to the collective heating share.
-      if(powerSum>0&&j%3===0){
-        const share=p.electron?eShare:iShare;
-        const breathe=.79+.21*Math.sin(2*Math.PI*(progress*(2+4*p.depth)+p.x));
-        const alpha=(.055+.43*Math.pow(share,.8))*breathe;
-        const r=(p.electron?13:16)*(.8+.25*share);
-        const glow=g.createRadialGradient(x,y,0,x,y,r);
-        const rgb=p.electron?'77,237,222':'255,172,97';
-        glow.addColorStop(0,`rgba(${rgb},${alpha.toFixed(3)})`);
-        glow.addColorStop(.4,`rgba(${rgb},${(alpha*.4).toFixed(3)})`);
-        glow.addColorStop(1,`rgba(${rgb},0)`);
-        g.fillStyle=glow;g.fillRect(x-r,y-r,2*r,2*r);
-      }
-      // Trace a fraction of the last thermal gyration, skipping periodic screen wraps.
-      if(ion&&j%5===0){
-        const steps=24,phaseSpan=Math.PI*1.6;
-        g.beginPath();
-        let previous;
+      const p=data.bundle.thermal[j],gyro=backgroundGyro(p,omegaD,thermalPhase);
+      const showTrail=population[p.species]++%speciesStyles[p.species].stride===0;
+      const reveal=ion?1:clamp((ingress-.60*(1-p.x))/.40)*exitOpacity;
+      if(reveal<=0)continue;
+      const pos=thermalPose(p,gyro),trail=[];
+      if(showTrail){
+        const steps=40,phaseSpan=Math.PI*2.6;
         for(let n=0;n<=steps;n++){
-          const theta=pos.phase+Math.sign(pos.omega)*phaseSpan*(1-n/steps);
-          const prevTime=thermalTime-(theta-pos.phase)/pos.omega;
-          const pt=thermalPose(p,prevTime,theta);
-          if(previous&&Math.abs(pt.x-previous.x)<w/2&&Math.abs(pt.y-previous.y)<h/2)g.lineTo(pt.x,pt.y);
-          else g.moveTo(pt.x,pt.y);
-          previous=pt;
+          const theta=gyro.phase+Math.sign(gyro.displayOmega)*phaseSpan*(1-n/steps);
+          const prevTime=thermalTime-(theta-gyro.phase)/gyro.displayOmega;
+          trail.push(thermalPose(p,gyro,prevTime,theta));
         }
-        g.strokeStyle=p.electron?'#81eadc':'#f0b982';g.lineWidth=p.electron?1:1.35;
-        g.save();g.globalAlpha*=.72;g.stroke();g.restore();
       }
-      shadedParticle(g,x,y,p.electron,(p.electron?2.2:3.1)*(.7+.6*p.depth));
-      g.strokeStyle=p.electron?'#76d9cb':'#eab27c';g.lineWidth=.7;
-      g.beginPath();g.arc(x,y,p.electron?3.2:4.7,0,Math.PI*2);g.stroke();g.restore();
+      const share=powerSum>0&&j%3===0?(p.species==='electron'?eShare:iShare):null;
+      drawThermalParticle(g,p,pos,trail,w,h,reveal*(.52+.44*p.depth),share);
     }
-    const renderPoint=(row,state)=>[center+scale*(axial*(row[6]-travel)+transverse*state.radius*Math.sin(row[5])),
-      axisY-scale*state.radius*Math.cos(row[5])];
+    const renderPoint=(row,state)=>[center+scale*(axial*(row[6]-travel)+transverse*state.radius*Math.sin(row[5]+initialAngle)),
+      axisY-scale*state.radius*Math.cos(row[5]+initialAngle)];
     let x=center,y=mid,encounter;
     const ionizing=ion&&f.ionization!==null;
     $('lensField').hidden=true;
-    $('lensTarget').hidden=true;
     if(ion){
       [x,y]=renderPoint(f.row,k);
       g.strokeStyle='#648ac2';g.lineWidth=1.1;g.beginPath();g.moveTo(12,axisY);g.lineTo(w-25,axisY);g.stroke();
       g.fillStyle='#648ac2';g.beginPath();g.moveTo(w-25,axisY-3);g.lineTo(w-17,axisY);g.lineTo(w-25,axisY+3);g.fill();
       lensLabel('lensField','\\mathbf{B}',w-31,axisY-19);
       const span=Math.min(f.row[0],2*Math.PI/k.omega*duration/3.2e-7*1.25);
-      g.strokeStyle='#9ed9ef';g.lineWidth=1.9;g.beginPath();
+      g.strokeStyle='#edf7ff';g.lineWidth=2.35;g.beginPath();
       for(let n=0;n<=64;n++){
         const row=energyAt(f.row[0]-span*(1-n/64)).row,pt=renderPoint(row,kinematics(row));
         if(n)g.lineTo(...pt);else g.moveTo(...pt);
@@ -297,16 +359,16 @@
           const dragDirection=k.parallel>=0?-1:1;
           arrow(g,x+dragDirection*12,y-8,dragDirection,0,dragLength,`rgba(75,230,219,${dragAlpha})`);
         }
-        if(!ionizing)encounter=drawEncounter(g,x,y,w,h,f.t);
+        if(!ionizing)encounter=drawEncounters(g,x,y,w,h,f.t);
       }
-    }else{x=w*(.22+.32*flight);}
-    if(ionizing)drawIonizationPulse(g,center,mid,f.ionization);
-    shadedParticle(g,x,y,false,6);
-    if(!ion)shadedParticle(g,x+8,y-4,true,2.8);
+    }else{x=lerp(w*.14,first?birthX:w*.86,flight);}
+    if(ionizing)drawIonizationPulse(g,birthX,mid,f.ionization);
+    shadedParticle(g,x,y,'deuteron',6);
+    if(!ion)shadedParticle(g,x+8,y-4,'electron',2.8);
     if(ionizing){
       const t=f.ionization;
       const departure=u=>u*u*(2-u);
-      const electronX=u=>center+8+w*.43*departure(u);
+      const electronX=u=>birthX+8+w*.43*departure(u);
       const electronY=u=>mid-4-h*(.22*departure(u)+.18*u*u);
       const tail=Math.max(0,t-.2);
       g.save();
@@ -315,7 +377,7 @@
       glow.addColorStop(0,'#9af5e600');glow.addColorStop(1,'#9af5e6');
       g.strokeStyle=glow;g.lineWidth=1.6;g.beginPath();
       g.moveTo(electronX(tail),electronY(tail));g.lineTo(electronX(t),electronY(t));g.stroke();
-      shadedParticle(g,electronX(t),electronY(t),true,2.8);g.restore();
+      shadedParticle(g,electronX(t),electronY(t),'electron',2.8);g.restore();
     }
     lensLabel('lensParticle',ion?'\\mathrm{D}^{+}':'\\mathrm{D}^{0}',x-10,y-24);
     const lost=!data.ion&&f.t>=data.flight;
@@ -327,9 +389,9 @@
       $(bar).style.width=(fraction*100)+'%';
       math($(value),Math.round(fraction*100)+'\\,\\%');
     }
-    $('exchangeNote').textContent=encounter?.[0]??(ionizing?'Ionizace · elektron se uvolňuje':
+    setText($('exchangeNote'),encounter?.[0]??(ionizing?'Ionizace · elektron se uvolňuje':
       lost?'Neutrální atom dopadl na stěnu':!ion?'Vstřik neutrálního deuteria':
-      powerSum>0?'Coulombovo zpomalování':'Konec vypočteného zpomalování');
+      powerSum>0?'Coulombovo zpomalování':'Konec vypočteného zpomalování'));
     $('exchangeValue').hidden=!encounter;
     if(encounter)math($('exchangeValue'),encounter[1]);
   }
@@ -379,7 +441,7 @@
     eBars.setAttribute('d',ePath);
     iBars.setAttribute('d',iPath);
     const val=key=>number(lerp(a[key],b[key],u),3);
-    $('beamTotals').textContent='Elektrony '+number(electrons,3)+' · ionty '+number(ions,3)+' · průlet na stěnu '+val('wall')+' MW. Neutrály v letu '+val('neutral')+' · zpomalující ionty '+val('fast')+' · zbytek při 5Tᵢ '+val('residual')+' MW.';
+    setText($('beamTotals'),'Elektrony '+number(electrons,3)+' · ionty '+number(ions,3)+' · průlet na stěnu '+val('wall')+' MW. Neutrály v letu '+val('neutral')+' · zpomalující ionty '+val('fast')+' · zbytek při 5Tᵢ '+val('residual')+' MW.');
   }
   const hardware=window.TokamakCAD;
   let gpu=null,assembly=null;
@@ -518,9 +580,11 @@
     const f=frame(),lens=$('lens');
     const reveal=data&&$('showMicro').checked?Math.min(1,progress/.055):0;
     const focus=reveal*reveal*(3-2*reveal);
-    lens.hidden=focus===0;
-    lens.style.opacity=focus;
-    lens.style.clipPath='inset(0 0 0 '+((1-focus)*100)+'%)';
+    if(lens.hidden!==(focus===0))lens.hidden=focus===0;
+    if(Number(lens.style.opacity)!==focus){
+      lens.style.opacity=focus;
+      lens.style.clipPath='inset(0 0 0 '+((1-focus)*100)+'%)';
+    }
     const plot=graph();
     const w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.max(1,devicePixelRatio*canvas.getBoundingClientRect().width/w);
     const W=Math.round(w*dpr),H=Math.round(h*dpr);
@@ -588,7 +652,7 @@
       const unit=f.t<.001?[1e6,'\\mu s']:[1e3,'ms'];
       math($('time'),fmt(f.t*unit[0])+'\\,\\mathrm{'+unit[1]+'}');
       for(const [id,value] of [['kin',lost?0:f.row[2]],['elec',f.row[3]],['ions',f.row[4]],['loss',lost?1000:0]])math($(id),fmt(value,1)+'\\,\\mathrm{keV}');
-      $('phase').textContent=lost?'Průlet bez ionizace · dopad na stěnu':f.neutral?(f.point[1]>=data.entry&&f.point[1]<=data.exit?'Neutrální atom proniká plazmatem':'Přímý let neutrálního atomu'):f.ionization!==null?'Ionizace uvnitř plazmatu · vznik rychlého deuteronu':f.t>=data.flight+data.energy.at(-1)[0]?'Konec modelu rychlého iontu · zbytková energie částice':'Trajektorie vodicího středu deuteronu';
+      setText($('phase'),lost?'Průlet bez ionizace · dopad na stěnu':f.neutral?(f.point[1]>=data.entry&&f.point[1]<=data.exit?'Neutrální atom proniká plazmatem':'Přímý let neutrálního atomu'):f.ionization!==null?'Ionizace uvnitř plazmatu · vznik rychlého deuteronu':f.t>=data.flight+data.energy.at(-1)[0]?'Konec modelu rychlého iontu · zbytková energie částice':'Trajektorie vodicího středu deuteronu');
       for(let i=0;i<3;i++){
         const dot=$('energy-marker-'+i);
         if(!dot)continue;
@@ -675,7 +739,13 @@
   }
   $('retry').onclick=()=>queueCalculation();
   $('density').oninput=$('temp').oninput=()=>queueCalculation(120);
-  function tick(now){progress=Math.min(1,progress+(now-last)*.000016*Number($('speed').value));last=now;$('seek').value=progress;draw();if(progress<1)raf=requestAnimationFrame(tick);else stop();}
+  function tick(now){
+    // A delayed frame must not jump the particle ahead by a large step.
+    const elapsed=Math.min(50,Math.max(0,now-last));
+    progress=Math.min(1,progress+elapsed*.000016*Number($('speed').value));
+    last=now;$('seek').value=progress;draw();
+    if(progress<1)raf=requestAnimationFrame(tick);else stop();
+  }
   $('play').onclick=()=>{if(playing){stop();return;}if(progress===1)progress=0;playing=true;$('play').textContent='Pozastavit';last=performance.now();raf=requestAnimationFrame(tick);};
   $('seek').oninput=()=>{stop();progress=Number($('seek').value);draw();};
   $('trace').onchange=draw;

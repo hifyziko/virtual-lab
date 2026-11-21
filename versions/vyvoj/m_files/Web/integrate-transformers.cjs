@@ -26,11 +26,12 @@ const modules=[
  {id:'sm03-torque',draft:false,group:'sync',num:'03',title:'Momentová charakteristika',file:'../synchronous/torque.html',description:'Moment od buzení, reluktanční moment a jejich součet. Vnější β a vnitřní β′, parametry a propojený fázorový diagram.'},
  {id:'sm02-schema',group:'sync',num:'01',title:'Náhradní schéma a fázory synchronního stroje',file:'../synchronous/schema.html',description:'Buzení, zátěžný úhel β a reakce kotvy. Propojené schéma a fázory, hladký rotor i vyniklé póly, činný a jalový výkon.'},
  {id:'sm01-princip',group:'sync',num:'02',title:'Princip synchronního stroje',file:'../synchronous/princip.html',description:'Veďte setrvačný rotor polem. Úhel β, zachycení a utržení, buzení, reluktanční moment a tlumicí klec. Vyniklé póly i hladký rotor.'},
- {id:'am05-odpor-rotoru',group:'induction',num:'02',title:'Proč rotor potřebuje odpor?',file:'../induction/resistance.html',description:'Jeden závit v točivém poli: vlastní pole proudu, úhel mezi poli a okamžitý i střední moment při nulovém a nenulovém odporu.'},
+ {id:'am05-odpor-rotoru',group:'induction',num:'02',title:'Proč rotor potřebuje odpor?',file:'../induction/resistance.html',description:'Ručně natočte pole jednoho závitu, zobrazte šipky nebo siločáry a porovnejte síly na tyčích a moment s odporem i bez něj.'},
  {id:'am04-trakcni',group:'induction',num:'05',title:'Trakční charakteristika AM',file:'../induction/traction.html',description:'Změna frekvence měniče, okamžitý moment, brzdění a oblasti plného toku, výkonu a omezení zvratem.'},
  {id:'am01-princip',group:'induction',num:'01',title:'Princip asynchronního motoru',file:'../induction/princip.html',description:'Otáčky pole a rotoru, skluz, rotorová frekvence, vznik proudu a momentu. Dva pohledy na stejný stroj bez grafů.'},
  {id:'am02-momentova-charakteristika',group:'induction',num:'04',title:'Momentová charakteristika AM',file:'../induction/momentova-charakteristika.html',draft:false,description:'Vinutá kotva a klec, vrstvený model tyče, odpor rotoru a časové i prostorové harmonické.'},
- {id:'em01-indukovane-napeti',group:'electromagnetism',num:'01',title:'Indukované napětí',file:'../../EM01_indukovane_napeti.html',description:'Transformační a pohybová indukce: změna proudu, natočení cívky, toková vazba a Faradayův zákon.'},
+ {id:'em01-indukovane-napeti',group:'electromagnetism',num:'01',title:'Transformační indukované napětí',file:'../../EM01_indukovane_napeti.html',description:'Dvě stojící cívky. Měňte budicí proud a sledujte napětí druhé cívky.'},
+ {id:'em01-pohybove-napeti',group:'electromagnetism',num:'02',title:'Pohybové indukované napětí',file:'../../EM01_indukovane_napeti.html',description:'Pohyb tyče, posuv pole a otáčení cívky. Sledujte velikost a polaritu napětí.'},
  {id:'em02-vzajemna-indukcnost',group:'electromagnetism',num:'02',title:'Vlastní a vzájemná indukčnost',file:'../../EM02_vlastni_vzajemna_indukcnost.html',description:'Dvě cívky, jejich vlastní a vzájemná toková vazba. Vliv natočení, proudu a počtu závitů.'},
  {id:'em03-silove-ucinky',group:'electromagnetism',num:'03',title:'Silové účinky mezi vodiči',file:'../../EM03_silove_ucinky_vodicu.html',description:'Tři přesouvatelné vodiče, nezávislé proudy, společné magnetické pole a výsledné síly. Přitahování, odpuzování a rovnováha.'},
  {id:'mag01-magnetizace',group:'materials',num:'01',title:'Magnetizace feromagnetika',file:'../../MAG01_magnetizace_vektory_v5.html',description:'Magnetické domény, jejich růst a rotace, nasycení a vratná B–H charakteristika. Vliv polarity a natočení budicího pole.'},
@@ -46,7 +47,7 @@ const modules=[
  {id:'tr03-schema',num:'04',title:'Náhradní schéma transformátoru',file:'nahradni_schema.html',draft:false,description:'Samostatná kapitola: přesun ideálního transformátoru a přepočet impedancí.'},
  {id:'tr08-zkratovy-proud',num:'07',title:'Zkratový proud transformátoru',file:'zkratovy-proud.html',description:'Vznik zkratu, střídavá a stejnosměrná složka proudu, proudové obálky a první špička. Vliv okamžiku zkratu, napětí nakrátko a poměru X/R.'}
 ];
-const foundationOrder=['mag01-magnetizace','mag02-hystereze','em01-indukovane-napeti','em02-vzajemna-indukcnost','em03-silove-ucinky','mag03-hysterezni-ztraty','mag04-virive-proudy','hf-skin-proximity'];
+const foundationOrder=['mag01-magnetizace','mag02-hystereze','em01-indukovane-napeti','em01-pohybove-napeti','em02-vzajemna-indukcnost','em03-silove-ucinky','mag03-hysterezni-ztraty','mag04-virive-proudy','hf-skin-proximity'];
 for(const m of modules){const i=foundationOrder.indexOf(m.id);if(i>=0){m.group='electromagnetism';m.num=String(i+1).padStart(2,'0')}}
 modules.sort((a,b)=>(foundationOrder.indexOf(a.id)<0?99:foundationOrder.indexOf(a.id))-(foundationOrder.indexOf(b.id)<0?99:foundationOrder.indexOf(b.id)));
 let html=fs.readFileSync(file,'utf8').replaceAll("id==='transformer'?Number(a.num)-Number(b.num):0","(id==='transformer'||id==='induction')?Number(a.num)-Number(b.num):0").replaceAll(/C\.mount\(app,\{num:'[^']*',title:'Asynchronní/g,"C.mount(app,{num:'02',title:'Asynchronní").replace(/<!-- transformer-modules:start -->[\s\S]*?<!-- transformer-modules:end -->\s*/,'');
@@ -77,7 +78,7 @@ function cleanLegacyBanner(source){
  if(match){const tokens=/<\/?div\b[^>]*>/gi;tokens.lastIndex=match.index;let depth=0,m;while((m=tokens.exec(source))){depth+=m[0].startsWith('</')?-1:1;if(depth===0){const block=source.slice(match.index,tokens.lastIndex);if(/Hi!|Fyziko/i.test(block))source=source.slice(0,match.index)+source.slice(tokens.lastIndex);break;}}}
  return source;
 }
-const payload=modules.map(m=>{let source=cleanLegacyBanner(fs.readFileSync(path.join(dir,m.file),'utf8'));if(m.id==='am02-momentova-charakteristika'){
+const payload=modules.map(m=>{let source=cleanLegacyBanner(fs.readFileSync(path.join(dir,m.file),'utf8'));if(m.id.startsWith('em01-'))source=require('../em-core/voltage-lesson.cjs')(source,m);if(m.id==='am02-momentova-charakteristika'){
  const intro=source.match(/<template id="lesson-guide-controls">([\s\S]*?)<\/template>/);
  if(!intro)throw Error('Missing AM controls guide');
  const sections=[];source=source.replace(/<details(?: class="equations")?><summary>(Výpočet momentu|Vrstvený model rotorové tyče)<\/summary>([\s\S]*?)<\/details>/g,(_,title,body)=>{sections.push('<section><h3>'+title+'</h3>'+body+'</section>');return '';});

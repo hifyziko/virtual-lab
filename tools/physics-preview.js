@@ -44,8 +44,7 @@
     home.querySelector('.hero').after(nav);
     nav.hidden = !!current.area;
     if (current.area) {
-      const up = current.group ? '#group-area-' + current.area.id : '#';
-      home.querySelector('.hero').insertAdjacentHTML('afterend', `<nav class="physics-level-navigation" aria-label="Návrat do nadřazeného tématu"><a class="physics-up physics-up-primary" href="${up}"><span aria-hidden="true">↑</span> O úroveň výš</a></nav>`);
+      home.querySelector('.hero').insertAdjacentHTML('afterend', '<nav class="physics-level-navigation" aria-label="Návrat do hlavního rozcestníku"><a class="physics-up physics-up-primary" href="#"><span aria-hidden="true">↑</span> O úroveň výš</a></nav>');
     }
     home.querySelector('.sectionline h2').textContent = 'Témata a moduly';
     const groups = [...home.querySelectorAll('.topic-group')];
@@ -92,5 +91,23 @@
     }
     // Fullscreen group links are maintained by the original shell.
   };
+  document.addEventListener('click', event => {
+    if (event.defaultPrevented || event.button !== 0 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    const up = event.target.closest?.('a.physics-up-primary');
+    if (!up) return;
+
+    const oldURL = location.href;
+    const nextURL = new URL(oldURL);
+    nextURL.hash = up.hash;
+    event.preventDefault();
+    if (nextURL.href === oldURL) {
+      Lab.route();
+      return;
+    }
+    // An area fragment also identifies an element below the heading. Let the
+    // router set the scroll position without native fragment scrolling.
+    history.pushState(null, '', nextURL.href);
+    window.dispatchEvent(new HashChangeEvent('hashchange', {oldURL, newURL:nextURL.href}));
+  });
   Lab.route();
 })();

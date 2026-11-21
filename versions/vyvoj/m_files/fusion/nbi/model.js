@@ -178,7 +178,7 @@ function computeBeam(density,temperature,report){
   const local=reference.ion?reference:members.find(m=>m.ion);
   const normal=()=>Math.sqrt(-2*Math.log(random()))*Math.cos(2*Math.PI*random());
   const encounters=[];
-  const encounterCount=28;
+  const encounterCount=14;
   let previousKind,runLength=0;
   if(local)for(let j=0;j<encounterCount;j++){
     const targetTime=(j+random()*.45)/encounterCount*local.energy.at(-1)[0];
@@ -202,10 +202,17 @@ function computeBeam(density,temperature,report){
     });
     encounters.push({time:local.flight+targetTime,energy,pairs,selected,rotation,ionDeflectionDeg});
   }
+  // Illustrative thermal background. Beam deposition still uses the deuterium approximation.
+  const backgroundSpecies={
+    electron:[9.1093837e-31,-1],deuteron:[3.3435838e-27,1],
+    triton:[5.0073567e-27,1],alpha:[6.6446573e-27,2]
+  };
   const thermal=Array.from({length:60},(_,i)=>{
-    const electron=i%2===0,mass=electron?9.1093837e-31:3.3435838e-27;
+    const ionIndex=Math.floor(i/2);
+    const species=i%2===0?'electron':ionIndex%10===2?'alpha':ionIndex%2?'triton':'deuteron';
+    const [mass,charge]=backgroundSpecies[species];
     const sigma=Math.sqrt((reference.localTemperature??temperature)*1.602176634e-16/mass);
-    return {electron,x:random(),y:random(),depth:random(),vx:sigma*normal(),vy:sigma*normal(),vz:sigma*normal()};
+    return {species,mass,charge,x:random(),y:random(),depth:random(),vx:sigma*normal(),vy:sigma*normal(),vz:sigma*normal()};
   });
   // Elliptical torus V(r) = 2 pi² R0 kappa r². Integrate between bin edges.
   const volumes=Array.from({length:bins},(_,i)=>2*Math.PI**2*6.2*1.7*(2/bins)**2*(2*i+1));

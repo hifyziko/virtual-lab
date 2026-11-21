@@ -5,14 +5,15 @@
 #lens{position:absolute;right:12px;top:48px;bottom:40px;width:44%;padding:14px;background:#f6fafc;border:1px solid #bdcfd6;border-radius:10px;display:flex;flex-direction:column;gap:7px}#lens[hidden]{display:none}#lens h3{margin:0;font-size:18px}#lens #micro{width:100%;min-height:88px;flex:1;cursor:default}.pair-energy{display:grid;grid-template-columns:auto 1fr;gap:5px;font-size:14px}.pair-energy > span{text-align:right}#exchange{padding:8px;background:#e4eff1;border-radius:5px;font-size:14px;min-height:52px}.recipient i{height:5px;background:#e2ebee;border-radius:4px;overflow:hidden}.recipient b{display:block;height:100%}.electrons{color:#177380}.deuterons{color:#9b6236}#electronPower{background:#27899a}#ionPower{background:#bd8150}#lens small{display:block;margin-top:3px;font-size:11px;color:#4f6571}
 
 .scene{background:radial-gradient(ellipse at 48% 58%,#edf1f4 0%,#fafaf8 59%,#fff 90%);overflow:hidden}
-#lens{bottom:12px;background:linear-gradient(150deg,#fff 10%,#edf4f5);border-color:#bacbd0}
 #micro{background:radial-gradient(ellipse at 48% 48%,#fff,#e7f1f1 76%,#d8e6e8);border-radius:8px}
 .pair-energy{grid-template-columns:minmax(0,1fr) auto;align-items:baseline}.pair-energy > span{white-space:nowrap}
 
 .shell footer:empty{display:none}
 
 .beam-results p{margin:5px 0;line-height:1.55;font-variant-numeric:tabular-nums}.toolbar label:has(#showMicro){display:flex;align-items:center}
-#lens{width:calc(62% - 22px);padding:11px;gap:4px}#lens #flightTitle,#exchangeNote{font-variant-numeric:tabular-nums;font-size:13px;margin:0}#exchangeNote{min-height:1.4em}
+#lens{top:12px;bottom:12px;width:calc(62% - 22px);padding:9px;gap:5px;background:linear-gradient(150deg,#fff 10%,#edf4f5);border-color:#bacbd0}
+.lens-heading{display:flex;flex:0 0 24px;align-items:center;justify-content:space-between;gap:12px;white-space:nowrap}
+#lens #flightTitle,#exchangeNote{font-variant-numeric:tabular-nums;font-size:13px;margin:0}
 
 .micro-stage{position:relative;flex:1;min-height:88px;overflow:hidden;border-radius:8px}
 #lens #micro{position:absolute;inset:0;display:block;height:100%}
@@ -24,7 +25,7 @@
 #lensShares > i{height:5px;border-radius:3px;background:#ffffff30}
 #lensShares b{display:block;height:100%;border-radius:inherit;background:currentColor}
 #lensShares > span:nth-child(3n){text-align:right}
-.encounter-caption{min-height:2.8em;font-size:13px}
+.encounter-caption{display:flex;flex:0 0 22px;align-items:center;gap:.35em;font-size:13px;line-height:1.4;white-space:nowrap}
 .energy-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-bottom:4px;font-size:12px;color:#216985}
 .energy-legend span::before{content:"";display:inline-block;width:12px;margin-right:4px;border-top:2px solid;vertical-align:middle}
 .profile-plot{position:relative}
@@ -36,7 +37,7 @@
 .profile-end{bottom:0;right:58px}
 .profile-unit{top:2px;right:1px}
 
-.panels{display:grid;grid-template-columns:minmax(0,2.3fr) minmax(0,1fr);gap:9px;flex:1;min-height:0}
+.panels{display:grid;grid-template-columns:minmax(0,2.67fr) minmax(0,1fr);gap:9px;flex:1;min-height:0}
 .balance-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
 .balance-heading h2{margin:0 0 4px}
 #axisY,#axisX{font-size:13px}

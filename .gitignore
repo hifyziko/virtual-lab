@@ -59,6 +59,7 @@
 !/tools/project/test-tools.cjs
 !/tools/project/zip.cjs
 !/tools/scene-loading.js
+!/tools/test-am-coil.cjs
 !/tools/test-commutation.cjs
 !/tools/test-compass-u.cjs
 !/tools/test-confinement-atlas.cjs
@@ -68,6 +69,7 @@
 !/tools/test-coulomb-quantum.cjs
 !/tools/test-coulomb.cjs
 !/tools/test-drift.cjs
+!/tools/test-eccd.cjs
 !/tools/test-em-wave.cjs
 !/tools/test-fusion-controls.cjs
 !/tools/test-fusion-dt.cjs
@@ -167,6 +169,7 @@
 !/versions/vyvoj/m_files/Web/induction/princip-template.html
 !/versions/vyvoj/m_files/Web/induction/princip.html
 !/versions/vyvoj/m_files/Web/induction/princip.js
+!/versions/vyvoj/m_files/Web/induction/resistance-coil.js
 !/versions/vyvoj/m_files/Web/induction/resistance-template.html
 !/versions/vyvoj/m_files/Web/induction/resistance.html
 !/versions/vyvoj/m_files/Web/induction/resistance.js
@@ -485,6 +488,7 @@
 !/versions/vyvoj/m_files/em-core/motional-rod.js
 !/versions/vyvoj/m_files/em-core/style.css
 !/versions/vyvoj/m_files/em-core/ui.js
+!/versions/vyvoj/m_files/em-core/voltage-lesson.cjs
 !/versions/vyvoj/m_files/fusion/barrier/app.js
 !/versions/vyvoj/m_files/fusion/barrier/fusion.js
 !/versions/vyvoj/m_files/fusion/barrier/index.html
@@ -544,6 +548,10 @@
 !/versions/vyvoj/m_files/fusion/drift/layout.js
 !/versions/vyvoj/m_files/fusion/drift/model.js
 !/versions/vyvoj/m_files/fusion/drift/style.css
+!/versions/vyvoj/m_files/fusion/eccd/app.js
+!/versions/vyvoj/m_files/fusion/eccd/index.html
+!/versions/vyvoj/m_files/fusion/eccd/model.js
+!/versions/vyvoj/m_files/fusion/eccd/style.css
 !/versions/vyvoj/m_files/fusion/equilibrium/app.js
 !/versions/vyvoj/m_files/fusion/equilibrium/blanket.js
 !/versions/vyvoj/m_files/fusion/equilibrium/cad-loading.js
@@ -560,6 +568,7 @@
 !/versions/vyvoj/m_files/fusion/heating/app.js
 !/versions/vyvoj/m_files/fusion/heating/index.html
 !/versions/vyvoj/m_files/fusion/heating/style.css
+!/versions/vyvoj/m_files/fusion/heating/wave-art.js
 !/versions/vyvoj/m_files/fusion/islands/app.js
 !/versions/vyvoj/m_files/fusion/islands/context.js
 !/versions/vyvoj/m_files/fusion/islands/data.js
@@ -604,6 +613,10 @@
 !/versions/vyvoj/m_files/fusion/plasma/layout.js
 !/versions/vyvoj/m_files/fusion/plasma/model.js
 !/versions/vyvoj/m_files/fusion/plasma/style.css
+!/versions/vyvoj/m_files/fusion/scattering/app.js
+!/versions/vyvoj/m_files/fusion/scattering/index.html
+!/versions/vyvoj/m_files/fusion/scattering/model.js
+!/versions/vyvoj/m_files/fusion/scattering/style.css
 !/versions/vyvoj/tools/build-release.cjs
 !/versions/vyvoj/tools/test-navigation.cjs
 !/versions/vyvoj/tools/update-version-index.cjs

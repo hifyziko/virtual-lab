@@ -4,6 +4,14 @@
  for(const link of document.querySelectorAll('[data-lab-route]')){
   if(link.dataset.labRoute===id)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
  }
+ // A standalone lesson returns through a fresh directory document.
+ const back=document.querySelector('a.back[href$="#group-area-plasma"]');
+ if(back){
+  const url=new URL(back.href);url.searchParams.set('fromFusion',id);back.href=url.href;
+  if(window.parent!==window)try{
+   const home=new URL(window.parent.location.href);home.hash='group-area-plasma';back.href=home.href;
+  }catch{}
+ }
  const button=document.querySelector('[data-fusion-full]');
  if(button){
   button.onclick=async()=>{if(window.parent!==window){try{if(window.parent.toggleModuleFullscreen){await window.parent.toggleModuleFullscreen();button.textContent=window.parent.document.fullscreenElement||window.parent.document.body.classList.contains('fullscreen')?'Zmenšit okno':'Celá obrazovka';return;}}catch(e){}}const active=document.fullscreenElement||document.body.classList.contains('fullscreen');document.body.classList.toggle('fullscreen',!active);try{if(active){if(document.fullscreenElement)await document.exitFullscreen?.();}else await document.documentElement.requestFullscreen?.();}catch(e){}button.textContent=active?'Celá obrazovka':'Zmenšit okno';window.dispatchEvent(new Event('resize'));};

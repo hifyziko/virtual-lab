@@ -41,14 +41,30 @@ console.log('PASS NBI: repeatable penetration, transmission to vessel wall, fiel
  const sceneArcs=[];
  el('scene').getContext=()=>new Proxy({},{get:(_,key)=>key==='arc'?(...args)=>sceneArcs.push(args):drawing(key)});
  Object.assign(el('profile'),{clientWidth:540,clientHeight:65});
- const microArcs=[];
- el('micro').getContext=()=>new Proxy({},{get:(_,key)=>key==='arc'?(...args)=>microArcs.push(args):drawing(key)});
+ const microArcs=[],microSprites=[],microColors=new Set(),microDashes=new Set(),microPathPoints=[];
+ el('micro').getContext=()=>{
+   let ox=0,oy=0;
+   const stack=[];
+   return new Proxy({},{
+     get:(_,key)=>{
+       if(key==='save')return ()=>stack.push([ox,oy]);
+       if(key==='restore')return ()=>{[ox,oy]=stack.pop();};
+       if(key==='translate')return (x,y)=>{ox+=x;oy+=y;};
+       if(key==='moveTo'||key==='lineTo')return (x,y)=>microPathPoints.push([x+ox,y+oy]);
+       if(key==='arc')return (x,y,...args)=>microArcs.push([x+ox,y+oy,...args]);
+       if(key==='drawImage')return (sprite,x,y,w,h)=>microSprites.push({sprite,x:x+ox+w/2,y:y+oy+h/2});
+       if(key==='setLineDash')return pattern=>microDashes.add(pattern.join(','));
+       return drawing(key);
+     },
+     set:(_,key,value)=>{if(key==='strokeStyle')microColors.add(value);return true;}
+   });
+ };
  let blob,worker,callback,timerId=0;
  const timers=new Map();
  function runTimers(){
    for(const [id,callback] of [...timers]){timers.delete(id);callback();}
  }
- const env={document:{createElement:()=>({getContext:el('scene').getContext}),getElementById:el,querySelectorAll:()=>[]},computeNBI:solve,computeBeam:solve.computeBeam,scatteringExample:solve.scatteringExample,devicePixelRatio:1,performance:{now:()=>0},
+ const env={document:{createElement:()=>({getContext:()=>new Proxy({},{get:(_,key)=>drawing(key)})}),getElementById:el,querySelectorAll:()=>[]},computeNBI:solve,computeBeam:solve.computeBeam,scatteringExample:solve.scatteringExample,devicePixelRatio:1,performance:{now:()=>0},
    addEventListener(){},removeEventListener(){},setTimeout(fn){timers.set(++timerId,fn);return timerId;},clearTimeout(id){timers.delete(id);},cancelAnimationFrame(){},requestAnimationFrame:f=>(callback=f,1),
    katex:{renderToString:katex.renderToString,render:(tex,node)=>{node.rendered=katex.renderToString(tex,{throwOnError:true});}},
    Blob:class{constructor(parts){blob=parts.join('');}},URL:{createObjectURL:()=>'blob:test',revokeObjectURL(){}},
@@ -57,7 +73,12 @@ console.log('PASS NBI: repeatable penetration, transmission to vessel wall, fiel
  env.window=env;env.createConfinementRenderer=()=>null;env.HiFyzikoParticleStyle=require(path.join(dir,'../particles/style.js'));
  for(const script of ['cad-parameters.js','cad.js'])vm.runInNewContext(fs.readFileSync(path.join(dir,'../equilibrium',script),'utf8'),env);
  const probes=`window.probe=()=>{const f=frame();return {...f,...(!f.neutral&&kinematics(f.row))};};
- window.probeOverview=focus=>({...overviewCamera(840,500,focus),bounds:projectedBounds});`;
+ window.probeOverview=focus=>({...overviewCamera(840,500,focus),bounds:projectedBounds});
+ window.probeGyro=(p,omegaD,dt)=>{
+   const gyro=backgroundGyro(p,omegaD,-omegaD*dt);
+   return {...gyro,point:gyroDisplacement(p,gyro.omega,gyro.phase)};
+ };
+ window.probeThermal=(g,p,pos,trail)=>drawThermalParticle(g,p,pos,trail,100,100,1,null);`;
  vm.runInNewContext(fs.readFileSync(path.join(dir,'app.js'),'utf8').replace('  queueCalculation();\n})();',probes+'\n  queueCalculation();\n})();'),env);
  function finishCalculation(){const w=worker,context={postMessage:data=>w.onmessage({data})};vm.runInNewContext(blob,context);context.onmessage({data:w.values});assert(w.closed);assert(!el('play').disabled);}
  assert(!elements.has('calc'));assert(el('play').disabled);assert.deepEqual([...worker.values],[8,10]);
@@ -69,11 +90,12 @@ console.log('PASS NBI: repeatable penetration, transmission to vessel wall, fiel
  assert.equal(el('profile').attrs.viewBox,'0 0 580 65');
  assert.match(el('mapScale').dataset.rendered,/kW\/m\^3/);
  assert(el('lens').hidden);el('showMicro').checked=true;el('showMicro').onchange();
- function seek(u){microArcs.length=0;sceneArcs.length=0;el('seek').value=u;el('seek').oninput();return JSON.stringify(microArcs);}
+ function seek(u){microArcs.length=0;microSprites.length=0;microPathPoints.length=0;sceneArcs.length=0;el('seek').value=u;el('seek').oninput();return JSON.stringify(microArcs);}
  seek(0);assert(el('lens').hidden);
  assert.doesNotMatch(html,/<section id="transfer"[^>]*\bhidden\b/);
  for(const id of ['give','gainE','gainI'])assert.equal(el(id).dataset.rendered,'\\text{—}');
  seek(.0275);assert.equal(el('lens').style.opacity,.5);
+ const beforePlasma=microSprites.length;
  const wide=env.probeOverview(0),compact=env.probeOverview(1);
  assert(compact.width<wide.width/2&&compact.ratio<wide.ratio);
  for(const camera of [wide,compact]){
@@ -84,17 +106,25 @@ console.log('PASS NBI: repeatable penetration, transmission to vessel wall, fiel
  }
  seek(.1999999);const neutral=env.probe();
  assert.equal(el('lens').style.opacity,1);
+ assert(microSprites.length>beforePlasma*2);
+ const sprites=new Set(microSprites.map(particle=>particle.sprite));
+ assert.equal(sprites.size,4);
+ assert.equal(parseFloat(el('lensParticle').style.top)+24,el('micro').clientHeight/2);
  seek(.20);const birth=env.probe();
  assert(neutral.neutral&&!birth.neutral&&birth.t>neutral.t);
+ for(const color of ['#4de4ee','#ff9c52','#e093ff','#ffe459','#edf7ff'])assert(microColors.has(color));
+ for(const trail of ['#849da8','#a59387','#9a8ea9','#a6a08a'])assert(microColors.has(trail));
+ for(const dash of ['','9,4','5,3,1,3','1,4'])assert(microDashes.has(dash));
  assert(Math.hypot(...birth.point.map((v,i)=>v-neutral.point[i]))<1e-5);
  seek(.23);assert.match(el('phase').textContent,/Ionizace/);
  assert(!el('lensShares').hidden);
  for(const id of ['give','gainE','gainI'])assert.match(el(id).dataset.rendered,/mathrm\{(?:m|k)?eV\}/);
- const [electronX,electronY]=microArcs.at(-1),during=env.probe();
+ const released=microSprites.at(-1),during=env.probe();
  seek(.24);const continued=env.probe();
  assert(continued.t>during.t&&continued.row[2]<during.row[2]);
  assert(Math.hypot(...continued.point.map((v,i)=>v-during.point[i]))>0);
- assert(microArcs.at(-1)[0]>electronX&&microArcs.at(-1)[1]<electronY);
+ assert(microSprites.at(-1).x>released.x&&microSprites.at(-1).y<released.y);
+ assert(microSprites.every(particle=>sprites.has(particle.sprite)));
  seek(.29);assert(env.probe().t-continued.t>5*(continued.t-during.t));
  const regularTime=env.probe().t;
  seek(.30);const regularStep=env.probe().t-regularTime;
@@ -140,22 +170,58 @@ console.log('PASS NBI: repeatable penetration, transmission to vessel wall, fiel
  assert(!el('lens').hidden && microArcs.length>=7);assert.match(el('flightTitle').dataset.rendered,/keV/);
  assert.notEqual(seek(.8),shapes);assert.equal(seek(.69),shapes);assert.equal(el('beamTotals').textContent,totals);
  const timeline=solve.computeBeam(8,10);
+ const background=timeline.bundle.thermal;
+ microSprites.length=0;microPathPoints.length=0;
+ env.probeThermal(el('micro').getContext(),background[0],{x:103,y:50,depth:0},[{x:95,y:50},{x:103,y:50}]);
+ assert.deepEqual(microPathPoints,[[-5,50],[3,50],[95,50],[103,50]]);
+ assert.deepEqual(microSprites.map(particle=>Math.round(particle.x)),[3,103]);
+ assert.deepEqual(
+   Object.fromEntries(['electron','deuteron','triton','alpha'].map(species=>[species,background.filter(p=>p.species===species).length])),
+   {electron:30,deuteron:12,triton:15,alpha:3}
+ );
+ const signs=[];
+ const ionOmega=2.5e8;
+ for(const species of ['electron','deuteron','triton','alpha']){
+   const particle={...background.find(p=>p.species===species),vy:1e6,vz:0};
+   const a=env.probeGyro(particle,ionOmega,.4/ionOmega),b=env.probeGyro(particle,ionOmega,.8/ionOmega);
+   const center=-particle.vy/a.omega;
+   signs.push(Math.sign(a.point[0]*(b.point[1]-center)-b.point[0]*(a.point[1]-center)));
+   assert.equal(Math.sign(a.omega),Math.sign(a.displayOmega));
+   assert(Math.abs(a.phase)<1);
+   assert(Math.abs(a.displayOmega)<=1.6*ionOmega);
+   if(species!=='electron')assert.equal(a.displayOmega,a.omega);
+ }
+ assert(signs[0]!==0&&signs[0]===-signs[1]&&signs[1]===signs[2]&&signs[1]===signs[3]);
  const encounters=timeline.bundle.encounters;
- const firstAfterIonization=encounters.findIndex(encounter=>encounter.time>regularTime);
- const [firstEncounter,nextEncounter]=encounters.slice(firstAfterIonization);
- function seekEncounter(interval){
-   const time=firstEncounter.time+interval*(nextEncounter.time-firstEncounter.time);
+ const encounterInterval=timeline.energy.at(-1)[0]/encounters.length*.23;
+ const firstEncounter=encounters.find(encounter=>encounter.time>regularTime+4*encounterInterval);
+ function seekEncounter(age){
+   const time=firstEncounter.time+age*encounterInterval;
    seek(.29+.01*(time-regularTime)/regularStep);
  }
- const displayedDistance=()=>Math.hypot(
-   parseFloat(el('lensTarget').style.left)-parseFloat(el('lensParticle').style.left)-18,
-   parseFloat(el('lensTarget').style.top)-parseFloat(el('lensParticle').style.top)-9);
- seekEncounter(.13);const arrivalDistance=displayedDistance();
- assert.equal(el('lensTarget').style.opacity,1);
- seekEncounter(.528);assert(arrivalDistance>2*displayedDistance());
- seekEncounter(.35);assert.equal(el('lensTarget').style.opacity,1);
- seekEncounter(.72);assert(el('lensTarget').style.opacity<.2);
- seekEncounter(.9);assert(el('lensTarget').hidden);
+ const displayedDistance=()=>{
+   const [x,y]=microArcs.findLast(arc=>arc[2]===10);
+   return Math.hypot(x-parseFloat(el('lensParticle').style.left)-10,y-parseFloat(el('lensParticle').style.top)-24);
+ };
+ seekEncounter(-3.9);assert(!microArcs.some(arc=>arc[2]===10));
+ seekEncounter(-1);const arrivalDistance=displayedDistance();
+ assert(arrivalDistance>el('micro').clientHeight*.22);
+ seekEncounter(0);assert(arrivalDistance>2*displayedDistance());
+ seekEncounter(1);const departureDistance=displayedDistance();
+ assert(departureDistance/arrivalDistance>.9&&departureDistance/arrivalDistance<1.1);
+ assert(!elements.has('lensTarget'));
+ seekEncounter(3.9);
+ const states=firstEncounter.pairs[firstEncounter.selected],entry=states[79];
+ const localTime=-3.9*entry.time,hi=states.findIndex(state=>state.time>=localTime);
+ const a=states[hi-1],b=states[hi],u=(localTime-a.time)/(b.time-a.time);
+ const dx=(a.p.x-a.d.x)*(1-u)+(b.p.x-b.d.x)*u,dy=(a.p.y-a.d.y)*(1-u)+(b.p.y-b.d.y)*u;
+ const width=el('micro').clientWidth,height=el('micro').clientHeight;
+ const factor=Math.min(width*.27,height*.34)/Math.hypot(entry.p.x-entry.d.x,entry.p.y-entry.d.y);
+ const cos=Math.cos(firstEncounter.rotation),sin=Math.sin(firstEncounter.rotation);
+ const x=parseFloat(el('lensParticle').style.left)+10+factor*(cos*dx+sin*dy);
+ const y=parseFloat(el('lensParticle').style.top)+24+factor*(sin*dx-cos*dy);
+ assert(x<-18||x>width+18||y<-18||y>height+18);
+ assert(!microArcs.some(arc=>arc[2]===10&&Math.hypot(arc[0]-x,arc[1]-y)<2));
  seek(.69);
  assert.match(el('profileElectrons').attrs.d,/^M/);assert.match(el('profileIons').attrs.d,/^M/);
  el('mapMode').value='ions';el('mapMode').onchange();assert.equal(el('beamTotals').textContent,totals);
@@ -175,9 +241,12 @@ console.log('PASS NBI: repeatable penetration, transmission to vessel wall, fiel
    assert(Math.abs((a.d.E-b.d.E)-(b.p.E-a.p.E))<1e-8 && b.p.E>a.p.E);
    console.log({electron,transferEV:b.p.E-a.p.E,energyError,momentumError});
  }
- seek(0);el('play').onclick();
+ seek(.4);el('play').onclick();
  callback(15625);assert.match(el('flightTitle').dataset.rendered,/keV/);
- callback(62503.125);assert.match(el('phase').textContent,/zbytková/);
+ assert(Math.abs(el('seek').value-.4008)<1e-12);
+ seek(.9999);el('play').onclick();
+ callback(16);assert.match(el('phase').textContent,/zbytková/);
+ assert.equal(el('play').textContent,'Přehrát');
  el('density').value=2;el('density').oninput();runTimers();
  const abandoned=worker;
  el('density').value=1.25;el('density').oninput();

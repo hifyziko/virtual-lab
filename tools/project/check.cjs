@@ -2,6 +2,7 @@
 const C=require('./common.cjs'),{cp,root}=C;
 const commands=[
  ['tools/test-pitch-selection.cjs'],
+ ['tools/test-am-coil.cjs'],
  ['tools/test-winding-control-effects.cjs'],
  ['tools/test-pmsm-parameter-scope.cjs'],
  ['versions/vyvoj/tools/test-navigation.cjs','versions/aktualni/web/index.html'],
@@ -28,6 +29,7 @@ const commands=[
  ['tools/test-tokamak-equilibrium.cjs'],
  ['tools/test-iter-blanket.cjs'],
  ['tools/test-nbi.cjs'],
+ ['tools/test-eccd.cjs'],
  ['tools/test-fusion-navigation.cjs'],
  ['tools/test-fusion-milestones.cjs'],
  ['tools/test-compass-u.cjs'],

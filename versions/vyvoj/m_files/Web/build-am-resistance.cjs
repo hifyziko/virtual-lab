@@ -7,7 +7,7 @@ const css=fs.readFileSync(path.join(dir,'torque.css'),'utf8').split('.schema-scr
 // Reuse the actual Principle drawing, rather than maintaining a second illustration.
 const principle=fs.readFileSync(path.join(dir,'princip.js'),'utf8');
 const drawing=principle.slice(principle.indexOf('const point='),principle.indexOf('function draw(){')).replace('Math.min(1,Math.abs(a.current)/.45)','Math.min(1,Math.pow(Math.abs(a.current)/.45,.35))');
-const renderer="window.AMResistanceMachine=function(a,field,rotor){const $=id=>({checked:id!=='trackBar'}),state=()=>a;"+drawing+"return drawScene(false)};\n";
-let html=fs.readFileSync(path.join(dir,'resistance-template.html'),'utf8').replace('/*SHARED*/',css+mathCss).replace('/*MATH*/',lib).replace('/*UI*/',fs.readFileSync(path.join(__dirname,'synchronous/machine-art.js'),'utf8')+';\n'+renderer+fs.readFileSync(path.join(dir,'resistance.js'),'utf8'));
+const renderer="window.AMResistanceMachine=function(a,field,rotor,layers){const $=id=>({checked:id==='mmfVectors'||Boolean(layers[id])}),state=()=>a;"+drawing+"return drawScene(false)};\n";
+let html=fs.readFileSync(path.join(dir,'resistance-template.html'),'utf8').replace('/*SHARED*/',css+mathCss).replace('/*MATH*/',lib).replace('/*UI*/',fs.readFileSync(path.join(__dirname,'synchronous/machine-art.js'),'utf8')+';\n'+renderer+fs.readFileSync(path.join(__dirname,'magnetic-field/contours.js'),'utf8')+';\n'+fs.readFileSync(path.join(dir,'resistance-coil.js'),'utf8')+';\n'+fs.readFileSync(path.join(dir,'resistance.js'),'utf8'));
 fs.writeFileSync(path.join(dir,'resistance.html'),require('./project-credit.cjs')(html));
 console.log('Built rotor resistance experiment');

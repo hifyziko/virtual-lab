@@ -14,8 +14,10 @@ for(const extra of [false,true]){
  assert(context.Lab.catalog.every(Boolean),'Ordering inserted undefined entries');
  assert.deepEqual([...context.Lab.catalog.map(m=>m.id)].sort(),before.map(m=>m.id).sort(),'Ordering lost modules');
 }
-const listeners={},app={innerHTML:'',scrollIntoView(){}};
-const context={console,document:{readyState:'loading',getElementById:()=>app,addEventListener:(name,fn)=>{(listeners[name]??=[]).push(fn)}},location:{hash:'#test'},requestAnimationFrame:()=>0,addEventListener:(name,fn)=>{(listeners[name]??=[]).push(fn)}};
+const listeners={},app={innerHTML:''};
+let scrollTop=0;
+const topic={scrollIntoView(){scrollTop=600;}};
+const context={console,document:{readyState:'loading',getElementById:id=>id==='app'?app:topic,addEventListener:(name,fn)=>{(listeners[name]??=[]).push(fn)}},location:{hash:'#test'},requestAnimationFrame:()=>0,addEventListener:(name,fn)=>{(listeners[name]??=[]).push(fn)},scrollTo({top,behavior}){assert.equal(behavior,'instant');scrollTop=top;}};
 context.window=context;
 vm.runInNewContext(scripts.find(s=>s.includes('/* Shared shell')),context);
 // Exercise the actual home-routing wrapper, with DOM rendering replaced by a string sink.
@@ -33,4 +35,49 @@ for(const hash of ['#group-transformer','','#group-sync']){
  context.location.hash='#test';context.Lab.route();assert.equal(app.innerHTML,'module');
 }
 assert.equal(disposals,3);
-console.log('PASS: script syntax, complete catalog including future modules, one initial mount, three module/home round trips and disposal.');
+for(const hash of ['#group-electromagnetism','#group-area-electricity','']){
+ scrollTop=400;
+ context.location.hash=hash;
+ listeners.hashchange[0]();
+ assert.equal(app.innerHTML,'home');
+ assert.equal(scrollTop,hash==='#group-electromagnetism'?600:0);
+}
+const physicsPreview=html.match(/<script id="physics-preview">([\s\S]*?)<\/script>/)?.[1];
+if(physicsPreview){
+ const home=context.Lab.home;
+ const url='file:///D:/virtual-lab/index.html';
+ context.URL=URL;
+ context.location=new URL(url+'#group-electromagnetism');
+ const history=[];
+ context.history={pushState(_state,_title,href){history.push(href);context.location=new URL(href);}};
+ context.HashChangeEvent=class {constructor(type,options){Object.assign(this,{type},options);}};
+ context.dispatchEvent=event=>{for(const fn of listeners[event.type]||[])fn(event);};
+ context.document.readyState='loading';
+ vm.runInNewContext(physicsPreview,context);
+ context.Lab.home=home;
+ context.document.readyState='interactive';
+ const parentHref=physicsPreview.match(/<a class="physics-up physics-up-primary" href="([^"]+)"/)[1];
+ function clickUp(href,options={}){
+  const event={button:0,target:{closest:selector=>selector==='a.physics-up-primary'?new URL(href,url):null},
+   defaultPrevented:false,preventDefault(){this.defaultPrevented=true;},...options};
+  listeners.click[0](event);
+  return event.defaultPrevented;
+ }
+ assert.equal(clickUp('#group-area-electricity',{ctrlKey:true}),false);
+ assert.deepEqual(history,[]);
+ const overviews=[
+  '#group-area-electricity','#group-electromagnetism','#group-materials',
+  '#group-area-machines','#group-transformer','#group-common','#group-induction','#group-sync','#group-dc','#group-drive',
+  '#group-area-plasma','#group-fusion'
+ ];
+ for(const start of overviews){
+  context.location=new URL(url+start);
+  scrollTop=400;
+  assert.equal(clickUp(parentHref),true);
+  assert.equal(context.location.href,url,start);
+  assert.equal(context.document.title,'Virtuální laboratoř fyziky',start);
+  assert.equal(scrollTop,0);
+ }
+ assert.deepEqual(history,overviews.map(()=>url));
+}
+console.log('PASS: script syntax, catalog, initial mount, module disposal and navigation from topic to area to main directory.');
