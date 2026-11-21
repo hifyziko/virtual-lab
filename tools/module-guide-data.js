@@ -205,6 +205,8 @@
   ['Přepínejte skupiny Vše, částice, jádra a atomy.','Tažením prohlížejte prostorové modely a porovnávejte jejich druhy a popisky.'],
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
  sources.heating='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 9.3, s. 187–192, vztah (9.5), obr. 9.6–9.7 a kap. 9.3.2, s. 193.';
+ sources.nbi='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 9.2, s. 181–186.';
+ add('fu15-nbi','nbi',['Nastav hustotu a teplotu. Po automatickém přepočtu přehraj dráhu.','Sniž hustotu a porovnej průnik svazku.'],['Neutrální atom proniká přímo. Po ionizaci vede magnetické pole rychlý deuteron podél magnetické plochy.','Klasické Coulombovo tření předává energii elektronům a iontům.'],null,['fu13-ohrev','fu03-drift']);
  add('fu13-ohrev','heating',
   ['Změň frekvenci vlny a sleduj polohu vrstvy vůči vyznačenému místu.','Porovnej obě kruhové složky a krokuj po čtvrtinách periody gyrace.'],
   ['Souhlasně rotující elektrická síla může urychlovat elektron po několik oběhů.','Změnu kolmé energie jedné částice určuje práce elektrické síly.'],String.raw`P=q\mathbf E_\perp\cdot\mathbf v_\perp`,['fu03-drift','fu04-udrzeni']);

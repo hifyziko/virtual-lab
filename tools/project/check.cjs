@@ -27,6 +27,7 @@ const commands=[
  ['tools/test-surface-unroll.cjs'],
  ['tools/test-tokamak-equilibrium.cjs'],
  ['tools/test-iter-blanket.cjs'],
+ ['tools/test-nbi.cjs'],
  ['tools/test-fusion-navigation.cjs'],
  ['tools/test-fusion-milestones.cjs'],
  ['tools/test-compass-u.cjs'],
