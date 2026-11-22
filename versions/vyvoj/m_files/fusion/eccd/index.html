@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ECCD – neindukční vlečení proudu</title>
+  <link rel="stylesheet" href="../particles/vendor/katex.css">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="../navigation/style.css">
+  <script>
+    function fit() {
+      document.documentElement.style.setProperty('--fit', Math.min((innerWidth - 12) / 1320, (innerHeight - 12) / 790));
+    }
+    fit(); addEventListener('resize', fit);
+  </script>
+  <script defer src="../particles/vendor/katex.js"></script><script defer src="../particles/style.js"></script>
+  <script defer src="../equilibrium/cad-parameters.js"></script><script defer src="../heating/wave-art.js"></script>
+  <script defer src="model.js"></script><script defer src="app.js"></script><script defer src="../navigation/page.js"></script>
+</head>
+<body data-fusion-page="fu16-eccd">
+<main>
+  <header data-fusion-heading>
+    <a class="back" href="../index.html#group-area-plasma" target="_top" aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a>
+    <h1 data-module-number="09">ECCD – neindukční vlečení proudu</h1>
+    <button id="help">Ovládání a výklad</button><button data-fusion-full>Celá obrazovka</button><span class="version">Verze 1.0</span>
+  </header>
+  <div class="controls">
+    <label for="angle" title="Úhel lze nastavit také tažením zářiče v horní scéně">Úhel k poli</label><input id="angle" type="range" min="50" max="130" value="65"><output for="angle" id="angle-value"></output>
+    <button id="mirror">Obrátit náklon</button><button id="normal">Kolmý ohřev</button>
+    <label for="frequency">Frekvence zářiče</label><input id="frequency" type="range" min="100" max="124" step="0.5" value="115"><output for="frequency" id="frequency-value"></output><button id="tune" title="Nastavit frekvenci pro elektrony s tepelnou podélnou rychlostí">Naladit</button>
+    <button id="doppler-help" aria-controls="doppler-scene" aria-pressed="false">Dopplerův posuv</button><button id="reset">Výchozí pokus</button>
+  </div>
+  <div class="panels">
+    <article>
+      <h2>Mikrovlnný svazek v tokamaku <small id="torus-stage"></small></h2>
+      <svg id="ensemble" viewBox="0 0 650 325" role="img" aria-label="Toroidální sloupec plazmatu s vnějším zářičem. Zlaté a fialové elektrony rozlišují směr pohybu při ohřevu. Zelená šipka ukazuje směr vlečeného proudu."></svg>
+      <div class="legend torus-legend"><span>Táhni za zářič</span><span>Ohřáté elektrony</span><span><i class="beam"></i> Po poli</span><span><i class="opposite"></i> Proti poli</span><span><i class="thermal-key"></i> Teplota</span><span id="cloud-state"></span></div>
+    </article>
+    <article>
+      <h2 id="energy-heading">Energie získaná při průchodu svazkem</h2>
+      <svg id="energy-detail" class="plot" role="img" aria-label="Střední přírůstek kolmé energie podle podélné rychlosti"></svg>
+      <svg id="doppler-scene" class="plot" style="display:none" viewBox="0 0 600 288" role="img" aria-label="Porovnání dvou elektronů vedle sebe ve stejné vlně. Vlevo letí elektron po poli, vpravo proti poli. Záblesk označuje průchod vlnoplochy."></svg>
+      <div hidden class="legend" id="doppler-key"><span>Záblesk při průchodu vlnoplochy</span><span data-tex="f_{\mathrm{ce},0}=112\,\mathrm{GHz}"></span></div>
+      <div class="legend" id="energy-key"><i class="beam"></i>Energie <span id="tuning-state"></span></div>
+    </article>
+    <article>
+      <h2>Rozdělení podélných rychlostí</h2>
+      <svg id="parallel-profile" class="plot" role="img" aria-label="Rovnovážné a narušené rozdělení podélných rychlostí. Vybarvená plocha mezi křivkami ukazuje jejich rozdíl."></svg>
+      <div class="legend" id="profile-key"><i class="equilibrium-key"></i>Základní <i class="perturbed-key"></i>Deformovaná (odchylka 4×) <i class="delta-key"></i>Rozdíl 4× <output id="current-value"></output></div>
+      </article>
+    <article>
+      <h2>Fischův–Boozerův mechanismus</h2>
+      <svg id="relax-detail" viewBox="0 0 680 234" role="img" aria-label="Podíly elektronů letících proti poli a po poli a příspěvky obou skupin k podélnému proudu. Poslední řádek ukazuje součet."></svg>
+      <div class="legend" id="relax-key"></div>
+    </article>
+  </div>
+</main>
+
+<dialog id="guide" aria-labelledby="guide-title">
+  <form method="dialog"><button>Zavřít</button></form><h2 id="guide-title">Ovládání a výklad</h2>
+  <h3>Proč vlna ohřívá jen část elektronů?</h3>
+  <ol><li>Táhni za zářič. Poblíž kolmého směru se při tažení přichytí. Vpravo nahoře sleduj, které podélné rychlosti získávají při průchodu svazkem nejvíce kolmé energie.</li><li>Dole porovnej původní a deformované rozdělení při průběžném ohřevu. Pro čitelnost je odchylka červené křivky od základní zvětšena čtyřikrát. Proud a podíly se počítají ze skutečného rozdělení.</li><li>Obrať náklon a potom zvol kolmý ohřev. Sleduj změnu směru proudu a zánik asymetrie při kolmém ohřevu.</li></ol>
+  <p>Pro průběžné buzení průměrujeme odezvu jednotlivého impulzu přes skupiny s exponenciálně rozděleným časem od ohřevu se střední hodnotou pěti srážkových časů. Grafy zobrazují ustálený stav pro aktuální nastavení. Dvacet gyračních period představuje dobu jednoho průchodu polem. Růžová stopa znázorňuje typické rozšíření tepla za uvedený střední čas.</p>
+  <p>Zkus při šikmém svazku měnit frekvenci. Čárka v grafu energie sleduje rezonanční podélnou rychlost. V ocasu rozdělení je málo elektronů, u nulové rychlosti se zase žádný směr nezvýhodní. Tlačítko Naladit zvolí nejbližší dostupnou frekvenci pro rychlost o velikosti tepelné rychlosti ve směru podélné složky svazku. Jde o názorný pracovní bod. Při kolmém vstupu nastaví cyklotronní frekvenci; ohřev je pak směrově symetrický.</p>
+  <p>V zobrazení Dopplerův posuv porovnej dva elektrony se stejně velkou podélnou rychlostí. Záblesk značí průchod vlnoplochy. Obrať náklon zářiče a sleduj, kterému elektronu se vnímaná frekvence <span data-tex="f'"></span> zvýší.</p>
+  <h3>Mikroskopický pokus v místě zásahu</h3>
+  <p>V homogenním poli se složka <span data-tex="v_\parallel"></span> zachovává. Uvažujeme kruhovou rezonanční složku pole s fází <span data-tex="\psi=\omega t-k_\parallel z"></span>, kde <span data-tex="z=v_\parallel t"></span>. Zanedbáváme magnetické pole vlny, změnu fáze přes gyrační kružnici a srážky během impulzu. Oba elektrony začínají v témže místě, elektrická síla je zpočátku rovnoběžná s jejich kolmou rychlostí.</p>
+  <p>V soustavě rotující s gyrací rychlost zapíšeme jejími dvěma kolmými složkami jako <span data-tex="w=(v_x+\mathrm i v_y)\exp(-\mathrm i\Omega_{\mathrm e}t)/v_{\mathrm{th}}"></span>, kde <span data-tex="\mathrm i^2=-1"></span>. Lorentzova rovnice pak dává <span data-tex="\mathrm dw/\mathrm ds=a\exp(\mathrm i\delta s)"></span>. Bezrozměrný čas je <span data-tex="s=\Omega_{\mathrm e}t"></span> a rozladění <span data-tex="\delta=(\omega-k_\parallel v_\parallel-\Omega_{\mathrm e})/\Omega_{\mathrm e}"></span>. Obdélníkový impulz trvá dvacet period, amplituda <span data-tex="a=eE_0/(m_{\mathrm e}\Omega_{\mathrm e}v_{\mathrm{th}})=0{,}006"></span> je společná pro všechny elektrony. Zde odpovídá intenzitě pole <span data-tex="E_0\approx0{,}45\,\mathrm{MV/m}"></span> a délce impulzu <span data-tex="20T_{\mathrm{ce}}\approx179\,\mathrm{ps}"></span>, kde <span data-tex="T_{\mathrm{ce}}=1/f_{\mathrm{ce},0}"></span>. Integrací síly získáme rychlost a z ní okamžitý Larmorův poloměr <span data-tex="r_{\mathrm L}=v_\perp/\Omega_{\mathrm e}"></span> a kinetickou energii <span data-tex="W=m_{\mathrm e}(v_\parallel^2+v_\perp^2)/2"></span>. Tečkovaná kružnice vyznačuje okamžitý poloměr. Práci koná elektrické pole podle <span data-tex="\mathrm dW/\mathrm dt=-e\mathbf E\cdot\mathbf v"></span>.</p>
+  <p>Graf vpravo nahoře průměruje přírůstek energie při jednom průchodu přes počáteční gyrofáze. Proto závisí na kvadrátu změny kolmé rychlosti vyvolané vlnou.</p>
+  <p>Spodní panely ukazují statistický Fischův–Boozerův model. Oba výpočty sdílejí Dopplerovu rezonanční podmínku. Pro soubor na prstenci používáme statistickou pravděpodobnost zásahu a předepsaný přírůstek kolmé energie. Značky vybraných elektronů patří stejným částicím i po opuštění svazku.</p>
+  <h3>Od rezonance k neindukčnímu vlečení proudu</h3>
+  <p>ECCD (<i>Electron Cyclotron Current Drive</i>) využívá elektronovou cyklotronní rezonanci. Úhel <span data-tex="\chi"></span> svírá vlnový vektor <span data-tex="\mathbf{k}"></span> s magnetickým polem <span data-tex="\mathbf{B}"></span>. Jeho podélná složka je <span data-tex="k_\parallel=k\cos\chi"></span>, kde <span data-tex="k=|\mathbf{k}|"></span>. Elektron s podélnou rychlostí <span data-tex="v_\parallel"></span> vnímá vlivem Dopplerova posuvu úhlovou frekvenci <span data-tex="\omega-k_\parallel v_\parallel"></span>.</p>
+  <p>Pro základní cyklotronní rezonanci v nerelativistickém přiblížení platí <span data-tex="\omega-k_\parallel v_\parallel=\Omega_{\mathrm e}"></span>. Zde <span data-tex="\omega=2\pi f"></span> a <span data-tex="\Omega_{\mathrm e}=eB/m_{\mathrm e}=2\pi f_{\mathrm{ce}}"></span>. Veličiny <span data-tex="e"></span> a <span data-tex="m_{\mathrm e}"></span> jsou velikost náboje a hmotnost elektronu, <span data-tex="B"></span> je velikost magnetické indukce. Při kolmém šíření je <span data-tex="k_\parallel=0"></span> a Dopplerův výběr směru zaniká.</p>
+  <p>Fischův-Boozerův mechanizmus využívá závislosti srážkové frekvence na rychlosti. Vlna zvětší hlavně kolmou energii vybraných elektronů. Tyto elektrony pak při coulombovských srážkách pomaleji ztrácejí původní směr. V rozdělení průchozích elektronů vzniká během relaxace směrová asymetrie. Při podélné distribuční funkci <span data-tex="f_\parallel"></span> a hustotě elektronů <span data-tex="n_{\mathrm e}"></span> platí <span data-tex="J_\parallel=-e\int v_\parallel f_\parallel\,\mathrm{d}v_\parallel=-e n_{\mathrm e}\langle v_\parallel\rangle"></span>. Závorky značí střední rychlost elektronů.</p>
+  <p>Místním vlečením proudu lze cíleně změnit proud v magnetickém ostrovu. Na tokamaku ASDEX Upgrade se tak podařilo potlačit neoklasickou trhací nestabilitu. Při záchytu části původně průchozích elektronů na banánové trajektorie může vzniknout i opačný příspěvek k proudu, který popisuje Ohkawův mechanizmus.</p>
+  <h3>Vlastní model krátkého impulzu</h3>
+
+  <p>Používáme <span data-tex="k=\omega/c"></span>, kde <span data-tex="c"></span> je rychlost světla ve vakuu. Teplota elektronů v energetických jednotkách je <span data-tex="T_{\mathrm e}=1\,\mathrm{keV}"></span>. Pro porovnání zavádíme <span data-tex="v_{\mathrm{th}}=\sqrt{2T_{\mathrm e}/m_{\mathrm e}}"></span>, <span data-tex="u=v_\parallel/v_{\mathrm{th}}"></span> a <span data-tex="F=f_\parallel v_{\mathrm{th}}/n_{\mathrm e}"></span>. Plocha pod křivkou <span data-tex="F"></span> je jedna. Rovnovážné rozdělení je <span data-tex="M(u)=\exp(-u^2)/\sqrt{\pi}"></span>.</p>
+  <p>Impulz zasáhne podíl <span data-tex="g(u)=0{,}6\exp[-(\Delta f/\sigma_f)^2/2]"></span> elektronů v každé rychlostní skupině. Rozladění je <span data-tex="\Delta f=f-f_{\mathrm{ce},0}-k_\parallel v_\parallel/(2\pi)"></span>. Zvolená šířka <span data-tex="\sigma_f=1{,}5\,\mathrm{GHz}"></span> představuje konečnou šířku rezonanční oblasti. Plocha pod křivkou <span data-tex="M g"></span> udává podíl zasažených elektronů. Každý z nich získá stejný přírůstek kolmé energie <span data-tex="2T_{\mathrm e}"></span>.</p>
+  <p>Úhlový rozptyl nahradíme výměnou mezi skupinami <span data-tex="+u"></span> a <span data-tex="-u"></span>. Jejich rozdíl klesá exponenciálně. Bez ohřevu použijeme rychlost relaxace <span data-tex="\nu_{\mathrm c}=\nu_0(1+u^2)^{-3/2}"></span>, po ohřevu <span data-tex="\nu_{\mathrm h}=\nu_0(3+u^2)^{-3/2}"></span>. Jednotkou času je <span data-tex="\tau_0=1/\nu_0"></span>, kde <span data-tex="\nu_0"></span> je vztažná srážková frekvence. V čase <span data-tex="t"></span> po impulzu pak platí</p>
+  <p class="equation" data-tex="\delta F(u,t)=\tfrac12 M(u)[g(u)-g(-u)]\,[\exp(-\nu_{\mathrm h}t)-\exp(-\nu_{\mathrm c}t)]."></p>
+  <p>Po impulzu platí <span data-tex="F=M+\delta F"></span>. Z prvního momentu určíme <span data-tex="J_\parallel/J_0=-\int u F\,\mathrm du"></span>, kde <span data-tex="J_0=e n_{\mathrm e}v_{\mathrm{th}}"></span>. Bezprostředně po impulzu obě skupiny dohromady zachovávají původní podélné rozdělení. Během relaxace vznikne proud a po odeznění poruchy postupně zaniká. Trvalé vlečení vyžaduje opakované nebo souvislé působení vlny.</p>
+  <p>Výpočet popisuje místní odezvu průchozích elektronů při pevném poli. Zanedbává lom a útlum svazku, relativistický posuv rezonance, přímý přenos podélné hybnosti vlny a záchyt elektronů. Absolutní proud celým plazmatem a účinnost vlečení by vyžadovaly prostorový a kinetický výpočet.</p>
+  <p>Vpravo od prstence sleduj zásah. Náklon zářiče určuje, kde osa svazku protne okraj plazmatu. Od tohoto místa roste rozšíření způsobené rozptylem s uraženou vzdáleností. Počáteční šířka, přirozená rozbíhavost a koeficient rozptylu jsou pevně zvolené. Model počítá obálku svazku v hladkém prstenci a jednotlivé fluktuace hustoty neřeší.</p>
+  <p>Barva elektronů zachycuje jejich původní směr při ohřevu. Během impulzu roste kolmá energie a celkový podélný proud zůstává nulový. Po impulzu porovnej, jak rychle se vyrovnávají směry ohřáté skupiny a zbytku plazmatu. Vyzkoušej kolmý svazek při cyklotronové frekvenci. Oba směry pak získají stejný ohřev a proud zůstane nulový i při srážkách.</p>
+  <p>V prstenci označuje růžová stopa zvýšení elektronové teploty. Při průběžném ohřevu zobrazuje typickou stopu rozšířenou podél magnetických ploch a pomaleji napříč nimi. Jde o názornou lokální aproximaci difuze s pevně zvolenými koeficienty. Barva vyjadřuje relativní oteplení. Rychlost šíření není kalibrována pro konkrétní tokamak. Výpočet proudu probíhá samostatně.</p>
+  <p>Graf profilů navazuje na obr. 9.11 v kap. 9.5.2, s. 198–199. Obě rozdělení jsou vztažena k maximu rovnovážné křivky. Tvar červené křivky určuje místní model krátkého impulzu.</p>
+  <h3>Zdroje</h3>
+  <ul>
+    <li>S. Entler, V. Kindl, <i>Jaderná fúze a fúzní elektrárny</i>, kap. 9.3.2, s. 193 a kap. 9.5.1–9.5.3, s. 194–199. Směrování vlny a rozdělení elektronů na obr. 9.8–9.11, vztahy (9.8)–(9.19).</li>
+    <li>N. J. Fisch, A. H. Boozer (1980). <a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.45.720" target="_blank" rel="noopener">Creating an Asymmetric Plasma Resistivity with Waves</a>.</li>
+    <li>M. W. Brookman a kol. (2023). <a href="https://eprints.whiterose.ac.uk/id/eprint/197121/1/Brookman_2023_Nucl._Fusion_63_044001.pdf" target="_blank" rel="noopener">Broadening of microwave heating beams in the DIII-D tokamak by edge turbulence</a>. Měření rozšíření oblasti ohřevu na tokamaku DIII-D.</li>
+    <li>J. H. Slief a kol. (2023). <a href="https://doi.org/10.1088/1741-4326/acaedc" target="_blank" rel="noopener">Quantifying electron cyclotron power deposition broadening in DIII-D and the potential consequences for the ITER EC system</a>. Rozlišení šířky oblasti ukládání energie a následného transportu tepla.</li>
+    <li>C. F. F. Karney, N. J. Fisch (1981). <a href="https://doi.org/10.1088/0029-5515/21/12/004" target="_blank" rel="noopener">Currents driven by electron cyclotron waves</a>.</li>
+    <li>G. Gantenbein a kol. (2000). <a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.85.1242" target="_blank" rel="noopener">Complete Suppression of Neoclassical Tearing Modes with Current Drive at the Electron-Cyclotron-Resonance Frequency in ASDEX Upgrade Tokamak</a>.</li>
+  
+  </ul>
+</dialog>
+</body>
+</html>

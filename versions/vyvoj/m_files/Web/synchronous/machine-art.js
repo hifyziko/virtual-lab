@@ -49,9 +49,9 @@ for(const [count,angle,path,fill,stroke,cls]of [[24,stator,statorPath,'#f8faf9',
 for(let k=0;k<24;k++){const t=stator+k*Math.PI/12,x=320+194*Math.cos(t),y=260-194*Math.sin(t);h+='<rect x="'+(x-8)+'" y="'+(y-6)+'" width="16" height="12" rx="4" fill="'+phaseColors[k%3]+'" transform="rotate('+(-t*180/Math.PI)+' '+x+' '+y+')"/>';}
 return h;}
 let paths;
-function canvas(plot,rotor){const c=plot.c,scale=Math.min(Math.abs(plot.X(1)-plot.X(0)),Math.abs(plot.Y(1)-plot.Y(0)))/211;c.save();c.translate(plot.X(0),plot.Y(0));c.scale(scale,scale);
+function canvas(plot,rotor,statorSlots=24){const c=plot.c,scale=Math.min(Math.abs(plot.X(1)-plot.X(0)),Math.abs(plot.Y(1)-plot.Y(0)))/211;c.save();c.translate(plot.X(0),plot.Y(0));c.scale(scale,scale);
 for(const [r,fill,stroke]of [[211,'#e7eeec','#8caaa3'],[173,'#fafcfb','#c4d3ce'],[147,'#f3eee3','#b9781c']]){c.beginPath();c.arc(0,0,r,0,2*Math.PI);c.fillStyle=fill;c.fill();c.strokeStyle=stroke;c.lineWidth=2;c.stroke();}
-paths??=[new Path2D(statorPath),new Path2D(rotorPath)];for(const [count,angle,index,fill,stroke]of [[24,0,0,'#f8faf9','#a9bdb6'],[20,rotor,1,'#ebe4d6','#c3ae88']])for(let k=0;k<count;k++){c.save();c.rotate(-(angle+k*2*Math.PI/count));c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=1;c.fill(paths[index]);c.stroke(paths[index]);c.restore();}for(const [r,fill]of [[25,'#d6dedb'],[8,'#fff']]){c.beginPath();c.arc(0,0,r,0,2*Math.PI);c.fillStyle=fill;c.fill();c.strokeStyle='#8caaa3';c.stroke();}c.restore();}
+paths??=[new Path2D(statorPath),new Path2D(rotorPath)];for(const [count,angle,index,fill,stroke]of [[statorSlots,0,0,'#f8faf9','#a9bdb6'],[20,rotor,1,'#ebe4d6','#c3ae88']])for(let k=0;k<count;k++){c.save();c.rotate(-(angle+k*2*Math.PI/count));if(index===0 && count>24)c.scale(1,24/count);c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=1;c.fill(paths[index]);c.stroke(paths[index]);c.restore();}for(const [r,fill]of [[25,'#d6dedb'],[8,'#fff']]){c.beginPath();c.arc(0,0,r,0,2*Math.PI);c.fillStyle=fill;c.fill();c.strokeStyle='#8caaa3';c.stroke();}c.restore();}
 window.InductionMachineArt={svg,canvas,statorPath,rotorPath};
 })();
 

@@ -1,0 +1,117 @@
+* { box-sizing: border-box; }
+body { margin: 0; color: #213747; font: 16px "Segoe UI", sans-serif; }
+main {
+  position: absolute; left: 50%; top: 6px; width: 1320px; height: 790px;
+  padding: 0 15px; transform: translateX(-50%) scale(var(--fit)); transform-origin: top center;
+  display: flex; flex-direction: column; gap: 6px;
+}
+button { border: 1px solid #bdcbd2; border-radius: 5px; background: white; padding: 5px 10px; color: inherit; font: inherit; cursor: pointer; }
+button:hover { background: #edf5f7; }
+input[type=range] { accent-color: #315d78; }
+input:focus-visible { outline: 2px solid #725198; outline-offset: 2px; }
+.version, small { color: #536b79; font-size: 14px; font-weight: 400; }
+.version { font-size: 12px; }
+.controls, .panel-head, .legend, .playback { display: flex; align-items: center; gap: 8px; }
+.controls {
+  flex: none; min-height: 43px; padding: 4px 0; border-block: 1px solid #c4d0d6; font-size: 15px;
+}
+.controls input { width: 142px; }
+.controls output { min-width: 78px; }
+.controls label[for=frequency] { margin-left: 15px; }
+#reset { margin-left: auto; }
+.panels { flex: 1; min-height: 0; display: grid; grid-template: minmax(0,1.32fr) minmax(0,1fr) / minmax(0,1.22fr) minmax(0,1fr); gap: 6px; }
+article {
+  display: flex; flex-direction: column; min-height: 0; min-width: 0; background: white;
+  border: 1px solid #bfccd4; border-radius: 8px; overflow: hidden;
+}
+h2 { margin: 0; font-size: 19px; }
+article > h2, .panel-head { flex: none; padding: 9px 14px 3px; }
+h2 small { margin-left: 8px; }
+.panel-head { justify-content: space-between; min-height: 41px; }
+.switch { display: flex; gap: 2px; }
+.switch button { padding: 4px 8px; font-size: 14px; }
+.switch [aria-pressed=true] { color: #24495c; background: #e6eff3; border-color: #99afbb; font-weight: 600; }
+#launch, .plot { display: block; width: 100%; min-height: 0; height: 0; flex: 1; }
+svg text { fill: #405969; font: 14px "Segoe UI", sans-serif; }
+svg foreignObject { font-size: 14px; color: #334957; }
+svg foreignObject span { white-space: nowrap; }
+.cross-section { min-height: 0; flex: 1; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); align-items: center; }
+#vessel { width: 100%; height: 100%; min-height: 0; }
+.readings { display: grid; gap: 13px; padding: 0 16px 0 0; }
+.readings div { border-left: 2px solid #d8e2e9; padding-left: 12px; display: grid; gap: 3px; }
+.readings div:last-child { border-color: #c99447; }
+.readings span:not(.katex *) { color: #536b79; }
+.readings b { font-weight: 600; }
+.legend, .playback { min-height: 37px; flex: none; border-top: 1px solid #e1e8ec; padding: 4px 13px; font-size: 14px; }
+.legend i { display: inline-block; width: 18px; height: 3px; }
+.legend i:not(:first-child) { margin-left: 9px; }
+.field { background: #356ac3; } .beam { background: #b57825; } .layer { background: #8c4b9d; }
+.legend .target { width: 10px; height: 10px; border-radius: 50%; border: 1px solid #273c4b; background: #273c4b; box-shadow: inset 0 0 0 2px white; }
+#parallel { margin-left: auto; }
+.legend[hidden] { display: none; }
+#current-value { color: #14665a; }
+.playback input { flex: 1; min-width: 75px; }
+.playback button { min-width: 143px; }
+.playback output { min-width: 82px; }
+dialog { max-width: min(800px,94vw); max-height: 88vh; padding: 18px 22px; border: 1px solid #b5c6cf; border-radius: 8px; color: inherit; line-height: 1.5; }
+dialog::backdrop { background: #23394a66; }
+dialog form { float: right; } dialog h3 { margin: 1em 0 .25em; } dialog li { margin: .35em 0; }
+dialog p { margin: .55em 0; } dialog .equation { text-align: center; } dialog a { color: #31596e; }
+.panels [hidden] { display: none; }
+#ensemble { width:100%; height:0; min-height:0; flex:1; }
+#orbit-detail, #relax-detail { width:100%; height:0; min-height:0; flex:1; }
+#cloud-state { margin-left:auto; }
+.opposite { background:#933a98; }
+#witness-speed { margin-left:auto; }
+#time-value { min-width:98px; }
+#sum-current { margin-left:auto; color:#14665a; }
+
+.aim-hint { padding-right: 9px; border-right: 1px solid #c4d0d6; }
+#ensemble { touch-action: none; }
+.launcher-grip { cursor: grab; }
+#ensemble.dragging, #ensemble.dragging .launcher-grip { cursor: grabbing; }
+
+#relax-detail > text:nth-of-type(-n+4) { font-weight: 600; }
+
+ .legend .reference-profile { height:0; border-top:2px dashed #536b79; }
+
+.legend .thermal-key { height:9px; border-radius:50%; background:radial-gradient(ellipse,#d74e57,transparent); }
+.equilibrium-key { background:#28343d; }
+.perturbed-key { background:#bd4745; }
+#profile-key output { margin-left:auto; }
+
+#delta-row { display:flex; align-items:center; gap:8px; padding:0 12px; font-size:13px; }
+#delta-row[hidden] {display:none;}
+#delta-profile {flex:1; height:49px;}
+
+.controls { height:43px; }
+.panel-head, article > h2 { height:41px; white-space:nowrap; }
+.legend { height:40px; line-height:1.15; }
+.playback { height:40px; }
+#delta-row { height:52px; flex:none; }
+#delta-row > span { width:165px; flex:none; }
+.playback output { width:108px; flex:none; }
+.equilibrium-key { background:none; border-top:3px dashed #28343d; }
+
+.torus-legend { display:grid; grid-template-columns:1.05fr 1.25fr .85fr 1.05fr .9fr 1.65fr; gap:3px; padding-inline:8px; font-size:12px; white-space:nowrap; }
+.torus-legend i {width:11px; vertical-align:middle;}
+#cloud-state { margin:0; text-align:right; font-variant-numeric:tabular-nums; }
+
+.delta-key {background:#c28b35;}
+#tune {min-width:120px;}
+#tuning-state {margin-left:auto;}
+
+#doppler-help[aria-pressed=true] {background:#e6eff3;border-color:#99afbb;}
+#doppler-scene {display:block;width:100%;}
+.controls input {width:115px;}
+.controls {gap:6px;}
+
+.controls {display:grid; grid-template-columns:max-content 108px 75px max-content max-content max-content 108px 112px 142px 140px 1fr; gap:5px;}
+.controls input {width:100%;margin:0;}
+.controls label[for=frequency] {margin-left:0;}
+.controls output {min-width:0;white-space:nowrap;}
+#tune,#doppler-help {width:100%;white-space:nowrap;}
+#doppler-scene .doppler-name {font-size:19px;font-weight:600;}
+#doppler-scene .doppler-relation {font-size:15px;}
+#doppler-scene foreignObject {font-size:17px;}
+#doppler-key {justify-content:space-between;}

@@ -64,10 +64,8 @@ function renderRotor(a){
   cachedArt='<defs><clipPath id="torque-field-window"><circle cx="280" cy="267" r="218"/></clipPath></defs><g clip-path="url(#torque-field-window)">'+art+'</g>'+axes;cachedKey=key;
  }
  SyncTorqueTransition.update($('torqueRotor'),cachedArt,key,type);
- $('rotorExampleTitle').textContent=equal?'Hladký rotor / povrchové magnety':type==='salient'?'Elektricky buzený rotor s vyniklými póly':'IPM · 4 póly · magnety ve V';
+ $('rotorExampleTitle').textContent=equal?'Srovnání rotorů':type==='salient'?'Vyniklé póly':'Vnořené magnety';
  const relation=equal?'L_d\\approx L_q':type==='salient'?'L_d>L_q':'L_q>L_d';if($('rotorRelation').dataset.relation!==relation){$('rotorRelation').innerHTML=math(relation);$('rotorRelation').dataset.relation=relation;}
- $('rotorExampleNote').textContent=equal?'Pásmo téměř shodných indukčností (rozdíl do 6 %). Vlevo elektrické buzení, vpravo povrchové magnety.':type==='ipm4'?'Numerický výpočet se skrytým statorem.':'Typický příklad odpovídající poměru indukčností. Pole příslušné referenční geometrie.';
- document.querySelector('.torque-rotor p:last-child').textContent=type==='ipm4'?'Pole statoru v ose d se slabými magnety.':'Stator je skrytý; ve výpočtu referenčního pole zůstává zahrnutý.';
  window.torqueRotorState={type,equal,relativeDifference:Math.abs(a.xd-a.xq)/Math.max(a.xd,a.xq),field:show,statorVisible:false};
 }
 let pending=null,pendingType='',timer=0;

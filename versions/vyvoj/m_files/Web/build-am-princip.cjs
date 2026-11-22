@@ -5,7 +5,7 @@ const mathCss=ref.match(/<style id="katex-typesetting">([\s\S]*?)<\/style>/)[1];
 const lib=[...ref.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].find(m=>m[1].trim().startsWith('!function')&&m[1].includes('ParseError'))[1];
 const css=fs.readFileSync(path.join(dir,'torque.css'),'utf8').split('.schema-scroll')[0];
 if(!fs.existsSync(path.join(dir,'princip-field-basis.js')))require('./induction/build-princip-fields.cjs');
-let html=fs.readFileSync(path.join(dir,'princip-template.html'),'utf8').replace('/*SHARED*/',css+mathCss).replace('/*MATH*/',lib).replace('/*UI*/',fs.readFileSync(path.join(__dirname,'synchronous/machine-art.js'),'utf8')+';\n'+fs.readFileSync(path.join(dir,'princip.js'),'utf8'));
+let html=fs.readFileSync(path.join(dir,'princip-template.html'),'utf8').replace('/*SHARED*/',css+mathCss).replace('/*MATH*/',lib).replace('/*UI*/',fs.readFileSync(path.join(dir,'resistance-control.js'),'utf8')+';\n'+fs.readFileSync(path.join(__dirname,'synchronous/machine-art.js'),'utf8')+';\n'+fs.readFileSync(path.join(dir,'princip.js'),'utf8'));
 for(const [tag,file]of [['BASIS','princip-field-basis.js'],['CONTOURS','../magnetic-field/contours.js'],['REALISTIC','princip-realistic.js'],['STARTUP','startup-model.js']])html=html.replace('/*'+tag+'*/',()=>fs.readFileSync(path.join(dir,file),'utf8'));
 html=html.replace('</head>',()=>'<style>'+fs.readFileSync(path.join(dir,'princip-realistic.css'),'utf8')+'</style></head>');
 fs.writeFileSync(path.join(dir,'princip.html'),require('./project-credit.cjs')(html));

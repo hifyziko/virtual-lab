@@ -13,6 +13,10 @@
     const style=getComputedStyle(heading);
     return heading.offsetHeight+(parseFloat(style.marginTop)||0)+(parseFloat(style.marginBottom)||0);
   }
+  function fillHeight(heading,logicalWidth,availableWidth,headingWidth=logicalWidth){
+    const widthScale=availableWidth/logicalWidth;
+    return Math.max(DESIGN_HEIGHT,Math.floor(availableHeight(heading)/widthScale-measureHeading(heading,headingWidth)));
+  }
   function layoutScale(width,height,available,heading,designWidth=DESIGN_WIDTH,headingWidth=designWidth){
     const headingHeight=measureHeading(heading,headingWidth);
     const scale=boundedScale(width,height+headingHeight,available,designWidth);
@@ -162,8 +166,7 @@
       // it from the host, never from the previously fitted child viewport.
       const heading=frameHost(frame).querySelector(':scope > .modulehead');
       if(heading){
-        const head=measureHeading(heading,width)*available/width;
-        height=Math.max(1000,Math.min(1400,Math.floor((availableHeight(heading)-head)/(available/width))));
+        height=fillHeight(heading,width,available);
       }
     }
     const root=doc.documentElement.style;
@@ -410,9 +413,7 @@
       const style=getComputedStyle(native);
       const inset=(parseFloat(style.paddingLeft)||0)+(parseFloat(style.paddingRight)||0);
       if(fill){
-        const widthScale=width/naturalWidth;
-        const head=measureHeading(heading,naturalWidth-inset)*widthScale;
-        const logicalHeight=Math.max(DESIGN_HEIGHT,Math.min(1400,Math.floor((availableHeight(heading)-head)/widthScale)));
+        const logicalHeight=fillHeight(heading,naturalWidth,width,naturalWidth-inset);
         native.style.setProperty('height',logicalHeight+'px','important');
         native.style.setProperty('--native-viewport-height',logicalHeight+'px');
       }else native.style.removeProperty('height');

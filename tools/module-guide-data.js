@@ -45,8 +45,11 @@
   ['Zvyšujte frekvenci a porovnávejte rozložení proudu uvnitř vodičů.','Porovnejte samostatný vodič se soustavou blízkých vodičů.'],
   ['Skin efekt souvisí s vlastním proměnným polem, proximity efekt s polem okolních vodičů.','Nerovnoměrné rozložení proudu zvyšuje střídavý odpor a ztráty. Hloubka vniku je měřítko útlumu, nikoli ostrá hranice vedení.'],String.raw`\delta=\sqrt{\frac{2\rho}{\omega\mu}}`,['mag04-virive-proudy','tr05-rozptylova-reaktance']);
  add('em01-indukovane-napeti','energy',
-  ['Měňte pohyb vodiče a orientaci magnetického pole.','Obraťte směr pohybu a porovnejte polaritu napětí.'],
-  ['Napětí může vzniknout pohybem v poli i časovou změnou tokové vazby.','Znaménko vždy vztahujte k vyznačené orientaci vodiče a svorek; indukované napětí samo neznamená, že uzavřeným obvodem teče proud.'],null,['em04-premena','em02-vzajemna-indukcnost']);
+  ['Natočte snímací cívku posuvníkem nebo tažením ve scéně. Porovnejte souhlasné, kolmé a opačné natočení při stejném buzení.','Zvyšte frekvenci při stejné amplitudě proudu. Porovnejte vrcholy tokové vazby a napětí. Pozastavte animaci a najděte okamžik největšího napětí.'],
+  ['Obě cívky stojí. Proud první cívky mění tokovou vazbu druhé. Největší velikost napětí nastává při nejrychlejší změně vazby.','Vzájemná indukčnost je při pevné poloze cívek v tomto lineárním modelu konstantní.'],String.raw`u_i=-M\frac{\mathrm d i_1}{\mathrm dt}`,['em01-pohybove-napeti','em02-vzajemna-indukcnost']);
+ add('em01-pohybove-napeti','energy',
+  ['Táhněte tyčí v poli a obraťte směr. Sledujte polaritu voltmetru.','Při posuvu pole měňte jeho rychlost. Při otáčení cívky sledujte napětí během jedné otáčky.'],
+  ['V homogenním poli závisí napětí tyče na indukci, aktivní délce vodiče a rychlosti kolmé k poli i vodiči.','Ve stojící cívce se při posuvu prostorově proměnného pole mění tok. V otáčející se cívce se mění její orientace vůči poli.'],String.raw`u_i=Blv`,['em01-indukovane-napeti','em02-vzajemna-indukcnost']);
  add('em02-vzajemna-indukcnost','magnetic',
   ['Měňte proudy a vazbu cívek a sledujte jejich společný a rozptylový tok.','Porovnejte změnu proudu v první cívce s odezvou druhé.'],
   ['Vzájemná indukčnost popisuje tokovou vazbu jedné cívky způsobenou proudem druhé.','Lineární superpozice předpokládá stálé parametry magnetického obvodu; při nasycení tento předpoklad obecně neplatí.'],String.raw`\psi_1=L_1 i_1+M i_2`,['tr01-matematicky','tr05-rozptylova-reaktance']);
@@ -103,8 +106,8 @@
   ['Měňte krok a rozlohu a porovnávejte jejich samostatný i společný účinek.','Porovnejte základní harmonickou s nežádoucí vyšší složkou.'],
   ['Činitel vinutí spojuje účinek kroku a rozlohy pro daný řád harmonické.','Dobré potlačení vyšší harmonické je kompromis s velikostí užitečné základní složky.'],String.raw`k_{w\nu}=k_{p\nu}k_{d\nu}`,['05-drazkove','08-zesikmeni']);
  add('03-pohyb','winding',
-  ['Sledujte stejnou vlnu nejprve v jednom čase a potom během přehrávání.','Porovnejte rychlost a směr vybraných harmonických.'],
-  ['Vyšší prostorová harmonická má více pólových dvojic, proto při stejném časovém kmitočtu postupuje pomaleji.','Směr závisí na sledu příslušné harmonické; ne všechny vyšší vlny se pohybují ve směru základní vlny.'],null,['06-casoprostor','10-asynchronni']);
+  ['Zvolte jeden pólový pár a řád 5. V prostorovém režimu spočítejte kladné oblasti kolem vzduchové mezery.','Přepněte na časové harmonické. Sledujte jedinou kladnou oblast a spočítejte kmity v pevné sondě během jedné základní periody.'],
+  ['Prostorový řád určuje počet opakování vlny na pólový pár. Časový řád určuje počet kmitů v sondě za základní periodu.','Pátá prostorová vlna obíhá pětkrát pomaleji než základní. Pátá časová harmonická na základní prostorové vlně obíhá pětkrát rychleji. Obě postupují zpětně.'],null,['06-casoprostor','10-asynchronni']);
  add('05-drazkove','winding',
   ['Měňte parametry vinutí a porovnávejte činitele základní a drážkových harmonických.','Sledujte, které složky zůstávají výrazné i při potlačení jiných řádů.'],
   ['Diskrétní uložení vodičů do drážek vytváří specifické skupiny prostorových harmonických.','Činitel vinutí sám neurčuje celkový hluk či ztráty; záleží i na geometrii, permeanci a provozním bodu.'],null,['04-cinitel','08-zesikmeni']);
@@ -115,19 +118,19 @@
   ['Měňte zešikmení a sledujte skládání příspěvků podél délky stroje.','Porovnejte potlačení drážkové harmonické s poklesem základní vlny.'],
   ['Axiálně posunuté řezy dávají různě natočené příspěvky, které se mohou vzájemně rušit.','Zešikmení není bez následků pro základní složku a nenahrazuje úplný výpočet ztrát nebo momentového zvlnění.'],null,['05-drazkove','04-cinitel']);
  add('am01-princip','induction',
-  ['Porovnejte stojící rotor s rotorem blízko rychlosti pole.','Měňte zatížení a sledujte vzájemnou rychlost pole a rotoru.'],
+  ['Porovnejte stojící rotor s rotorem blízko rychlosti pole.','Při stejném skluzu změňte odpor klece. Potom nastavte synchronní otáčky a porovnejte magnetická napětí a spřažené toky.'],
   ['Proud v rotoru vzniká díky relativnímu pohybu vůči poli.','Při přesně synchronní rychlosti ideální základní vlna neindukuje rotorový proud, a proto nevytváří asynchronní moment.'],String.raw`s=\frac{n_s-n}{n_s}`,['am02-momentova-charakteristika','10-asynchronni']);
  add('am02-momentova-charakteristika','induction',
   ['Měňte pracovní rychlost a sledujte bod na momentové charakteristice.','Porovnejte průsečíky motorové a zátěžové charakteristiky.'],
   ['Rovnost momentů určuje kandidáta ustáleného bodu; jeho stabilita závisí na odezvě při malé změně rychlosti.','Maximum momentu vymezuje přetížitelnost daného ustáleného modelu, ne automaticky dovolený trvalý provoz.'],null,['am05-odpor-rotoru','am04-trakcni']);
  add('am05-odpor-rotoru','induction',
-  ['Měňte odpor rotoru a porovnávejte polohu maxima momentu.','Porovnejte rozběh s provozem blízko synchronní rychlosti.'],
+  ['Spusťte otáčení pole nebo nastavte polohu ručně. Ve spodním grafu porovnejte tangenciální složku s velikostí celé síly na tyči a s výslednicí na rotor.','Nastavte nulový odpor a porovnejte okamžitý a střední moment. Zvolte Tok statoru smyčkou a natočte pole do polohy největšího toku.'],
   ['Odpor rotoru umožňuje činný přenos výkonu, ale současně způsobuje ztráty.','Ve zjednodušeném ustáleném schématu zvýšení odporu posouvá maximum k většímu skluzu; nezajišťuje obecně vyšší účinnost.'],String.raw`P_{\mathrm{Cu2}}=sP_\delta`,['am02-momentova-charakteristika','am01-princip']);
  add('am04-trakcni','induction',
   ['Měňte frekvenci a porovnávejte rodinu momentových charakteristik.','Použijte volby provozního stavu a sledujte rychlost při změně zatížení.'],
   ['Pod základní rychlostí lze vhodným řízením napětí a frekvence přibližně udržovat tok a dostupný moment.','Po dosažení napěťového limitu tok klesá a oblast přibližně konstantního výkonu má klesající dostupný moment.'],null,['am02-momentova-charakteristika','08-vozidla']);
  add('10-asynchronni','induction',
-  ['Měňte skluz nebo zatížení a porovnávejte proudy, pole a pohyb rotoru.','Odlišujte rychlost rotoru od rychlosti točivého pole.'],
+  ['Spusťte rozběh z klidu a sledujte pracovní bod na momentové charakteristice.','Změňte zátěž a sledujte, při kterých otáčkách se hnací a zatěžovací moment vyrovnají.'],
   ['Frekvence rotorového proudu je určena relativním pohybem pole vůči rotoru.','Zvětšené řezy a značky proudů slouží názornosti; jejich geometrie není výrobním výkresem.'],String.raw`f_2=|s|f_1`,['am01-princip','03-pohyb']);
  add('sm01-princip','synchronous',
   ['Měňte vzájemné natočení polí a porovnávejte směr momentu.','Porovnejte generátorický a motorický pracovní bod.'],
@@ -205,6 +208,13 @@
   ['Přepínejte skupiny Vše, částice, jádra a atomy.','Tažením prohlížejte prostorové modely a porovnávejte jejich druhy a popisky.'],
   ['Povrchy jsou názornou reprezentací, nikoli fotografií částic nebo ostrou hranicí elektronového obalu.','Porovnání barev a kreslených velikostí slouží orientaci; z náhledu nelze odečítat skutečné poměry rozměrů částic a atomů.'],null,['fu01-reakce']);
  sources.heating='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 9.3, s. 187–192, vztah (9.5), obr. 9.6–9.7 a kap. 9.3.2, s. 193.';
+ sources.eccd='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 9.5.1–9.5.3, s. 194–199, obr. 9.8–9.11.';
+ add('fu16-eccd','eccd',['Porovnej kolmý vstup se dvěma opačnými náklony svazku.','Časovým posuvníkem najdi okamžik největší proudové hustoty.'],['Při šikmém vstupu vybírá Dopplerův posuv elektrony podle podélné rychlosti.','Elektrony po ohřevu ztrácejí původní směr pomaleji. Jejich výsledný tok a elektrický proud mají opačný směr.'],String.raw`J_\parallel=-e n_{\mathrm e}\langle v_\parallel\rangle`,['fu13-ohrev','fu11-rekonexe','fu17-rozptyl']);
+ sources.scattering='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 9.5.2, s. 195–199, zejména s. 198 a obr. 9.11.';
+ add('fu17-rozptyl','scattering',['Posuvníkem změň rychlost druhého elektronu a porovnej oba odklony při průletu.','Přepni na Více setkání a časovým posuvníkem sleduj směry obou skupin.'],['U rychlejšího elektronu síla působí kratší dobu a mění směr větší počáteční hybnosti.','Při mnoha slabých setkáních se náhodné odchylky částečně ruší.'],String.raw`\nu_{\mathrm D}\propto v^{-3}`,['fu16-eccd','fu03-drift']);
+ sources.nbi='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 9.2, s. 181–186.';
+ add('fu18-injektor','nbi',['Krokuj od disociace až k prvnímu závitu deuteronu v plazmatu.','Vypni plyn v neutralizátoru a sleduj místo dopadu částice.'],['Záporný iont zrychluje směrem k vyššímu elektrickému potenciálu.','Po ztrátě přidaného elektronu neutrální atom projde separátorem přímo do tokamaku.'],String.raw`\Delta E_{\mathrm k}=eU`,['fu15-nbi','fu07-plazma']);
+ add('fu15-nbi','nbi',['Nastav hustotu a teplotu. Po automatickém přepočtu přehraj dráhu.','Sniž hustotu a porovnej průnik svazku.'],['Neutrální atom proniká přímo. Po ionizaci vede magnetické pole rychlý deuteron podél magnetické plochy.','Klasické Coulombovo tření předává energii elektronům a iontům.'],null,['fu13-ohrev','fu03-drift']);
  add('fu13-ohrev','heating',
   ['Změň frekvenci vlny a sleduj polohu vrstvy vůči vyznačenému místu.','Porovnej obě kruhové složky a krokuj po čtvrtinách periody gyrace.'],
   ['Souhlasně rotující elektrická síla může urychlovat elektron po několik oběhů.','Změnu kolmé energie jedné částice určuje práce elektrické síly.'],String.raw`P=q\mathbf E_\perp\cdot\mathbf v_\perp`,['fu03-drift','fu04-udrzeni']);

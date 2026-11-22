@@ -321,7 +321,8 @@ const vectorReference=Math.max(...DATA.vectors.flatMap(row=>row.map(q=>Math.hypo
 const $=id=>document.getElementById(id);
 const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
 const fmt=(v,n=2)=>Number(v).toLocaleString('cs-CZ',{minimumFractionDigits:n,maximumFractionDigits:n});
-let run=true, phase=.15, lastT=0, directionSign=1, arrowOffset=0, lastArrow=0, mode=MODULE==='EM01'?'transform':'self', angle=0, I=1;
+const adjustableCoil = document.body.dataset.voltage === 'transform';
+let run=true, phase=.15, lastT=0, directionSign=1, arrowOffset=0, lastArrow=0, mode=MODULE==='EM01'?(document.body.dataset.voltage || 'transform'):'self', angle=0, I=1;
 const ORX=212, ORY=220, SCALE=1320, X2=C.d;
 let fieldPaths=[];const graphScales={};let scaleNoticeUntil=0,scaleNoticeTimer=0;
 function announceScale(){scaleNoticeUntil=performance.now()+3500;clearTimeout(scaleNoticeTimer);scaleNoticeTimer=setTimeout(()=>render(),3550)}
@@ -507,12 +508,12 @@ function render(){
  }else{
   let freq=10**(Number($('freq').value)/1000*Math.log10(5000));
   let omega=Number($('omega').value)*PI/180, offset=Number($('offset').value), ia=Number($('amp').value)/10;
-  let ang=mode==='transform'?0:(offset+360*p)%360;
+  let ang=mode==='transform'?(adjustableCoil?offset:0):(offset+360*p)%360;
   let cur=mode==='transform'?ia*Math.sin(2*PI*p):ia;
   let M=mutual(ang),Md=dMutual(ang),psi=M*cur, ui=mode==='transform'?-M*ia*2*PI*freq*Math.cos(2*PI*p):-ia*Md*omega;
   scene(ang,cur);
-  const psiNorm=mode==='transform'?Math.abs(mutual(0)*ia):Math.abs(mutual(0)*ia);
-  let uiMax=mode==='transform'?Math.abs(mutual(0)*ia*2*PI*freq):Math.abs(ia*omega*Math.max(...DATA.dM.map(x=>Math.abs(x)))*(n1()/2)*(n2()/2));
+  const psiNorm=Math.abs((mode==='transform'?M:mutual(0))*ia);
+  let uiMax=mode==='transform'?Math.abs(M*ia*2*PI*freq):Math.abs(ia*omega*Math.max(...DATA.dM.map(x=>Math.abs(x)))*(n1()/2)*(n2()/2));
   $('referenceInfo').textContent='Amplitudy: Ψ̂ = '+fmt(psiNorm*1e3,4)+' mWb · ûᵢ = '+fmt(uiMax*1e3,2)+' mV';
   const oldScale=graphScales[mode];
   if(!oldScale)graphScales[mode]=[Math.max(psiNorm*1.2,1e-8),Math.max(uiMax*1.2,1e-6)];
@@ -520,17 +521,17 @@ function render(){
   const [psiScale,uScale]=graphScales[mode];
   $('voltageAmplitude').textContent='Amplituda napětí û₂ = '+(uiMax>=1?fmt(uiMax,2)+' V':fmt(uiMax*1e3,2)+' mV');
   $('scaleWarning').textContent='Rozsah se zvětší jen při překročení osy. Pro menší průběhy lze měřítko přizpůsobit tlačítkem.';
-  const blue=t=> mode==='transform'?(ia?Math.sin(2*PI*t):0):(mutual((offset+360*t)%360)*ia)/(psiNorm||1);
-  const red=t=> mode==='transform'?(ia?-Math.cos(2*PI*t):0):(-ia*dMutual((offset+360*t)%360)*omega)/(uiMax||1);
-  graph([[t=>blue(t)*psiNorm/psiScale,'#2e59ce'],[t=>red(t)*uiMax/uScale,'#ce4e33']],p,'percent',[psiScale*1e3,uScale*1e3],['Ψ₂₁ [mWb]','uᵢ [mV]']);
+  const flux=t=>mode==='transform'?M*ia*Math.sin(2*PI*t):mutual((offset+360*t)%360)*ia;
+  const voltage=t=>mode==='transform'?-M*ia*2*PI*freq*Math.cos(2*PI*t):-ia*dMutual((offset+360*t)%360)*omega;
+  graph([[t=>flux(t)/psiScale,'#2e59ce'],[t=>voltage(t)/uScale,'#ce4e33']],p,'percent',[psiScale*1e3,uScale*1e3],['Ψ₂₁ [mWb]','uᵢ [mV]']);
 
   drawCurrentPreview(ia,freq,p);
   setData('N1Out',n1());setData('N2Out',n2());setData('ampOut',fmt(ia,1)+' A');setData('freqOut',freq<100?fmt(freq,1)+' Hz':freq<1000?fmt(freq,0)+' Hz':fmt(freq/1000,2)+' kHz');setData('omegaOut',Number($('omega').value)+' °/s');setData('offsetOut',Number($('offset').value)+'°');
   setData('statA',fmt(psi*1e3,4)+' mWb');setData('statB',fmt(ui*1e3,2)+' mV');setData('statC',fmt(cur,2)+' A');setData('statD',fmt(ang,0)+'°');
   $('sceneExplain').textContent=mode==='transform'?'Obě cívky stojí. Během půlperiody se obrací směr B₁ i šipek na siločarách. Změna pole mění tokovou vazbu Ψ₂₁, takže vzniká uᵢ.':'Budicí proud je konstantní. Druhá cívka se otáčí a mění se skutečný integrál B₁·n₂ přes její závity. Právě tato změna způsobuje pohybovou složku uᵢ.';
-  $('transBox').classList.toggle('muted',mode!=='transform');$('moveBox').classList.toggle('muted',mode!=='motion');
-  $('freqWrap').classList.toggle('hidden',mode!=='transform');$('omegaWrap').classList.toggle('hidden',mode!=='motion');$('offsetWrap').classList.toggle('hidden',mode!=='motion');
-  $('modeExpl').textContent=mode==='transform'?'Pevná geometrie: dα/dt=0. Aktivní je transformační člen totální časové derivace.':'Neměnný proud: di₁/dt=0. Aktivní je pohybový člen; k jeho vyčíslení používáme derivaci numericky vypočteného M(α).';
+  $('transBox')?.classList.toggle('muted',mode!=='transform');$('moveBox')?.classList.toggle('muted',mode!=='motion');
+  $('freqWrap').classList.toggle('hidden',mode!=='transform');$('omegaWrap').classList.toggle('hidden',mode!=='motion');$('offsetWrap').classList.toggle('hidden',mode!=='motion'&&!adjustableCoil);
+  if($('modeExpl'))$('modeExpl').textContent=mode==='transform'?'Pevná geometrie: dα/dt=0. Aktivní je transformační člen totální časové derivace.':'Neměnný proud: di₁/dt=0. Aktivní je pohybový člen; k jeho vyčíslení používáme derivaci numericky vypočteného M(α).';
   setData('phaseOut',Math.round(p*100)+' %');
  }
  scaleNotice();if(['EM01','EM02'].includes(MODULE))for(const id of ['sceneExplain','modeExpl','referenceInfo','voltageAmplitude'])mathifyText($(id));maths();fitInductionViewport();
@@ -555,8 +556,16 @@ function init(){
   const bearing=p=>Math.atan2(ORY-p.y,p.x-(ORX+SCALE*C.d));
   surface.style.touchAction='none';surface.style.cursor='grab';
   const hint=document.createElementNS(NS,'title');hint.textContent='Táhněte cívku kolem jejího středu pro změnu natočení.';surface.prepend(hint);
-  surface.addEventListener('pointerdown',e=>{if(e.button!==0||dragging||mode!=='motion')return;const p=point(e);if(!p)return;const r=Math.hypot(p.x-(ORX+SCALE*C.d),p.y-ORY);if(r<12||r>SCALE*C.r2+40)return;dragging={id:e.pointerId,angle:bearing(p)};run=false;setData('play','▶ Přehrát');surface.setPointerCapture(e.pointerId);surface.style.cursor='grabbing';e.preventDefault()});
-  surface.addEventListener('pointermove',e=>{if(!dragging||dragging.id!==e.pointerId)return;const p=point(e);if(!p)return;const a=bearing(p),delta=Math.atan2(Math.sin(a-dragging.angle),Math.cos(a-dragging.angle));dragging.angle=a;phase=((phase+delta/(2*PI))%1+1)%1;$('phase').value=phase*1000;render()});
+  surface.addEventListener('pointerdown',e=>{if(e.button!==0||dragging||(mode!=='motion'&&!adjustableCoil))return;const p=point(e);if(!p)return;const r=Math.hypot(p.x-(ORX+SCALE*C.d),p.y-ORY);if(r<12||r>SCALE*C.r2+40)return;dragging={id:e.pointerId,angle:bearing(p),orientation:Number($('offset').value)};if(!adjustableCoil){run=false;setData('play','▶ Přehrát')}surface.setPointerCapture(e.pointerId);surface.style.cursor='grabbing';e.preventDefault()});
+  surface.addEventListener('pointermove',e=>{if(!dragging||dragging.id!==e.pointerId)return;const p=point(e);if(!p)return;const a=bearing(p),delta=Math.atan2(Math.sin(a-dragging.angle),Math.cos(a-dragging.angle));dragging.angle=a;
+   if(adjustableCoil){
+    dragging.orientation=(dragging.orientation+delta*180/PI+360)%360;
+    $('offset').value=Math.round(dragging.orientation);
+   }else{
+    phase=((phase+delta/(2*PI))%1+1)%1;
+    $('phase').value=phase*1000;
+   }
+   render()});
   const stop=e=>{if(!dragging||dragging.id!==e.pointerId)return;dragging=null;surface.style.cursor='grab';if(surface.hasPointerCapture(e.pointerId))surface.releasePointerCapture(e.pointerId)};
   for(const event of ['pointerup','pointercancel','lostpointercapture'])surface.addEventListener(event,stop);
  }
@@ -572,9 +581,9 @@ function init(){
  document.querySelectorAll('input[type=range]').forEach(e=>e.addEventListener('input',()=>{if(e.id==='phase'){phase=Number(e.value)/1000;run=false;setData('play', '▶ Přehrát');}render();}));
  let play=$('play');if(play)play.onclick=()=>{run=!run;play.textContent=run?'Ⅱ Pozastavit':'▶ Přehrát';};
  maths();render();requestAnimationFrame(currentSignField);
- if(MODULE==='EM02'){let lastSize='',queued=false;const observer=new ResizeObserver(()=>{const box=$('chart').getBoundingClientRect(),size=box.width.toFixed(2)+'/'+box.height.toFixed(2);if(size===lastSize||queued)return;lastSize=size;queued=true;requestAnimationFrame(()=>{queued=false;render()})});observer.observe(document.querySelector('.chartBox'));document.fonts.ready.then(()=>render())}
+ if(MODULE==='EM02'||document.body.dataset.voltage){let lastSize='',queued=false;const observer=new ResizeObserver(()=>{const box=$('chart').getBoundingClientRect(),size=box.width.toFixed(2)+'/'+box.height.toFixed(2);if(size===lastSize||queued)return;lastSize=size;queued=true;requestAnimationFrame(()=>{queued=false;render()})});observer.observe(document.querySelector('.chartBox'));document.fonts.ready.then(()=>render())}
  function frame(t){if(!lastT)lastT=t;let dt=Math.min(.045,(t-lastT)/1000);lastT=t;
-  if(run&&MODULE==='EM01'){
+  if(run&&MODULE==='EM01'&&!document.body.classList.contains('rod-view-active')){
     let rate=mode==='transform'?.12:Number($('omega').value)/360;
     if(rate>0){phase=(phase+dt*rate)%1;$('phase').value=Math.round(phase*1000);render();}
   }
@@ -854,7 +863,26 @@ const angle=Math.max(-1,Math.min(1,u/meterRange))*1.05;h+='<path d="M'+mx+' 417L
 const art={defs,conductor,charges,fieldMark,meter};if(typeof module==='object'&&module.exports)module.exports=art;else root.MotionalRodArt=art;
 })(typeof window==='undefined'?globalThis:window);
 
-function initializeMotionalRod(){if(!window.katex){setTimeout(initializeMotionalRod,50);return;}(()=>{'use strict';const panel=document.getElementById('motional-rod-panel');if(!panel)return;const $=id=>document.getElementById(id),slider=$('rod-position');let x=.5,v=0,u=0,qL=0,qR=0,meterRange=1.2,time=0,last=0,lastDraw=0;let B=.5,fieldPhase=0;const L=.3;const fmt=(value,d=2)=>(Math.abs(value)<.5*Math.pow(10,-d)?0:value).toLocaleString('cs-CZ',{maximumFractionDigits:d}).replace(/\s/g,'').replace(',','{,}');function math(id,tex){const el=$(id);if(el.dataset.math===tex)return;el.dataset.math=tex;if(['rod-speed','rod-emf','rod-voltage'].includes(id)){if(!el.querySelector('.rod-value-number'))el.innerHTML='<span class="rod-value-sign" aria-hidden="true"></span><span class="rod-value-number"></span>';const negative=tex.startsWith('-');el.querySelector('.rod-value-sign').textContent=negative?'−':'';katex.render(negative?tex.slice(1):tex,el.querySelector('.rod-value-number'),{throwOnError:false});el.setAttribute('aria-label',tex.replaceAll('{,}',','));return}katex.render(tex,el,{throwOnError:false})}const switcher=document.createElement('div');switcher.className='rod-view-switch';switcher.hidden=true;switcher.innerHTML='<span>Pohybové napětí:</span><button type="button" data-rod-view="coil" aria-pressed="false">Otáčení cívky</button><button type="button" data-rod-view="rod" aria-pressed="true">Cívka a vodič</button>';document.querySelector('main > .layout').before(switcher);let rodView=true;function visible(){const motion=!!document.querySelector('[data-mode="motion"]')?.classList.contains('active');switcher.hidden=!motion;const show=motion&&rodView;panel.hidden=!show;document.body.classList.toggle('rod-view-active',show);return show}switcher.querySelectorAll('button').forEach(b=>b.onclick=()=>{rodView=b.dataset.rodView==='rod';switcher.querySelectorAll('button').forEach(el=>el.setAttribute('aria-pressed',String(el===b)));visible()});const button=document.querySelector('[data-mode="motion"]');if(button)new MutationObserver(visible).observe(button,{attributes:true,attributeFilter:['class']});visible();document.querySelectorAll('[data-rod-tex]').forEach(el=>katex.render(el.dataset.rodTex,el,{throwOnError:false}));
+function initializeMotionalRod(){if(!window.katex){setTimeout(initializeMotionalRod,50);return;}(()=>{'use strict';const panel=document.getElementById('motional-rod-panel');if(!panel)return;const $=id=>document.getElementById(id),slider=$('rod-position');let x=.5,v=0,u=0,qL=0,qR=0,meterRange=1.2,time=0,last=0,lastDraw=0;let B=.5,fieldPhase=0;const L=.3;const fmt=(value,d=2)=>(Math.abs(value)<.5*Math.pow(10,-d)?0:value).toLocaleString('cs-CZ',{maximumFractionDigits:d}).replace(/\s/g,'').replace(',','{,}');function math(id,tex){const el=$(id);if(el.dataset.math===tex)return;el.dataset.math=tex;if(['rod-speed','rod-emf','rod-voltage'].includes(id)){if(!el.querySelector('.rod-value-number'))el.innerHTML='<span class="rod-value-sign" aria-hidden="true"></span><span class="rod-value-number"></span>';const negative=tex.startsWith('-');el.querySelector('.rod-value-sign').textContent=negative?'−':'';katex.render(negative?tex.slice(1):tex,el.querySelector('.rod-value-number'),{throwOnError:false});el.setAttribute('aria-label',tex.replaceAll('{,}',','));return}katex.render(tex,el,{throwOnError:false})}const button=document.querySelector('[data-mode="motion"]');
+const picker=document.querySelector('.motion-picker');
+if(picker){
+  const options=[...picker.querySelectorAll('button')];
+  function selectExperiment(selected){
+    const experiment=selected.dataset.experiment;
+    const rod=experiment!=='rotation';
+    panel.hidden=!rod;
+    document.body.classList.toggle('rod-view-active',rod);
+    options.forEach(option=>option.setAttribute('aria-pressed',String(option===selected)));
+    if(rod && $('rod-motion-mode').value!==experiment){
+      $('rod-motion-mode').value=experiment;
+      $('rod-motion-mode').onchange?.();
+    }
+  }
+  options.forEach(option=>option.onclick=()=>selectExperiment(option));
+  selectExperiment(options[0]);
+}else{
+const switcher=document.createElement('div');switcher.className='rod-view-switch';switcher.hidden=true;switcher.innerHTML='<span>Pohybové napětí:</span><button type="button" data-rod-view="coil" aria-pressed="false">Otáčení cívky</button><button type="button" data-rod-view="rod" aria-pressed="true">Cívka a vodič</button>';document.querySelector('main > .layout').before(switcher);let rodView=true;function visible(){const motion=!!document.querySelector('[data-mode="motion"]')?.classList.contains('active');switcher.hidden=!motion;const show=motion&&rodView;panel.hidden=!show;document.body.classList.toggle('rod-view-active',show);return show}switcher.querySelectorAll('button').forEach(b=>b.onclick=()=>{rodView=b.dataset.rodView==='rod';switcher.querySelectorAll('button').forEach(el=>el.setAttribute('aria-pressed',String(el===b)));visible()});if(button)new MutationObserver(visible).observe(button,{attributes:true,attributeFilter:['class']});visible();}
+document.querySelectorAll('[data-rod-tex]').forEach(el=>katex.render(el.dataset.rodTex,el,{throwOnError:false}));
 const arrow=(x,y,dx,dy,color)=>{const len=Math.hypot(dx,dy);if(len<1)return '';const nx=dx/len,ny=dy/len,ex=x+dx,ey=y+dy,h=Math.min(10,len*.4);return `<path d="M${x} ${y}L${ex-h*nx} ${ey-h*ny}" stroke="${color}" stroke-width="${Math.min(3,h*.75)}" stroke-linecap="butt"/><path d="M${ex} ${ey}L${ex-h*nx+h*.5*ny} ${ey-h*ny-h*.5*nx}L${ex-h*nx-h*.5*ny} ${ey-h*ny+h*.5*nx}Z" fill="${color}"/>`};
 
 // Positive B points into the page; U is the right terminal relative to the left.
@@ -908,8 +936,8 @@ c.fillStyle='#71877d';c.font='11px system-ui';c.fillText('−'+duration.toLocale
 math('rod-legend-b','B_1/(1\\,\\mathrm T)');math('rod-legend-psi','\\Psi/(0{,}16\\,\\mathrm{Wb})');math('rod-legend-u','u/('+fmt(voltageScale,3)+'\\,\\mathrm V)');}
 
 const formulaNodes=[...panel.querySelectorAll('.rod-relations [data-rod-tex]')],originalFormula=formulaNodes.map(n=>n.dataset.rodTex);
-function configureMode(){const fieldMode=movingField();panel.querySelectorAll('[data-rod-experiment]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.rodExperiment==='field')===fieldMode)));while(note.childNodes.length>1)note.lastChild.remove();note.append(document.createTextNode(fieldMode?' Ionty drží v mřížce. Ideální voltmetr neodebírá proud. Posuny nábojů jsou zvětšené a odezva zpomalená.':' Ionty drží v mřížce. Po zastavení napětí zaniká. Odezva je zpomalená; připojení voltmetru je schematické.'));panel.querySelector('.rod-heading h2').textContent=fieldMode?'Cívka v prostorově sinusovém poli':'Jedna cívková strana v homogenním poli';panel.querySelector('.rod-heading .rod-note').textContent=fieldMode?'Plný krok · čela mimo pole':'Pohyb vodiče · oddělení nábojů';slider.closest('label').querySelector('span').textContent='Poloha vodiče · pole stojí';$('rod-legend-b').hidden=$('rod-legend-psi').hidden=!fieldMode;const formulas=fieldMode?originalFormula:['u_i=Blv','\\mathbf F_m=-e(\\mathbf v\\times\\mathbf B)','l=0{,}30\\,\\mathrm m'];formulaNodes.forEach((n,i)=>{n.hidden=i>=formulas.length;if(formulas[i])katex.render(formulas[i],n,{throwOnError:false})});const title=panel.querySelector('.rod-graph-title');title.firstChild.textContent=fieldMode?'Indukce · tok · napětí ':'Napětí vodiče ';}
-$('rod-induction').oninput=()=>{B=+$('rod-induction').value;draw()};$('rod-field-speed').oninput=draw;$('rod-motion-mode').onchange=()=>{$('rod-reset').click();$('rod-position').closest('label').hidden=movingField();$('rod-field-speed').closest('label').hidden=!movingField();$('rod-reset').textContent=movingField()?'Výchozí fáze':'Vycentrovat';configureMode();$('rod-force-note').textContent=movingField()?'Modré šipky: elektrická síla na elektrony; cívka stojí.':'Růžová šipka: magnetická síla přesouvá elektrony k jednomu konci vodiče.';draw()};$('rod-reset').onclick=()=>{slider.value=50;x=.5;fieldPhase=0;v=u=qL=qR=time=0;history.length=0;graphTime=0;graphLast=0;meterRange=1.2;draw()};function tick(t){const dt=Math.min(.04,(t-last)/1000||0);last=t;if(!panel.hidden){const steps=Math.max(1,Math.ceil(dt/.008));for(let k=0;k<steps;k++){const h=dt/steps,target=+slider.value/100;if(movingField()){v=+$('rod-field-speed').value;fieldPhase=(fieldPhase+h*v*420+1920)%1920}else{v+=h*(36*(target-x)-10*v);x+=h*v;if(x<0||x>1){x=Math.max(0,Math.min(1,x));v=0}}const f=sample(),relax=1-Math.exp(-h/.3);qL+=(f.bL*L*relativeSpeed()-qL)*relax;qR+=(f.bR*L*relativeSpeed()-qR)*relax;u=qL-qR}if(Math.abs(v)>.015||Math.abs(u)>.003)time+=dt;else time=0;draw();if(t-lastDraw>33){recordGraph(dt+(t-lastDraw)/1000);lastDraw=t}}requestAnimationFrame(tick)}panel.querySelectorAll('[data-rod-experiment]').forEach(b=>b.onclick=()=>{if($('rod-motion-mode').value===b.dataset.rodExperiment)return;$('rod-motion-mode').value=b.dataset.rodExperiment;$('rod-motion-mode').onchange()});button?.click();visible();$('rod-motion-mode').onchange();draw();requestAnimationFrame(tick);
+function configureMode(){const fieldMode=movingField();panel.querySelectorAll('[data-rod-experiment]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.rodExperiment==='field')===fieldMode)));while(note.childNodes.length>1)note.lastChild.remove();note.append(document.createTextNode(fieldMode?' Ionty drží v mřížce. Ideální voltmetr neodebírá proud. Posuny nábojů jsou zvětšené a odezva zpomalená.':' Ionty drží v mřížce. Po zastavení napětí zaniká. Odezva je zpomalená; připojení voltmetru je schematické.'));panel.querySelector('.rod-heading h2').textContent=fieldMode?'Cívka v prostorově sinusovém poli':'Jedna cívková strana v homogenním poli';panel.querySelector('.rod-heading .rod-note').textContent=fieldMode?'Plný krok · čela mimo pole':'Pohyb vodiče · oddělení nábojů';slider.closest('label').querySelector('span').textContent='Poloha vodiče · pole stojí';$('rod-legend-b').hidden=$('rod-legend-psi').hidden=!fieldMode;const formulas=fieldMode?originalFormula:['u_i=Blv','\\mathbf F_m=-e(\\mathbf v\\times\\mathbf B)','l=0{,}30\\,\\mathrm m'];formulaNodes.forEach((n,i)=>{n.toggleAttribute('data-primary-law',i===(fieldMode?1:0));n.hidden=i>=formulas.length;if(formulas[i])katex.render(formulas[i],n,{throwOnError:false})});const title=panel.querySelector('.rod-graph-title');title.firstChild.textContent=fieldMode?'Indukce · tok · napětí ':'Napětí vodiče ';}
+$('rod-induction').oninput=()=>{B=+$('rod-induction').value;draw()};$('rod-field-speed').oninput=draw;$('rod-motion-mode').onchange=()=>{$('rod-reset').click();$('rod-position').closest('label').hidden=movingField();$('rod-field-speed').closest('label').hidden=!movingField();$('rod-reset').textContent=movingField()?'Výchozí fáze':'Vycentrovat';configureMode();$('rod-force-note').textContent=movingField()?'Modré šipky: elektrická síla na elektrony; cívka stojí.':'Růžová šipka: magnetická síla přesouvá elektrony k jednomu konci vodiče.';draw()};$('rod-reset').onclick=()=>{slider.value=50;x=.5;fieldPhase=0;v=u=qL=qR=time=0;history.length=0;graphTime=0;graphLast=0;meterRange=1.2;draw()};function tick(t){const dt=Math.min(.04,(t-last)/1000||0);last=t;if(!panel.hidden){const steps=Math.max(1,Math.ceil(dt/.008));for(let k=0;k<steps;k++){const h=dt/steps,target=+slider.value/100;if(movingField()){v=+$('rod-field-speed').value;fieldPhase=(fieldPhase+h*v*420+1920)%1920}else{v+=h*(36*(target-x)-10*v);x+=h*v;if(x<0||x>1){x=Math.max(0,Math.min(1,x));v=0}}const f=sample(),relax=1-Math.exp(-h/.3);qL+=(f.bL*L*relativeSpeed()-qL)*relax;qR+=(f.bR*L*relativeSpeed()-qR)*relax;u=qL-qR}if(Math.abs(v)>.015||Math.abs(u)>.003)time+=dt;else time=0;draw();if(t-lastDraw>33){recordGraph(dt+(t-lastDraw)/1000);lastDraw=t}}requestAnimationFrame(tick)}panel.querySelectorAll('[data-rod-experiment]').forEach(b=>b.onclick=()=>{if($('rod-motion-mode').value===b.dataset.rodExperiment)return;$('rod-motion-mode').value=b.dataset.rodExperiment;$('rod-motion-mode').onchange()});button?.click();$('rod-motion-mode').onchange();draw();requestAnimationFrame(tick);
 })();
 
 }

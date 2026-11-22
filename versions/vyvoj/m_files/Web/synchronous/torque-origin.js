@@ -1,5 +1,5 @@
 (function(root){'use strict';
-// Keep three main visual panels; detailed derivation belongs to the explanation.
+// Pair the diagrams with the three steps of the calculation.
 const graph=document.querySelector('.graph-panel'),diagrams=graph.querySelector('.origin-diagrams'),curve=graph.querySelector('.origin-curve'),plot=diagrams.querySelector('.plot-wrap'),voltage=diagrams.querySelector('.voltage-box');
 graph.classList.remove('panel');graph.querySelector(':scope>h2').remove();
 const triangle=document.createElement('section');triangle.className='panel origin-phasor';triangle.innerHTML='<h2>Napěťový trojúhelník</h2>';plot.before(triangle);triangle.append(plot,document.getElementById('legend'));
@@ -57,12 +57,11 @@ function diagram(t){
  if(Math.hypot(U[0]-E[0],U[1]-E[1])>3)h+=place(E,U,'@Delta U','#8661b1',true);
  if(a.e>1e-8&&Math.abs(a.beta)>.05){const b=-a.beta*Math.PI/180,r=38,ex=ox+r*Math.sin(b),ey=oy-r*Math.cos(b);arcSegments(r,0,-b);h+=`<path d="M${ox} ${oy-r}A${r} ${r} 0 0 ${b>0?1:0} ${ex} ${ey}" fill="none" stroke="#ba497d" stroke-width="1"/>`+place(O,[ex,ey],'@beta','#ba497d');}
  if(a.amp>1e-8){const angle=Math.atan2(a.I[1],a.I[0]),xy=(r,t)=>[ox-r*Math.sin(t),oy-r*Math.cos(t)],radius=Math.cos(angle)<0?45:86,ar=Math.cos(angle)<0?34:62,end=xy(radius,angle),arc=xy(ar,angle),v=xy(ar+25,angle/2);segments.push([O,end]);arcSegments(ar,0,angle);h+=`<path d="M${O}L${end}" stroke="#3273b8" stroke-width="1.4" stroke-dasharray="3 4"/>`+place(O,end,'@overline I_a','#3273b8');if(Math.abs(angle)>.03)h+=`<path d="M${ox} ${oy-ar}A${ar} ${ar} 0 ${Math.abs(angle)>Math.PI?1:0} ${angle>0?0:1} ${arc}" fill="none" stroke="#3273b8" stroke-width="1"/>`+place(O,arc,'@varphi','#3273b8');}
- if(t.lossless&&Math.abs(E[0]-ox)>1){const H=[ox,E[1]];segments.push([U,H],[E,H]);h+=`<path d="M${U}L${H}" stroke="#9fbbb3" stroke-dasharray="4 4"/>`+arrow(E,H,'#007e6c',3)+label(380,H-52,320,'X_sI_a@cos@varphi=-U_{ib}@sin@beta','#007e6c');}
- h+=label(380,H-19,610,t.smooth?'@overline U_a=@overline U_{ib}+(R_a+jX_s)@overline I_a':'@overline U_a=@overline U_{ib}+R_a@overline I_a+jX_q@overline I_a+j(X_d-X_q)@overline I_d');
+ if(t.lossless&&Math.abs(E[0]-ox)>1){const foot=[ox,E[1]];segments.push([U,foot],[E,foot]);h+=`<path d="M${U}L${foot}" stroke="#9fbbb3" stroke-dasharray="4 4"/>`+arrow(E,foot,'#007e6c',3);}
  h+=pending.map(args=>renderLabel(...args)).join('');
  $('plot').setAttribute('viewBox','0 0 760 '+H);$('plot').innerHTML=h;phasorLabelScale=0;
 }
-function equations(id,title,lines){$(id+'Title').textContent=title;$(id).innerHTML=lines.map(s=>tex(colored(s))).join('<br>');}
+function equations(id,title,lines){$(id+'Title').textContent=title;$(id).innerHTML=lines.map(s=>tex('@displaystyle '+colored(s))).join('');}
 root.SyncTorqueOrigin=function(s,{phasor}){
  const read=(id,fallback)=>{const n=+$(id)?.value;return Number.isFinite(n)&&n>0?n:fallback;},t=SyncTorqueOriginModel.calculate(s,{voltage:read('baseVoltage',230),current:read('baseCurrent',10),frequency:read('baseFrequency',50),polePairs:Math.max(1,Math.round(read('polePairs',2)))}),{a}=t;
  diagram(t);phasor(a);characteristic(s,t);
@@ -70,17 +69,18 @@ root.SyncTorqueOrigin=function(s,{phasor}){
 
  $('legend').innerHTML='<span style="color:#007e6c">Svorkové napětí</span><span style="color:#ad701b">Budicí napětí</span><span style="color:#8661b1">Úbytek ΔU</span>';
  const cosLines=['(@Delta U)^2=U_a^2+U_{ib}^2-2U_aU_{ib}@cos@beta'];
- cosLines.push(t.smooth?`I_a^*={@Delta U^*@over@sqrt{R_a^{*2}+X_s^{*2}}}=${num(t.cosineCurrent,3)}`:'@Delta@overline U=R_a@overline I_a+jX_q@overline I_a+j(X_d-X_q)@overline I_d');
- equations('eq1','1 · Kosinová věta → velikost proudu',cosLines);
- if(t.lossless){equations('eq2','2 · Sinová věta → činná složka',[
+ if(t.smooth)cosLines.push('@Delta@overline U=(R_a+jX_s)@overline I_a',`I_a^*={@Delta U^*@over@sqrt{R_a^{*2}+X_s^{*2}}}=${num(t.cosineCurrent,3)}`);
+ else cosLines.push('@begin{aligned}@Delta@overline U&=(R_a+jX_q)@overline I_a@@&@quad+j(X_d-X_q)@overline I_d@end{aligned}');
+ equations('eq1','1. Úbytek napětí a proud',cosLines);
+ if(t.lossless){equations('eq2','2. Činná složka proudu',[
   a.e>1e-8&&a.amp>1e-8&&Math.abs(t.cosPhi)>1e-8&&Math.abs(Math.sin(a.beta*Math.PI/180))>1e-8?'@frac{U_{ib}}{|@cos@varphi|}=@frac{X_sI_a}{|@sin@beta|}':'X_sI_a|@cos@varphi|=U_{ib}|@sin@beta|',
   `I_a^*@cos@varphi=-{U_{ib}^*@over X_s^*}@sin@beta=${num(t.sineCurrent,3)}`]);
- }else equations('eq2','2 · Obecný výpočet včetně ztrát',[
+ }else equations('eq2','2. Elektromagnetický výkon',[
   'P_{em}=m@operatorname{Re}(@overline U_i@overline I_a^*)',
   `P_{em}^*=P^*-R_a^*I_a^{*2}=${num(a.Pem,3)}`]);
- const law=t.lossless?'M=-@frac{mpU_aU_{ib}}{@omega_1X_s}@sin@beta':!a.r?'M=-@frac{mp}{@omega_1}[@frac{U_aU_{ib}}{X_d}@sin@beta+@frac{U_a^2}{2}(@frac1{X_q}-@frac1{X_d})@sin(2@beta)]':'M=@frac{p}{@omega_1}[mU_aI_a@cos@varphi-mR_aI_a^2]';
- equations('eq3','3 · Výkon → elektromagnetický moment',[law,`@omega=@frac{@omega_1}{p}=@frac{2@pi f_1}{p}=${num(t.omega)}@,@mathrm{rad/s}`,`M=@frac{P_{em}}{@omega}=${num(t.torque)}@,@mathrm{N@,m}`]);
- $('status').textContent=(a.Pem>1e-7?'Motorický chod. ':a.Pem< -1e-7?'Generátorický chod. ':'Nulový moment. ')+(t.lossless?'Hladký rotor, Ra = 0: platí odvození sinovou větou.':'Sinový vztah platí pro hladký rotor bez odporu. Zde je použit obecný výpočet.');
+ const law=t.lossless?'M=-@frac{mpU_aU_{ib}}{@omega_1X_s}@sin@beta':!a.r?'@begin{aligned}M={}&-@frac{mp}{@omega_1}@frac{U_aU_{ib}}{X_d}@sin@beta@@&-@frac{mp}{@omega_1}@frac{U_a^2}{2}@left(@frac1{X_q}-@frac1{X_d}@right)@sin(2@beta)@end{aligned}':'M=@frac{mp}{@omega_1}(U_aI_a@cos@varphi-R_aI_a^2)';
+ equations('eq3','3. Elektromagnetický moment',[law,`@omega=@frac{@omega_1}{p}=@frac{2@pi f_1}{p}=${num(t.omega)}@,@mathrm{rad/s}`,`M=@frac{P_{em}}{@omega}=${num(t.torque)}@,@mathrm{N@,m}`]);
+ $('status').textContent=(a.Pem>1e-7?'Motorický chod':a.Pem< -1e-7?'Generátorický chod':'Nulový moment')+(t.lossless?' · odvození sinovou větou':' · obecný výpočet');
  $('lesson').textContent='Úhel β roste od Ua k Uib proti směru hodinových ručiček: generátor má kladný β, motor záporný. Moment je kladný v motorickém režimu, záporný v generátorickém. Hvězdička značí poměrnou hodnotu; m = 3 fáze.';
  $('explanation').textContent='Tečkovaný paprsek v trojúhelníku ukazuje pouze směr proudu Ia, nikoli jeho velikost. Kosinová věta určí délku třetí strany napěťového trojúhelníku. U hladkého rotoru je tato délka rovna |Ra + jXs| Ia. Pro Ra = 0 pak sinová věta dává velikost činné složky; její znaménko určuje orientace β. Při zanedbání odporu je Ua = Ui a elektrický příkon se rovná elektromagnetickému výkonu. Při nenulovém Ra se odečtou měděné ztráty. U vyniklých pólů nelze všechny úbytky nahradit jediným jXsIa; obecný výpočet zahrnuje také reluktanční moment. Napětí a proud pro převod na N·m jsou efektivní fázové základy, nikoli sdružené napětí.';
 

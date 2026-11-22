@@ -26,11 +26,12 @@ const modules=[
  {id:'sm03-torque',draft:false,group:'sync',num:'03',title:'Momentová charakteristika',file:'../synchronous/torque.html',description:'Moment od buzení, reluktanční moment a jejich součet. Vnější β a vnitřní β′, parametry a propojený fázorový diagram.'},
  {id:'sm02-schema',group:'sync',num:'01',title:'Náhradní schéma a fázory synchronního stroje',file:'../synchronous/schema.html',description:'Buzení, zátěžný úhel β a reakce kotvy. Propojené schéma a fázory, hladký rotor i vyniklé póly, činný a jalový výkon.'},
  {id:'sm01-princip',group:'sync',num:'02',title:'Princip synchronního stroje',file:'../synchronous/princip.html',description:'Veďte setrvačný rotor polem. Úhel β, zachycení a utržení, buzení, reluktanční moment a tlumicí klec. Vyniklé póly i hladký rotor.'},
- {id:'am05-odpor-rotoru',group:'induction',num:'02',title:'Proč rotor potřebuje odpor?',file:'../induction/resistance.html',description:'Jeden závit v točivém poli: vlastní pole proudu, úhel mezi poli a okamžitý i střední moment při nulovém a nenulovém odporu.'},
+ {id:'am05-odpor-rotoru',group:'induction',num:'02',title:'Proč rotor potřebuje odpor?',file:'../induction/resistance.html',description:'Natočte pole vůči jednomu závitu. Sledujte tok, napětí a proud a porovnejte okamžitý a střední moment při změně odporu.'},
  {id:'am04-trakcni',group:'induction',num:'05',title:'Trakční charakteristika AM',file:'../induction/traction.html',description:'Změna frekvence měniče, okamžitý moment, brzdění a oblasti plného toku, výkonu a omezení zvratem.'},
- {id:'am01-princip',group:'induction',num:'01',title:'Princip asynchronního motoru',file:'../induction/princip.html',description:'Otáčky pole a rotoru, skluz, rotorová frekvence, vznik proudu a momentu. Dva pohledy na stejný stroj bez grafů.'},
+ {id:'am01-princip',group:'induction',num:'01',title:'Princip asynchronního motoru',file:'../induction/princip.html',description:'Porovnejte stejnou klec ze statoru i z rotoru. Měňte skluz a odpor, sledujte magnetická napětí, spřažené toky a rozběh.'},
  {id:'am02-momentova-charakteristika',group:'induction',num:'04',title:'Momentová charakteristika AM',file:'../induction/momentova-charakteristika.html',draft:false,description:'Vinutá kotva a klec, vrstvený model tyče, odpor rotoru a časové i prostorové harmonické.'},
- {id:'em01-indukovane-napeti',group:'electromagnetism',num:'01',title:'Indukované napětí',file:'../../EM01_indukovane_napeti.html',description:'Transformační a pohybová indukce: změna proudu, natočení cívky, toková vazba a Faradayův zákon.'},
+ {id:'em01-indukovane-napeti',group:'electromagnetism',num:'01',title:'Transformační indukované napětí',file:'../../EM01_indukovane_napeti.html',description:'Dvě stojící cívky. Měňte budicí proud a sledujte napětí druhé cívky.'},
+ {id:'em01-pohybove-napeti',group:'electromagnetism',num:'02',title:'Pohybové indukované napětí',file:'../../EM01_indukovane_napeti.html',description:'Pohyb tyče, posuv pole a otáčení cívky. Sledujte velikost a polaritu napětí.'},
  {id:'em02-vzajemna-indukcnost',group:'electromagnetism',num:'02',title:'Vlastní a vzájemná indukčnost',file:'../../EM02_vlastni_vzajemna_indukcnost.html',description:'Dvě cívky, jejich vlastní a vzájemná toková vazba. Vliv natočení, proudu a počtu závitů.'},
  {id:'em03-silove-ucinky',group:'electromagnetism',num:'03',title:'Silové účinky mezi vodiči',file:'../../EM03_silove_ucinky_vodicu.html',description:'Tři přesouvatelné vodiče, nezávislé proudy, společné magnetické pole a výsledné síly. Přitahování, odpuzování a rovnováha.'},
  {id:'mag01-magnetizace',group:'materials',num:'01',title:'Magnetizace feromagnetika',file:'../../MAG01_magnetizace_vektory_v5.html',description:'Magnetické domény, jejich růst a rotace, nasycení a vratná B–H charakteristika. Vliv polarity a natočení budicího pole.'},
@@ -46,7 +47,7 @@ const modules=[
  {id:'tr03-schema',num:'04',title:'Náhradní schéma transformátoru',file:'nahradni_schema.html',draft:false,description:'Samostatná kapitola: přesun ideálního transformátoru a přepočet impedancí.'},
  {id:'tr08-zkratovy-proud',num:'07',title:'Zkratový proud transformátoru',file:'zkratovy-proud.html',description:'Vznik zkratu, střídavá a stejnosměrná složka proudu, proudové obálky a první špička. Vliv okamžiku zkratu, napětí nakrátko a poměru X/R.'}
 ];
-const foundationOrder=['mag01-magnetizace','mag02-hystereze','em01-indukovane-napeti','em02-vzajemna-indukcnost','em03-silove-ucinky','mag03-hysterezni-ztraty','mag04-virive-proudy','hf-skin-proximity'];
+const foundationOrder=['mag01-magnetizace','mag02-hystereze','em01-indukovane-napeti','em01-pohybove-napeti','em02-vzajemna-indukcnost','em03-silove-ucinky','mag03-hysterezni-ztraty','mag04-virive-proudy','hf-skin-proximity'];
 for(const m of modules){const i=foundationOrder.indexOf(m.id);if(i>=0){m.group='electromagnetism';m.num=String(i+1).padStart(2,'0')}}
 modules.sort((a,b)=>(foundationOrder.indexOf(a.id)<0?99:foundationOrder.indexOf(a.id))-(foundationOrder.indexOf(b.id)<0?99:foundationOrder.indexOf(b.id)));
 let html=fs.readFileSync(file,'utf8').replaceAll("id==='transformer'?Number(a.num)-Number(b.num):0","(id==='transformer'||id==='induction')?Number(a.num)-Number(b.num):0").replaceAll(/C\.mount\(app,\{num:'[^']*',title:'Asynchronní/g,"C.mount(app,{num:'02',title:'Asynchronní").replace(/<!-- transformer-modules:start -->[\s\S]*?<!-- transformer-modules:end -->\s*/,'');
@@ -77,7 +78,7 @@ function cleanLegacyBanner(source){
  if(match){const tokens=/<\/?div\b[^>]*>/gi;tokens.lastIndex=match.index;let depth=0,m;while((m=tokens.exec(source))){depth+=m[0].startsWith('</')?-1:1;if(depth===0){const block=source.slice(match.index,tokens.lastIndex);if(/Hi!|Fyziko/i.test(block))source=source.slice(0,match.index)+source.slice(tokens.lastIndex);break;}}}
  return source;
 }
-const payload=modules.map(m=>{let source=cleanLegacyBanner(fs.readFileSync(path.join(dir,m.file),'utf8'));if(m.id==='am02-momentova-charakteristika'){
+const payload=modules.map(m=>{let source=cleanLegacyBanner(fs.readFileSync(path.join(dir,m.file),'utf8'));if(m.id.startsWith('em01-'))source=require('../em-core/voltage-lesson.cjs')(source,m);if(m.id==='am02-momentova-charakteristika'){
  const intro=source.match(/<template id="lesson-guide-controls">([\s\S]*?)<\/template>/);
  if(!intro)throw Error('Missing AM controls guide');
  const sections=[];source=source.replace(/<details(?: class="equations")?><summary>(Výpočet momentu|Vrstvený model rotorové tyče)<\/summary>([\s\S]*?)<\/details>/g,(_,title,body)=>{sections.push('<section><h3>'+title+'</h3>'+body+'</section>');return '';});
@@ -87,9 +88,32 @@ const payload=modules.map(m=>{let source=cleanLegacyBanner(fs.readFileSync(path.
  for(const [text,tex] of [['384 nebo 416',String.raw`384\,\text{nebo}\,416`],['52',String.raw`52`],['136,5 mm',String.raw`136{,}5\,\mathrm{mm}`],['26,22 mm',String.raw`26{,}22\,\mathrm{mm}`],['5,63 mm',String.raw`5{,}63\,\mathrm{mm}`],['250 mm',String.raw`250\,\mathrm{mm}`],['11 kW',String.raw`11\,\mathrm{kW}`]])theory=theory.replace(text,math(tex));
  source=source.replace(intro[0],'<template id="lesson-guide-content">'+intro[1]+theory+'</template>');
 } if(['tr04-pricna-vetev','tr05-rozptylova-reaktance'].includes(m.id))source=require('./energy-experiments/integrate-transformer.cjs')(source);source=source.replace(/<header>[\s\S]*?<\/header>/,'').replace(/<div class="actions"><a class="button primary" href="nahradni_schema.html">Náhradní schéma<\/a><\/div>/,'');let style=m.fem?'':m.group==='sync'?'main{padding:8px 0 16px}':m.group==='induction'?'.hero{display:none}.project-credit{display:none}main{padding:8px 0 16px}':m.id==='tr06-hodinove-cislo'?'.top,main>h1{display:none}main{padding:8px 0 16px}':m.id.startsWith('em')?'.top{display:none}main{padding-top:8px}.hero{display:none}':m.id==='hf-skin-proximity'?'.top{display:none}main{padding-top:8px}':(m.id==='mag02-hystereze'||m.id==='mag03-hysterezni-ztraty'||m.id==='mag04-virive-proudy')?'.hero h1{display:none}.hero p{max-width:none;text-align:left}main{padding:8px 0 20px}#launchInfo{display:none}':m.id==='mag01-magnetizace'?'.top{display:none}main{max-width:1440px;padding:8px 0 20px}.heading h1{display:none}.heading .hint{max-width:none;text-align:left}.heading{margin-bottom:12px}':css;if(m.id==='tr06-hodinove-cislo'||m.group==='electromagnetism')style+='\n'+css;source=source.replace('</head>',()=>'<style>'+style+'</style></head>');return {...m,group:m.group||'transformer',source};});
-const script=`\n<!-- transformer-modules:start -->\n<style></style>\n<script>\n(function(){\nconst entries=${JSON.stringify(payload).replace(/</g,'\\u003c')};\nfor(const entry of entries){Lab.register({id:entry.id,title:entry.title,mount(app){\napp.innerHTML='<div class="workspace imported-workspace'+''+'"><div class="modulehead"><a class="back" href="#group-'+entry.group+'">← '+(entry.group==='induction'?'Asynchronní stroje':entry.group==='sync'?'Synchronní stroje':entry.group==='electromagnetism'?'Účinky elektrického proudu a elektromagnetická indukce':'Transformátory')+'</a><span class="num">'+(Lab.catalog.find(item=>item.id===entry.id)?.num||entry.num)+'</span><h1>'+entry.title+'</h1>'+(entry.draft?'<span class="badge">Rozpracováno</span>':'')+'<div class="actions">'+(entry.id==='am02-momentova-charakteristika'?'<button id="import-guide" type="button" aria-haspopup="dialog" aria-controls="module-guide-dialog">Ovládání a výklad</button>':'')+'<button id="import-fullscreen">Celá obrazovka</button></div></div><iframe id="transformer-frame" class="transformer-frame" title="'+entry.title+'"></iframe></div>';\nif(window.__schemaReturnTarget===entry.id){const back=document.createElement('a');back.className='back';back.href='#tr03-schema';back.textContent='← Zpět k náhradnímu schématu';app.querySelector('.modulehead').after(back);}
+const script=`\n<!-- transformer-modules:start -->\n<style>
+.am-torque-heading-choices,.am-torque-heading-choices label{display:flex;align-items:center;gap:7px}
+.am-torque-heading-choices{flex-wrap:wrap}
+.am-torque-heading-choices label{font-size:13px;font-weight:600;white-space:nowrap}
+.am-torque-heading-choices label[hidden]{display:none}
+.am-torque-heading-choices select{min-height:40px;padding:7px 11px;font:600 15px/1.25 system-ui,sans-serif;color:var(--ink);background:#ffdf9e;border:1px solid #a66c22;border-radius:8px;cursor:pointer}
+.am-torque-heading-choices select:hover{background:#ffcf78;border-color:#875317}
+.sync-schema-heading-controls,.sync-schema-heading-controls label{display:flex;align-items:center;gap:6px}
+.sync-schema-heading-controls{flex-wrap:wrap;gap:6px 12px;font-size:13px}
+.sync-schema-heading-controls label{white-space:nowrap}
+.sync-schema-heading-controls select{font:inherit;padding:5px 8px;border:1px solid #a5c9ba;border-radius:6px;background:#f2f8f5;color:var(--ink)}
+.sync-schema-heading-controls label:has(input:disabled){opacity:.55}
+</style>\n<script>\n(function(){\nconst entries=${JSON.stringify(payload).replace(/</g,'\\u003c')};\nfor(const entry of entries){Lab.register({id:entry.id,title:entry.title,mount(app){\napp.innerHTML='<div class="workspace imported-workspace'+''+'"><div class="modulehead"><a class="back" href="#group-'+entry.group+'">← '+(entry.group==='induction'?'Asynchronní stroje':entry.group==='sync'?'Synchronní stroje':entry.group==='electromagnetism'?'Účinky elektrického proudu a elektromagnetická indukce':'Transformátory')+'</a><span class="num">'+(Lab.catalog.find(item=>item.id===entry.id)?.num||entry.num)+'</span><h1>'+entry.title+'</h1>'+(entry.draft?'<span class="badge">Rozpracováno</span>':'')+'<div class="actions">'+(entry.id==='am02-momentova-charakteristika'?'<button id="import-guide" type="button" aria-haspopup="dialog" aria-controls="module-guide-dialog">Ovládání a výklad</button>':'')+'<button id="import-fullscreen">Celá obrazovka</button></div></div><iframe id="transformer-frame" class="transformer-frame" title="'+entry.title+'"></iframe></div>';\nif(window.__schemaReturnTarget===entry.id){const back=document.createElement('a');back.className='back';back.href='#tr03-schema';back.textContent='← Zpět k náhradnímu schématu';app.querySelector('.modulehead').after(back);}
 const frame=document.getElementById('transformer-frame');
 let modeObserver=null;
+if(entry.id==='am01-princip'){
+ frame.addEventListener('load',()=>{
+  const original=frame.contentDocument?.getElementById('releaseRotor');
+  const actions=app.querySelector('.modulehead > .actions');
+  if(!original||!actions)return;
+  const button=document.createElement('button');
+  button.type='button';button.textContent=original.textContent;
+  button.onclick=()=>original.click();
+  actions.prepend(button);original.hidden=true;
+ },{once:true});
+}
 if(entry.id==='hf-skin-proximity'){
  frame.addEventListener('load',()=>{
   modeObserver?.disconnect();
@@ -120,6 +144,91 @@ if(entry.id==='hf-skin-proximity'){
   frame.contentDocument.documentElement.classList.add('hf-host-modes');
   actions.prepend(modes);
   syncModes();
+ },{once:true});
+}
+if(entry.id==='am02-momentova-charakteristika'){
+ frame.addEventListener('load',()=>{
+  const doc=frame.contentDocument;
+  const originals=doc?.querySelectorAll('.rotor-choices select');
+  if(originals?.length!==2)return;
+  const choices=document.createElement('div');
+  choices.className='am-torque-heading-choices';
+  const fields=[...originals].map(original=>{
+   const label=original.parentElement.cloneNode(true);
+   const select=label.querySelector('select');
+   select.removeAttribute('id');
+   select.onchange=()=>{
+    original.value=select.value;
+    original.dispatchEvent(new Event('change',{bubbles:true}));
+   };
+   choices.append(label);
+   return {original,label,select};
+  });
+  const sync=()=>{
+   for(const {original,label,select} of fields){
+    select.value=original.value;
+    label.hidden=original.parentElement.hidden;
+   }
+  };
+  frame.contentWindow.addEventListener('am-torque-rotor-change',sync);
+  app.querySelector('.imported-workspace > .modulehead > .actions').prepend(choices);
+  sync();
+ },{once:true});
+}
+if(entry.id==='sm02-schema'){
+ frame.addEventListener('load',()=>{
+  const originals=frame.contentDocument?.querySelector('.schema-heading-controls');
+  if(!originals)return;
+  const toolbar=originals.cloneNode(true);
+  toolbar.className='sync-schema-heading-controls';
+  const sourceFields=originals.querySelectorAll('select,input');
+  const fields=[...toolbar.querySelectorAll('select,input')];
+  const sync=()=>{
+   fields.forEach((field,i)=>{
+    const source=sourceFields[i];
+    field.value=source.value;
+    if(field.type==='checkbox')field.checked=source.checked;
+    field.disabled=source.disabled;
+   });
+  };
+  fields.forEach((field,i)=>{
+   const source=sourceFields[i];
+   field.removeAttribute('id');
+   field.onchange=()=>{
+    if(field.type==='checkbox')source.checked=field.checked;
+    else source.value=field.value;
+    source.dispatchEvent(new Event('change',{bubbles:true}));
+   };
+  });
+  frame.contentWindow.addEventListener('sync-schema-heading-update',sync);
+  app.querySelector('.imported-workspace > .modulehead > .actions').prepend(toolbar);
+  originals.hidden=true;
+  sync();
+ },{once:true});
+}
+if(entry.id==='sm06-torque-origin'){
+ frame.addEventListener('load',()=>{
+  const child=frame.contentDocument;
+  const rotor=child?.getElementById('type'),example=child?.getElementById('losslessExample');
+  if(!rotor||!example)return;
+  const toolbar=document.createElement('div');
+  toolbar.className='sync-schema-heading-controls';
+  const label=rotor.closest('label').cloneNode(true);
+  const select=label.querySelector('select');
+  select.removeAttribute('id');
+  select.value=rotor.value;
+  select.onchange=()=>{
+   rotor.value=select.value;
+   rotor.dispatchEvent(new frame.contentWindow.Event('input',{bubbles:true}));
+  };
+  const button=document.createElement('button');
+  button.type='button';
+  button.textContent='Hladký rotor bez odporu';
+  button.onclick=()=>{example.click();select.value=rotor.value;};
+  toolbar.append(label,button);
+  app.querySelector('.modulehead > .actions').prepend(toolbar);
+  rotor.closest('label').hidden=true;
+  example.hidden=true;
  },{once:true});
 }
 const guideButton=document.getElementById('import-guide');if(guideButton)guideButton.onclick=()=>{const content=frame.contentDocument?.getElementById('lesson-guide-content');if(content&&window.ModuleGuide)window.ModuleGuide.open(content.innerHTML);};

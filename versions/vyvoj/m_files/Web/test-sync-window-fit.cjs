@@ -33,6 +33,24 @@ for(const id of ['am01-princip','sm01-princip','sm02-schema','sm03-torque','sm04
 }
 assert(enlarged,'automatic enlargement preserved');console.log('PASS synchronous window contract:',count,'fits across 13 lessons, 5 viewport sizes, 3 content widths; header alignment, no clipping, stable scale, enlargement preserved');
 
+const computedStyle=ctx.getComputedStyle;
+ctx.getComputedStyle=element=>({...computedStyle(element),getPropertyValue:name=>name==='--module-flexible-height'&&element===main?'1':''});
+main.scrollWidth=1600;
+for(const [w,h] of [[900,650],[1366,768],[1366,1600],[768,1024]]){
+ width=w;height=h;
+ let previous;
+ for(let i=0;i<10;i++){
+  ctx.prepareImportedViewport(frame,doc,h);
+  const logicalHeight=parseFloat(doc.documentElement.style.getPropertyValue('--module-host-height'));
+  ctx.fitImportedModule(frame,main,logicalHeight);
+  const visibleHeight=parseFloat(stage.style.height)+(heading.offsetHeight+12)*Number(heading.style.zoom);
+  assert(Math.abs(visibleHeight-(h-80-4))<1,'flexible lesson fills the available window height');
+  if(h>=1024)assert(logicalHeight>1400,'tall windows can exceed the old height limit');
+  if(previous!==undefined)assert.equal(logicalHeight,previous,'height remains stable after fitting');
+  previous=logicalHeight;
+ }
+}
+
 // Verify real embedded payloads, including the two independently registered lessons.
 const page=fs.readFileSync(__dirname+'/interaktivni-elektricke-stroje.html','utf8');
 const entries=JSON.parse(page.match(/const entries=(\[.*?\]);\nfor\(const entry of entries\)/s)[1]);

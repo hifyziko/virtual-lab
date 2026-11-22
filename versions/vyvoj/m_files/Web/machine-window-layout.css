@@ -12,7 +12,7 @@ main[data-machine-viewport="am01-princip"] .machine{width:100%;height:100%;min-h
 main[data-machine-viewport] :is(.settings,.inspector,.circuit-column){overflow:visible;max-height:none}
 main[data-machine-viewport] :is(.focus-note,.control-note){max-height:none;overflow:visible}
 main[data-machine-viewport="sm02-schema"] .equation{overflow:visible}
-main[data-machine-viewport="sm02-schema"] .workspace{height:auto;min-height:940px;align-items:stretch}
+
 main[data-machine-viewport="sm03-torque"] .layout{height:auto;min-height:900px;align-items:stretch}
 main.uniform-module-layout[data-pmsm]{height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;max-height:var(--module-host-height,1000px)!important;display:grid;gap:10px}
 
@@ -29,11 +29,18 @@ main[data-machine-viewport] :is(.toolbar,.topline,.footerbar,.legend){flex-wrap:
 main[data-machine-viewport] :is(svg,canvas){max-width:100%;box-sizing:border-box}
 /* Reserve no phantom scrollbar beside the right-hand diagrams and formulas. */
 main[data-machine-viewport] :is(.card,.panel){scrollbar-gutter:auto}
-/* These teaching panels used their own scrolling viewport. Let the host fit
-   the complete content instead of cutting off the panel's right/bottom edge. */
-main[data-machine-viewport="sm07-dq"]>.workspace{height:calc(690px + var(--module-host-height,1000px) - 1000px);min-height:calc(690px + var(--module-host-height,1000px) - 1000px)}
-main[data-machine-viewport="sm07-dq"] .workspace>:is(.analysis-card,.machine-card){height:auto;min-height:690px;max-height:none;overflow:visible}
-main[data-machine-viewport="sm07-dq"] .machine-card>svg{flex:1 1 0;height:0;min-height:0}
+/* d–q: the two teaching panels share all height left by the visible controls. */
+main.uniform-module-layout[data-machine-viewport="sm07-dq"]{height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:8px}
+main[data-machine-viewport="sm07-dq"]>*{flex-shrink:0;margin-block:0}
+main[data-machine-viewport="sm07-dq"]>.workspace{flex:1 1 0;height:auto;min-height:0}
+main[data-machine-viewport="sm07-dq"] .workspace>:is(.analysis-card,.machine-card){height:auto;min-height:0;max-height:none;overflow:visible}
+main[data-machine-viewport="sm07-dq"] :is(.machine-card>svg,#mechanism,#waveCard,#vectors,#paths,#waves){flex:1 1 0;height:0;min-height:0}
+
+main.uniform-module-layout[data-machine-viewport="sm04-transients"]{height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:8px}
+main[data-machine-viewport="sm04-transients"]>.layout{flex:1 1 0;min-height:0;margin-block:0}
+main[data-machine-viewport="sm04-transients"]>.layout>.settings{display:flex;flex-direction:column;min-height:0}
+
+main.uniform-module-layout[data-machine-viewport="sm11-v-curves"]{height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;max-height:none!important}
 main[data-machine-viewport="sm08-rotor-dq"] .insight{height:auto;min-height:110px}
 main[data-machine-viewport="sm08-rotor-dq"] .insight>div:first-child{height:auto;min-height:86px;overflow:visible}
 main[data-machine-viewport="sm08-rotor-dq"] .recipe{height:auto;min-height:205px;overflow:visible}
@@ -73,23 +80,31 @@ main:is([data-machine-viewport="sm01-princip"],[data-machine-viewport="sm07-dq"]
 
 /* All synchronous lessons use the same width and host-derived height budget. */
 main.uniform-module-layout[data-machine-viewport^="sm"]{--module-flexible-height:1;width:1600px!important;max-width:1600px!important}
-main[data-machine-viewport="sm02-schema"]>.workspace{height:calc(var(--module-host-height,1000px) - 60px);min-height:940px;align-items:stretch}
+/* The host has already reserved the outer heading and footer. */
+main.uniform-module-layout:is([data-machine-viewport="sm02-schema"],[data-machine-viewport="sm03-torque"]){
+ height:var(--module-host-height,1000px)!important;box-sizing:border-box;display:flex;flex-direction:column
+}
+main[data-machine-viewport="sm02-schema"]>.workspace,
+main[data-machine-viewport="sm03-torque"]>.layout{flex:1 1 0;height:auto;min-height:0;align-items:stretch}
+
 /* Avoid a tall single stack of controls, phasors and rotor shrinking the whole lesson. */
-main[data-machine-viewport="sm03-torque"]>.layout{grid-template-columns:500px minmax(0,1fr);height:calc(var(--module-host-height,1000px) - 70px);min-height:0;align-items:stretch}
+main[data-machine-viewport="sm03-torque"]>.layout{grid-template-columns:minmax(0,34fr) minmax(0,66fr);min-height:0;align-items:stretch}
 main[data-machine-viewport="sm03-torque"] .settings{gap:7px;height:100%;min-height:0}
-main[data-machine-viewport="sm03-torque"] .settings>.controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
-main[data-machine-viewport="sm03-torque"] .settings>.voltage-box{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto 240px auto auto;gap:6px 12px;margin-top:6px;padding-top:8px}
-main[data-machine-viewport="sm03-torque"] .voltage-box>h3{grid-column:1;grid-row:1}
-main[data-machine-viewport="sm03-torque"] .settings #voltage{grid-column:1;grid-row:2;width:100%;height:240px;min-height:240px}
-main[data-machine-viewport="sm03-torque"] .voltage-box>.angle-readouts{grid-column:1;grid-row:3;flex-wrap:wrap;gap:4px;font-size:13px}
-main[data-machine-viewport="sm03-torque"] .voltage-box>.angle-key{grid-column:1;grid-row:4}
-main[data-machine-viewport="sm03-torque"] .voltage-box>.torque-rotor{grid-column:2;grid-row:1/5;margin:0;padding:0;border:0}
-main[data-machine-viewport="sm03-torque"] .torque-rotor .rotor-example-heading{flex-wrap:wrap;gap:4px}
-main[data-machine-viewport="sm03-torque"] .torque-rotor svg{width:100%;max-width:240px}
+main[data-machine-viewport="sm03-torque"] .settings>.controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;padding:2px 0}
+main[data-machine-viewport="sm03-torque"] .settings>.preset-row{display:grid;grid-template-columns:auto repeat(4,minmax(0,1fr));gap:5px;align-items:center}
+main[data-machine-viewport="sm03-torque"] .torque-resistance{display:flex;align-items:center;gap:4px;padding-right:5px;white-space:nowrap}
+main[data-machine-viewport="sm03-torque"] .preset-row button{min-height:34px;padding:5px 4px;font-size:14px}
+main[data-machine-viewport="sm03-torque"] .settings>.voltage-box{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,9fr) minmax(0,11fr);flex:1 1 0;min-height:300px;gap:8px;margin-top:0;padding-top:7px}
+main[data-machine-viewport="sm03-torque"] .voltage-box>:is(.torque-angles,.torque-rotor){display:flex;flex-direction:column;min-width:0;min-height:0;margin:0;padding:6px 8px;border:1px solid #e1e9e5;border-radius:8px}
+main[data-machine-viewport="sm03-torque"] .settings #voltage{flex:1 1 0;width:100%;height:0;min-height:0;contain:size}
+main[data-machine-viewport="sm03-torque"] .torque-diagram-text{display:flex;align-items:center;flex-wrap:wrap;gap:3px 12px;min-width:0;flex-shrink:0}
+main[data-machine-viewport="sm03-torque"] .torque-diagram-text h3{margin:0;font-size:14px}
+main[data-machine-viewport="sm03-torque"] .torque-diagram-text .angle-readouts{display:flex;flex-wrap:wrap;gap:3px 10px;margin:0;font-size:14px}
+main[data-machine-viewport="sm03-torque"] .torque-rotor .rotor-example-heading{justify-content:flex-start;flex-wrap:wrap;gap:3px 12px}
+main[data-machine-viewport="sm03-torque"] .torque-rotor svg{flex:1 1 0;width:100%;height:0;min-height:0;max-width:none;aspect-ratio:auto;contain:size}
 main[data-machine-viewport="sm03-torque"] .graph-panel{height:100%;min-height:0}
 main[data-machine-viewport="sm03-torque"] .graph-panel .plot-wrap{flex:1 1 0;min-height:260px}
-main[data-machine-viewport="sm03-torque"] .equations article:first-child .formula{font-size:18px;min-height:60px}
-main[data-machine-viewport="sm03-torque"] .equations article:not(:first-child) .formula{font-size:17px;min-height:52px}
+main[data-machine-viewport="sm03-torque"] .graph-panel .equations article .formula{font-size:18px;min-height:0;padding:4px 0}
 /* Traction: square main plot needs less width; the right data band gets fewer rows. */
 main[data-machine-viewport="am04-trakcni"] .traction-layout{grid-template-columns:minmax(0,min(46%,calc(var(--module-host-height,1000px) - 300px))) minmax(0,1fr)}
 main[data-machine-viewport="am04-trakcni"] .fitted .readouts{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}

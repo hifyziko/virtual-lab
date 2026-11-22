@@ -1,5 +1,31 @@
 # Aktuální stav předání
 
+## Asynchronní motor, 22. listopadu 2026
+
+Jemná část stupnice odporu v obou pokusech zabírá přes polovinu dráhy. Do poměru 0,1 má krok 0,0001 a nad ním 0,001. Princip ve volbě Spřažené toky zobrazuje jejich skutečný vzájemný úhel z lineárního modelu. Při zániku rotorového toku se úhel označí jako neurčený.
+
+Princip AM zobrazuje jednu klec současně od statoru a od rotoru. Odpor ovlivňuje proud, fázové zpoždění, moment a rozběh proti konstantní brzdě. Přepínač veličin ukazuje magnetická napětí nebo celkové poměrné spřažené toky v lineárním modelu. Volba siločar je samostatná.
+
+Proč rotor potřebuje odpor používá jediný stojící závit. Pole lze natočit posuvníkem nebo spustit jeho otáčení. Kompaktní panel má vedle posuvníků odporu a natočení pevný prostor pro odečty. Horní graf zobrazuje okamžitý a střední moment za periodu. Volba Tok smyčkou vyznačí kladnou normálu a přepne horní graf na budicí tok, indukované napětí a proud. Dolní graf zachovává síly na tyči a výslednici. Pod lupou se pokus zaměřuje na rozběh, zatížení a polohu pracovního bodu.
+
+## Proximity efekt, 21. listopadu 2026
+
+Zapracovány opravy souřadnic a místních vzorků indukovaného proudu v modulu Skin a proximity efekt.
+
+## Coulombův rozptyl a směrová relaxace, 21. listopadu 2026
+
+Modul `fu17-rozptyl` je ve skupině Základy plazmatu a fúze za Driftem částic v poli. Vazba z výkladu ECCD zůstává. Zdroje: `versions/vyvoj/m_files/fusion/scattering/`. Dva průlety používají stejné měřítko a čas. Vpravo jsou doba a příčný impuls, skládání hybnosti a směry elektronů po mnoha slabých setkáních. Integrace a reprodukovatelné náhodné odchylky vycházejí z přiloženého pokusu. Ověřeny shoda numerických drah a odchylek s přílohou, matematická sazba a ovládání v testovacím prostředí. Vizuální kontrola v prohlížeči zůstává otevřená.
+
+Průlety, doba a impuls, skládání hybnosti i statistika setkání jsou vidět současně. Průlety běží ve smyčce a oba vektory jsou trvale zapnuté. Časový posuvník zůstává v horním ovládání a změna rychlosti zachovává čas. Okno používá společné vystředění a škálování podle obou rozměrů. Částice vykresluje sdílená knihovna Driftu s dvojnásobným vzorkováním v obou směrech a značky částic a vektorů jsou přímo ve scénách v KaTeXu.
+
+## ECCD – neindukční vlečení proudu, 21. listopadu 2026
+
+Modul ECCD nyní běží průběžně. Tažením zářiče se mění výběr rychlostí a znaménko proudu. Horní pravý panel ukazuje energii jednoho průchodu, spodní panely ustálené podélné rozdělení a proudové příspěvky. Ustálená odezva průměruje impulsní řešení přes exponenciálně rozdělené časy od ohřevu se středem 5 τ₀. Rozdíl profilů je vložen do hlavního grafu na společnou rychlostní osu. Naladění nabízí frekvenci pro tepelnou rychlost podle náklonu. Odchylka červeného profilu je pro zobrazení násobena čtyřmi, proud se počítá z fyzikálního profilu.
+
+## NBI – ohřev plazmatu, 21. listopadu 2026
+
+Modul `fu15-nbi` ve skupině Magnetické udržení a tokamak používá zdroje z `versions/vyvoj/m_files/fusion/nbi/`. Přehled s CAD modelem ITERu zobrazuje referenční dráhu a depozici ve vrstvách. Volitelné sledování kamerou a značky dalších částic byly odstraněny. Rozšířený pravý graf energie přepočítává osu podle dostupných rozměrů. Číselná bilance částice je v dolním pásu. Parametry se přepočítávají automaticky po otevření a změně hustoty nebo teploty. Okolí ionizace je v přehrávání plynule zpomalené. Deuteron pokračuje po dráze i během pulzu a odletu elektronu. Po spuštění se přehled tokamaku zmenší a vycentruje v levé části. Zvětšený detail plazmatu zabírá hlavní část scény a graf má užší pravý sloupec. Tři spodní oddíly jsou výškově zarovnané na střed. Řádek Za úsek letu je viditelný i před ionizací a mění pouze hodnoty, aby dolní panel neměnil výšku. Detail přebírá z mechanického náhledu gyraci okolních částic, střídání vybraných Coulombových setkání a barevné pulzy obou skupin. Deuteron se zpomaluje podle kinetické energie. Podíl okamžitého ohřevu vychází ze statistického tření, graf a tabulka sledují postupně předanou energii. Šipky u setkání ukazují přitažlivost a odpuzování. Směry, časy a nárazové vzdálenosti průletů se mění podle reprodukovatelného výběru. V detailu je osa gyrace deuteronu ve středu a plazma se od vstupu po ionizaci postupně zaplní. Pozadí zobrazuje elektrony, deuterony, tritony a tepelná alfa jádra. Tepelné stopy mají tlumené odstíny a druh rozlišuje typ čáry i barevný obrys částice. Středová dráha deuteronu je bílá. Stopy se při přechodu hranice kreslí souvisle ve dvou periodických výřezech. Plovoucí popisek terče nahradil stávající pevný popis setkání. Detail plazmatu využívá téměř celou výšku panelu a graf je přibližně o desetinu užší. Hlavička a popis setkání mají pevnou výšku, částice používají čtyři předkreslené obrázky a přehrávání omezuje skok po opožděném snímku. Iontová gyrace používá příslušná znaménka náboje a poměry nábojů k hmotnosti. Zobrazení dodatečně zpomaluje elektronovou fázi, aby se mezi snímky zdánlivě neobracel směr. Bilance ohřevu používá dál deuteriovou aproximaci. Zvýrazněné částice vstupují přes okraj detailu a po průletu stejně opouštějí záběr. V každé ukázce se celá relativní dráha vzorkuje rovnoměrně ve fyzikálním čase, s pevným zvětšením. Průlety se mohou překrývat. Graf radiální depozice používá vektorové křivky SVG a popisky KaTeX. Pojmenování volby Zobrazit ohřev vysvětluje výběr elektronů a iontů v radiálním grafu i prostorovém řezu. Sledovaný svazek a jeho bilance zůstávají stejné. Test `node tools/test-nbi.cjs` kontroluje model, rychlost přehrávání, růst obou energetických příspěvků, bilanci a ovládání. Vizuální kontrola v prohlížeči zůstává otevřená. Původní NBI byl odeslán commitem 4978044. Novější úpravy detailu obsahuje aktualizace origin/main s koncovým commitem 2165c3f.
+
 ## Předání k publikaci — 20. listopadu 2026
 
 Uživatel obnovil souhlas s pushem na origin/main. Tento záznam nahrazuje
@@ -4133,3 +4159,16 @@ v návrhové šířce a celá se škáluje společně s obsahem, včetně tlač�
 a textu. Testy měřítka, synchronních modulů a načítání prošly.
 Vizuální ověření při 1920 × 1080 a 125 % zbývá.
 Balení na druhý počítač zůstává pozastavené. Tato oprava je součástí odeslání na origin/main.
+
+### 21. 11. 2026 — rozdělení indukovaného napětí
+
+Původní odkaz `#em01-indukovane-napeti` otevírá transformační napětí dvou stojících cívek. Nový modul `#em01-pohybove-napeti` otevírá pohyb tyče a přímo přepíná na posuv pole vůči stojící cívce nebo otáčení cívky. Oba pohledy skládá `versions/vyvoj/m_files/em-core/voltage-lesson.cjs` nad společným modelem. Počty závitů budicí a snímací cívky mají přímo viditelné posuvníky v horní řadě ovladačů. Scéna a graf mají dva hlavní panely a podrobný výklad je v dialogu.
+Oba výklady obsahují totální diferenciál tokové vazby podle proudu a natočení a rozklad indukovaného napětí na transformační a pohybový člen.
+V transformačním pokusu lze snímací cívce nastavit pevné natočení od 0° do 360° posuvníkem i tažením ve scéně. Graf počítá obě křivky se znaménkem vzájemné indukčnosti pro zvolenou polohu.
+
+### 21. 11. 2026 — injektor NBI se zápornými ionty
+
+V části Magnetické udržení a tokamak otevírá odkaz `#fu18-injektor` řez injektorem s grafem energie, zvětšeným detailem a krokováním. Plyn v neutralizátoru přepíná mezi tangenciálním vstřikem do plazmatu a dopadem na desku separátoru. Následuje původní ohřev `#fu15-nbi` s vlastním referenčním nastavením. Zdroj modulu je ve `versions/vyvoj/m_files/fusion/injector`, kontrola obou průletů v `tools/test-injector.cjs`.
+
+V injektoru nyní sdílí horní řez a graf jeden řádek. Hlavní animace výboje plynule spojuje přílet elektronu, rozštěpení molekuly, nárazovou ionizaci druhého atomu a přenos elektronu z povrchu s cesiem. Detail přiblíží povrch a sleduje iont až k otvoru mřížky. Krokování i ruční posuv používají stejný čas jako změny náboje.
+Čas přehrávání je odstupňován po komentovaných dějích. Každý průběžný popisek v dolní části obrazu má ve výchozí rychlosti alespoň tři sekundy, zásadní srážky a zachycení elektronu mají vlastní intervaly. Tlačítko kroku i posuvník synchronizují pohyb a komentář v obou variantách pokusu.

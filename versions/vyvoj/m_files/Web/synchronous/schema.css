@@ -80,8 +80,6 @@ main:has(>header) .workspace{height:calc(100dvh - 172px)}
 @media(max-width:1000px){.workspace{grid-template-columns:minmax(320px,.72fr) minmax(0,1.28fr)}}
 @media(max-width:760px){.workspace{grid-template-columns:minmax(0,1fr)}#circuit{height:200px}.circuit-column .operating-mini{min-height:280px}}
 
-.torque-angle-note{text-align:center;font-size:10px;color:var(--muted);margin-top:3px}
-
 /* Compact phasor lettering and readable characteristic lettering. */
 #phasor .diagram-label .math-label{font-size:13px}#power .diagram-label .math-label{font-size:18px}#power text{font-size:13px}
 
@@ -90,10 +88,47 @@ main:has(>header) .workspace{height:calc(100dvh - 172px)}
 .circuit-column .operating-mini #power .math-label{font-size:21px}
 .circuit-column .operating-title h3{font-size:15px}
 .circuit-column .characteristic-pictogram figcaption,.circuit-column .torque-key{font-size:13px}
-.circuit-column .torque-angle-note{font-size:12px;line-height:1.4}
 .circuit-column .operating-title>span{font-size:13px}
 
 #phasor .diagram-label .math-label{font-size:12px}
 
 /* Primary action for the fixed phasor frame. */
-.diagram-options #fitPoint.rescale-axes-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border:1px solid #006c5c;border-radius:8px;background:#007e6c;color:#fff;font-size:15px;font-weight:650;line-height:1.3;box-shadow:0 2px 5px #19313b18;white-space:nowrap}.diagram-options #fitPoint.rescale-axes-button:hover{background:#006958}.diagram-options #fitPoint.rescale-axes-button:active{background:#005c4e}.diagram-options #fitPoint.rescale-axes-button:focus-visible{outline:3px solid #d8aa43;outline-offset:3px}.diagram-options{flex-wrap:wrap;gap:10px}
+.phasor-footer #fitPoint.rescale-axes-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border:1px solid #006c5c;border-radius:8px;background:#007e6c;color:#fff;font-size:15px;font-weight:650;line-height:1.3;box-shadow:0 2px 5px #19313b18;white-space:nowrap}.phasor-footer #fitPoint.rescale-axes-button:hover{background:#006958}.phasor-footer #fitPoint.rescale-axes-button:active{background:#005c4e}.phasor-footer #fitPoint.rescale-axes-button:focus-visible{outline:3px solid #d8aa43;outline-offset:3px}.diagram-options{flex-wrap:wrap;gap:10px}
+
+.schema-heading-controls{margin-bottom:8px}
+.circuit-column .controls>.load-mode{display:flex;align-items:center;gap:4px;width:fit-content}
+.phasor-card .presets{margin-left:auto;justify-content:flex-end}
+.phasor-card .presets button{border-color:#bed6cb;background:#f1f8f4;white-space:nowrap}
+.phasor-card .presets button:hover{background:#e0f1e8;border-color:#93b9ae}
+.phasor-toolbar,.diagram-options,.diagram-options label{display:flex;align-items:center}
+.phasor-toolbar{justify-content:space-between;gap:5px 10px;flex-wrap:wrap}
+.diagram-options label{gap:4px}
+.phasor-footer{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:5px 10px}
+.phasor-footer .legend{flex:1 1 320px}
+.phasor-scale-controls,.phasor-scale-controls label{display:flex;align-items:center;gap:6px}
+.phasor-scale-controls{justify-content:flex-end;flex-wrap:wrap;font-size:12px}
+.phasor-card .focus-note{min-height:0;max-height:none}
+.circuit-column .operating-title{align-items:center;flex-wrap:wrap;gap:4px 8px}
+.operating-title>button{margin-left:auto}
+.circuit-column .characteristic-pictogram .torque-key{display:flex;flex-wrap:wrap;gap:2px 10px;margin:0;font-size:12px}
+.torque-key .torque-point::before{width:8px;height:8px;border:0;border-radius:50%;background:var(--gold)}
+.circuit-column .operating-mini #power .torque-tick .math-label{font-size:14px}
+@media(min-width:761px){
+ .workspace{min-height:675px}
+ .circuit-column{overflow:visible;scrollbar-gutter:auto}
+}
+
+/* Live values and notes must not resize either diagram. */
+@media(min-width:761px){
+ .sliders output{flex:0 0 8ch;white-space:nowrap}
+ .sliders small{min-height:2.6em;line-height:1.3}
+ .phasor-card .focus-note{flex:0 0 3em;line-height:1.5}
+ .phasor-footer .legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,1.5em);gap:0 8px;line-height:1.5}
+ .circuit-column .operating-title{display:grid;grid-template-columns:minmax(0,1fr) auto 7.5em;gap:8px}
+ .circuit-column .operating-title>span{text-align:right;white-space:nowrap}
+}
+.circuit-column .equation{min-height:0;padding:4px 0;gap:4px}
+.circuit-column>.controls{padding-block:4px}
+.circuit-column .operating-mini{margin-top:0}
+.circuit-column .characteristic-pictogram{display:grid;grid-template-rows:minmax(140px,1fr) auto;gap:4px}
+.circuit-column .operating-mini #power{display:block;width:100%;height:100%;min-height:0;contain:size}

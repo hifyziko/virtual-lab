@@ -1,46 +1,32 @@
-/* Three visual panels and one result band; detailed derivation opens separately. */
+/* Keep the three diagrams and their equations aligned in reading order. */
 main.torque-derivation.uniform-module-layout{--module-flexible-height:1;height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:8px}
-.torque-derivation .layout{display:flex;flex-direction:column;flex:1 1 0;height:0;min-height:0;gap:10px;margin:0}
-.torque-derivation .settings{display:grid;grid-template-columns:170px minmax(0,1fr) 200px;gap:7px 16px;flex:0 0 auto;overflow:visible}
-.torque-derivation .settings .row{grid-column:1;grid-row:1}
-.torque-derivation .settings>label{grid-column:1;grid-row:2}
-.torque-derivation .controls{grid-column:2;grid-row:1/3;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;align-items:center}
-.torque-derivation #losslessExample{grid-column:3;grid-row:1}
-.torque-derivation .torque-bases{grid-column:3;grid-row:2;margin:0}
-.torque-derivation #status{grid-column:1/-1;margin:0}
-.torque-derivation .graph-panel{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);grid-template-rows:auto minmax(260px,1fr) auto;gap:10px;flex:1 1 0;min-height:0;overflow:visible;padding:0;background:none;border:0}
-.torque-derivation .metrics{margin:0;min-height:30px}
-.torque-derivation .origin-diagrams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-height:0;height:100%}
-.torque-derivation .origin-phasor,.torque-derivation .origin-diagrams .voltage-box{display:flex;flex-direction:column;gap:6px;min-width:0;min-height:0;height:100%;margin:0;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:white;max-width:none}
-.torque-derivation .origin-phasor h2,.torque-derivation .voltage-box h3,.torque-derivation .origin-curve h3{margin:0;font-size:16px}
-.torque-derivation .graph-panel .origin-phasor .plot-wrap{flex:1 1 0;min-height:0;height:0}
-.torque-derivation .origin-diagrams .voltage{flex:1 1 0;min-height:0;height:0;width:100%}
-.torque-derivation .origin-diagrams :is(.angle-key,.angle-readouts,.legend){margin:0;font-size:12px;min-height:20px;flex-shrink:0}
-.torque-derivation .origin-curve{display:flex;flex-direction:column;min-height:0;padding:10px 14px;gap:4px}
-.torque-derivation .origin-curve svg{flex:1 1 0;min-height:0;height:0;width:100%}
-.torque-derivation .moment-result{padding:8px 14px!important;border:1px solid #cbded6;border-radius:10px;background:#f1f7f4}
-.torque-derivation .moment-result h3{margin:0 0 3px;font-size:13px}
-.torque-derivation .moment-result .formula{font-size:16px;line-height:1.45;padding:0;min-height:0;overflow:visible}
-.torque-derivation .formula .katex{font-size:1em}
+.torque-derivation .layout{display:flex;flex-direction:column;flex:1 1 0;height:auto;min-height:0;gap:8px;margin:0}
+.torque-derivation .settings{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;flex:0 0 auto;padding:6px 10px;gap:4px 12px;overflow:visible}
+.torque-derivation .settings>.row{display:none}
+.torque-derivation .settings>[hidden]{display:none!important}
+.torque-derivation .settings>.controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px 18px;flex:1 1 700px;margin:0;padding:0!important}
+.torque-derivation .controls input[type=range]{width:100%;margin:1px 0 0}
+.torque-derivation .controls .control>span{gap:8px}
+.torque-derivation .controls .control:has(input:disabled){opacity:.55}
+.torque-derivation #status{flex-basis:100%;margin:0;font-size:12px}
+.torque-derivation .graph-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(250px,1fr) auto;gap:8px;flex:1 1 0;min-height:0;overflow:visible;padding:0;background:none;border:0}
+.torque-derivation .origin-diagrams{display:contents}
+.torque-derivation .graph-panel :is(.origin-phasor,.voltage-box,.origin-curve){display:flex;flex-direction:column;gap:4px;min-width:0;min-height:0;height:100%;width:auto;max-width:none;margin:0;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:white}
+.torque-derivation .graph-panel :is(h2,h3){margin:0;font-size:16px;line-height:1.35}
+.torque-derivation .graph-panel :is(.plot-wrap,.voltage,.origin-curve svg){display:block;flex:1 1 0;min-height:0;height:0;width:100%}
+.torque-derivation .graph-panel .plot{height:100%;min-height:0}
+.torque-derivation .graph-panel :is(.angle-key,.angle-readouts,.legend){margin:0;font-size:13px;min-height:0;flex-shrink:0}
+.torque-derivation .origin-steps{display:contents}
+.torque-derivation .origin-steps>article{min-width:0;padding:10px 12px;border:1px solid #cbded6;border-radius:10px;background:#f5f9f7}
+.torque-derivation .origin-steps .moment-result{background:#eaf5ef}
+.torque-derivation .origin-steps .formula{display:grid;justify-items:start;align-content:start;gap:4px;font-size:18px;line-height:1.55;min-height:0;padding:5px 0 0;overflow:visible}
+.torque-derivation .origin-steps .formula .katex{font-size:1em}
+.torque-derivation .moment-result .formula>.katex:last-child{font-weight:600;color:#006655}
 .torque-derivation>details{flex-shrink:0;margin:0}
 .torque-derivation .origin-derivation{padding:12px}
-.torque-derivation .origin-derivation .equations{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.torque-derivation .origin-derivation .equations article{grid-column:auto;overflow:visible}
-.torque-derivation .origin-derivation .formula{min-height:0;font-size:18px;overflow:visible}
-.torque-derivation .origin-derivation .note{margin:12px 0 0}
-
-/* Three neighboring panels; metrics and the result span the complete row. */
-.torque-derivation .graph-panel>.metrics{grid-column:1/-1;grid-row:1}
-.torque-derivation .graph-panel>.origin-diagrams{grid-column:1;grid-row:2}
-.torque-derivation .graph-panel>.origin-curve{grid-column:2;grid-row:2;min-width:0}
-.torque-derivation .graph-panel>.moment-result{grid-column:1/-1;grid-row:3}
-
-/* Three graphs above a single three-step derivation band. */
-.torque-derivation .graph-panel{grid-template-rows:minmax(260px,1fr) auto}
-.torque-derivation .graph-panel>.origin-diagrams{grid-row:1}
-.torque-derivation .graph-panel>.origin-curve{grid-row:1}
-.torque-derivation .graph-panel>.origin-steps{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid #cbded6;border-radius:10px;background:#f5f9f7;padding:10px 0;min-width:0}
-.torque-derivation .origin-steps>article{min-width:0;padding:0 14px!important;background:none;border:0;border-radius:0}
-.torque-derivation .origin-steps>article+article{border-left:1px solid #cbded6}
-.torque-derivation .origin-steps h3{font-size:13px;margin:0 0 5px}
-.torque-derivation .origin-steps .formula{font-size:14px!important;line-height:1.5;min-height:0;padding:0;overflow:visible}
+.torque-derivation .origin-derivation .note{margin:0}
+@media(max-width:850px){
+ main.torque-derivation:not(.uniform-module-layout) .graph-panel{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-auto-rows:auto}
+ main.torque-derivation:not(.uniform-module-layout) .graph-panel :is(.origin-phasor,.voltage-box,.origin-curve){height:300px}
+ .torque-derivation .settings>.controls{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
+}

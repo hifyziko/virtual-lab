@@ -7,7 +7,7 @@ const Lab={catalog:[...imported,...catalog.filter(m=>!imported.some(e=>e.id===m.
 for(const m of html.matchAll(/const entry=\{id:'([^']+)',group:'([^']+)'[^;]*?title:'([^']+)'/g)){
  if(!Lab.catalog.some(e=>e.id===m[1]))Lab.catalog.push({id:m[1],group:m[2],title:m[3]});
 }
-const c={Lab,EnergyExperiments:{},document:{readyState:'loading'}};c.window=c;vm.createContext(c);
+const c={Lab,EnergyExperiments:{},location:{search:'',hash:''},document:{readyState:'loading'}};c.window=c;vm.createContext(c);
 for(const file of ['versions/vyvoj/m_files/Web/direct-current/lessons.js','versions/vyvoj/m_files/Web/energy-experiments/ui.js','tools/particle-library-navigation.js','tools/module-guide-data.js'])vm.runInContext(fs.readFileSync(file,'utf8'),c);
 const {entries,sources,aliases}=c.ModuleGuideData;
 assert(!/STEJNOSMERNE|SYNCHRONNI_|prezentac|TEs|TES kni/i.test(Object.values(sources).join(' ')),'no presentation or working scan-folder citations in the guide');
@@ -185,4 +185,4 @@ assert(scrolled&&dialog.open);assert.equal(c.location.hash,'#tr01-matematicky','
 guideContent.querySelectorAll=oldQuery;
 console.log('PASS: study contents lists chapters and scrolls within the dialog without routing or closing the lesson.');
 
-for(const file of ['princip-template.html','princip.html']){const source=fs.readFileSync('versions/vyvoj/m_files/Web/induction/'+file,'utf8');assert(!source.includes('fieldExplanation'),'Redundant field accordion removed');assert(source.includes('id="showNumericalField"'),'Numerical field toggle retained');}
+for(const file of ['princip-template.html','princip.html']){const source=fs.readFileSync('versions/vyvoj/m_files/Web/induction/'+file,'utf8');assert(!source.includes('fieldExplanation'),'Redundant field accordion removed');assert(source.includes('id="numericalSource"'),'Numerical field source selector retained');}

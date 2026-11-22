@@ -1,8 +1,8 @@
 /* Transparent instances of the approved shared nuclear surface. */
 (function(root){
 class NucleusView{
- constructor(canvas){
- this.canvas=canvas;const gl=this.gl=canvas.getContext('webgl2',{alpha:true,antialias:true,premultipliedAlpha:false});if(!gl)throw Error('WebGL 2 není dostupné.');
+ constructor(canvas,{supersample=1}={}){
+ this.canvas=canvas;this.supersample=supersample;const gl=this.gl=canvas.getContext('webgl2',{alpha:true,antialias:true,premultipliedAlpha:false});if(!gl)throw Error('WebGL 2 není dostupné.');
  const compile=(type,source)=>{const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;};
  const p=this.program=gl.createProgram();gl.attachShader(p,compile(gl.VERTEX_SHADER,'#version 300 es\nin vec2 aPosition;out vec2 vUV;void main(){vUV=aPosition;gl_Position=vec4(aPosition,0.,1.);}'));
  const source=root.HiFyzikoNuclearShader.replace('uAtoms[4]','uAtoms[8]').replaceAll('i<4','i<8').replace('uniform float uTime','uniform float uOpacity;\nuniform float uTime').replace('fragColor=vec4(col+grain,1.);','fragColor=vec4(col+grain,surfaceT<999.?uOpacity:0.);');
@@ -18,7 +18,7 @@ class NucleusView{
  if(this.pending){const state=gl.clientWaitSync(this.pending,0,0);if(state===gl.TIMEOUT_EXPIRED)return;if(state===gl.WAIT_FAILED){this.dispose();return;}gl.deleteSync(this.pending);this.pending=null;}
  this.lastDraw=now;
  const bounds=this.canvas.getBoundingClientRect(),fit=Math.min(bounds.width/width,bounds.height/height);
- const u=this.u,S=root.HiFyzikoParticleStyle,d=Math.min((devicePixelRatio||1)*fit,Math.sqrt(8000000/(width*height))),cw=Math.max(1,Math.floor(width*d)),ch=Math.max(1,Math.floor(height*d));if(this.canvas.width!==cw||this.canvas.height!==ch){this.canvas.width=cw;this.canvas.height=ch;}gl.useProgram(this.program);gl.disable(gl.SCISSOR_TEST);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.SCISSOR_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.uniform1f(u.uTime,time);gl.uniform1f(u.uVib,S.connected.vibration);gl.uniform1i(u.uElectronCount,0);gl.uniform1f(u.uYaw,0);gl.uniform1f(u.uPitch,0);
+ const u=this.u,S=root.HiFyzikoParticleStyle,d=Math.min((devicePixelRatio||1)*fit*this.supersample,Math.sqrt(8000000/(width*height))),cw=Math.max(1,Math.floor(width*d)),ch=Math.max(1,Math.floor(height*d));if(this.canvas.width!==cw||this.canvas.height!==ch){this.canvas.width=cw;this.canvas.height=ch;}gl.useProgram(this.program);gl.disable(gl.SCISSOR_TEST);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.SCISSOR_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.uniform1f(u.uTime,time);gl.uniform1f(u.uVib,S.connected.vibration);gl.uniform1i(u.uElectronCount,0);gl.uniform1f(u.uYaw,0);gl.uniform1f(u.uPitch,0);
  for(const item of items){const leptonColor=item.id==='positron'?S.colors.positron:S.colors.e;gl.uniform3f(u.uElectron,(leptonColor>>16&255)/255,(leptonColor>>8&255)/255,(leptonColor&255)/255);gl.uniform1f(u.uVib,item.vibration??S.connected.vibration);gl.uniform1f(u.uOpacity,item.opacity??1);const size=item.radius*8,zoom=6.2/(1.72*8),xx=Math.round((item.x-size/2)*d),yy=Math.round((height-item.y-size/2)*d),ss=Math.round(size*d),atoms=item.atoms||S.connected.atoms[item.id],buffer=new Float32Array(32);atoms.forEach((a,i)=>buffer.set(a,i*4));gl.viewport(xx,yy,ss,ss);const clip=item.clipY;gl.scissor(xx,yy+(clip?Math.floor(ss*clip[0]):0),ss,clip?Math.ceil(ss*(clip[1]-clip[0])):ss);gl.uniform2f(u.uResolution,ss,ss);gl.uniform2f(u.uOrigin,xx,yy);gl.uniform1f(u.uZoom,zoom);gl.uniform1i(u.uCount,atoms.length);gl.uniform4fv(u['uAtoms[0]'],buffer);gl.drawArrays(gl.TRIANGLES,0,6);}
  this.pending=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush();
  }

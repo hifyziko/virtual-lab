@@ -219,3 +219,37 @@ aside h2{font-size:14px;margin-bottom:5px}
  .layout>aside>.schema-pane{height:326px}
  .bar-pane .note{margin:3px 0}
 }
+
+.hero,.rotor-choices,.rotor-choices label{display:flex;align-items:center;gap:8px}
+.hero{justify-content:space-between;flex-wrap:wrap}
+.rotor-choices{flex-wrap:wrap}
+.rotor-choices label{font-size:13px;font-weight:600;white-space:nowrap}
+.rotor-choices select{width:auto;min-height:40px;margin:0;padding:7px 11px;font:600 15px/1.25 system-ui,sans-serif;background:#ffdf9e;border:1px solid #a66c22;border-radius:8px;cursor:pointer}
+.rotor-choices select:hover{background:#ffcf78;border-color:#875317}
+.machine-controls{padding:6px 10px}
+.machine-controls .controls{grid-template-columns:repeat(2,minmax(0,1fr)) auto;gap:6px 12px}
+.machine-controls .controls:has(> .cage:not([hidden])){grid-template-columns:repeat(4,minmax(0,1fr)) auto}
+.machine-controls input[type=range]{margin-top:5px}
+.machine-controls .buttons{flex-wrap:nowrap}
+.cursor .control>span{flex-wrap:wrap;gap:3px 12px}
+.cursor #speedOut{font-size:18px;line-height:1.2}
+.harmonics .card{height:auto;padding:7px 10px;overflow:visible}
+.harmonics .harm-row{height:auto;min-height:28px}
+.harmonics .time-gain,.harmonics .space-gain{position:static;width:100%;margin:4px 0 0}
+.harmonics .time-gain[hidden],#componentsLegend[hidden],#gainNotice:empty{display:none!important}
+.operating-panel{display:flex;flex-direction:column;gap:8px}
+.bar-pane{display:flex;flex:1;min-height:0;flex-direction:column}
+.bar-pane #barPlot{width:100%;height:auto;aspect-ratio:255 / 165;max-height:none;margin:0}
+.bar-pane .bar-math{font-size:11px}
+.detail-grid .bar-equations{display:flex;flex-wrap:wrap;gap:8px 20px}
+@media(min-width:801px){
+ .layout>aside{grid-template-rows:326px minmax(0,1fr)}
+ .bar-pane #barPlot{flex:1;min-height:0;aspect-ratio:auto}
+}
+@media(max-width:800px){
+ .machine-controls .controls:has(> .cage:not([hidden])){grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:500px){
+ .machine-controls .controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .machine-controls .buttons{grid-column:1/-1}
+}

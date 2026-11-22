@@ -50,18 +50,22 @@ function phasor(a){
 }
 
 function power(a){
- const W=Math.max(260,$("power").clientWidth||420),H=Math.max(140,$("power").clientHeight||260),top=25,bottom=H-15,zero=(top+bottom)/2;$("power").setAttribute("viewBox",`0 0 ${W} ${H}`);
+ const chart=$('power'),W=chart.clientWidth||420,H=chart.clientHeight||260;
+ const top=24,bottom=H-8,zero=(top+bottom)/2;
+ chart.setAttribute('viewBox',`0 0 ${W} ${H}`);
  const points=[];for(let beta=-180;beta<=180;beta+=2){const sample=M.solve({...a,beta}),unexcited=M.solve({...a,beta,e:0});points.push({beta:window.torqueInternal?sample.internalBeta:sample.beta,value:sample.Pem,excitation:sample.Pem-unexcited.Pem,reluctance:unexcited.Pem});}
  const limit=Math.max(.6,Math.abs(a.Pem),...points.flatMap(p=>[Math.abs(p.value),Math.abs(p.excitation),Math.abs(p.reluctance)]))*1.12;
  let h='';
  // At synchronous speed, matching per-unit power/torque bases give M* = Pem*.
  // Generator-positive beta increases to the right; motor torque remains positive.
- for(const [left,right,title,color,key] of [[26,W-38,'M',C.d,'torque']]){
+ for(const [left,right,title,color,key] of [[26,W-38,'M^*',C.d,'torque']]){
   const x=beta=>left+(beta+180)/360*(right-left),y=value=>zero-value/limit*(bottom-top)/2;
   h+='<rect x="'+left+'" y="'+top+'" width="'+(right-left)/2+'" height="'+(bottom-top)+'" fill="#edf7f2"/><rect x="'+x(0)+'" y="'+top+'" width="'+(right-left)/2+'" height="'+(bottom-top)+'" fill="#f5f0f8"/>';
   h+=line([left,zero],[right,zero],C.gray,1)+line([x(0),top],[x(0),bottom],C.gray,1,'3 4')+label(x(0),11,title,color,40,22);
-  h+='<g font-family="system-ui" font-size="11" fill="#657b82"><text x="'+(left+7)+'" y="'+(top+14)+'">Motor · β &lt; 0</text><text x="'+(right-145)+'" y="'+(top+14)+'">Generátor · β &gt; 0</text></g>';
-  for(const tick of [180,90,0,-90,-180]){h+=line([x(tick),zero-3],[x(tick),zero+4],C.gray,1)+'<text x="'+x(tick)+'" y="'+(zero+19)+'" text-anchor="middle" font-family="system-ui" font-size="10" fill="#657b82">'+tick+'°</text>';}
+  h+='<g font-family="system-ui" fill="#657b82"><text x="'+(left+7)+'" y="'+(top+14)+'">Motor</text><text x="'+(right-7)+'" y="'+(top+14)+'" text-anchor="end">Generátor</text></g>';
+  for(const tick of [-180,-90,0,90,180]){
+   h+=line([x(tick),zero-3],[x(tick),zero+4],C.gray,1)+'<g class="torque-tick">'+label(x(tick),zero+17,tick+'^\\circ',C.gray,50,22)+'</g>';
+  }
   h+=line([x(0)-3,top+7],[x(0),top],C.gray,1)+line([x(0),top],[x(0)+3,top+7],C.gray,1)+line([right-7,zero-3],[right,zero],C.gray,1)+line([right,zero],[right-7,zero+3],C.gray,1)+label(right+18,zero,String.fromCharCode(92)+(window.torqueInternal?'beta'+String.fromCharCode(92)+'prime':'beta'),C.gray,24,24);
   if(key==='torque')for(const [component,stroke,dash] of [['excitation',C.e,'5 3'],['reluctance',C.x,'2 3']]){
    let curve='',prev=null;for(const point of points){curve+=(prev===null||Math.abs(point.beta-prev)>180?'M':'L')+x(point.beta)+' '+y(point[component]);prev=point.beta;}
@@ -71,7 +75,7 @@ function power(a){
   h+='<path data-characteristic="'+key+'" d="'+path+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round"/>';
   h+='<circle data-working-point="'+key+'" data-beta="'+a.beta+'" data-value="'+a.Pem+'" cx="'+x(window.torqueInternal?a.internalBeta:a.beta)+'" cy="'+y(a.Pem)+'" r="7.5" fill="'+C.e+'" stroke="white" stroke-width="2.5" style="filter:drop-shadow(0 1px 2px rgba(25,49,59,.35))"/>';
  }
- $('power').innerHTML=h;
+ chart.innerHTML=h;
 
  const stiffness=M.slope(a),stable=stiffness>1e-6;$('stability').classList.toggle('warning',!stable);$('stability').textContent=stable?'Kladná synchronizační tuhost vůči natočení rotoru při pevném napětí sítě. Malé vychýlení může stroj vrátit k pracovnímu bodu.':'Záporná synchronizační tuhost vůči natočení rotoru při pevném napětí sítě. Tento bod není stabilním synchronním chodem; diagram pouze ukazuje algebraické řešení.';if(Math.abs(stiffness)<=1e-6)$('stability').textContent='Nulová synchronizační tuhost: mezní bod nebo stav bez synchronizačního účinku. Nelze jej označit za stabilní synchronní chod.';
 }
@@ -87,17 +91,18 @@ function update(){
  if(angleInvalid){$('controlNote').classList.add('warning');$('controlNote').textContent='Pro zadané buzení a vnitřní β neexistuje bod s kladným Ui při Ua = 1 p. j. Diagram ponechává poslední platný bod; upravte zadání.';}
  $('controlNote').textContent+=a.r===0?' Odpor je zanedbaný; reakce kotvy a rozptyl jsou sdružené v synchronních reaktancích.':'';
  circuit(a);rotor(a);phasor(a);power(a);
- const stiffness=M.slope(a),syn=stiffness>1e-6,mode=Math.abs(a.Pem)<.005?'Bez činné přeměny':a.Pem>0?'Motor':'Generátor';$('miniMode').textContent=mode;$('mode').textContent=mode+(syn?'':stiffness< -1e-6?' · nestabilní bod':' · nulová tuhost');$('flow').textContent=Math.abs(a.P)<.005?'Síť ↔ jalový výkon':a.P>0?'Síť → stroj':'Stroj → síť';
+ const stiffness=M.slope(a),syn=stiffness>1e-6,mode=Math.abs(a.Pem)<.005?'Bez činné přeměny':a.Pem>0?'Motor':'Generátor';$('miniMode').textContent=Math.abs(a.Pem)<.005?'Bez přeměny':mode;$('mode').textContent=mode+(syn?'':stiffness< -1e-6?' · nestabilní bod':' · nulová tuhost');$('flow').textContent=Math.abs(a.P)<.005?'Síť ↔ jalový výkon':a.P>0?'Síť → stroj':'Stroj → síť';
  $('stateNote').textContent=Math.abs(a.Q)<.005?'Jalový výkon je téměř nulový. Proud leží na ose svorkového napětí.':a.Q>0?'Stroj odebírá jalový výkon ze sítě. Kladné Q znamená induktivní složku odběru.':'Stroj dodává jalový výkon do sítě. Záporné Q znamená kapacitní složku odběru.';
  for(const [id,v] of [['pValue',a.P],['qValue',a.Q],['iValue',a.amp]])$(id).textContent=fmt(v);$('pfValue').textContent=a.pf===null?'—':fmt(a.pf,3);$('pfNote').textContent=a.pf===null?'Proud je nulový':Math.abs(a.Q)<.005?'Bez jalové složky':a.Q>0?'Odběr jalového výkonu':'Dodávka jalového výkonu';
  if(loadMode){const phi=+$('loadPhi').value;$('stateNote').textContent=Math.abs(phi)<.5?'Generátor napájí odporovou zátěž. Výstupní proud Iᵍ je ve fázi se svorkovým napětím.':phi>0?'Generátor napájí induktivní zátěž. Výstupní proud Iᵍ zaostává za svorkovým napětím.':'Generátor napájí kapacitní zátěž. Výstupní proud Iᵍ předbíhá svorkové napětí.';$('pfNote').textContent=Math.abs(phi)<.5?'Odporová zátěž':phi>0?'Induktivní zátěž':'Kapacitní zátěž';}
  math('lossNote',`P_{\\mathrm{Cu}}=${fmt(a.loss)}\\quad P_{\\mathrm{em}}=${fmt(a.Pem)}\\;\\mathrm{p.j.}`);
  const notes={1:'Buzení vytváří vnitřní napětí Uᵢᵦ. Síť drží U; vnější úhel β vede od Ua k Uib, vnitřní β′ od Ui k Uib. Kladný směr je proti směru hodinových ručiček.',2:a.type==='salient'?'Proud rozložte na I_d a I_q. Každé složce odpovídá vlastní reaktance a napěťový úbytek.':'Od budicího napětí přičtěte reakci kotvy jXₐIₐ. Dostanete vnitřní napětí Uᵢ.',3:a.r!==0?'Od Uᵢᵦ přičtěte reakci kotvy: dostanete vnitřní Uᵢ. Rozptylový a odporový úbytek uzavřou řetězec na Uₐ.':'Reakce kotvy a rozptyl jsou sdružené v synchronních reaktancích; napěťový řetězec končí na Uₐ.',4:a.type==='salient'?'Vyniklost je rozdíl podélné a příčné reaktance. Při přepnutí na hladký rotor zmizí a dvě reaktance se sjednotí. Zkuste také vypnout buzení: reluktanční výkon může zůstat.':'U hladkého rotoru platí jediná reaktance X_s. Po vypnutí buzení nezůstává reluktanční přeměna výkonu; proud naprázdno může být přesto značný.'};$('focusNote').innerHTML=(a.e<1e-10?'Buzení je vypnuté: β se vztahuje k rotorové ose q. Nulové budicí napětí nemá definovaný argument. ':notes[step]);
  document.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.step===step));
+ if(typeof window.dispatchEvent==='function')window.dispatchEvent(new Event('sync-schema-heading-update'));
 }
 let labelSettleTimer=null,labelDragging=false;
 const settleLabels=()=>{clearTimeout(labelSettleTimer);window.syncLabelsMoving=false;update();};
-for(const id of ['e','beta','xd','xq','r','type','axes','mmf','loadMode','loadP','loadPhi','xsigma','rEnabled','phasorScale']){
+for(const id of ['e','beta','xd','xq','r','type','axes','mmf','loadP','loadPhi','xsigma','rEnabled','phasorScale']){
  const el=$(id);
  el.addEventListener('pointerdown',()=>{if(el.type==='range')labelDragging=true;});
  el.addEventListener('input',()=>{clearTimeout(labelSettleTimer);window.syncLabelsMoving=true;update();if(!labelDragging)labelSettleTimer=setTimeout(settleLabels,200);});
@@ -105,13 +110,20 @@ for(const id of ['e','beta','xd','xq','r','type','axes','mmf','loadMode','loadP'
 }
 if(typeof window.addEventListener==='function')for(const name of ['pointerup','pointercancel','blur'])window.addEventListener(name,()=>{if(labelDragging){labelDragging=false;settleLabels();}});
 $('fitPoint').onclick=()=>{fitDiagram(last,true);update()};
-$('lock').onchange=()=>{target=last.P;update()};
+$('loadMode').addEventListener('change',()=>{
+ if(!$('loadMode').checked){
+  $('e').value=last.e;
+  $('beta').value=last.beta;
+  $('lock').checked=false;
+ }
+ settleLabels();
+});
+$('lock').addEventListener('change',()=>{target=last.P;update()});
 document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{step=+b.dataset.step;update()});
 document.querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{const kind=b.dataset.preset;$('loadMode').checked=kind==='generator';$('lock').checked=false;const s=params();let beta=-25,e=1.15;
  if(kind==='generator')beta=25;if(kind==='compensator'){beta=0;e=1.4}if(kind==='reluctance'){e=0;beta=-35}
  if(['under','unity','over'].includes(kind)){target=.5;const unity=M.fromLoad(s,-target,0);beta=unity.beta;e=kind==='unity'?unity.e:kind==='under'?unity.e*.8:unity.e*1.35;$('lock').checked=true;}
  $('beta').value=beta;$('e').value=e;step=4;update();});
-$('loadMode').checked=true;$('lock').checked=false;
 update();
 if(typeof ResizeObserver!=="undefined")new ResizeObserver(()=>{if(last)power(last)}).observe($("power"));
 })();

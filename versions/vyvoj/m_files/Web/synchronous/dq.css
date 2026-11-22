@@ -37,3 +37,7 @@ main[data-teaching-step="2"] #waveCard>:not(svg){flex-shrink:0}
 /* Both panels stretch to the same grid row on every teaching step.
    The left machine establishes the stage; a fixed right-card height left a gap. */
 main[data-teaching-step]:is([data-teaching-step="1"],[data-teaching-step="2"],[data-teaching-step="3"],[data-teaching-step="4"]) .workspace>.analysis-card{height:auto;min-height:0;max-height:none;align-self:stretch}
+
+.toolbar label:has(>#speed){flex:1 1 240px;min-width:0}
+.toolbar #speed{flex:1 1 0;width:auto;margin:0}
+.toolbar #speedOut{flex:0 0 7ch;min-width:0;text-align:left}

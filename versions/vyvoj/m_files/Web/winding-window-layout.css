@@ -3,6 +3,13 @@
 #app>.workspace[data-winding-viewport]{--native-height:640px!important;--native-viewport-height:1000px;min-height:0!important;padding:0!important;position:relative;display:flex;flex-direction:column}
 #app>.workspace[data-winding-viewport]>.gridplots{flex:1 1 0;height:auto!important;min-height:0!important;max-height:none;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
 #app>.workspace[data-winding-viewport]>.gridplots.one{grid-template-columns:minmax(0,1fr)}
+#app>.workspace>.gridplots.harmonic-motion{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}
+#app .modulehead .harmonic-header-tempo{display:inline-flex;align-items:center;flex:0 0 auto;gap:5px;margin:0;min-width:0}
+#app .harmonic-header-tempo select{width:auto;min-width:0}
+#app>.workspace[data-module="03-pohyb"]>.controls{gap:5px 10px;padding:6px 10px;margin-bottom:6px}
+#app>.workspace[data-module="03-pohyb"] #orders{width:12ch}
+#app>.workspace[data-module="03-pohyb"] .parameter-slider{width:135px;gap:4px}
+#app>.workspace[data-module="03-pohyb"] .parameter-slider output{flex:0 0 2ch;min-width:0;text-align:left;margin:0;padding:0}
 #app>.workspace[data-winding-viewport]>.gridplots.three{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
 #app>.workspace[data-winding-viewport]>.gridplots.winding-overview{grid-template-rows:minmax(0,1.65fr) minmax(0,1fr)}
 #app>.rf-workspace[data-winding-viewport]>.gridplots{grid-template-rows:repeat(2,minmax(0,1fr))}
