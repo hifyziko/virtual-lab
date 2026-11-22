@@ -65,7 +65,7 @@ function mount(app,kind){
  $('ee-pause').onclick=()=>{paused=!paused;$('ee-pause').textContent=paused?'Pokračovat':'Pozastavit';redraw();};
  $('ee-reset').onclick=()=>{s=rotor?M.rotor():M.rod();history=[];elapsed=0;drag=null;resume();if(rotor){$('ee-current').value=s.I;$('ee-damping').value=s.b;}else{$('ee-field').value=s.B;$('ee-resistance').value=s.R;}redraw();};
  for(const [id,prop]of rotor?[['ee-current','I'],['ee-damping','b']]:[['ee-field','B'],['ee-resistance','R']])$(id).oninput=()=>{s[prop]=+$(id).value;redraw();};
- const toggleCircuit=()=>{s.closed=!s.closed;redraw();};
+ const toggleCircuit=()=>{s.closed=!s.closed;window.MachineSound?.clickSwitch();redraw();};
  if(rotor)$('ee-off').onclick=()=>{$('ee-current').value=0;s.I=0;redraw();};else $('ee-circuit').onclick=toggleCircuit;
  for(const [id,sign]of [['ee-left',-1],['ee-right',1]])$(id).onclick=()=>{if(rotor)s.omega=sign*2;else{s.x=1;s.v=sign*1.5;s.heat=s.stopHeat=s.handWork=s.handForce=0;history=[];elapsed=0;}resume();redraw();};
  const point=e=>{const p=scene.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(scene.getScreenCTM().inverse());};

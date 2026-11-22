@@ -3,10 +3,28 @@
 // An illustrative blade-like whoosh at crossings of the relative electrical angle.
 function createFieldPassingSound(host){
  let context=null,noise=null,master=null,enabled=true,unavailable=false,disposed=false,previous=null,gate=false,lastPulse=-Infinity,previewUntil=0,generation=0;
+ let handVoice=null;
+ function stopHand(){
+  if(!handVoice)return;
+  const {source,gain,filter}=handVoice,now=context.currentTime;
+  gain.gain.setTargetAtTime(0,now,.014);
+  source.onended=()=>{source.disconnect();gain.disconnect();filter.disconnect();};
+  source.stop(now+.08);handVoice=null;
+ }
+ function handSound(speed){
+  if(!handVoice){
+   const source=context.createBufferSource(),filter=context.createBiquadFilter(),gain=context.createGain();
+   source.buffer=noise;source.loop=true;filter.type="lowpass";filter.Q.value=.45;gain.gain.value=0;
+   source.connect(filter);filter.connect(gain);gain.connect(master);source.start();handVoice={source,filter,gain};
+  }
+  const strength=1-Math.exp(-speed/6),now=context.currentTime;
+  handVoice.filter.frequency.setTargetAtTime(300+530*strength,now,.045);
+  handVoice.gain.gain.setTargetAtTime(.83*strength,now,.035);
+ }
  const voices=new Set();
  function setGate(on){if(!context||gate===on)return;gate=on;const now=context.currentTime;master.gain.cancelScheduledValues(now);master.gain.setTargetAtTime(on ? .16 : 0,now,.015);}
  function release(voice){for(const node of voice.nodes)try{node.disconnect();}catch{}voices.delete(voice);}
- function silence(){generation++;previous=null;previewUntil=0;setGate(false);if(context)for(const voice of voices)for(const source of voice.sources)try{source.stop(context.currentTime+.06);}catch{release(voice);}}
+ function silence(){stopHand();generation++;previous=null;previewUntil=0;setGate(false);if(context)for(const voice of voices)for(const source of voice.sources)try{source.stop(context.currentTime+.06);}catch{release(voice);}}
  async function setEnabled(on,preview=false){
   const request=generation;if(disposed)return false;enabled=!!on;previous=null;if(!enabled){silence();return false;}
   try{
@@ -17,22 +35,26 @@ function createFieldPassingSound(host){
  function pulse(speed,force=false){
   const now=context.currentTime;if((!force&&now-lastPulse<.045)||voices.size>=4)return 0;lastPulse=now;
   const source=context.createBufferSource(),filter=context.createBiquadFilter(),envelope=context.createGain(),duration=Math.max(.22,Math.min(.55,.62-Math.abs(speed)*.018));source.buffer=noise;filter.type='lowpass';filter.Q.value=.45;
-  filter.frequency.setValueAtTime(650,now);filter.frequency.exponentialRampToValueAtTime(320,now+duration);envelope.gain.setValueAtTime(0,now);envelope.gain.linearRampToValueAtTime(.6,now+.085);envelope.gain.linearRampToValueAtTime(.5,now+duration*.55);envelope.gain.exponentialRampToValueAtTime(.0001,now+duration);
+  filter.frequency.setValueAtTime(530,now);filter.frequency.exponentialRampToValueAtTime(320,now+duration);envelope.gain.setValueAtTime(0,now);envelope.gain.linearRampToValueAtTime(.6,now+.085);envelope.gain.linearRampToValueAtTime(.5,now+duration*.55);envelope.gain.exponentialRampToValueAtTime(.0001,now+duration);
   const tone=context.createOscillator(),toneGain=context.createGain();tone.type='sine';tone.frequency.setValueAtTime(130+Math.min(Math.abs(speed),20)*2,now);tone.frequency.exponentialRampToValueAtTime(110+Math.min(Math.abs(speed),20),now+duration);toneGain.gain.value=.07;source.connect(filter);filter.connect(envelope);tone.connect(toneGain);toneGain.connect(envelope);envelope.connect(master);const voice={sources:[source,tone],nodes:[source,filter,tone,toneGain,envelope]};voices.add(voice);source.onended=()=>release(voice);source.start(now);tone.start(now);tone.stop(now+duration+.02);source.stop(now+duration+.04);return duration;
  }
  function update(state,playing){
   const poles=state.type==='ipm4'||state.type==='spm4'?2:1,phase=poles*(state.field-state.rotor),key=state.type,rotorField=state.type.startsWith('ipm')||state.type.startsWith('spm')||(state.excitation&&state.excitationLevel>1e-3),speed=poles*(state.fieldOmega-state.omega),current={phase,key,t:state.t};
+  if(state.drive==="hand"&&enabled&&!disposed&&playing&&rotorField&&context?.state==="running"&&Math.abs(state.fieldOmega)>.035&&Math.abs(speed)>.05){
+   setGate(true);handSound(Math.abs(speed));previous=null;return;
+  }
+  stopHand();
   const fast=state.drive==='auto'&&state.autoSpeed===7,audible=enabled&&!disposed&&fast&&playing&&rotorField&&context?.state==='running'&&Number.isFinite(phase);
   if(!audible){if(gate&&!(fast&&playing&&enabled&&context?.state==='running'&&context.currentTime<previewUntil))silence();previous=current;return;}setGate(true);
   if(previous&&previous.key===key&&state.t>=previous.t&&state.t-previous.t<.2&&Math.abs(speed)>.35){const crossed=Math.abs(Math.floor(phase/Math.PI)-Math.floor(previous.phase/Math.PI));if(crossed)pulse(speed);}
   previous=current;
  }
- function activate(eligible=false){if(!eligible||!enabled||disposed)return Promise.resolve(false);if(context?.state==='running')return Promise.resolve(true);return setEnabled(true,!context);}
+ function activate(eligible=false,preview=true){if(!eligible||!enabled||disposed)return Promise.resolve(false);if(context?.state==='running')return Promise.resolve(true);return setEnabled(true,preview&&!context);}
  function dispose(){if(disposed)return;enabled=false;silence();disposed=true;for(const voice of [...voices])release(voice);context?.close()?.catch?.(()=>{});}
  return {setEnabled,activate,update,silence,dispose,get enabled(){return enabled;},get unavailable(){return unavailable;}};
 }
 const fieldPassingSound=createFieldPassingSound(window);
-function syncSoundButton(){const button=$('fieldSound');button.setAttribute('aria-pressed',String(fieldPassingSound.enabled));button.setAttribute('aria-label',(fieldPassingSound.enabled?'Vypnout':'Zapnout')+' zvuk míjení polí');button.disabled=fieldPassingSound.unavailable&&!window.AudioContext&&!window.webkitAudioContext;button.title=fieldPassingSound.unavailable?'Zvuk se nepodařilo spustit. Zkuste jej znovu zapnout.':'Názorný zvuk pouze v režimu Točit rychle';}
+function syncSoundButton(){const button=$('fieldSound');button.setAttribute('aria-pressed',String(fieldPassingSound.enabled));button.setAttribute('aria-label',(fieldPassingSound.enabled?'Vypnout':'Zapnout')+' zvuk míjení polí');button.disabled=fieldPassingSound.unavailable&&!window.AudioContext&&!window.webkitAudioContext;button.title=fieldPassingSound.unavailable?'Zvuk se nepodařilo spustit. Zkuste jej znovu zapnout.':'Zvuk ručního mávnutí a rychlého míjení polí';}
 function activateFieldSound(){fieldPassingSound.activate(s.drive==='auto'&&s.autoSpeed===7&&!paused).then(syncSoundButton);}
 $('fieldSound').onclick=async()=>{const on=!fieldPassingSound.enabled;await fieldPassingSound.setEnabled(on,on&&s.drive==='auto'&&s.autoSpeed===7&&!paused);syncSoundButton();};
 
@@ -50,7 +72,7 @@ window.fitSyncPrincip=fitWorkspace;
 addEventListener('resize',fitWorkspace);new ResizeObserver(fitWorkspace).observe(document.querySelector('.controls'));document.fonts.ready.then(fitWorkspace);requestAnimationFrame(fitWorkspace);
 function syncControls(){$('pause').setAttribute('aria-pressed',String(paused));for(const id of ['type','inertia','excitationLevel','load'])$(id).value=s[id];for(const id of ['excitation','damper'])$(id).checked=s[id];$('inertiaOut').textContent=fmt(s.inertia);$('excitationOut').textContent=fmt(s.excitationLevel,2);$('loadOut').textContent=fmt(s.load,2);$('slow').setAttribute('aria-pressed',String(s.drive==='auto'&&s.autoSpeed===.65));$('fast').setAttribute('aria-pressed',String(s.drive==='auto'&&s.autoSpeed===7));$('pause').textContent=paused?'Pokračovat':'Pozastavit';const pm=s.type.startsWith('ipm');$('excitation').disabled=pm;$('excitation').checked=pm||s.excitation;$('excitationLevel').disabled=pm;$('damper').disabled=pm;$('damper').checked=!pm&&s.damper;$('excitationName').textContent=pm?'Permanentní magnety':'Buzení rotoru';document.querySelector('.chart-legend .gold').textContent=pm?'━ Magnety':'━ Buzení';document.querySelector('.torque-row.gold > span').textContent=pm?'Magnety':'Buzení';$('fieldSource').options[0].textContent=pm?'Výsledné: stator + magnety':'Výsledné: stator + buzení';$('fieldSource').options[2].textContent=pm?'Jen příspěvek magnetů':'Jen příspěvek buzení';$('excitationCaption').textContent=pm?'Tok magnetů (pevný)':'Buzení Iᶠ / Iᶠ₀';$('excitationOut').textContent=pm?'pevný':fmt(s.excitationLevel,2);if(window.SyncMath)SyncMath.controls(s);}
 function slider(){const deg=s.target*D,min=Number($('angle').min),max=Number($('angle').max);if(deg<min||deg>max){const center=Math.round(deg/360)*360;$('angle').min=center-360;$('angle').max=center+360;}$('angle').value=deg;$('angleOut').textContent=fmt(deg,0)+'°';const labels=document.querySelectorAll('.range-labels > span');labels[0].textContent=$('angle').min+'°';labels[1].textContent=(Number($('angle').min)+360)+'°';labels[2].textContent=$('angle').max+'°';if(window.SyncMath)SyncMath.slider(s);}
-function setTarget(angle){fieldPassingSound.silence();paused=false;s.drive='hand';s.target=angle;syncControls();slider();draw();}
+function setTarget(angle){if(s.drive!=="hand")fieldPassingSound.silence();if(!fieldPassingSound.unavailable)fieldPassingSound.activate(true,false);paused=false;s.drive='hand';s.target=angle;syncControls();slider();draw();}
 function describe(a){const noSync=(!s.excitation||s.excitationLevel===0)&&s.type==='smooth',still=Math.abs(s.fieldOmega)<.03,settled=Math.abs(a.slip)<.06&&Math.abs(a.acceleration)<.07;
 const bounds=M.loadLimits(s),overload=s.drive==='auto'&&(s.load<bounds.min-1e-6||s.load>bounds.max+1e-6);let state,text,slip=false;if(overload){state=Math.abs(a.slip)>1?'Ztráta synchronismu':'Přetížení · rotor vypadává';text='Požadovaný moment překročil synchronní mez. Ustálený synchronní chod není možný. Snižte zatížení nebo zvyšte buzení; klec může dočasně přispívat momentem.';slip=true;}else if(noSync&&!s.damper){state='Bez elektromagnetického momentu';text=s.type==='smooth'?'Hladký rotor bez buzení a bez klece nemá v tomto ideálním modelu co táhnout. Pole může rotorem procházet, aniž jej roztočí.':'Buzení i reluktanční moment jsou vypnuté. Pole rotorem prochází, ale model nevytváří hnací moment.';}
 else if(noSync&&s.damper){state='Asynchronní účinek klece';text='Klec reaguje na rozdíl rychlostí. Při mechanickém odporu se rotor ustálí pod rychlostí pole. Zkuste teď zapnout buzení.';}

@@ -343,12 +343,12 @@
   }
   const energyPlot=el('energy-detail');
   let energyAxes;
+  // With zero initial perpendicular velocity, the squared kick gives the gyrophase average.
+  const meanPerpendicularGain=(u,periods=cycles)=>calc.pulseState(u,periods,0).gain;
   function energyPath(periods){
     return 'M'+Array.from({length:181},(_,i)=>{
       const u=(i-90)/30;
-      // Averaging over gyrophase cancels the cross term with the initial velocity.
-      const gain=calc.pulseState(u,periods,0).gain;
-      return energyAxes.x(u).toFixed(2)+' '+energyAxes.y(gain).toFixed(2);
+      return energyAxes.x(u).toFixed(2)+' '+energyAxes.y(meanPerpendicularGain(u,periods)).toFixed(2);
     }).join('L');
   }
   function setupEnergy(){
@@ -402,6 +402,7 @@
     math(hotShare,'\\text{Z ohřátých po poli: }'+fmt(100*hot.right/calc.heated,1)+'\\,\\%');
     math(el('angle-value'), '\\chi=' + fmt(angle) + '^\\circ');
     math(el('frequency-value'), 'f=' + fmt(frequency) + '\\,\\mathrm{GHz}');
+    if(dopplerVisible)refreshDoppler();
     renderTime();
   }
   function aim(){refresh();}
@@ -452,43 +453,88 @@
     aim();
   };
   let dopplerVisible=false;
-  const laneWidth=266,laneHeight=140;
-  const dopplerColumns=[1,-1].map((sign,i)=>{
-    const root=el('doppler-scene'),color=sign>0?'#895923':'#713778';
-    const group=node(root,'g',{transform:'translate('+(12+292*i)+' 12)'});
-    node(group,'rect',{width:284,height:264,rx:8,fill:'#fbfcfd',stroke:'#d5e0e6'});
-    node(group,'text',{x:142,y:29,'text-anchor':'middle',class:'doppler-name',style:'fill:'+color},
-      sign>0?'Elektron po poli':'Elektron proti poli');
-    mathLabel(group,9,41,laneWidth,'v_\\parallel='+(sign>0?'+':'-')+'v_{\\mathrm{th}}',color,'center');
-    const lane=node(group,'svg',{x:9,y:68,width:laneWidth,height:laneHeight,viewBox:'0 0 '+laneWidth+' '+laneHeight,overflow:'hidden'});
-    node(lane,'rect',{width:laneWidth,height:laneHeight,rx:4,fill:'#edf3f7'});
-    const waves=node(lane,'g');
-    for(let n=-7;n<=7;n++)line(waves,'M'+(n*52)+' -180v360',electric,2);
-    const marker=node(lane,'g');
-    const flash=dot(marker,0,0,13,'#ffc354');
-    arrow(marker,0,0,sign*33,0,color,3.5);
-    dot(marker,0,0,5.5,color);
-    const reading=mathLabel(group,9,218,laneWidth,'0',color,'center');
-    const relation=node(group,'text',{x:142,y:252,'text-anchor':'middle',class:'doppler-relation'});
-    return {sign,waves,marker,flash,relation,reading};
+  const dopplerScene=el('doppler-scene');
+  const laneX=72,laneY=33,laneWidth=347,laneHeight=245;
+  const waveCenterX=laneWidth/2,waveCenterY=laneHeight/2;
+  const stripX=433,stripWidth=43;
+  const velocityY=u=>waveCenterY+35*u;
+  const noGain=[237,241,244], fullGain=[184,63,50];
+  const gainLimit=(2*Math.PI*cycles*ECCD.acceleration)**2;
+  math(el('doppler-gain-max'),fmt(gainLimit,2)+'\\,\\mathrm{keV}');
+  const dopplerDefs=node(dopplerScene,'defs');
+  const gainGradient=node(dopplerDefs,'linearGradient',{id:'eccd-doppler-gain',gradientUnits:'userSpaceOnUse',
+    x1:stripX,x2:stripX,y1:laneY+velocityY(-3),y2:laneY+velocityY(3)});
+  const gainStops=Array.from({length:121},(_,i)=>({
+    u:i/20-3,stop:node(gainGradient,'stop',{offset:i/120})
+  }));
+  mathLabel(dopplerScene,4,5,64,'v_\\parallel/v_{\\mathrm{th}}',ink,'center');
+  label(dopplerScene,laneX,21,'Vlnoplochy');
+  mathLabel(dopplerScene,laneX+laneWidth-81,5,24,'\\mathbf{B}',magnetic,'center');
+  arrow(dopplerScene,laneX+laneWidth-51,16,49,0,magnetic,2);
+  mathLabel(dopplerScene,stripX-4,5,stripWidth+8,'\\langle\\Delta W_\\perp\\rangle',ink,'center');
+  mathLabel(dopplerScene,484,5,80,"f'\\;(\\mathrm{GHz})",ink,'center');
+  const lanes=node(dopplerScene,'svg',{x:laneX,y:laneY,width:laneWidth,height:laneHeight,
+    viewBox:'0 0 '+laneWidth+' '+laneHeight,overflow:'hidden'});
+  node(lanes,'rect',{width:laneWidth,height:laneHeight,fill:'#f2f6f9'});
+  for(let u=-3;u<=3;u++){
+    const y=velocityY(u);
+    line(lanes,'M0 '+y+'H'+laneWidth,u===0?'#b4c3d0':'#d3dfe7');
+  }
+  const dopplerWaves=node(lanes,'g',{opacity:.62});
+  const waveStep=49, waveRate=1.6;
+  for(let n=-7;n<=7;n++)line(dopplerWaves,'M'+(n*waveStep)+' -260v520',electric,1.6);
+  node(dopplerScene,'rect',{x:stripX,y:laneY,width:stripWidth,height:laneHeight,
+    rx:4,fill:'url(#eccd-doppler-gain)',stroke:'#c4d0d7'});
+  const gainPointer=line(dopplerScene,'','#253848',2);
+  const electronsPerRow=5;
+  const dopplerRows=Array.from({length:7},(_,i)=>{
+    const u=i-3, y=velocityY(u);
+    mathLabel(dopplerScene,4,laneY+y-10,64,(u>0?'+':'')+fmt(u),ink,'center');
+    const row=node(lanes,'g',{'data-velocity':u});
+    const particles=Array.from({length:electronsPerRow},(_,j)=>{
+      const marker=node(row,'g');
+      const flash=node(marker,'circle',{r:11,fill:'none',stroke:electric,'stroke-width':2});
+      node(marker,'circle',{r:6,stroke:'#334957','stroke-width':1.3});
+      arrow(marker,Math.sign(u)*9,0,u*6,0,ink,1.8);
+      return {marker,flash,start:(j+.5)/electronsPerRow+.02*u};
+    });
+    const reading=mathLabel(dopplerScene,484,laneY+y-10,80,'0',ink,'center');
+    return {u,y,row,particles,reading};
   });
+  function gainColor(u){
+    const fraction=Math.min(1,meanPerpendicularGain(u)/gainLimit);
+    return 'rgb('+noGain.map((channel,i)=>
+      Math.round(channel+(fullGain[i]-channel)*fraction)).join(',')+')';
+  }
+  function refreshDoppler(){
+    const f=Number(el('frequency').value);
+    for(const {u,stop} of gainStops)stop.setAttribute('stop-color',gainColor(u));
+    for(const {u,row,reading} of dopplerRows){
+      row.setAttribute('fill',gainColor(u));
+      math(reading,fmt(f*(1-u*calc.parallel*ECCD.thermalOverC),2));
+    }
+    const u=calc.resonantU;
+    gainPointer.setAttribute('d',u===null||Math.abs(u)>3?'':'M'+(stripX+stripWidth+5)+' '+(laneY+velocityY(u))+'h-11');
+    drawDoppler();
+  }
   let dopplerStart=0;
   function drawDoppler(){
     const f=Number(el('frequency').value), angle=Number(el('angle').value);
     const t=previewTime-dopplerStart;
-    const speed=52*1.6*ECCD.thermalOverC;
-    const halfSpan=laneWidth/2-17;
-    const displacement=(t*speed+halfSpan)%(2*halfSpan)-halfSpan;
-    for(const {sign,waves,marker,flash,relation,reading} of dopplerColumns){
-      const observed=f*(1-sign*calc.parallel*ECCD.thermalOverC);
-      const periods=t*1.6*f/ECCD.cyclotron;
-      const spacing=52*ECCD.cyclotron/f;
-      const phase=fract(periods-sign*displacement*calc.parallel/spacing);
-      marker.setAttribute('transform','translate('+(laneWidth/2+sign*displacement)+' '+laneHeight/2+')');
-      waves.setAttribute('transform','translate('+laneWidth/2+' '+laneHeight/2+') rotate('+(-angle)+') scale('+(spacing/52)+' 1) translate('+(52*fract(periods))+' 0)');
-      flash.setAttribute('opacity',Math.exp(-120*Math.min(phase,1-phase)**2));
-      relation.textContent=calc.parallel===0?'Stejný počet vlnoploch':sign*calc.parallel>0?'Méně vlnoploch':'Více vlnoploch';
-      math(reading,"f'="+fmt(observed,1)+'\\,\\mathrm{GHz}');
+    const speed=waveStep*waveRate*ECCD.thermalOverC;
+    const spacing=waveStep*ECCD.cyclotron/f, periods=t*waveRate*f/ECCD.cyclotron;
+    const fieldY=Math.sin(angle*Math.PI/180);
+    dopplerWaves.setAttribute('transform','translate('+waveCenterX+' '+waveCenterY+') rotate('+(-angle)+
+      ') scale('+(spacing/waveStep)+' 1) translate('+(waveStep*fract(periods))+' 0)');
+    for(const {u,y,particles} of dopplerRows){
+      const travel=t*speed*u/laneWidth;
+      for(const {marker,flash,start} of particles){
+        const x=laneWidth*fract(start+travel);
+        // This is the phase of the visible wave at the marker's current position.
+        const phase=fract(periods-((x-waveCenterX)*calc.parallel-(y-waveCenterY)*fieldY)/spacing);
+        marker.setAttribute('transform','translate('+x+' '+y+')');
+        flash.setAttribute('opacity',Math.exp(-120*Math.min(phase,1-phase)**2));
+      }
     }
   }
   el('doppler-help').onclick=()=>{
@@ -500,7 +546,7 @@
     el('doppler-scene').style.display=dopplerVisible?'block':'none';
     el('energy-key').hidden=dopplerVisible;
     el('doppler-key').hidden=!dopplerVisible;
-    if(dopplerVisible)drawDoppler(); else setupEnergy();
+    if(dopplerVisible)refreshDoppler(); else setupEnergy();
   };
   el('help').onclick = () => el('guide').showModal();
   document.querySelectorAll('[data-tex]').forEach(span => math(span, span.dataset.tex));

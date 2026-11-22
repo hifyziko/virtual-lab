@@ -9,5 +9,20 @@ const bursts=[];for(let t=.002;t<duration-.025;t+=.012+Math.random()*.022)bursts
 const hp=Math.exp(-2*Math.PI*1000/ctx.sampleRate),lp=1-Math.exp(-2*Math.PI*7500/ctx.sampleRate);let previous=0,high=0,soft=0;
 for(let i=0;i<a.length;i++){const t=i/ctx.sampleRate,noise=Math.random()*2-1;high=hp*(high+noise-previous);previous=noise;soft+=lp*(high-soft);let envelope=.06;for(const burst of bursts){const age=t-burst.t;if(age>=0)envelope+=burst.level*(1-Math.exp(-age/.00015))*Math.exp(-age/burst.decay);}const edge=Math.min(1,t/.001,(duration-t)/.012);a[i]=Math.max(-1,Math.min(1,soft*Math.min(1,envelope)*Math.max(0,edge)));}
 source.buffer=b;}source.connect(g);voices.add(source);source.onended=()=>{voices.delete(source);source.disconnect();g.disconnect();};source.start(now);source.stop(now+duration);}
-window.MachineSound={mount,play,stop};if(typeof document!=='undefined'){document.addEventListener('pointerdown',unlock,{capture:true});document.addEventListener('keydown',unlock,{capture:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',stop);window.addEventListener('hashchange',()=>{stop();enabled=true;});}
+async function clickSwitch(){
+ if(!enabled||document.hidden)return;
+ await unlock();
+ if(!enabled||document.hidden||ctx?.state!=='running')return;
+ const now=ctx.currentTime,source=ctx.createOscillator(),gain=ctx.createGain();
+ source.type='triangle';
+ source.frequency.setValueAtTime(1050,now);
+ source.frequency.exponentialRampToValueAtTime(310,now+.022);
+ gain.gain.setValueAtTime(0,now);
+ gain.gain.linearRampToValueAtTime(.095,now+.0015);
+ gain.gain.exponentialRampToValueAtTime(.0001,now+.029);
+ source.connect(gain);gain.connect(ctx.destination);voices.add(source);
+ source.onended=()=>{voices.delete(source);source.disconnect();gain.disconnect();};
+ source.start(now);source.stop(now+.03);
+}
+window.MachineSound={mount,play,stop,clickSwitch};if(typeof document!=='undefined'){document.addEventListener('pointerdown',unlock,{capture:true});document.addEventListener('keydown',unlock,{capture:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',stop);window.addEventListener('hashchange',()=>{stop();enabled=true;});}
 })();

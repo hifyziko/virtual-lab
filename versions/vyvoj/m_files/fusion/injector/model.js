@@ -4,24 +4,27 @@ const InjectorModel = (() => {
   const axis = {y: 192, tokamakX: 1174, scale: 11, tangentRadius: 5.31};
   const dumpX = 888, birthX = 1140;
   const stages = [
-    [0, 39, 'Elektrony ve vysokofrekvenčním výboji', 'Indukované pole působí na volné elektrony ve výboji.'],
+    [0, 39, 'Elektron v atomu deuteria', 'Příklad počáteční ionizace: atom může pohltit foton s dostatečnou energií. Sleduj jeho vázaný elektron.'],
+    [.020, 50, 'Uvolnění elektronu', 'Po pohlcení fotonu zůstává kladné jádro a původně vázaný elektron odlétá jako volná částice.'],
+    [.042, 62, 'Volné elektrony v poli', 'Při obratu pole se hned obrátí síla. Elektron potřebuje čas, aby jej síla zabrzdila a urychlila zpět.'],
+    [.053, 68, 'Vzájemné odpuzování elektronů', 'Oba elektrony mají záporný náboj. Působí na sebe stejně velkými silami opačných směrů.'],
     [.07, 77, 'Přílet elektronu k molekule', 'Obě jádra molekuly sdílejí elektronový obal.'],
     [.10, 100, 'Disociace molekuly', 'Po rozpadu molekuly sledujeme atom, který míří k mřížce.'],
-    [.14, 142, 'Dva neutrální atomy', 'Kroužek označuje atom, jehož náboj a energii zde odečítáš.'],
-    [.18, 177, 'Ionizace levého atomu', 'Zakroužkovaný atom vpravo se srážky neúčastní. Jeho náboj se proto nemění.'],
+    [.14, 142, 'Dva neutrální atomy', 'Dál sledujeme pravý atom. K levému atomu přilétá elektron.'],
+    [.18, 177, 'Ionizace levého atomu', 'Pravý atom se srážky neúčastní. Jeho náboj se proto nemění.'],
     [.231, 239, 'Atom přilétá k mřížce', 'Na povrch dopadá neutrální atom s jedním vázaným elektronem.'],
     [.254, 279, 'Přenos elektronu z povrchu', 'Cesium snižuje výstupní práci povrchu. Elektron proto snáze přejde z kovu na atom.'],
     [.27, 285, 'Vznik záporného iontu', 'Jeden kladný náboj jádra a dva elektrony dávají záporný iont.'],
     [.306, 285, 'Let k extrakčnímu otvoru', 'Na záporný iont působí elektrická síla proti směru pole.'],
-    [0.34, 295, 'Extrakce', 'Volný elektron má mnohem menší hmotnost než iont. Jeho dráha se v magnetickém poli stáčí výrazněji.'],
+    [0.34, 295, 'Extrakce', 'Napětí vytahuje z plazmatu iont i volný elektron. Magnety v extrakční mřížce stáčejí lehký elektron na její povrch.'],
     [0.38, 310, 'Urychlování mezi mřížkami', 'Práce elektrické síly v každé mezeře zvětšuje kinetickou energii iontu.'],
     [0.57, 525, 'Výstup z urychlovače', 'Konečnou energii určuje napětí mezi zdrojem a poslední mřížkou.'],
     [0.65, 661, 'Neutralizace v plynu', 'Odtržení slabě vázaného elektronu vyžaduje málo energie. Téměř všechnu kinetickou energii nese těžké jádro.'],
     [0.73, 793, 'Separace zbylých iontů', 'Směr elektrické síly určuje znaménko náboje. Na neutrální atom v tomto poli vychází síla nulová.'],
     [0.84, 980, 'Výstupní kanál', 'Do vstupního portu míří neutrální složka svazku.'],
     [0.90, 1111, 'Průnik do plazmatu', 'Atom před srážkou nemá výsledný náboj. Magnetické pole jeho dráhu nezakřivuje.'],
-    [0.94, birthX, 'Ionizace v plazmatu', 'Po ztrátě elektronu má částice kladný náboj. Magnetické pole proto zakřivuje její dráhu.'],
-    [1, birthX + 26, 'Rychlý deuteron', 'Sleduj první závit dráhy. Předávání energie plazmatu prozkoumej v navazujícím modulu.']
+    [0.94, birthX, 'Ionizace v plazmatu', 'Zde sleduješ jeden možný střet. Jiné atomy se ionizují v jiné hloubce nebo proletí plazmatem až ke stěně.'],
+    [1, birthX + 26, 'Rychlý deuteron', 'Předávání energie deuteronu okolnímu plazmatu prozkoumej v navazujícím modulu.']
   ];
   const noGas = [
     ...stages.filter(([t])=>t<.65),
@@ -32,33 +35,37 @@ const InjectorModel = (() => {
   // Each interval has its own screen time. Short physical transitions can be read
   // without stretching the slow drift through an empty beam duct.
   const cues = [
-    [0,4,'Proud v cívce střídá směr. V plynu se mění směr indukovaného elektrického pole.'],
-    [.042,4,'Sleduj modrou stopu volného elektronu. Pole během letu mění jeho rychlost.'],
-    [.07,3.8,'Elektron se blíží k molekule. Její dvě jádra zatím sdílejí elektronový obal.'],
+    [0,7,'Vstupuješ do RF zdroje podél jeho osy. Jantarové kružnice ukazují elektrické pole, modré stopy obvodový pohyb elektronů.'],
+    [.020,3,'Foton uvolnil elektron. E a Fₑ míří proti sobě. Až se pole obrátí, sleduj světlemodrý elektron na vnější čárkované kružnici.'],
+    [.042,3,'Světlemodrý elektron dobrzďuje. Na konci oblouku se zastaví a vrací se po stejné dráze.'],
+    [.053,3,'Elektrony se navzájem odpudí a jejich dráhy se rozevřou. Oba zůstávají volné.'],
+    [.07,3.8,'Elektrony v driveru získávají energii z RF pole. Sleduj, co se s molekulou stane při střetu s rychlým elektronem.'],
     [.10,4,'Elektron předá molekule energii, která stačí k rozštěpení vazby. Sám odlétá šikmo vzhůru.'],
     [.117,3.8,'Jádra se rozestupují. Každý vzniklý atom si odnáší jeden elektron.'],
-    [.14,4,'Zakroužkovaný atom letí k mřížce. K druhému atomu přilétá zleva další elektron.'],
+    [.14,4,'K levému atomu přilétá rychlý elektron. Při srážce může část své energie předat vázanému elektronu.'],
     [.18,4.5,'Při nárazu získá elektron levého atomu dost energie k úniku z obalu.'],
     [.196,4,'Od místa srážky odlétají dva elektrony. Na místě levého atomu zůstal kladný deuteron.'],
     [.211,3.8,'Vrať se pohledem k pravému atomu. Přibližuje se k povrchu stále s jedním elektronem.'],
     [.231,4,'Zlatá vrstva na povrchu mřížky je cesium. Modrý bod v kovu označuje elektron, který sleduješ.'],
     [.254,4.5,'Atom se dostal k povrchu. Elektron z kovu začíná přecházet do jeho obalu.'],
     [.263,4,'Elektron z kovu vstupuje do obalu. Původní elektron zůstává u jádra.'],
-    [.27,4.5,'Přenos je dokončený. S jádrem teď odcházejí dva elektrony a částice má záporný náboj.'],
+    [.27,4.5,'Iont má dva elektrony. Rozlehlejší oblak naznačuje, že k odtržení jednoho z nich stačí málo energie.'],
     [.29,3.5,'Záporný iont se po odrazu vrací od kovu do plazmatu před mřížkou.'],
     [.306,3.8,'Pole v otvoru míří doleva. Záporný iont proto získává rychlost doprava.'],
-    [.34,4,'Mřížka vytahuje záporné ionty. Společně vytažený volný elektron se v magnetickém poli stáčí stranou.'],
+    [.34,4,'Volný elektron ze zdroje se v místním magnetickém poli stáčí vzhůru na mřížku. Iont D⁻ proletí otvorem dál.'],
     [.38,5,'Každá další mřížka má vyšší potenciál. Při průletu mezerou stoupá bod v grafu.'],
     [.57,3.5,'Iont opouští poslední mřížku s plnou energií. V neutralizátoru se blíží k molekule plynu.','Iont opouští poslední mřížku s plnou energií. Před ním je vyčerpaná komora.'],
-    [.65,4.5,'Srážka s molekulou uvolňuje slabě vázaný elektron. Rychlý atom pokračuje téměř původní rychlostí.','V prázdné komoře iont pokračuje se dvěma vázanými elektrony.'],
-    [.73,4,'Záporné a kladné ionty míří k opačným deskám. Sledovaný neutrální atom letí přímo.','Záporný iont se stáčí proti směru elektrického pole ke kladné sběrné desce.'],
+    [.65,4.5,'Od místa střetu s molekulou odlétá slabě vázaný elektron. Druhý zůstává u jádra a letí s neutrálním atomem dál.','V prázdné komoře iont pokračuje se dvěma vázanými elektrony.'],
+    [.73,4,'Kladné ionty stoupají k záporné desce, záporné klesají ke kladné desce. Neutrální atomy pokračují přímo.','Záporný iont se stáčí proti směru elektrického pole ke kladné sběrné desce.'],
     [.84,3,'Neutrální atom prolétá výstupním kanálem směrem k tokamaku.','Iont dopadl na kladnou desku a předal jí svou kinetickou energii.'],
     [.90,3.5,'Atom protíná magnetické siločáry. V plazmatu se k němu blíží elektron.'],
     [.94,4.5,'Elektron z plazmatu předá při srážce dost energie k vyražení posledního vázaného elektronu.'],
-    [.959,4,'Dráha rychlého deuteronu se zakřivuje. V detailu sleduj první závit kolem magnetické siločáry.'],
-    [1,0,'Deuteron dokončil první závit. Jeho další let a předávání energie ukazuje navazující modul.']
+    [.959,4,'Deuteron obíhá kolem magnetické siločáry a současně postupuje podél ní.'],
+    [1,0,'Po ionizaci pokračuje částice plazmatem jako rychlý deuteron.']
   ];
   function cueIndex(t){return cues.findLastIndex(([start])=>t>=start);}
+  const cueSeconds=[0];
+  for(const [,duration] of cues)cueSeconds.push(cueSeconds.at(-1)+duration);
   function advance(t,seconds,gas){
     const limit=gas?1:.84;
     t=Math.min(t,limit);
@@ -101,9 +108,11 @@ const InjectorModel = (() => {
     const y = axis.y + (gas ? 5*Math.sin(angle) : deflection(x));
     const kinetic = impact ? 0 : energy(x, voltage);
     const cue=cueIndex(t);
-    return {t, x, y, i, local, title, description, impact, electrons, kinetic,
+    const cueLength=(cues[cue+1]?.[0]??t)-cues[cue][0];
+    const playSeconds=cueSeconds[cue]+(cueLength?(t-cues[cue][0])*cues[cue][1]/cueLength:0);
+    return {t, x, y, i, local, title, description, impact, electrons, kinetic,playSeconds,
       caption:(!gas && cues[cue][3])||cues[cue][2],
-      symbol: t < .10 ? '\\mathrm{D}_2' : ['\\mathrm{D}^{+}','\\mathrm{D}^{0}','\\mathrm{D}^{-}'][electrons],
+      symbol: t < .020 ? '\\mathrm{D}^{0}' : t < .07 ? '\\mathrm e^-' : t < .10 ? '\\mathrm{D}_2' : ['\\mathrm{D}^{+}','\\mathrm{D}^{0}','\\mathrm{D}^{-}'][electrons],
       speed: Math.sqrt(2*kinetic*1.602176634e-16/3.3435838e-27),
       endTime:events.at(-1)[0], next: Math.min(events.at(-1)[0],cues[cue+1]?.[0]??1)};
   }

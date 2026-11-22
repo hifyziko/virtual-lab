@@ -351,7 +351,22 @@ const bursts=[];for(let t=.002;t<duration-.025;t+=.012+Math.random()*.022)bursts
 const hp=Math.exp(-2*Math.PI*1000/ctx.sampleRate),lp=1-Math.exp(-2*Math.PI*7500/ctx.sampleRate);let previous=0,high=0,soft=0;
 for(let i=0;i<a.length;i++){const t=i/ctx.sampleRate,noise=Math.random()*2-1;high=hp*(high+noise-previous);previous=noise;soft+=lp*(high-soft);let envelope=.06;for(const burst of bursts){const age=t-burst.t;if(age>=0)envelope+=burst.level*(1-Math.exp(-age/.00015))*Math.exp(-age/burst.decay);}const edge=Math.min(1,t/.001,(duration-t)/.012);a[i]=Math.max(-1,Math.min(1,soft*Math.min(1,envelope)*Math.max(0,edge)));}
 source.buffer=b;}source.connect(g);voices.add(source);source.onended=()=>{voices.delete(source);source.disconnect();g.disconnect();};source.start(now);source.stop(now+duration);}
-window.MachineSound={mount,play,stop};if(typeof document!=='undefined'){document.addEventListener('pointerdown',unlock,{capture:true});document.addEventListener('keydown',unlock,{capture:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',stop);window.addEventListener('hashchange',()=>{stop();enabled=true;});}
+async function clickSwitch(){
+ if(!enabled||document.hidden)return;
+ await unlock();
+ if(!enabled||document.hidden||ctx?.state!=='running')return;
+ const now=ctx.currentTime,source=ctx.createOscillator(),gain=ctx.createGain();
+ source.type='triangle';
+ source.frequency.setValueAtTime(1050,now);
+ source.frequency.exponentialRampToValueAtTime(310,now+.022);
+ gain.gain.setValueAtTime(0,now);
+ gain.gain.linearRampToValueAtTime(.095,now+.0015);
+ gain.gain.exponentialRampToValueAtTime(.0001,now+.029);
+ source.connect(gain);gain.connect(ctx.destination);voices.add(source);
+ source.onended=()=>{voices.delete(source);source.disconnect();gain.disconnect();};
+ source.start(now);source.stop(now+.03);
+}
+window.MachineSound={mount,play,stop,clickSwitch};if(typeof document!=='undefined'){document.addEventListener('pointerdown',unlock,{capture:true});document.addEventListener('keydown',unlock,{capture:true});document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',stop);window.addEventListener('hashchange',()=>{stop();enabled=true;});}
 })();
 
 (()=>{'use strict';
@@ -409,8 +424,8 @@ function render(){K.set($('dampingOut'),'D_k='+fmt(s.damper?s.damping:0,0));$('d
  $('phasorNote').textContent=run?'Po sepnutí: čárkovaně vnitřní napětí. Černé šipky ukazují vnitřní úbytek, nikoli napětí na sepnutém spínači.':s.sequence===1?'Stejný sled fází. K sepnutí musí souhlasit také velikosti a směry fázorů.':'Opačný sled fází: překrytí jediného páru fázorů nestačí.';
  $('status').textContent=run&&s.sequence!==1?(t>=run.end?'Konec ukázky prvních period. Další chod při opačném sledu tento model neurčuje.':'Sepnuto při nesouhlasu sledu. Sledujte proudový ráz; rotor se mechanicky stále otáčí vpřed.'):run?(run.lost&&t>=run.end?'Ztráta synchronismu. Záznam skončil po prokluzu rotoru.':checks.every(Boolean)?'Sepnuto při souhlasu. Sledujte proud a pohyb rotoru.':'Sepnuto při nesouhlasu. Sledujte proudový ráz a moment působící na rotor.'):checks.every(Boolean)?'Vhodný okamžik: všechny podmínky souhlasí.':s.sequence!==1?'Sledy fází se liší. Sepnutím ukážete chybný pokus.':'Podmínky zatím nesouhlasí. Sepnout lze i nyní a ukázat chybný pokus.';drawChart();
 }
-function reset(name=$('preset').value||'approach'){const options={approach:{},ideal:{delta:0,df:0},angle:{delta:Math.PI/3,df:0},voltage:{delta:0,df:0,voltage:460},frequency:{delta:0,df:.8},sequence:{delta:0,df:0,sequence:-1}};s=M.create({...options[name],type:$('rotorType').value,damper:$('damper').checked,damping:+$('damping').value});run=null;t=0;mode=name==='sequence'?'currents':'overview';prepared=name!=='approach';playing=name==='approach';last=null;conditionKey='';$('preset').value=name;for(const [id,n]of [['voltage',s.voltage/400/(1+s.df/50)],['frequency',50+s.df],['angle',s.delta*180/Math.PI],['sequence',s.sequence]])$(id).value=n;initMachine();initPhasors();circuit();initChart();render();}
-function close(){if(run)return;if(s.sequence!==1)mode='currents';prepared=false;run=M.simulate(s);t=0;playing=true;last=null;circuit();for(let k=0;k<3;k++)K.set($('phasor-label-'+k).firstElementChild.firstElementChild,'\\overline U_{ib,'+'ABC'[k]+'}');initChart();render();}
+function reset(name=$('preset').value||'approach'){if(run)window.MachineSound?.clickSwitch();const options={approach:{},ideal:{delta:0,df:0},angle:{delta:Math.PI/3,df:0},voltage:{delta:0,df:0,voltage:460},frequency:{delta:0,df:.8},sequence:{delta:0,df:0,sequence:-1}};s=M.create({...options[name],type:$('rotorType').value,damper:$('damper').checked,damping:+$('damping').value});run=null;t=0;mode=name==='sequence'?'currents':'overview';prepared=name!=='approach';playing=name==='approach';last=null;conditionKey='';$('preset').value=name;for(const [id,n]of [['voltage',s.voltage/400/(1+s.df/50)],['frequency',50+s.df],['angle',s.delta*180/Math.PI],['sequence',s.sequence]])$(id).value=n;initMachine();initPhasors();circuit();initChart();render();}
+function close(){if(run)return;if(s.sequence!==1)mode='currents';prepared=false;run=M.simulate(s);window.MachineSound?.clickSwitch();t=0;playing=true;last=null;circuit();for(let k=0;k<3;k++)K.set($('phasor-label-'+k).firstElementChild.firstElementChild,'\\overline U_{ib,'+'ABC'[k]+'}');initChart();render();}
 $('close').onclick=close;$('switch').onclick=close;$('reset').onclick=()=>reset();$('preset').onchange=()=>reset();$('pause').onclick=()=>{if(!run&&prepared){close();return;}if(run&&t>=viewEnd()){t=0;playing=true;}else playing=!playing;last=null;render();};$('replay').onclick=()=>{if(!run)return;t=0;playing=true;last=null;render();};$('time').oninput=()=>{if(!run)return;t=Math.max(0,Math.min(viewEnd(),+$('time').value));playing=false;render();};
 for(const id of ['voltage','frequency','angle','sequence'])$(id).oninput=()=>{if(run)return;if(id==='frequency'){s.df=+$('frequency').value-50;s.voltage=400*+$('voltage').value*(1+s.df/50);}else if(id==='voltage')s.voltage=400*+$('voltage').value*(1+s.df/50);else if(id==='angle'){s.delta=+$('angle').value*Math.PI/180;playing=false;}else s[id]=+$(id).value;if(id==='voltage'||id==='frequency')initMachine();if(id==='sequence')circuit();render();};
 function machineSettings(){const initial=run?run.initial:s;s=M.create({...initial,t:0,theta:initial.theta,i:[0,0,0],peak:0,closed:false,closedAt:null,type:$('rotorType').value,damper:$('damper').checked,damping:+$('damping').value});run=null;t=0;prepared=true;playing=false;last=null;conditionKey='';initMachine();initPhasors();circuit();initChart();render();}

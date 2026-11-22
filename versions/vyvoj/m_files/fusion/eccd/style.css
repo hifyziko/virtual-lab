@@ -111,7 +111,7 @@ dialog p { margin: .55em 0; } dialog .equation { text-align: center; } dialog a 
 .controls label[for=frequency] {margin-left:0;}
 .controls output {min-width:0;white-space:nowrap;}
 #tune,#doppler-help {width:100%;white-space:nowrap;}
-#doppler-scene .doppler-name {font-size:19px;font-weight:600;}
-#doppler-scene .doppler-relation {font-size:15px;}
-#doppler-scene foreignObject {font-size:17px;}
+#doppler-scene foreignObject {font-size:15px;}
 #doppler-key {justify-content:space-between;}
+.doppler-scale {display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.doppler-scale i {width:55px;height:9px;border:1px solid #c4d0d7;border-radius:2px;background:linear-gradient(90deg,#edf1f4,#b83f32);}

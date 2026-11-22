@@ -23,7 +23,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #ticks span.tick{position:absolute;left:0;width:38px;padding-right:4px;text-align:right;transform:translateY(-50%);font-size:12px}
 .detail{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;align-items:stretch;gap:14px;padding:8px}
 .lens{border-radius:5px;overflow:hidden;background:#edf4f4}
-.lens #micro{height:calc(100% - 60px)}
+.lens #rf-vector{position:absolute;inset:0;width:100%;pointer-events:none;overflow:hidden}.lens #micro,.lens #rf-vector{height:calc(100% - 60px)}
 #action-caption{position:absolute;inset:auto 0 0;margin:0;height:60px;padding:6px 16px;display:flex;align-items:center;background:#e0eded;border-top:1px solid #bed3d6;color:#234852;font-size:17px;font-weight:550;line-height:1.32}
 .readout{display:flex;flex-direction:column;justify-content:center;padding:3px 12px 3px 0}
 .readout h2{color:#234f60}.readout p{font-size:16px;line-height:1.3;margin:4px 0 8px}
@@ -36,3 +36,5 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .transport input{flex:1;min-width:0}footer{margin-left:8px}
 dialog{width:min(780px,92vw);max-height:82vh;overflow:auto;border:1px solid #b4c8cd;border-radius:10px;padding:22px;color:inherit}
 dialog h3{margin:16px 0 4px}dialog p{line-height:1.5;margin:7px 0}dialog::backdrop{background:#18313b65}
+.toolbar .camera-label{margin-left:auto}.toolbar #cameraZoom{width:130px}
+#micro{touch-action:none;cursor:grab}#micro:active{cursor:grabbing}

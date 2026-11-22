@@ -11,6 +11,7 @@ const chart=(...a)=>{record('chart',...a.slice(1));return plot;};
 const Lab={register:m=>registered=m,mount:(_,c)=>cfg=c,legend:()=>'',control:(_,id,content)=>'<label>'+id+content+'</label>',select:(id)=>'<select id="'+id+'"></select>',number:id=>'<input id="'+id+'">',range:id=>'<input id="'+id+'">',check:id=>'<input id="'+id+'">',palette:['red','blue','green','orange','black','grey','pink','purple'],linspace:(a,b,n)=>Array.from({length:n},(_,i)=>a+(b-a)*i/(n-1)),chart};
 for(const method of ['text','fill','arrow','bar','slots'])Lab[method]=(_,...args)=>record(method,...args);
 env.Lab=Lab;env.katex=require('../versions/vyvoj/m_files/fusion/particles/vendor/katex.js');
+vm.runInContext(html.match(/^Lab\.panel=.*$/m)[0],env);
 env.window=env;
 env.Path2D=class {constructor(path){this.path=path}};
 const machineArt=fs.readFileSync('versions/vyvoj/m_files/Web/synchronous/machine-art.js','utf8');
@@ -31,6 +32,15 @@ for(const [id,changes]of Object.entries(cases)){
  for(const change of changes)assert.notEqual(signature(c,{...base,...change}),before,id+' effect '+JSON.stringify(change));
  if(id==='03-pohyb'){
   assert.equal(c.panels[0].title,'Příčný řez strojem');
+  assert.equal(c.panels.length,4);
+  assert.match(c.panels[3].title,/class="katex"/);
+  c.panels.forEach(({title,legend},index)=>{
+   const id='plot'+index;
+   const markup=Lab.panel(id,title,legend||'');
+   assert(markup.includes('<h2 id="'+id+'-title">'+title+'</h2>'));
+   assert(markup.includes('<button type="button" aria-label="Zvětšit graf" aria-describedby="'+id+'-title" title="Zvětšit graf">⛶</button>'));
+   assert(markup.includes('<canvas id="'+id+'" role="img" aria-labelledby="'+id+'-title"></canvas>'));
+  });
   assert.equal(c.layout,'harmonic-motion');
   const css=fs.readFileSync('versions/vyvoj/m_files/Web/winding-window-layout.css','utf8');
   assert.match(css,/\.gridplots\.harmonic-motion\{[^}]*grid-template-rows:repeat\(2,minmax\(0,1fr\)\)/);
