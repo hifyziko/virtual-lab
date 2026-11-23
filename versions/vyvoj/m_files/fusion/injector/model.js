@@ -20,7 +20,7 @@ const InjectorModel = (() => {
     [0.38, 310, 'Urychlování mezi mřížkami', 'Práce elektrické síly v každé mezeře zvětšuje kinetickou energii iontu.'],
     [0.57, 525, 'Výstup z urychlovače', 'Konečnou energii určuje napětí mezi zdrojem a poslední mřížkou.'],
     [0.65, 661, 'Neutralizace v plynu', 'Odtržení slabě vázaného elektronu vyžaduje málo energie. Téměř všechnu kinetickou energii nese těžké jádro.'],
-    [0.73, 793, 'Separace zbylých iontů', 'Směr elektrické síly určuje znaménko náboje. Na neutrální atom v tomto poli vychází síla nulová.'],
+    [0.73, 793, 'Odklon zbylých iontů do iontové pasti', 'Směr elektrické síly určuje znaménko náboje. Na neutrální atom v tomto poli vychází síla nulová.'],
     [0.84, 980, 'Výstupní kanál', 'Do vstupního portu míří neutrální složka svazku.'],
     [0.90, 1111, 'Průnik do plazmatu', 'Atom před srážkou nemá výsledný náboj. Magnetické pole jeho dráhu nezakřivuje.'],
     [0.94, birthX, 'Ionizace v plazmatu', 'Zde sleduješ jeden možný střet. Jiné atomy se ionizují v jiné hloubce nebo proletí plazmatem až ke stěně.'],
@@ -29,8 +29,8 @@ const InjectorModel = (() => {
   const noGas = [
     ...stages.filter(([t])=>t<.65),
     [0.65, 661, 'Průlet prázdnou komorou', 'Plyn je vypnutý. Iont si ponechá oba elektrony i energii.'],
-    [0.73, 793, 'Odklon záporného iontu', 'Elektrická síla působí proti směru pole. Záporný iont míří ke kladné sběrné desce.'],
-    [0.84, dumpX, 'Dopad na sběrnou desku', 'Iont odevzdal svou kinetickou energii sběrné desce. Do tokamaku tento svazek nedoletí.']
+    [0.73, 793, 'Odklon záporného iontu', 'Elektrická síla působí proti směru pole. Záporný iont míří ke kladnému terči iontové pasti.'],
+    [0.84, dumpX, 'Dopad na terč iontové pasti', 'Iont odevzdal svou kinetickou energii terči iontové pasti. Do tokamaku tento svazek nedoletí.']
   ];
   // Each interval has its own screen time. Short physical transitions can be read
   // without stretching the slow drift through an empty beam duct.
@@ -56,8 +56,8 @@ const InjectorModel = (() => {
     [.38,5,'Každá další mřížka má vyšší potenciál. Při průletu mezerou stoupá bod v grafu.'],
     [.57,3.5,'Iont opouští poslední mřížku s plnou energií. V neutralizátoru se blíží k molekule plynu.','Iont opouští poslední mřížku s plnou energií. Před ním je vyčerpaná komora.'],
     [.65,4.5,'Od místa střetu s molekulou odlétá slabě vázaný elektron. Druhý zůstává u jádra a letí s neutrálním atomem dál.','V prázdné komoře iont pokračuje se dvěma vázanými elektrony.'],
-    [.73,4,'Kladné ionty stoupají k záporné desce, záporné klesají ke kladné desce. Neutrální atomy pokračují přímo.','Záporný iont se stáčí proti směru elektrického pole ke kladné sběrné desce.'],
-    [.84,3,'Neutrální atom prolétá výstupním kanálem směrem k tokamaku.','Iont dopadl na kladnou desku a předal jí svou kinetickou energii.'],
+    [.73,4,'Kladné ionty stoupají k zápornému terči, záporné klesají ke kladnému terči. Neutrální atomy pokračují přímo.','Záporný iont se stáčí proti směru elektrického pole ke kladnému terči iontové pasti.'],
+    [.84,3,'Neutrální atom prolétá výstupním kanálem směrem k tokamaku.','Iont dopadl na kladný terč iontové pasti a předal mu svou kinetickou energii.'],
     [.90,3.5,'Atom protíná magnetické siločáry. V plazmatu se k němu blíží elektron.'],
     [.94,4.5,'Elektron z plazmatu předá při srážce dost energie k vyražení posledního vázaného elektronu.'],
     [.959,4,'Deuteron obíhá kolem magnetické siločáry a současně postupuje podél ní.'],

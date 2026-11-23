@@ -15,21 +15,21 @@ const InjectorSource = (() => {
   const between=(a,b,u)=>a+(b-a)*u;
   const ease=u=>u*u*(3-2*u);
   const axisY=184, loopRadius=77, loopStations=[150,250,350];
-  function project(x,y,z){return [x+.48*z,y-.19*z];}
+  function project(x,y){return [x,y];}
   function ring(x,r,a){return project(x,axisY+r*Math.cos(a),r*Math.sin(a));}
   // Double integration of tangential acceleration proportional to -sin(phase).
   // The affine term sets the incoming velocity for the selected encounter.
   const rfDisplacement=t=>1.05*Math.sin(rfPhase(t));
-  const inPlane=(p,z)=>[p[0]-.48*z,p[1]+.19*z,z];
+  const inPlane=(p,z)=>[p[0],p[1],z];
   function flightWorld(start,finish,t,a,b,depth=70){
     if(t<=a)return inPlane(start,depth);
     if(t>=b)return inPlane(finish,depth);
     const u=part(t,a,b);
-    const polar=p=>Math.atan2(depth,p[1]+.19*depth-axisY);
-    const radius=p=>Math.hypot(depth,p[1]+.19*depth-axisY);
+    const polar=p=>Math.atan2(depth,p[1]-axisY);
+    const radius=p=>Math.hypot(depth,p[1]-axisY);
     const angle=between(polar(start),polar(finish),u)+rfDisplacement(t)
       -between(rfDisplacement(a),rfDisplacement(b),u);
-    return ringWorld(between(start[0],finish[0],u)-.48*depth,
+    return ringWorld(between(start[0],finish[0],u),
       between(radius(start),radius(finish),u),angle);
   }
   function rfFlight(start,finish,t,a,b,depth=70){
@@ -82,8 +82,8 @@ const InjectorSource = (() => {
   // initial velocity once so the prescribed molecular collision occurs on cue.
   function incomingOrbit(){
     const steps=320,h=(hit-release)/steps,z0=60;
-    const start=[releasePoint[0]-.48*z0,releasePoint[1]+.19*z0,z0];
-    const end=[356-.48*z0,162+.19*z0,z0];
+    const start=inPlane(releasePoint,z0);
+    const end=inPlane([356,162],z0);
     function acceleration(p,t){
       const e=electricField(p,t);
       const spread=.004,dt=t-encounter;

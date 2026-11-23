@@ -162,3 +162,18 @@ body[data-fusion-page] header[data-fusion-heading] > details > summary:hover{bac
 
 /* Tight gutters between the main experiment panels. */
 body[data-fusion-page] :is(.layout,.workspace,.experiment,.analysisRail):has(> :is(.panel,.card,.scene,.controlRail,.analysisRail)){gap:5px!important}
+
+/* On compact screens the project credit is in normal flow and can wrap. */
+@media(max-width:850px){
+ body:has(#app > [data-fusion-lesson="fu19-tvar"]){display:flex;flex-direction:column;height:100dvh}
+ #app:has(> [data-fusion-lesson="fu19-tvar"]){flex:1 1 0;min-height:0}
+ #app > [data-fusion-lesson="fu19-tvar"]{height:100%;min-height:0}
+ body:has(#app > [data-fusion-lesson="fu19-tvar"]) > .project-credit{flex:none}
+}
+body:has(#app > [data-fusion-lesson="fu19-tvar"]) > .lab-tree-toggle{
+ top:auto;bottom:5px;left:8px;min-height:32px;min-width:0;padding:4px 10px;font-size:14px;border-radius:7px
+}
+@media(max-width:850px){
+ body:has(#app > [data-fusion-lesson="fu19-tvar"]) > .lab-tree-toggle{position:static;order:-1;flex:none;align-self:flex-start;margin:4px 8px}
+}
+.physics-area-link .fusion-review-notice{display:block;grid-column:1/-1;font-size:14px;font-weight:650;line-height:1.35;color:#714c20}

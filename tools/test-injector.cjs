@@ -39,9 +39,9 @@ const gap=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
 // Reconstruct the angle from the oblique screen coordinates of one electron.
 // Tangential acceleration has the opposite sign to the local RF field.
 function ringAngle(t){
-  const [x,y]=source.ambientElectron(0,t),z=(x-150)/.48;
-  assert(Math.abs(Math.hypot(z,y-184+.19*z)-77)<1e-8);
-  return Math.atan2(z,y-184+.19*z);
+  const [,y,z]=source.ambientWorld(0,t);
+  assert(Math.abs(Math.hypot(z,y-184)-77)<1e-8);
+  return Math.atan2(z,y-184);
 }
 for(const t of [.012,.044,.42,.45]){
   const h=.00001;
@@ -120,7 +120,7 @@ for(const gas of [true,false]){
 function toEnd(){for(let i=0;i<=M.cues.length&&!get('step').disabled;i++)get('step').onclick();assert(get('step').disabled);}
 toEnd();assert.equal(get('stage').textContent,'Rychlý deuteron');
 get('gas').checked=false;get('gas').onchange();assert.equal(get('seek').value,.57);
-toEnd();assert.equal(get('stage').textContent,'Dopad na sběrnou desku');assert.match(get('action-caption').textContent,/dopadl/);
+toEnd();assert.equal(get('stage').textContent,'Dopad na terč iontové pasti');assert.match(get('action-caption').textContent,/dopadl/);
 get('play').onclick();advance(100);advance(200);assert(get('seek').value>0 && get('seek').value<.1);
 get('seek').value=.8;get('seek').oninput();assert.equal(get('play').textContent,'Přehrát');
 get('voltage').value=500;get('voltage').oninput();assert(get('kinetic').dataset.rendered.startsWith('500'));
@@ -132,7 +132,10 @@ for(const gas of [true,false]){
     assert(Math.abs(a.zoom-b.zoom)<.00001);
   }
 }
+assert.equal(vm.runInContext('InjectorScene.frontView(0)',c),0);
 assert(camera(M.sample(0,500,true)).zoom<.35);
+assert(camera(M.sample(.005,500,true)).zoom>camera(M.sample(0,500,true)).zoom);
+assert.equal(vm.runInContext('InjectorScene.frontView(.009)',c),1);
 assert.equal(camera(M.sample(.09,500,true)).zoom,camera(M.sample(.105,500,true)).zoom);
 assert.equal(camera(M.sample(.09,500,true)).x,camera(M.sample(.105,500,true)).x);
 assert.equal(camera(M.sample(.009,500,true)).zoom,camera(M.sample(.017,500,true)).zoom);

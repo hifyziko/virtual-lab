@@ -163,9 +163,9 @@ const InjectorScene = (() => {
   function focusParticle(f){
     if(f.t<.34){
       const source=InjectorSource.sourceFrame(f.t);
-      if(f.t<.10 && frontView(f.t)>0){
+      if(f.t<.080){
         const p=f.t<.02?InjectorSource.inPlane(source.incident,60):InjectorSource.incidentWorld(f.t);
-        return shellProjector(smooth(f.t,.001,.009),1,frontView(f.t))(p);
+        return detailProjector(f.t)(p);
       }
       return f.t<.10?source.incident:source.tracked;
     }
@@ -173,7 +173,7 @@ const InjectorScene = (() => {
     return [beamX(f.x),218+(f.electrons===2?45*deflection(f.x)/37:0)];
   }
   function camera(f){
-    const t=f.t,arrival=smooth(t,.001,.009),collision=smooth(t,.053,.084),surface=smooth(t,.202,.246);
+    const t=f.t,arrival=approach(t),collision=smooth(t,.053,.084),surface=smooth(t,.202,.246);
     const exit=smooth(t,.286,.34),z=1+.42*collision+.43*surface;
     const sourceX=(460-92*collision)*(1-surface)+688*surface;
     const sourceY=(177+16*collision)*(1-surface)+(145+66*smooth(t,.27,.313))*surface;
@@ -441,7 +441,7 @@ const InjectorScene = (() => {
       gl.uniform1f(coating,1);gl.drawArrays(gl.TRIANGLES,0,count);
       // Resolve the nearest copper surface before blending. Back-facing
       // triangles of a turn must not accumulate tint through its front face.
-      gl.uniform4f(camera,x,y,s,windingTilt(tilt));
+      gl.uniform4f(camera,x,y,s,tilt);
       gl.uniform1f(coating,.85);gl.colorMask(false,false,false,false);gl.drawArrays(gl.TRIANGLES,count,copperData.length/9);
       gl.colorMask(true,true,true,true);
       gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
@@ -451,7 +451,9 @@ const InjectorScene = (() => {
       return true;
     };
   }
-  function frontView(t){return smooth(t,.001,.009)*(1-smooth(t,.053,.080));}
+  function approach(t){return smooth(t,.001,.009);}
+  function frontView(t){return approach(t)*(1-smooth(t,.053,.080));}
+  function detailProjector(t){return shellProjector(approach(t),0,frontView(t));}
   // A shallow oblique projection keeps the pitch visible in the longitudinal cutaway.
   function windingTilt(tilt){return .34+.66*tilt;}
   function shellProjector(angle,tilt,front=0){
@@ -490,7 +492,7 @@ const InjectorScene = (() => {
   }
   function paintExterior(c,angle,tilt,reveal,pass,front){
     const project=shellProjector(angle,tilt,front);
-    const projectWinding=shellProjector(angle,windingTilt(tilt),front);
+    const projectWinding=shellProjector(angle,tilt,front);
     const depth=p=>(p[0]*.45-p[1]*.25-p[2]*.86)*(1-front)-p[0]*front;
     const visible=exterior.filter(f=>depth(f.n)>0).sort((a,b)=>depth(a.centre)-depth(b.centre));
     c.save();
@@ -514,8 +516,8 @@ const InjectorScene = (() => {
     const cx=right<=2*half?right/2:Math.max(half,Math.min(right-half,focusX));
     c.save();c.translate(w/2,h/2);c.scale(s,s);c.translate(-cx,-focusY);
     const front=overview?0:frontView(t);
-    const angle=smooth(t,.001,.009),reveal=smooth(t,.011,.017);
-    const tilt=1-smooth(t,.117,.141);
+    const angle=approach(t),reveal=smooth(t,.011,.017);
+    const tilt=overview?1-smooth(t,.117,.141):0;
     if(overview && reveal<1){
       c.save();c.beginPath();c.rect(out,-300,right-out+400,950);c.clip();
       detailVessel(c,y);
@@ -565,7 +567,7 @@ const InjectorScene = (() => {
           nucleus(c,0,0);electron(c,...InjectorSource.boundElectron([0,0],t,0));c.restore();
         }
       }
-      label(c,'Separátor',dump-74,y-72);
+      label(c,'Iontová past',dump-74,y-72);
       if(gas)label(c,'Kladné ionty',beamX(collector[1])+15,y-bend,positive,12,'left');
       label(c,'Záporné ionty',beamX(collector[1])+15,y+bend+7,negative,12,'left');
       arrow(c,entry-22,y+28,0,-46,electric);
@@ -688,7 +690,7 @@ const InjectorScene = (() => {
     const view=micro(c,w,h-22,f,gas,scale/Math.min(w/920,(h-22)/354),{x:right/2,y:184},true);
     c.restore();
     const marks=[[210,'RF zdroj'],[sectionX(405),'Urychlovač'],[sectionX(650),'Neutralizátor'],
-      [sectionX(850),'Separátor'],[sectionX(1000),'Kanál'],[plasmaX,'Tokamak']];
+      [sectionX(850),'Iontová past'],[sectionX(1000),'Kanál'],[plasmaX,'Tokamak']];
     const active=f.t<.34?0:f.t<.57?1:f.t<.73?2:f.t<.84||f.impact?3:f.t<.9?4:5;
     const size=Math.min(13,w/61);
     c.font='600 '+size+'px "Segoe UI",sans-serif';
@@ -705,5 +707,5 @@ const InjectorScene = (() => {
       circle(c,w/2+(x-view.x)*scale,22+(h-22)/2+(y-view.y)*scale,5,ink,1.4);
     }
   }
-  return {frontView,shellProjector,overview:drawOverview,micro,camera,focusParticle,beamCount,neighbour,line,dot,ink,neutral};
+  return {frontView,detailProjector,shellProjector,overview:drawOverview,micro,camera,focusParticle,beamCount,neighbour,line,dot,ink,neutral};
 })();

@@ -24,7 +24,7 @@
   byId('book-pages').textContent = 'kap. 9, s. 181 a násl.; kap. 12.6–12.7 a 12.9–12.11, s. 330–339; kap. 13.9–13.12, s. 366–373';
   const explanations = [
     [String.raw`P_{\mathrm{ch}}=0{,}2P_{\mathrm F},\quad \frac{\mathrm dU}{\mathrm dt}=P_{\mathrm H}+P_{\mathrm{ch}}-P_{\mathrm L}`, 'Předepsaný fúzní výkon a ztráty plazmatu nastavuješ posuvníky. Pětina fúzního výkonu se předá plazmatu částicemi alfa. Zbytek nesou neutrony do blanketu. U je vnitřní energie plazmatu. Zapnutý ohřev doplňuje jen schodek.'],
-    [String.raw`P_{\mathrm{TH}}=M_{\mathrm R}P_{\mathrm F}+P_{\mathrm H}`, 'V ustáleném knižním modelu se tepelný výkon reaktoru skládá z jaderného výkonu a tepla dodaného ohřevem. Faktor multiplikace blanketu se vztahuje k celému fúznímu výkonu.'],
+    [String.raw`P_{\mathrm{TH}}=M_{\mathrm R}P_{\mathrm F}+P_{\mathrm H}`, 'V ustáleném knižním modelu se tepelný výkon reaktoru skládá z jaderného výkonu a tepla dodaného ohřevem. Faktor multiplikace výkonu reaktoru se vztahuje k celému fúznímu výkonu.'],
     [String.raw`P_{\mathrm{TH}}=(M_{\mathrm R}-0{,}2)P_{\mathrm F}+P_{\mathrm L}`, 'Rozšíření pro okamžitý snímek modelu. Teplo do výměníku zahrnuje neutronový výkon, přírůstek v blanketu a veškeré teplo odvedené z plazmatu. Část výkonu může právě měnit vnitřní energii plazmatu. Teplota, fúzní výkon ani ztráty se v čase nepřepočítávají.'],
     [String.raw`P_{\mathrm{HC}}=\frac{P_{\mathrm{NBI}}}{\eta_{\mathrm{NBI}}}+\frac{P_{\text{vlny}}}{\eta_{\text{vlny}}},\quad \eta_{\mathrm H}=\frac{P_{\mathrm H}}{P_{\mathrm{HC}}}`, 'Výkon NBI a vln představuje teplo skutečně předané plazmatu. Účinnosti udávají, jaká část příkonu každého zařízení se do plazmatu dostane. Efektivní účinnost vychází z jejich nastaveného podílu i při nulovém ohřevu. Proudový pohon je samostatný jev. Rozběh solenoidem má pouze názorné zvýraznění.'],
     [String.raw`P_{\mathrm{GR}}=\eta_{\mathrm{GR}}P_{\mathrm{TH}},\quad P_{\mathrm{NET}}=P_{\mathrm{GR}}-P_{\mathrm{SC}}^{\mathrm{NH}}-P_{\mathrm{HC}}`, 'Hrubá účinnost zahrnuje celý pracovní oběh včetně výroby elektřiny. V kresbě odpovídá mechanický výkon hrubému elektrickému výkonu, protože ztráty generátoru nerozlišujeme. Od hrubého výkonu odečti ostatní vlastní spotřebu a příkon ohřevu. Všechny technologické parametry jsou modelové.'],
@@ -44,7 +44,7 @@
     ['heating','waveEfficiency','Účinnost vln',20,75,1,value => number(value)+String.raw`\,\%`],
     ['tech','grossEfficiency','Hrubá účinnost',25,50,.5,value => number(value)+String.raw`\,\%`],
     ['tech','ownShare','Ostatní vlastní spotřeba',0,40,.5,value => number(value)+String.raw`\,\%`],
-    ['tech','multiplication','Multiplikace blanketu',1,1.3,.01,number]
+    ['tech','multiplication','Faktor multiplikace výkonu',1,1.3,.01,number]
   ];
   const ranges = new Map();
   let state = {...defaults};

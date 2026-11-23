@@ -393,7 +393,7 @@
     el('tune').textContent='Naladit '+String(tuned).replace('.',',')+' GHz';
     el('tune').onclick=()=>{el('frequency').value=tuned;refresh();};
     const u=calc.resonantU;
-    el('tuning-state').textContent=u===null ? (frequency===ECCD.cyclotron?'Kolmý ohřev obou směrů':'Mimo cyklotronovou rezonanci') :
+    el('tuning-state').textContent=u===null ? (frequency===ECCD.cyclotron?'Kolmý ohřev obou směrů':'Mimo cyklotronní rezonanci') :
       Math.abs(u)>1.7?'Rezonance v řídce obsazeném ocasu rozdělení':Math.abs(u)<.15?'Ohřev obou směrů u nulové rychlosti':'Rezonance v obsazené části rozdělení';
     prepareCloud(angle); capturePulse();
     const hot=calc.populations(0)[0];
@@ -541,7 +541,7 @@
     dopplerStart=previewTime;
     dopplerVisible=!dopplerVisible;
     el('doppler-help').setAttribute('aria-pressed',String(dopplerVisible));
-    el('energy-heading').textContent=dopplerVisible?'Dopplerův posuv':'Energie získaná při průchodu svazkem';
+    el('energy-heading').textContent=dopplerVisible?'Dopplerův posun':'Energie získaná při průchodu svazkem';
     energyPlot.style.display=dopplerVisible?'none':'block';
     el('doppler-scene').style.display=dopplerVisible?'block':'none';
     el('energy-key').hidden=dopplerVisible;

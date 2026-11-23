@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Coulombův rozptyl a směrová relaxace</title>
+  <title>Coulombovský rozptyl a kolizní relaxace</title>
   <link rel="stylesheet" href="../particles/vendor/katex.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="../navigation/style.css">
@@ -47,7 +47,7 @@
 <main>
   <header data-fusion-heading>
     <a class="back" href="../index.html#group-area-plasma" target="_top" aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a>
-    <h1 data-module-number="06">Coulombův rozptyl a směrová relaxace</h1>
+    <h1 data-module-number="06">Coulombovský rozptyl a kolizní relaxace</h1>
     <button id="help" aria-haspopup="dialog">Ovládání a výklad</button>
     <button data-fusion-full>Celá obrazovka</button>
   </header>
@@ -120,7 +120,7 @@
           <div class="canvas-stage"><canvas id="meetings" role="img" aria-label="Ionty míjené pomalejším a rychlejším elektronem"></canvas><canvas id="meetings-particles" class="particle-layer" aria-hidden="true"></canvas></div>
           <div class="canvas-stage"><canvas id="directions" role="img" aria-label="Šipky porovnávají směry rozptýlených pomalých a rychlých elektronů"></canvas></div>
         </div>
-        <div class="relationship encounter-results"><span class="slow">Pomalejší <output id="count-slow"></output></span><span class="fast">Rychlejší <output id="count-fast"></output></span><span data-tex="\nu_{\mathrm D}\propto v^{-3}" title="Směrová relaxační frekvence"></span></div>
+        <div class="relationship encounter-results"><span class="slow">Pomalejší <output id="count-slow"></output></span><span class="fast">Rychlejší <output id="count-fast"></output></span><span data-tex="\nu_{\mathrm D}\propto v^{-3}" title="Frekvence rozptylu směru"></span></div>
       </section>
     </div>
   </div>
@@ -139,8 +139,8 @@
   <p>Poloha elektronu vůči iontu je <span data-tex="\mathbf r"></span>, vzdálenost <span data-tex="r=|\mathbf r|"></span>, rychlost <span data-tex="\mathbf v"></span> a hybnost <span data-tex="\mathbf p=m_{\mathrm e}\mathbf v"></span>. Sílu určuje <span data-tex="\mathbf F=m_{\mathrm e}\mathrm d\mathbf v/\mathrm dt=-\kappa\mathbf r/r^3"></span>. Hmotnost elektronu je <span data-tex="m_{\mathrm e}"></span> a kladná konstanta <span data-tex="\kappa=|q_{\mathrm i}q_{\mathrm e}|/(4\pi\varepsilon_0)"></span> závisí na nábojích iontu a elektronu a permitivitě vakua.</p>
   <p>Rychlost, čas a hybnost jsou v jednotkách <span data-tex="v_0,\ t_0=\ell_0/v_0,\ p_0=m_{\mathrm e}v_0"></span>, kde <span data-tex="\ell_0"></span> je zvolená jednotka délky. Počáteční dopadový parametr je <span data-tex="b=1{,}45\,\ell_0"></span> a čas u iontu měříme v pásmu <span data-tex="|x|\le2\,\ell_0"></span>, kde <span data-tex="x"></span> je podélná poloha. Odklon je okamžitý úhel vůči vstupnímu směru. Výsledná hodnota se odečítá v konečné vzdálenosti. Vlastní názorný model počítá dráhu u nehybného iontu v rovině, bez pohybu iontu, magnetického pole a stínění.</p>
   <p>Při malém odklonu je síla podél téměř stejné dráhy podobná, ale působí po dobu úměrnou <span data-tex="v^{-1}"></span>. Proto <span data-tex="|\Delta p_\perp|\propto v^{-1}"></span>, kde <span data-tex="\Delta p_\perp"></span> je změna hybnosti kolmo ke vstupnímu směru. Zároveň je počáteční dopředná hybnost <span data-tex="p=m_{\mathrm e}v"></span> větší. Dohromady dostaneš <span data-tex="\Delta\theta\approx|\Delta p_\perp|/p\propto v^{-2}"></span>. V grafu skládání se oběma vektorům přičítá stejný příčný impuls z pomalejšího průletu.</p>
-  <h3>Směrová relaxace</h3>
-  <p>Za čas <span data-tex="t"></span> míjí elektron <span data-tex="N\propto vt"></span> iontů. Nezávislé malé odchylky se střídají na obě strany, proto typický výsledný odklon roste jako <span data-tex="\theta_{\text{typ}}\sim\sqrt N\,\Delta\theta\propto\sqrt t\,v^{-3/2}"></span>. Pro stejný typický odklon tedy potřebuješ dobu <span data-tex="t_{\text{rel}}\propto v^3"></span>. Směrová relaxační frekvence <span data-tex="\nu_{\mathrm D}\sim1/t_{\text{rel}}\propto v^{-3}"></span> udává rychlost ztráty původního směru. V názorném statistickém modelu mají rychlé testovací elektrony stejné rozmezí dopadových parametrů. Přesné koeficienty závisejí také na Coulombově logaritmu a na rozdělení rychlostí pozadí.</p>
+  <h3>Kolizní relaxace směru</h3>
+  <p>Za čas <span data-tex="t"></span> míjí elektron <span data-tex="N\propto vt"></span> iontů. Nezávislé malé odchylky se střídají na obě strany, proto typický výsledný odklon roste jako <span data-tex="\theta_{\text{typ}}\sim\sqrt N\,\Delta\theta\propto\sqrt t\,v^{-3/2}"></span>. Pro stejný typický odklon tedy potřebuješ dobu <span data-tex="t_{\text{rel}}\propto v^3"></span>. Frekvence rozptylu směru <span data-tex="\nu_{\mathrm D}\sim1/t_{\text{rel}}\propto v^{-3}"></span> udává rychlost ztráty původního směru. V názorném statistickém modelu mají rychlé testovací elektrony stejné rozmezí dopadových parametrů. Přesné koeficienty závisejí také na Coulombově logaritmu a na rozdělení rychlostí pozadí.</p>
   <p>Při ECCD zvýší mikrovlny hlavně kolmou složku rychlosti vybraných elektronů. Rychlejší elektrony si déle zachovávají původní směr a přispívají ke vzniku proudu Fischovým–Boozerovým mechanizmem.</p>
   <h3>Zdroje</h3>
   <p>S. Entler, V. Kindl, <i>Jaderná fúze a fúzní elektrárny</i>, kap. 9.5.2, s. 195–199, zejména s. 198 a obr. 9.11.</p>

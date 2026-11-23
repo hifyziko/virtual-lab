@@ -14,6 +14,8 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
  copy(path.join(source,'heating'),'fuze-ohrev/');
  copy(path.join(source,'eccd'),'fuze-eccd/');
  copy(path.join(source,'scattering'),'fuze-rozptyl/');
+ copy(path.join(source,'shaping'),'fuze-tvar/');
+ copy(path.join(source,'conductivity'),'fuze-vodivost/');
  copy(path.join(source,'lawson'),'fuze-lawson/');
  copy(path.join(source,'injector'),'fuze-injektor/');
  copy(path.join(source,'nbi'),'fuze-nbi/');
@@ -32,7 +34,7 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
  const js=fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8');
  const anchor=html.includes('<script id="progressive-web-install">')?'<script id="progressive-web-install">':'</body>';
  html=html.replace(anchor,()=>`<!-- particle-library:start --><script>${js}</script><!-- particle-library:end -->\n`+anchor);fs.writeFileSync(index,html);
- const file=path.join(dest,'manifest.json'),m=JSON.parse(fs.readFileSync(file,'utf8'));m.files=m.files.filter(f=>!['fuze-injektor/','fuze-rozptyl/','fuze-eccd/','fuze-nbi/','fuze-milniky/','fuze-ohrev/','fuze-lawson/','compass-u/','fuze-ostrovy/','fuze-plazma/','fuze-galerie/','fuze-castice/','fuze-seznam/','fuze-bariera/','fuze-drift/','fuze-udrzeni/','fuze-rovnovaha/','shared/particles/','shared/fusion/'].some(p=>f.path.startsWith(p))).concat(entries);const item=m.files.find(f=>f.path==='index.html');if(item){item.bytes=Buffer.byteLength(html);item.sha256=crypto.createHash('sha256').update(html).digest('hex');}if(m.progressive)m.progressive.shellBytes=Buffer.byteLength(html);m.bytes=m.files.reduce((n,f)=>n+f.bytes,0);fs.writeFileSync(file,JSON.stringify(m,null,2)+'\n');
+ const file=path.join(dest,'manifest.json'),m=JSON.parse(fs.readFileSync(file,'utf8'));m.files=m.files.filter(f=>!['fuze-tvar/','fuze-injektor/','fuze-rozptyl/','fuze-vodivost/','fuze-eccd/','fuze-nbi/','fuze-milniky/','fuze-ohrev/','fuze-lawson/','compass-u/','fuze-ostrovy/','fuze-plazma/','fuze-galerie/','fuze-castice/','fuze-seznam/','fuze-bariera/','fuze-drift/','fuze-udrzeni/','fuze-rovnovaha/','shared/particles/','shared/fusion/'].some(p=>f.path.startsWith(p))).concat(entries);const item=m.files.find(f=>f.path==='index.html');if(item){item.bytes=Buffer.byteLength(html);item.sha256=crypto.createHash('sha256').update(html).digest('hex');}if(m.progressive)m.progressive.shellBytes=Buffer.byteLength(html);m.bytes=m.files.reduce((n,f)=>n+f.bytes,0);fs.writeFileSync(file,JSON.stringify(m,null,2)+'\n');
  require('./build-em-wave.cjs').build(web);
  if(m.progressive)require('./build-progressive-web.cjs').build(web);
 }

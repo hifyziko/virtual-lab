@@ -1,0 +1,41 @@
+/* Existing plasma frame and controls are inherited; only this two-scene layout differs. */
+main{gap:8px}.comparison{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;min-height:0}.medium{display:flex;flex-direction:column;min-width:0;background:white;border:1px solid #ded2e8;border-radius:14px;overflow:hidden}.medium h2{font-size:21px;margin:12px 16px 4px}.temperature{margin:0 16px 8px;font-size:16px;min-height:25px}.micro{position:relative;flex:1;min-height:0;background:#f9faf6}.micro canvas,.detail canvas{position:absolute;width:100%;height:100%;inset:0}.field{position:absolute;top:8px;right:14px;color:#b57825;font-size:13px}.readings{padding:8px 16px;border-top:1px solid #e8e0ec;display:grid;grid-template-columns:1fr auto;gap:6px;font-size:14px}.meter{grid-column:1/-1;height:7px;background:#eee8f2;position:relative}.meter i{position:absolute;left:0;top:0;height:100%;background:#725198}.meter:after{content:'';position:absolute;left:40%;height:11px;top:-2px;border-left:1px solid #51445c}.lower{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:206px;flex:none}.lower article{border:1px solid #ded2e8;border-radius:14px;background:white;display:flex;flex-direction:column;overflow:hidden}.lower h2{margin:8px 14px 4px;font-size:15px}.detail{position:relative;flex:1;min-height:0;background:#f9faf6}.detail-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.detail-heading #flightLabel{margin-right:14px;font-size:13px;white-space:nowrap}.legend{padding:0 16px 6px;font-size:13px}.version{font-size:12px;white-space:nowrap}header{flex:none}dialog details{margin-top:14px}dialog summary{cursor:pointer;font-weight:600}
+
+.drift-caption{position:absolute;bottom:31px;left:22px;right:22px;display:flex;justify-content:space-between;font-size:13px;color:#31596e;pointer-events:none}header h1{font-size:21px}
+
+.micro>svg{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}.micro{isolation:isolate}
+
+.selected-caption{position:absolute;left:10px;top:8px;font-size:13px;pointer-events:none}.velocity-label,#metalEvent{color:#187767}.force-label{color:#b57825}
+
+body[data-fusion-page="fu15-vodivost"] header[data-fusion-heading]{flex-wrap:nowrap;gap:7px}
+body[data-fusion-page="fu15-vodivost"] header[data-fusion-heading] > h1{font-size:21px}
+.experiment-controls{display:flex;align-items:center;gap:7px;flex:none;font-size:13px;white-space:nowrap}
+.experiment-controls input[type=range]{
+ appearance:none;width:clamp(190px,24vw,310px);height:34px;
+ margin:0;background:transparent;color:#725198;cursor:pointer;
+}
+.experiment-controls input[type=range]::-webkit-slider-runnable-track{
+ height:9px;border-radius:8px;
+ background:linear-gradient(to right,currentColor 0 var(--heating-progress,0%),#e2d7eb var(--heating-progress,0%) 100%);
+}
+.experiment-controls input[type=range]::-webkit-slider-thumb{
+ appearance:none;width:22px;height:22px;margin-top:-6.5px;
+ border:0;border-radius:50%;background:currentColor;
+}
+.experiment-controls input[type=range]::-moz-range-track{height:9px;border-radius:8px;background:#e2d7eb}
+.experiment-controls input[type=range]::-moz-range-progress{height:9px;border-radius:8px;background:currentColor}
+.experiment-controls input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;border-radius:50%;background:currentColor}
+.experiment-controls output{min-width:4.1em;text-align:right}
+.experiment-controls button{padding:6px 9px;min-height:34px}
+.metal-zones{display:inline-flex;align-items:center;gap:4px;margin-left:auto;white-space:nowrap;cursor:pointer}.metal-zones input{margin:0;accent-color:#b57825}
+
+.detail>svg{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.probe-legend{display:flex;gap:12px;margin-right:14px;color:#435966;font-size:12px;white-space:nowrap}
+.probe-legend>span{display:inline-flex;align-items:center;gap:5px}
+.probe-legend>span::before{content:"";width:16px;border-top:3px solid currentColor}
+
+
+.metal-probe{display:grid;grid-template-columns:minmax(0,1fr) minmax(145px,28%)}
+.metal-probe>svg{position:static;display:block;min-width:0;min-height:0}
+.probe-readout{align-self:center;border-left:1px solid #cbd7d8;padding:6px 9px;text-align:center;font-size:13px;color:#435966}
+#probeAngle{display:block;min-height:1.5em;margin-top:4px;color:#233f49;font-size:24px}

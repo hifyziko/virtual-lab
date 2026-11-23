@@ -23,6 +23,8 @@ for(const record of p.preserved){
 }
 assert.deepEqual(p.dependencies['dc18-dve-pole'],['dc-simple-fields']);
 assert.deepEqual(p.dependencies['em05-reluktance'],['armature-fields']);
+assert.deepEqual(p.dependencies['fu15-vodivost'],['fusion-fu15-vodivost']);
+assert(!html.includes('function relaxPlasma('),'Plasma trajectories load only on opening the lesson');
 assert(p.assets['dialog-transformer-field'],'Transformer field document must load on demand');
 assert.equal(p.preserved.find(item=>item.key==='dialog-transformer-field').sha256,
  sha(fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/transformator/pole-transformatoru-live.html'))),

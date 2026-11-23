@@ -1,5 +1,33 @@
 # Aktuální stav předání
 
+## Terminologie fúzních modulů, 23. listopadu 2026
+
+Prošlo všech 18 položek aktuálního fúzního rozcestníku podle knihy
+Entler–Kindl. Sjednoceny popisky v rozcestníku, ve výkladech, ovladačích
+a při přehrávání. Přehled modulů a stránek knihy je v `docs/fuze/README.md`.
+
+## Měrný odpor kovu a plazmatu, 23. listopadu 2026
+
+Modul `fu15-vodivost` je v sekci Základy plazmatu a fúze jako položka 08.
+Animace sčítá přitažlivost protonů, párové odpuzování elektronů a vnější
+elektrické pole. Předepsaný pohyb protonů a výuková tepelná lázeň jsou oddělené
+od makroskopického výpočtu Spitzerovy rezistivity a driftu. Model a ověření
+popisuje `docs/fuze/vodivost-kovu-a-plazmatu.md`.
+Kov přebírá princip přílohy `HiFyziko_kovova_mrizka_v6_neutralita.zip`.
+Ukazuje neutrální soubor 32 iontových zbytků a 32 vodivostních elektronů.
+Kružnice kolem kmitajících uzlů vymezují dosah modelového potenciálu,
+který plynule vychyluje elektron. Místní kmity ovlivňují také četnost
+malých fononových změn směru. Mřížka vlevo navazuje přes okraje díky
+periodickému vykreslení i výpočtu sil. V levém dolním detailu je jeden
+elektron se stejnou značkou jako v hlavní scéně. Oblouk a boční odečet
+ukazují úhel mezi rychlostí a silou. Detail běží průběžně i přes hranice
+buňky a při nulové síle zobrazuje její nulovou hodnotu. Legenda kovu používá „32 iontů“
+a „32 volných elektronů v buňce“. Jemné spojnice sledují polohy
+sousedních iontů i přes hranice buňky. Výklad popisuje doporučený pokus.
+Průlet kolem protonu používá společné měřítko pro všechny teploty
+a zobrazuje živou i referenční dráhu.
+Posuvník Zahřátí má delší dráhu a větší úchyt.
+
 ## Asynchronní motor, 22. listopadu 2026
 
 Jemná část stupnice odporu v obou pokusech zabírá přes polovinu dráhy. Do poměru 0,1 má krok 0,0001 a nad ním 0,001. Princip ve volbě Spřažené toky zobrazuje jejich skutečný vzájemný úhel z lineárního modelu. Při zániku rotorového toku se úhel označí jako neurčený.

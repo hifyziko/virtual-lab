@@ -391,7 +391,7 @@
     }
     setText($('exchangeNote'),encounter?.[0]??(ionizing?'Ionizace · elektron se uvolňuje':
       lost?'Neutrální atom dopadl na stěnu':!ion?'Vstřik neutrálního deuteria':
-      powerSum>0?'Coulombovo zpomalování':'Konec vypočteného zpomalování'));
+      powerSum>0?'Zpomalování coulombovskými srážkami':'Konec vypočteného zpomalování'));
     $('exchangeValue').hidden=!encounter;
     if(encounter)math($('exchangeValue'),encounter[1]);
   }
@@ -441,7 +441,7 @@
     eBars.setAttribute('d',ePath);
     iBars.setAttribute('d',iPath);
     const val=key=>number(lerp(a[key],b[key],u),3);
-    setText($('beamTotals'),'Elektrony '+number(electrons,3)+' · ionty '+number(ions,3)+' · průlet na stěnu '+val('wall')+' MW. Neutrály v letu '+val('neutral')+' · zpomalující ionty '+val('fast')+' · zbytek při 5Tᵢ '+val('residual')+' MW.');
+    setText($('beamTotals'),'Elektrony '+number(electrons,3)+' · ionty '+number(ions,3)+' · průlet na stěnu '+val('wall')+' MW. Neutrální atomy v letu '+val('neutral')+' · zpomalující ionty '+val('fast')+' · zbytek při 5Tᵢ '+val('residual')+' MW.');
   }
   const hardware=window.TokamakCAD;
   let gpu=null,assembly=null;
@@ -652,7 +652,7 @@
       const unit=f.t<.001?[1e6,'\\mu s']:[1e3,'ms'];
       math($('time'),fmt(f.t*unit[0])+'\\,\\mathrm{'+unit[1]+'}');
       for(const [id,value] of [['kin',lost?0:f.row[2]],['elec',f.row[3]],['ions',f.row[4]],['loss',lost?1000:0]])math($(id),fmt(value,1)+'\\,\\mathrm{keV}');
-      setText($('phase'),lost?'Průlet bez ionizace · dopad na stěnu':f.neutral?(f.point[1]>=data.entry&&f.point[1]<=data.exit?'Neutrální atom proniká plazmatem':'Přímý let neutrálního atomu'):f.ionization!==null?'Ionizace uvnitř plazmatu · vznik rychlého deuteronu':f.t>=data.flight+data.energy.at(-1)[0]?'Konec modelu rychlého iontu · zbytková energie částice':'Trajektorie vodicího středu deuteronu');
+      setText($('phase'),lost?'Průlet bez ionizace · dopad na stěnu':f.neutral?(f.point[1]>=data.entry&&f.point[1]<=data.exit?'Neutrální atom proniká plazmatem':'Přímý let neutrálního atomu'):f.ionization!==null?'Ionizace uvnitř plazmatu · vznik rychlého deuteronu':f.t>=data.flight+data.energy.at(-1)[0]?'Konec modelu rychlého iontu · zbytková energie částice':'Trajektorie gyračního středu deuteronu');
       for(let i=0;i<3;i++){
         const dot=$('energy-marker-'+i);
         if(!dot)continue;

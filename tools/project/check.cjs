@@ -1,6 +1,7 @@
 'use strict';
 const C=require('./common.cjs'),{cp,root}=C;
 const commands=[
+ ['tools/test-conductivity.cjs'],
  ['tools/test-pitch-selection.cjs'],
  ['tools/test-am-coil.cjs'],
  ['tools/test-winding-control-effects.cjs'],

@@ -159,7 +159,7 @@
     if(t>=.117){marks.replaceChildren();return;}
     svg.setAttribute('viewBox','0 0 '+w+' '+h);
     const ease=(a,b)=>{const u=Math.max(0,Math.min(1,(t-a)/(b-a)));return u*u*(3-2*u);};
-    const front=art.frontView(t),project=art.shellProjector(ease(.001,.009),1,front),open=ease(.011,.017);
+    const front=art.frontView(t),project=art.detailProjector(t),open=ease(.011,.017);
     const pieces=[],phase=src.rfPhase(t),rf=Math.sin(phase),amber='#b57825';
     const fmt=p=>p.map(v=>v.toFixed(2)).join(',');
     const depth=p=>p[2]*(1-front)+(p[0]-200)*front;
