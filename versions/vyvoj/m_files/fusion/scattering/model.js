@@ -54,7 +54,7 @@
     return sums;
   });
   function encounters(phase, speed, fastest) {
-    const distance = maxEncounters * phase * speed / fastest;
+    const distance = maxEncounters * phase * (speed / fastest);
     const count = Math.floor(distance);
     return { distance, count, angles: walks.map(sums => sums[count] * 0.09 / speed ** 2) };
   }

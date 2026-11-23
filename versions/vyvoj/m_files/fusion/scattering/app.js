@@ -295,11 +295,33 @@
     render();
   }
 
+  function lockShotControls(locked) {
+    $('shoot').disabled = locked;
+    speed.disabled = locked;
+    $('reset-speed').disabled = locked;
+    time.disabled = locked;
+  }
+
+  function shoot() {
+    if ($('shoot').disabled) return;
+    clock = 0;
+    previousTime = null;
+    lockShotControls(true);
+    render();
+    animation = requestAnimationFrame(frame);
+  }
+
   function frame(timestamp) {
     if (previousTime !== null) {
       clock += Math.min((timestamp - previousTime) / 1000, 0.06) * 1.3;
-      if (clock > endTime) clock = 0;
+      clock = Math.min(clock, endTime);
       render();
+    }
+    if (clock >= endTime) {
+      animation = 0;
+      lockShotControls(false);
+      $('shoot').textContent = 'Vystřelit znovu';
+      return;
     }
     previousTime = timestamp;
     animation = requestAnimationFrame(frame);
@@ -318,7 +340,7 @@
   };
 
   refresh();
-  animation = requestAnimationFrame(frame);
+  $('shoot').onclick = shoot;
   const resize = new ResizeObserver(render);
   resize.observe(document.querySelector('main'));
   resize.observe(document.querySelector('.panels'));
