@@ -18,7 +18,7 @@
       // The particle labels and shared-color markers also work without WebGL.
     }
   }
-  let faster, orbits, timeMarks, endTime, sceneBottom, clock = 0, pixelRatio = 1;
+  let faster, orbits, timeMarks, fastRowDuration, endTime, sceneBottom, clock = 0, pixelRatio = 1;
   let animation = 0, previousTime = null;
 
   const decimal = (value, places = 1) => value.toFixed(places).replace('.', '{,}');
@@ -231,7 +231,7 @@
   }
 
   function drawEncounters() {
-    const rows = orbits.map(orbit => model.encounters(clock / endTime, orbit.speed, faster));
+    const rows = orbits.map(orbit => model.encounters(clock / fastRowDuration, orbit.speed, faster));
     names.forEach((name, i) => math($('count-' + name), 'N=' + rows[i].count));
     const scene = surface('meetings'), plot = surface('directions');
     if (!scene || !plot) return;
@@ -287,7 +287,9 @@
       }
       return marks;
     });
-    endTime = orbits[0].end + 1.2;
+    fastRowDuration = orbits[0].end + 1.2;
+    endTime = fastRowDuration * faster;
+    clock = Math.min(clock, endTime);
     sceneBottom = Math.min(-0.95, ...orbits[0].samples.map(({ state }) => state[1] - 0.6));
     math($('speed-value'), decimal(faster) + '\\times');
     math($('speed-fast'), decimal(faster) + '\\,v_0');
