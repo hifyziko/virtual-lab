@@ -64,11 +64,7 @@
       }
       if (area.id === 'electricity') section.insertAdjacentHTML('beforeend', '<aside class="physics-proposal"><span class="badge">Námět k doplnění</span><h3>Elektrostatika</h3><p>Elektrický náboj, Coulombův zákon, elektrické pole, potenciál a kondenzátor. Tato část zatím neobsahuje interaktivní moduly.</p></aside>');
       if (area.id === 'machines') section.insertAdjacentHTML('beforeend', '<p class="physics-connection">Potřebujete si připomenout principy? <a href="#group-electromagnetism">Přejít k základům elektromagnetismu →</a></p>');
-      if (area.id === 'plasma') section.insertAdjacentHTML('beforeend', '<div class="physics-proposals">' + [
-        ['Částice v elektrickém a magnetickém poli','Pohyb nabitých částic jako základ pro pochopení plazmatu.'],
-        ['Magnetické udržení plazmatu','Od pohybu podél siločar k principu tokamaku.'],
-        ['Fúzní elektrárny','Od jaderných reakcí k výrobě elektrické energie.']
-      ].map(([title,text]) => `<article class="physics-proposal"><span class="badge">Námět k doplnění</span><h3>${title}</h3><p>${text}</p></article>`).join('') + '</div><p>Zatím návrh obsahu této oblasti. Interaktivní moduly zde ještě nejsou.</p>');
+      if (area.id === 'plasma') section.insertAdjacentHTML('beforeend', '<div class="physics-proposals"><article class="physics-proposal"><h3>Tepelný oběh fúzní elektrárny</h3><p>Přenos tepla z blanketu chladivem do parního oběhu a pohon turbíny.</p></article></div>');
       footer.before(section);
     }
     footer.innerHTML = 'Zkušební verze 1.8.0-fyzika-preview · Interaktivní výuka v češtině · Dostupná také offline<br>Číselné modely jsou výukové idealizace. <a href="../../aktualni/web/index.html">Otevřít původní laboratoř elektrických strojů →</a>';

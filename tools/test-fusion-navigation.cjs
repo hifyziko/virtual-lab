@@ -16,10 +16,11 @@ const Lab={catalog:[{id:'existing',group:'sync'}],modules:new Map(),home(){},rou
 const c={Lab,LabProgress:{value:key=>'<html>'+key+'</html>'},document:{readyState:'loading',createElement:tag=>new Element(tag)},location:{hash:''},setTimeout:fn=>{timers.add(fn);return fn;},clearTimeout:fn=>timers.delete(fn),addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);}};c.window=c;vm.createContext(c);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8'),c);
 assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,24);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,20,'Nineteen fusion modules are listed');
-assert.equal(Lab.catalog.find(e=>e.id==='fu02-galerie').num,'01','Gallery opens the fundamentals topic');
-assert.deepEqual(Lab.catalog.filter(e=>e.topic==='basics').map(e=>e.id),['fu02-galerie','fu01-reakce','fu12-lawson','fu07-plazma','fu03-drift','fu17-rozptyl','fu14-milniky','fu15-vodivost']);
-assert.deepEqual(Lab.catalog.filter(e=>e.topic==='tokamak').map(e=>e.id),['fu04-udrzeni','fu09-princip','fu10-compass','fu06-divertor','fu20-rezonance','fu11-rekonexe','fu18-injektor','fu15-nbi','fu13-ohrev','fu16-eccd','fu19-tvar']);
-for(const topic of ['basics','tokamak'])assert.deepEqual(Lab.catalog.filter(e=>e.topic===topic).map(e=>e.num),topic==='tokamak'?['01','02','03','04','05','06','07','08','09','10','11']:['01','02','03','04','05','06','07','08']);
+assert.deepEqual(Lab.catalog.slice(1).map(e=>e.id),[
+ 'fu07-plazma','fu17-rozptyl','fu15-vodivost','fu01-reakce','fu12-lawson','fu14-milniky',
+ 'fu03-drift','fu04-udrzeni','fu09-princip','fu06-divertor','fu19-tvar','fu20-rezonance','fu11-rekonexe','fu18-injektor','fu15-nbi','fu13-ohrev','fu16-eccd','fu10-compass',
+ 'fu02-galerie']);
+assert.deepEqual(Lab.catalog.slice(1).map(e=>e.num),Array.from({length:19},(_,i)=>String(i+1).padStart(2,'0')));
 assert.equal(Lab.catalog.find(e=>e.id==='fu06-divertor').title,'Tokamak: pole a plazma');
 {
  const create=c.document.createElement;let injected;const area={querySelector:selector=>selector==='.physics-area-heading'?{after(group){injected=group;}}:null};
@@ -36,6 +37,7 @@ assert.equal(Lab.catalog.find(e=>e.id==='fu06-divertor').title,'Tokamak: pole a 
  assert.equal(injected.id,'group-fusion','Keep historical group links');assert.equal(injected.tagName,'section');
  const topics=[...markup.matchAll(/<details\b([^>]+)>([\s\S]*?)<\/details>/g)];assert.equal(topics.length,2);
  for(const [attributes,body]of topics.map(m=>[m[1],m[2]])){const topic=attributes.match(/data-fusion-subgroup="([^"]+)"/)[1],items=Lab.catalog.filter(e=>e.topic===topic);assert(attributes.includes('name=\u0022fusion-directory-topic\u0022') && !/\bopen\b/.test(attributes),'Fusion topics start collapsed and share one exclusive details group');assert.equal((body.match(/class="card ready fusion-card"/g)||[]).length,items.length);for(const entry of items)assert(body.includes('href="#'+entry.id+'"'));assert(body.includes(topic==='basics'?'Základy plazmatu a fúze':'Magnetické udržení a tokamak'));assert(body.includes('fusion-theme-label'));}
+ assert(markup.endsWith('<a class="fusion-gallery-link" href="#fu02-galerie">Galerie částic, jader a atomů</a>'));
  for(const entry of Lab.catalog.filter(e=>e.group==='fusion'))assert.equal(markup.split('href="#'+entry.id+'"').length-1,1,'Each module has one tile');
 }
 assert(!Lab.catalog.some(e=>e.id==='fu08-ostrovy'));assert.equal(Lab.modules.get('fu08-ostrovy').sourceId,'fu11-rekonexe');assert(!Lab.catalog.some(e=>e.id==='fu05-rovnovaha'));assert.equal(Lab.modules.get('fu05-rovnovaha').sourceId,'fu06-divertor');
@@ -77,11 +79,13 @@ for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
  assert(hub.includes('Základy plazmatu a fúze')&&hub.includes('Magnetické udržení a tokamak'),'Delivered hub contains both fusion topics');
  assert(hub.includes('fusion-card-fill:#fbf7ed')&&hub.includes('fusion-card-fill:#f0f5fa'),'Both quiet topic palettes are included');
  for(const entry of Lab.catalog.filter(e=>e.group==='fusion'))assert(hub.includes("id:'"+entry.id+"'"),'Delivered hub registers '+entry.id);
+ assert(hub.includes('Tepelný oběh fúzní elektrárny') && !hub.includes('Od pohybu podél siločar k principu tokamaku.'),'Planned topics describe work still to come');
+ assert(hub.includes("id === 'plasma' ? tokamakCardArt()") && !hub.includes('id="wow-plasma-glow"'),'The fusion heading uses the directory tokamak');
  const published=new Set(require('./project/common.cjs').webFiles(manifest));
  for(const entry of Lab.modules.values()){
   if(entry.sourceId){assert.deepEqual(manifest.progressive.dependencies[entry.id],['fusion-'+entry.sourceId]);assert(!manifest.progressive.assets['fusion-'+entry.id],'Aliases must share the gallery payload');continue;}
   const file=path.join(web,entry.page),html=fs.readFileSync(file,'utf8');assert(html.includes('data-fusion-page="'+entry.id+'"'));assert(html.includes('aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a>'));assert(html.includes('<header data-fusion-heading'));assert(html.includes('<h1 data-module-number="'+entry.num+'">'));
-  if(entry.id==='fu06-divertor')assert(html.includes('<h1 data-module-number="04">Tokamak: pole a plazma</h1>'),'The renamed lesson heading is delivered under its existing route');
+  if(entry.id==='fu06-divertor')assert(html.includes('<h1 data-module-number="10">Tokamak: pole a plazma</h1>'),'The renamed lesson heading is delivered under its existing route');
   if(entry.id==='fu11-rekonexe'){
    assert.match(html,/<main class="shell">\s*<header data-fusion-heading\b/);
    const cutHeader=html.match(/<article class="panel main">\s*<header>([^]*?)<\/header>/)?.[1];

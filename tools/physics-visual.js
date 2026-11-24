@@ -12,7 +12,6 @@
   }
   applyAreaPalette();window.addEventListener('hashchange',applyAreaPalette);
   const fieldArt = () => `<svg data-plain-svg viewBox="0 0 600 440" aria-hidden="true"><defs><radialGradient id="wow-field-glow"><stop stop-color="#b8f4dd"/><stop offset="1" stop-color="#b8f4dd" stop-opacity="0"/></radialGradient></defs><circle cx="300" cy="220" r="215" fill="url(#wow-field-glow)"/><g class="wow-orbits" fill="none" stroke="#138f86" stroke-width="1.4">${Array.from({length:11},(_,i)=>`<ellipse cx="300" cy="220" rx="${65+i*14}" ry="${30+i*8}" transform="rotate(${i*16} 300 220)" opacity="${.35+i*.05}"/>`).join('')}</g><g fill="#11786f"><circle cx="300" cy="220" r="20"/><circle cx="300" cy="220" r="32" fill="none" stroke="#11786f" opacity=".25"/><circle class="wow-particle" cx="465" cy="220" r="7"/></g><circle cx="300" cy="220" r="8" fill="#edfff6"/></svg>`;
-  const plasmaArt = () => `<svg data-plain-svg viewBox="0 0 600 440" aria-hidden="true"><defs><radialGradient id="wow-plasma-glow"><stop stop-color="#ebccff"/><stop offset="1" stop-color="#ebccff" stop-opacity="0"/></radialGradient></defs><circle cx="300" cy="220" r="220" fill="url(#wow-plasma-glow)"/><g class="wow-plasma" fill="none" stroke-width="1.6">${Array.from({length:22},(_,i)=>`<ellipse cx="300" cy="220" rx="${150+28*Math.cos(i*Math.PI/11)}" ry="${57+24*Math.sin(i*Math.PI/11)}" transform="rotate(${i*8.2} 300 220)" stroke="${i%3?'#8c62bb':'#dc79ae'}" opacity=".65"/>`).join('')}</g><circle cx="300" cy="220" r="32" fill="#fff9ff" opacity=".8"/></svg>`;
   const tokamakCardArt = () => `<div class="iter-card-scene" aria-hidden="true">
     <picture>
       <source media="(prefers-reduced-motion: reduce)" srcset="shared/fusion/iter-card-still.webp">
@@ -61,7 +60,7 @@
       }
       hero.querySelector('h1').parentElement.append(branding);
     }
-    const art = id => id === 'plasma' ? plasmaArt() : id === 'machines' ? machineArt() : fieldArt();
+    const art = id => id === 'plasma' ? tokamakCardArt() : id === 'machines' ? machineArt() : fieldArt();
     const scene = document.createElement('div');
     scene.className = 'wow-scene';
     scene.innerHTML = art(area || 'electricity') + '<span class="wow-scene-caption">POZOROVAT · ZKOUMAT · POROZUMĚT</span>';
@@ -82,7 +81,7 @@
       const visual = document.createElement('div');
       visual.className = 'wow-card-art';
       // Unique IDs prevent gradient collisions between the hero and cards.
-      visual.innerHTML = id === 'plasma' ? tokamakCardArt() : art(id).replaceAll('wow-field-glow','wow-card-field-glow');
+      visual.innerHTML = art(id).replaceAll('wow-field-glow','wow-card-field-glow');
       card.prepend(visual);
       card.querySelector('strong').innerHTML = 'Vstoupit do oblasti <span aria-hidden="true">↗</span>';
     }
