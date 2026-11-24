@@ -18,9 +18,10 @@ vm.createContext(c);vm.runInContext(fs.readFileSync(path.join(dir,'data.js'),'ut
 vm.runInContext(fs.readFileSync(path.join(dir,'app.js'),'utf8'),c);
 assert.equal(video.src,'compass-u/assembly.mp4');assert.equal(video.loads,1,'Only the selected clip starts loading');
 assert.equal(video.poster,'compass-u/assembly.jpg');
-assert.equal(video.paused,true,'No autoplay on module entry');
+assert.equal(video.autoplay,true,'The opening clip requests native autoplay');
+assert.match(html,/<video\b[^>]*\bmuted\b/);
 video.emit('loadedmetadata');assert.equal(nodes.get('seek').disabled,false);video.emit('loadeddata');assert.equal(nodes.get('cover').hidden,true);
-video.currentTime=29;clips[1].onclick();assert.equal(video.src,'compass-u/interior.mp4');video.emit('loadedmetadata');assert.equal(video.currentTime,0);
+video.currentTime=29;clips[1].onclick();assert.equal(video.autoplay,false);assert.equal(video.src,'compass-u/interior.mp4');video.emit('loadedmetadata');assert.equal(video.currentTime,0);
 video.currentTime=14;clips[0].onclick();video.emit('loadedmetadata');assert.equal(video.currentTime,29,'Switching clips remembers the previous position');
 const seek=nodes.get('seek');video.paused=false;seek.emit('pointerdown');assert(video.paused);seek.value='500';seek.emit('input');assert.equal(video.currentTime,42.0625);listeners.get('pointerup')();assert.equal(video.paused,false,'Dragging resumes previously playing video');
 nodes.get('speed').value='0.5';nodes.get('speed').onchange();assert.equal(video.playbackRate,.5);

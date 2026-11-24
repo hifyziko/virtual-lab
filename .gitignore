@@ -631,6 +631,11 @@
 !/versions/vyvoj/m_files/fusion/plasma/layout.js
 !/versions/vyvoj/m_files/fusion/plasma/model.js
 !/versions/vyvoj/m_files/fusion/plasma/style.css
+!/versions/vyvoj/m_files/fusion/resonance/app.js
+!/versions/vyvoj/m_files/fusion/resonance/drawings.js
+!/versions/vyvoj/m_files/fusion/resonance/index.html
+!/versions/vyvoj/m_files/fusion/resonance/style.css
+!/versions/vyvoj/m_files/fusion/resonance/surface.js
 !/versions/vyvoj/m_files/fusion/scattering/app.js
 !/versions/vyvoj/m_files/fusion/scattering/index.html
 !/versions/vyvoj/m_files/fusion/scattering/model.js

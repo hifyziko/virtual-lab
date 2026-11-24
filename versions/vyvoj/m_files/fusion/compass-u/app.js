@@ -14,7 +14,7 @@
  function showLoad(immediate=false){clearTimeout(loadTimer);const show=()=>{if(disposed)return;cover.hidden=false;$('loadText').textContent='Načítání videa…';$('retry').hidden=true;progress.hidden=false;progress.removeAttribute('value');};if(immediate)show();else loadTimer=setTimeout(show,400);}
  function fail(){clearTimeout(loadTimer);cover.hidden=false;$('loadText').textContent='Video se nepodařilo načíst.';progress.hidden=true;$('retry').hidden=false;}
  function chapters(){const node=$('chapters');node.replaceChildren();for(const [label,seconds]of data.clips[active].chapters){const b=document.createElement('button');b.textContent=label;b.onclick=()=>{if(Number.isFinite(video.duration))video.currentTime=Math.min(seconds,video.duration);};node.append(b);}}
- function select(name){times[active]=video.currentTime||0;video.pause();active=name;for(const b of clips)b.setAttribute('aria-pressed',String(b.dataset.clip===name));$('clipTitle').textContent=data.clips[name].title;video.setAttribute('aria-label',data.clips[name].title);seek.disabled=true;showLoad(true);const clip=clips.find(b=>b.dataset.clip===name);video.poster=clip.dataset.videoPoster;$('play').disabled=false;video.src=clip.dataset.videoSrc;video.load();chapters();update();}
+ function select(name,autoplay=false){video.autoplay=autoplay;times[active]=video.currentTime||0;video.pause();active=name;for(const b of clips)b.setAttribute('aria-pressed',String(b.dataset.clip===name));$('clipTitle').textContent=data.clips[name].title;video.setAttribute('aria-label',data.clips[name].title);seek.disabled=true;showLoad(true);const clip=clips.find(b=>b.dataset.clip===name);video.poster=clip.dataset.videoPoster;$('play').disabled=false;video.src=clip.dataset.videoSrc;video.load();chapters();update();}
  clips.forEach(b=>b.onclick=()=>{if(b.dataset.clip!==active)select(b.dataset.clip);});
  video.addEventListener('loadedmetadata',()=>{seek.disabled=false;video.currentTime=Math.min(times[active],video.duration||0);update();});
  for(const event of ['loadeddata','canplay','playing','seeked'])video.addEventListener(event,hideLoad);
@@ -30,5 +30,5 @@
  $('speed').onchange=()=>{video.playbackRate=Number($('speed').value);};
  const dialog=$('compass-help');$('help').onclick=()=>dialog.showModal();$('closeHelp').onclick=()=>dialog.close();
  window.HiFyzikoFusionDispose=()=>{disposed=true;clearTimeout(loadTimer);video.pause();video.removeAttribute('src');video.load();window.removeEventListener('pointerup',endScrub);window.removeEventListener('pointercancel',endScrub);};
- select('assembly');
+ select('assembly',true);
 })();

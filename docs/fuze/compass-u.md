@@ -7,7 +7,7 @@ Zdroj je `versions/vyvoj/m_files/fusion/compass-u/`; uživatelský výstup
 Velké video doplňuje kompaktní panel plánovaných návrhových hodnot.
 Sestavení celého zařízení a detailní vnitřní sestava jsou dvě samostatná
 videa s vlastní zapamatovanou pozicí. Videa se načítají až v otevřeném
-modulu, vždy jen vybrané; žádné automatické přehrávání. Posuvník mění
+modulu, vždy jen vybrané. Úvodní sestavení se po načtení automaticky přehrává. Posuvník mění
 čas, nikoli prostorový pohled. Připravený pohyb kamery je součástí videa.
 Původní vzhled a rozměrové konvence ostatních modulů se nemění.
 

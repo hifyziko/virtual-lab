@@ -7,8 +7,8 @@ main{gap:8px}.comparison{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex
 
 .selected-caption{position:absolute;left:10px;top:8px;font-size:13px;pointer-events:none}.velocity-label,#metalEvent{color:#187767}.force-label{color:#b57825}
 
-body[data-fusion-page="fu15-vodivost"] header[data-fusion-heading]{flex-wrap:nowrap;gap:7px}
-body[data-fusion-page="fu15-vodivost"] header[data-fusion-heading] > h1{font-size:21px}
+
+
 .experiment-controls{display:flex;align-items:center;gap:7px;flex:none;font-size:13px;white-space:nowrap}
 .experiment-controls input[type=range]{
  appearance:none;width:clamp(190px,24vw,310px);height:34px;

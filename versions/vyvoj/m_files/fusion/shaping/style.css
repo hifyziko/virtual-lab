@@ -82,9 +82,7 @@ main:not([data-mode=current]) :is(.current-controls,.current-views),[data-mode=c
 .current-controls output{min-width:46px}
 .winding .profile-key{font-size:12px}
 
-body[data-fusion-page="fu19-tvar"] header[data-fusion-heading] {
-  zoom:1; flex-wrap:nowrap; gap:8px;
-}
+
 .modebar {gap:4px}
 .modebar button {white-space:nowrap; padding:7px 9px}
 .current-controls,.guided-action,.toolbar {height:60px;flex:none}
