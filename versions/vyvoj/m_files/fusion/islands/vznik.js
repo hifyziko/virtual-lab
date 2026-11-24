@@ -3,9 +3,9 @@
 const TAU=2*Math.PI, RS=.59, CAMERA_CUT=Math.PI/2, TRACK_H=.00140;
 const slider=document.querySelector('#timeline'), play=document.querySelector('#play'), reset=document.querySelector('#reset');
 const story=[
-{title:'1. Hladké magnetické plochy',body:'V tokamaku teče plazmatem elektrický proud. Spolu s polem cívek vytváří magnetické pole, jehož plochy se v řezu jeví jako vnořené křivky. Směrové trojúhelníky ukazují oběh poloidálního pole. V rozvinuté vrstvě dole vidíš dvě větve vybrané hladiny toku.',key:'Polož pravý palec do roviny obrázku. Ohnuté prsty ukazují směr modrých siločar. Řez protíná plazmový prstenec napříč.'},
-{title:'2. Malá nerovnoměrnost proudu',body:'Proud v tokamaku nesou hlavně elektrony. Když se někde na chvíli změní elektrické pole, elektrony tam mohou podél prstence trochu zrychlit. Stejným průřezem pak za sekundu projde víc náboje a proud místně zesílí. Kde se jejich společný pohyb zpomalí, proud zeslábne. Takový malý rozdíl nazýváme proudová porucha.',key:'Sleduj barvy. V modrošedé oblasti teče silnější proud, v oranžové slabší. V obou stále teče do roviny obrázku.'},
-{title:'3. Přídavné pole zakřivuje původní čáry',body:'Zvýšená a snížená proudová hustota vytvářejí přídavné magnetické pole. V bodě P porovnej původní směr pole s výslednou šipkou v horním panelu. Tečna k siločáře má směr výsledného pole. V bodě P míří součet příspěvků celého rozložení doprava.',key:'P leží mezi sousedními extrémy proudové odchylky. Čárkovaně je původní siločára, modře výsledná siločára. Trojúhelník ukazuje příspěvek poruchy. Zobrazeny jsou pouze složky v rovině řezu.'},
+{title:'1. Mimo rezonanci',body:'Začni stejně jako v pokusu s bezpečnostním faktorem. Fialová siločára kříží hřebeny předepsané výchylky. Dole proto její výchylka kolísá a červené šipky míří zpět k rovnováze.',key:'Sleduj stále stejný mód a amplitudu. Přepni na Rezonance a porovnej sklon fialové čáry.'},
+{title:'2. Rezonance',body:'Na téže mapě změníme jen bezpečnostní faktor. Fialová siločára nyní vede podél hřebene. Výchylka je podél ní konstantní a vratná síla od dodatečného ohybu mizí.',key:'Rezonance určuje plochu, na kterou se zaměříme. Vznik ostrova vyžaduje také změnu propojení magnetických ploch.'},
+{title:'3. Proudová porucha',body:'Nyní v okolí vyznačené rezonanční plochy předepíšeme malou odchylku proudu. Vpravo nahoře sleduj, jak její přídavné pole vychýlí původní siločáru. Dole vidíš dvě oddělené větve vybrané hladiny toku.',key:'Pokračuj k proudové vrstvě a sleduj, ve kterém kroku se větve skutečně přepojí.'},
 {title:'4. Mění se celé magnetické uspořádání',body:'Malé příčné pole změní směry výsledného pole. Porovnej sklon siločáry v místním pohledu s původním směrem. Na jedné vrstvě tokamaku má porucha stejný prostorový rytmus jako původní šroubovicové pole — tam je odezva nejsilnější.',key:'Není potřeba znát čísla módu. Důležité je, že tytéž siločáry reagují na stále stejnou fázi poruchy. Ještě se nic nepřepojilo.'},
 {title:'5. V úzké vrstvě se blíží změna propojení',body:'Když je rovnováha nestabilní, může deformace růst. U určité vrstvy se zesílí gradient rekonektující složky pole a vzniknou podmínky pro neideální změnu propojení. Obě větve jsou ještě otevřené.',key:'Oranžové značky označují budoucí místa změny propojení. Hlavní toroidální pole zůstává přítomné.'},
 {title:'6. Původní větve se k sobě přiblíží a propojí',body:'Sleduj výhradně silné fialové křivky. Jsou zde už od začátku: dvě oddělené větve téže hodnoty helikálního toku. V místě neideální vrstvy se jejich mezera zmenšuje. Když růst poruchy dosáhne této vybrané hladiny toku, její návaznost se změní a sledovaná hladina toku vytvoří uvnitř magnetického ostrova uzavřenou křivku.',key:'Neobjevuje se nová čára: fialově pořád sleduješ STEJNOU hodnotu helikálního toku, nikoli stejnou materiální siločáru. V proudu dochází k neideálnímu přepojení; jde o názorný model, ne časové řešení MHD.'},
@@ -31,12 +31,17 @@ function clamp(v,a=0,b=1){return Math.max(a,Math.min(b,v));}
 function smooth(v){v=clamp(v);return v*v*(3-2*v)}
 function parameters(t){
   // Content is progressively revealed, not a time-accurate MHD evolution.
-  let seed=smooth(t-1), field=smooth(t-2), b=0, e=0;
+  let seed=smooth((t-2)*2), field=smooth(t-2), b=0, e=0;
   if(t>=2 && t<3)b=.012*field;
   if(t>=3 && t<4)b=.012+.020*smooth(t-3);
   if(t>=4)b=.032+.006*smooth(t-4);
-  if(t>=5)e=TRACK_H*smooth((t-5)/.78)+(.0049-TRACK_H)*smooth((t-5.94)/1.06);
-  return {t,seed,field,b,e,phi:CAMERA_CUT,layer:smooth(t-4),rec:smooth(t-5)};
+  // Ease the visible gap and then the angular position of each new tip.
+  if(t>=5){
+   const gap=1-smooth((t-5)/.78);
+   const tip=Math.acos(TRACK_H/.0049)*smooth((t-5.94)/1.06);
+   e=TRACK_H*(1-gap*gap)/Math.cos(tip);
+  }
+  return {t,seed,field,b,e,q:1.5+.5*smooth((t-.1)/.9),intro:1-smooth((t-1.8)/.8),phi:CAMERA_CUT,layer:smooth(t-4),rec:smooth(t-5)};
 }
 const blue='#356ac3', violet='#8743b1', reference='#879bab';
 const element=id=>document.getElementById(id);
@@ -178,7 +183,39 @@ function parallelLines(strength){
  }
  return out;
 }
-element('micro').innerHTML='<g id="microPlane"><g id="parallelField"></g><g id="localProbe">'+
+// Same prescribed 2/1 displacement as the preceding safety-factor lesson.
+function stabilityMap(q){
+ const x=76,y=25,w=540,h=148,bottom=y+h;
+ // Phase in screen coordinates: 2 theta - phi, with two toroidal turns.
+ const ax=2*TAU/w,ay=2*TAU/h,k=ax*ax+ay*ay;
+ let stops='';
+ for(let i=0;i<=64;i++){
+  const wave=Math.cos(TAU*i/64),end=wave>=0?[232,190,145]:[157,193,231];
+  const color=[244,247,248].map((v,j)=>Math.round(v+.65*Math.abs(wave)*(end[j]-v)));
+  stops+='<stop offset="'+i/64+'" stop-color="rgb('+color.join(',')+')"/>';
+ }
+ let plot='<defs><linearGradient id="phaseBands" gradientUnits="userSpaceOnUse" x1="'+x+'" y1="'+y+'" x2="'+(x+TAU*ax/k)+'" y2="'+(y+TAU*ay/k)+'" spreadMethod="repeat">'+stops+'</linearGradient><clipPath id="resonanceMapClip"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'"/></clipPath></defs>';
+ plot+='<g clip-path="url(#resonanceMapClip)"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="url(#phaseBands)"/>';
+ for(let j=-2;j<=2;j++){
+  const start=bottom+j*h/2;
+  plot+=path('M'+x+' '+start+'l'+w+' '+(-h),'#a45c25',2,'none','stroke-dasharray="5 4"');
+ }
+ for(let wrap=0;wrap<=2;wrap++){
+  const start=bottom+wrap*h;
+  plot+=line([[x,start],[x+w,start-2*h/q]],violet,3.5);
+ }
+ return plot+'</g>'+mathAt(5,16,64,'2\\pi')+mathAt(14,155,50,'0')+mathAt(47,177,58,'0')+mathAt(580,177,70,'4\\pi')+mathAt(7,84,54,'\\theta')+mathAt(315,200,60,'\\varphi')+mathAt(292,0,100,'q='+String(num(q)).replace('.', '{,}'));
+}
+function stabilityTrace(q){
+ const detuning=2/q-1, amplitude=.65, x=t=>70+545*t;
+ const displacement=t=>amplitude*Math.cos(2*TAU*detuning*t),y=t=>90-66*displacement(t);
+ let plot=path('M70 90H615',reference,1,'none','stroke-dasharray="4 4"')+line(samples(200,t=>[x(t),y(t)]),violet,3);
+ for(let i=1;i<14;i++){
+  const t=i/14;plot+=arrow(x(t),y(t),0,190*detuning*detuning*displacement(t),'#ba354b',2);
+ }
+ return plot+mathAt(0,69,70,'\\xi_r/A_{\\max}')+mathAt(45,139,50,'0')+mathAt(584,139,63,'4\\pi')+mathAt(315,151,60,'\\varphi')+mathAt(432,4,200,'|\\hat f_{\\mathrm v}|'+(q===2?'=0':'\\approx '+(amplitude*detuning*detuning).toFixed(3).replace('.', '{,}')));
+}
+element('micro').innerHTML='<g id="resonanceMap"></g><g id="microPlane"><g id="parallelField"></g><g id="localProbe">'+
  circle(190,111,4,'white',blue,1.5)+label(179,115,'P','end')+'</g>'+
  source(70,219,false)+label(87,224,'Proud plazmatu do roviny řezu')+
  path('M389 14V230','#dce4eb')+label(519,27,'Směr poloidálního pole','middle')+'<g id="microTriangle"></g></g><g id="connectionView"></g>';
@@ -206,41 +243,43 @@ function connectionPreview(s){
  const xy=(q,sign)=>[cx+140*q,cy-730*(s.b*(1-Math.cos(q))+sign*Math.sqrt(Math.max(0,2*(TRACK_H-s.e*Math.cos(q)))))];
  const secondary='#ad9bb6';
  let drawing=label(17,21,'Vně','start','#657782')+label(17,200,'K ose','start','#657782')+label(cx+12,cy+19,'X','start','#92591b')+path(`M${cx-6} ${cy}h12m-6 -6v12`,'#a8682c',1.5);
- if(s.e<=TRACK_H){
-  drawing+=line(samples(140,u=>xy(span*(2*u-1),-1)),secondary,2.5);
-  drawing+=line(samples(140,u=>xy(span*(2*u-1),1)),s.e===TRACK_H?secondary:violet,3.5);
-  if(s.e===TRACK_H)drawing+=line(samples(70,u=>xy(span*(u-1),1)),violet,3.5);
- }else{
-  const q0=Math.acos(TRACK_H/s.e);
-  for(const side of [-1,1]){
-   const q=u=>side*(q0+(span-q0)*u*u);
-   const points=samples(64,u=>xy(q(1-u),1)).concat(samples(64,u=>xy(q(u),-1)));
-   drawing+=line(points,side<0?violet:secondary,side<0?3.5:2.5);
+ // During contact, gradually transfer the highlight from A–B to A–D.
+ const transfer=smooth((s.t-5.78)/.16);
+ const tip=s.e>TRACK_H?Math.acos(TRACK_H/s.e):0;
+ for(const side of [-1,1]){
+  for(const sign of [-1,1]){
+   const weight=sign>0?(side<0?1:1-transfer):(side<0?transfer:0);
+   const points=samples(84,u=>xy(side*(tip+(span-tip)*u*u),sign));
+   drawing+=line(points,secondary,2.5)+layer(weight,()=>line(points,violet,3.5));
   }
  }
  for(const [side,sign,name] of [[-1,1,'A'],[1,1,'B'],[1,-1,'C'],[-1,-1,'D']]){
   const [x,y]=xy(side*span,sign);
-  const selected=name==='A'||(s.e<TRACK_H&&name==='B')||(s.e>TRACK_H&&name==='D');
-  drawing+=circle(x,y,5,selected?violet:secondary,name==='A'?violet:'white',2)+label(x+side*18,y+5,name,'middle');
+  const weight=name==='A'?1:name==='B'?1-transfer:name==='D'?transfer:0;
+  drawing+=circle(x,y,5,secondary,'white',2)+layer(weight,()=>circle(x,y,5,violet,name==='A'?violet:'white',2))+label(x+side*18,y+5,name,'middle');
  }
- if(s.e===TRACK_H)drawing+=circle(cx,cy,5,'#a8682c','white',2);
+ drawing+=layer(smooth((s.t-5.68)/.10)*(1-smooth((s.t-5.94)/.12)),()=>circle(cx,cy,5,'#a8682c','white',2));
  return drawing;
 }
 function updateDetail(s){
  const detail=smooth((s.t-4.65)/.4);
- element('microPlane').setAttribute('opacity',1-detail);
+ const intro=s.intro;
+ if(intro && changed('stabilityMap',s.q))element('resonanceMap').innerHTML=stabilityMap(s.q);
+ element('resonanceMap').setAttribute('opacity',intro);
+ element('microPlane').setAttribute('opacity',(1-detail)*(1-intro));
  element('connectionView').setAttribute('opacity',detail);
- if(detail && changed('connectionGeometry',[s.b,s.e].join()))
+ if(detail && changed('connectionGeometry',[s.b,s.e,clamp((s.t-5.68)/.38)].join()))
   element('connectionView').innerHTML=connectionPreview(s);
- const caption=detail<.5?0:s.e<TRACK_H?1:s.e===TRACK_H?2:3;
+ const caption=intro>.5?4:detail<.5?0:s.e<TRACK_H?1:s.e===TRACK_H?2:3;
  if(changed('detailCaption',caption)){
-  element('detailTitle').textContent=caption===0?'Siločáry před poruchou a při ní':'U bodu X · řez fialovou magnetickou plochou';
+  element('detailTitle').textContent=caption===4?'Siločára na rozvinuté ploše':caption===0?'Siločáry před poruchou a při ní':'U bodu X · řez fialovou magnetickou plochou';
   element('micro').setAttribute('aria-label',element('detailTitle').textContent);
   element('detailLegend').innerHTML=[
    'Levý okraj poloidálního řezu je zde rozvinutý naplocho. Trojúhelníky ukazují směr magnetického pole.',
    'Najdi A v orámované výseči vlevo. Tady je výseč rozvinutá naplocho. Fialový obrys vede z A do B.',
    'V X se setkají čtyři ramena řezu magnetickou plochou. Prostorové siločáry zde mají společný směr podél prstence.',
-   'Začni znovu v A. Tmavá větev se stáčí zpět doleva do D. Světlá spojuje B s C.'
+   'Začni znovu v A. Tmavá větev se stáčí zpět doleva do D. Světlá spojuje B s C.',
+   'Čárkovaně hřebeny výchylky, fialově sledovaná siločára.'
   ][caption];
  }
 }
@@ -284,7 +323,7 @@ function gapMarks(s,project){
    trails+=line([start,end],'#b699c6',2)+circle(...start,2,'#b699c6','white',1);
   }
  }
- return trails+line([a,b],'#a8682c',2)+circle(...a,3.5,violet,'white',1.8)+circle(...b,3.5,violet,'white',1.8);
+ return layer(clamp(half/(originalHalf*.25)),()=>trails)+line([a,b],'#a8682c',2)+circle(...a,3.5,violet,'white',1.8)+circle(...b,3.5,violet,'white',1.8);
 }
 function plasmaCurrentRow(s,project){
  const y=181,color='#384f60';
@@ -299,6 +338,7 @@ function plasmaCurrentRow(s,project){
  }
  return row;
 }
+element('local').innerHTML='<g id="tracePlot"></g><g id="layerPlot"></g>';
 function renderLocal(s){
  // Keep 28% of a neighbouring period visible beyond each end of the main one.
  const halfPeriod=200,centre=340;
@@ -311,7 +351,7 @@ function renderLocal(s){
  const yCentre=85+240*s.b,halfHeight=118*240/730;
  const box=path(`M${xCentre-halfWidth} ${yCentre-halfHeight}h${2*halfWidth}v${2*halfHeight}h${-2*halfWidth}Z`,'#936e48',1.5,'none','stroke-dasharray="5 4"');
  plot+=layer(smooth((s.t-4.65)/.4),()=>box);
- element('local').innerHTML='<defs><clipPath id="layer-window"><rect x="28" y="0" width="624" height="170"/></clipPath></defs>'+
+ element('layerPlot').innerHTML='<defs><clipPath id="layer-window"><rect x="28" y="0" width="624" height="170"/></clipPath></defs>'+
   '<g clip-path="url(#layer-window)">'+plot+'</g>'+layer(currentVisibility(s),()=>label(28,21,'Odchylky','start','#805135')+modeMarkers(s,project,true))+plasmaCurrentRow(s,project);
  element('fluxStatus').textContent=s.e>TRACK_H?'U ⊙ se větve propojily. Fialová křivka teď v řezu obepíná střed magnetického ostrova.':s.t>=5?'U ⊙ se mezera zavírá, u ⊗ se otevírá. Úsečka měří rozestup větví.':s.b>0?'Obě větve se zatím vychylují společně a jejich rozestup zůstává stejný.':'Fialové větve mají po celé délce stejný rozestup.';
 }
@@ -433,7 +473,7 @@ function torus(s){
  return scene+items.sort((a,b)=>a.depth-b.depth).map(item=>item.markup).join('')+front;
 }
 const probeX=280-probeRadius;
-element('fieldNotes').innerHTML=source(280,270,false)+label(297,275,'proud plazmatu')+ '<g id="mainProbe" opacity="0">'+circle(probeX,270,4,'white',blue,1.5)+label(probeX-10,276,'P','end')+'</g>';
+element('fieldNotes').innerHTML='<g id="resonantBand">'+circle(280,270,226*RS,'#8743b140','none',14)+circle(280,270,226*RS,violet,'none',1.6)+'</g>'+source(280,270,false)+label(297,275,'proud plazmatu')+ '<g id="mainProbe" opacity="0">'+circle(probeX,270,4,'white',blue,1.5)+label(probeX-10,276,'P','end')+'</g>';
 element('seedSites').innerHTML='<g transform="translate(280 270)">'+currentPattern('whole-current')+'</g>';
 let fieldOverride=null;
 const drawKeys=new Map();
@@ -459,7 +499,7 @@ function renderSection(s){
  toggle.textContent=showField?'Ukázat tokové plochy':'Ukázat siločáry';
  element('cut').classList.toggle('is-3d',spatial);
  const opacity=(id,v)=>element(id).setAttribute('opacity',v.toFixed(3));
- opacity('flatView',1-depthMix);
+ opacity('flatView',1-depthMix);opacity('resonantBand',1-smooth(s.t-2));
  opacity('spaceView',depthMix);
  if(depthMix<1){
   if(changed('baseField',s.field))element('baseField').innerHTML=fieldDrawing(s,false);
@@ -479,12 +519,20 @@ element('sectionToggle').onclick=()=>{
 };
 function draw(){
  const s=parameters(stageValue()),idx=Math.min(6,Math.floor(s.t));
+ element('inject').textContent=idx===0?'Nastavit rezonanci':'Vnést poruchu proudu';
  document.querySelectorAll('.stage').forEach((b,i)=>b.classList.toggle('active',i===idx));
  element('txtTitle').textContent=story[idx].title;element('txtBody').textContent=story[idx].body;element('pointBody').textContent=story[idx].key;
  element('stepName').textContent=story[idx].title.split(' · ')[0];
  if(changed('micro',[s.field,s.seed].join()))renderMicro(s);
  updateDetail(s);
- if(changed('local',[s.seed,s.b,s.e,smooth((s.t-4.65)/.4)].join()))renderLocal(s);
+ const showTrace=s.intro>=.5;
+ element('localTitle').textContent=showTrace?'Výchylka podél siločáry':'Rozvinutá rezonanční vrstva';
+ element('fluxFormula').hidden=showTrace;
+ element('tracePlot').setAttribute('opacity',s.intro);
+ element('layerPlot').setAttribute('opacity',1-s.intro);
+ if(s.intro && changed('traceQ',s.q))element('tracePlot').innerHTML=stabilityTrace(s.q);
+ if(s.intro<1 && changed('local',[showTrace,idx,s.seed,s.b,s.e,smooth((s.t-4.65)/.4)].join()))renderLocal(s);
+ if(showTrace)element('fluxStatus').textContent=s.q<2?'Červené šipky ukazují vratnou sílu od ohybu.':'Výchylka je konstantní. Příspěvek podélného ohybu k vratné síle je nulový.';
  renderSection(s);ensureSpin();
 }
 let phase3d=0,spinEnabled=true,spinFrameID=0,spinPrevious=0,viewYaw=-1.43,viewPitch=.58,dragStart=null;
@@ -510,7 +558,7 @@ function tick(time){
  if(!last)last=time;
  const dt=Math.min(.07,(time-last)/1000);last=time;
  // Progress distributed uniformly over visual changes; slightly slower close to reconnection.
- const vel=(playhead>=700&&playhead<=845)?24:38;
+ const vel=38-21*smooth((playhead-665)/75)*(1-smooth((playhead-875)/70));
  playhead+=dt*vel;
  if(playhead>=1000){playhead=1000;slider.value='1000.0';draw();stop();return;}
  slider.value=playhead.toFixed(1);draw();raf=requestAnimationFrame(tick);
@@ -518,24 +566,28 @@ function tick(time){
 play.addEventListener('click',()=>{if(active){stop();return;}stop();if(parseFloat(slider.value)>=1000)slider.value='0.0';playhead=parseFloat(slider.value);last=0;active=true;play.textContent='❚❚ Pozastavit';raf=requestAnimationFrame(tick)});
 reset.addEventListener('click',()=>{stop();fieldOverride=null;slider.value='0.0';draw()});document.getElementById('replay').addEventListener('click',()=>{stop();seekStage(5.30);playhead=parseFloat(slider.value);draw();last=0;active=true;play.textContent='❚❚ Pozastavit';raf=requestAnimationFrame(tick)});slider.addEventListener('pointerdown',()=>{sliderDrag=true;stop();ensureSpin()});slider.addEventListener('pointerup',()=>{sliderDrag=false;draw();ensureSpin()});slider.addEventListener('input',()=>{stop();playhead=parseFloat(slider.value);draw()});
 document.getElementById('expandDetail').addEventListener('click',()=>{const el=document.querySelector('.workspace'),btn=document.getElementById('expandDetail');const focused=el.classList.toggle('focus-local');btn.setAttribute('aria-pressed',String(focused));btn.textContent=focused?'⤡ Vrátit zobrazení':'⤢ Rozšířit detail';draw();});
-document.getElementById('inject').addEventListener('click',()=>{stop();seekStage(1.45);draw()});document.getElementById('spinToggle').addEventListener('click',()=>{spinEnabled=!spinEnabled;document.getElementById('spinToggle').textContent=spinEnabled?'❚❚ Zastavit rotaci':'▶ Roztočit ostrov';draw()});
+document.getElementById('inject').addEventListener('click',()=>animateToStage(stageValue()<1?1.5:2.6));document.getElementById('spinToggle').addEventListener('click',()=>{spinEnabled=!spinEnabled;document.getElementById('spinToggle').textContent=spinEnabled?'❚❚ Zastavit rotaci':'▶ Roztočit ostrov';draw()});
 const cutView=document.getElementById('cut');
 cutView.addEventListener('pointerdown',e=>{if(stageValue()<threeDStart())return;dragStart={x:e.clientX,y:e.clientY,yaw:viewYaw,pitch:viewPitch};cutView.classList.add('dragging');cutView.setPointerCapture(e.pointerId)});
 cutView.addEventListener('pointermove',e=>{if(!dragStart)return;viewYaw=dragStart.yaw+(e.clientX-dragStart.x)*.007;viewPitch=clamp(dragStart.pitch-(e.clientY-dragStart.y)*.006,-1.25,1.25);renderSection(parameters(stageValue()))});
 for(const ev of ['pointerup','pointercancel'])cutView.addEventListener(ev,()=>{dragStart=null;cutView.classList.remove('dragging')});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)ensureSpin()});
 
-document.querySelectorAll('.stage').forEach(button=>button.addEventListener('click',()=>{
+function animateToStage(stage){
  stop();
- const from=Number(slider.value),target=betweenKnot([0,1.8,2.9,3.8,4.8,5.68,6.4][Number(button.dataset.step)],false);
- const start=performance.now(),duration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:650;
+ const from=Number(slider.value),target=betweenKnot(stage,false);
+ const crossesContact=Math.min(stage,stageValue())<5.94 && Math.max(stage,stageValue())>5.78;
+ const duration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:
+  Math.min(crossesContact?6500:2200,(crossesContact?1800:900)+Math.abs(target-from)*(crossesContact?7:3));
+ const start=performance.now();
  function advance(now){
   const progress=duration?clamp((now-start)/duration):1;
   slider.value=from+(target-from)*smooth(progress);draw();
   if(progress<1)stepFrame=requestAnimationFrame(advance);else stepFrame=0;
  }
  advance(start);
-}));
+}
+document.querySelectorAll('.stage').forEach(button=>button.addEventListener('click',()=>animateToStage([0,1.5,2.9,3.8,4.8,5.68,6.4][Number(button.dataset.step)])));
 draw();
 for(const label of document.querySelectorAll('[data-tex]')){
  katex.render(label.dataset.tex,label);
