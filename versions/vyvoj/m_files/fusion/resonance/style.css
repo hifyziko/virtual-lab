@@ -30,15 +30,14 @@ svg .probeLabel{fill:#8743b1;font-weight:700}
 .slice svg{flex:1;width:100%;min-height:0}
 .slice-head,.key,.values{font-size:14px}
 .gallery svg{flex:1;min-height:0}
-#singleMap{flex:1.5}
-.key{justify-content:center;gap:18px;margin-bottom:7px}
+#singleMap{flex:1.1}
+.key{justify-content:center;gap:18px;margin-bottom:1px}
 .key span:before{content:'';display:inline-block;width:24px;margin-right:6px;vertical-align:middle;border-top:2px dashed #a45c25}
 .key span+span:before{border-top:3px solid #8743b1}
 #compare svg[id^=map]{flex:1.5}
 #bend svg[id^=sheet]{flex:1.9}
 .values{justify-content:space-between}
 #bend article>output{text-align:center}
-body[data-fusion-page="fu20-rezonance"] footer{position:absolute;right:20px;bottom:10px;line-height:1;font-size:10px;pointer-events:none}
 
 .amplitude{display:grid;grid-template-columns:1fr auto;align-items:center;flex:1;min-width:155px;font-size:13px}
 .amplitude label{display:block}

@@ -49,7 +49,7 @@ function render(){
  $('qControl').dataset.locked=String(Math.abs(Q-resonance)<1e-9);
  setMath($('qVal'),numberTex(Q));setMath($('probeVal'),numberTex(probeAngle(view===1?lineTurns():2)*180/Math.PI,0)+'^\\circ');
  if(view===0){
-  for(const k of [1,2,4]){drawSurface($('shape'+k),cameras.get('shape'+k),k,A);$('gallery'+k).innerHTML=galleryDrawing(k,1,A);}
+  for(const k of [1,2,4]){drawSurface($('shape'+k),cameras.get('shape'+k),k,A);$('gallery'+k).innerHTML=galleryDrawing(k,A);}
  }else if(view===1){
   const turns=lineTurns(), transparency=Number($('transparency').value);
   setMath($('transparencyVal'),numberTex(transparency,0)+'\\,\\%');

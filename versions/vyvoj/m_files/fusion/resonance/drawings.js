@@ -40,21 +40,37 @@ function plasmaPreview(id,along){
  const p=(th,ph,dr=0)=>{let rr=r+dr,X=(R+rr*Math.cos(th))*Math.cos(ph),Y=(R+rr*Math.cos(th))*Math.sin(ph),Z=rr*Math.sin(th),x=X*cy-Y*sy,y=X*sy+Y*cy;return [175+S*x,87-S*(y*sp+Z*cp),-y*cp+Z*sp]};
  const coords=(u,v)=>[theta0+du*(u-.5)/q0+dv*(v-.5),phi0+du*(u-.5)];
  const pp=(u,v,old=false,lift=0)=>{let [th,ph]=coords(u,v);return p(th,ph,(old?0:disp(th,ph))+lift)};
- let pieces=[];const add=(ps,markup)=>pieces.push({z:ps.reduce((sum,a)=>sum+a[2],0)/ps.length,markup});
+ const pieces=[];
+ function tile(points,color){
+  pieces.push({z:points.reduce((sum,p)=>sum+p[2],0)/points.length,markup:path(points,color,.5,color,true)});
+ }
+ const shade=(th,base)=>'rgb('+base.map(c=>Math.round(c*(.83+.17*Math.cos(th-.85)))).join(',')+')';
  const U=88,V=56;
  for(let i=0;i<U;i++)for(let j=0;j<V;j++){
-  let f=TAU*i/U,g=TAU*(i+1)/U,t=TAU*j/V,h=TAU*(j+1)/V,th=(t+h)/2,ph=(f+g)/2;
-  let ps=[[t,f],[t,g],[h,g],[h,f]].map(([a,b])=>p(a,b,disp(a,b)));let [u,v]=uv(th,ph),patch=u>=0&&u<=1&&v>=0&&v<=1;
-  let light=.66+.34*(.5+.5*Math.cos(th-.85)),base=patch?[196,164,222]:[218,232,240];let w=patch?.35*A*Math.cos(TAU*(along?v:u)):0,shade=w>=0?[234,189,151]:[151,183,224];
-  let col='rgb('+base.map((b,k)=>Math.round((b*(1-Math.abs(w))+shade[k]*Math.abs(w))*light)).join(',')+')';add(ps,path(ps,col,.5,col,true));
+  const f=TAU*i/U,g=TAU*(i+1)/U,t=TAU*j/V,h=TAU*(j+1)/V;
+  tile([[t,f],[t,g],[h,g],[h,f]].map(([th,ph])=>p(th,ph,disp(th,ph))),shade((t+h)/2,[218,232,240]));
  }
- // The selected patch is traced in the same field-aligned coordinates as the local sheet.
- for(let v of [0,1/6,2/6,.5,4/6,5/6,1])for(let i=0;i<60;i++){let ps=[pp(i/60,v,false,.013),pp((i+1)/60,v,false,.013)];add(ps,path(ps,v===.5?purple:'#7c69a1',v===.5?2.5:1.05));}
- for(let u of [0,1])for(let i=0;i<40;i++){let ps=[pp(u,i/40,false,.014),pp(u,(i+1)/40,false,.014)];add(ps,path(ps,purple,1.2));}
  let out=pieces.sort((a,b)=>a.z-b.z).map(a=>a.markup).join('');
- if(A>.01){for(let v of [0,1,.5])out+=path(sample(80,u=>pp(u,v,true)),ref,1.2,'none',false,'stroke-dasharray="3 3" opacity=".85"');for(let u of [0,1])out+=path(sample(60,v=>pp(u,v,true)),ref,1.2,'none',false,'stroke-dasharray="3 3" opacity=".85"');}
+ pieces.length=0;
+ // Align the coloured surface mesh with the four edges of the selected patch.
+ for(let i=0;i<48;i++)for(let j=0;j<24;j++){
+  const u=i/48,v=j/24,u1=(i+1)/48,v1=(j+1)/24;
+  const th=coords((u+u1)/2,(v+v1)/2)[0];
+  const w=.35*A*Math.cos(Math.PI*(along?v+v1:u+u1)),tint=w>=0?[234,189,151]:[151,183,224];
+  const color=shade(th,[196,164,222].map((c,k)=>c+(tint[k]-c)*Math.abs(w)));
+  tile([pp(u,v),pp(u1,v),pp(u1,v1),pp(u,v1)],color);
+ }
+ out+=pieces.sort((a,b)=>a.z-b.z).map(a=>a.markup).join('');
+ if(A>.01){
+  const dashed='stroke-dasharray="3 3" opacity=".85"';
+  for(const v of [0,.5,1])out+=path(sample(96,u=>pp(u,v,true)),ref,1.2,'none',false,dashed);
+  for(const u of [0,1])out+=path(sample(72,v=>pp(u,v,true)),ref,1.2,'none',false,dashed);
+ }
+ // The fixed front view shows the patch. Stroke each curve once over its surface.
+ for(const v of [0,1/6,2/6,.5,4/6,5/6,1])out+=path(sample(120,u=>pp(u,v)),v===.5?purple:'#7c69a1',v===.5?2.5:1.05);
+ for(const u of [0,1])out+=path(sample(96,v=>pp(u,v)),purple,1.2);
  for(let [i,u] of [.12,.5,.88].entries()){
-  let a=pp(u,.5,true),b=pp(u,.5,false,.018);if(A>.01)out+=`<circle cx="${a[0]}" cy="${a[1]}" r="3" fill="white" stroke="${ref}" stroke-width="1"/>`+arrow(a,b,orange,2.2);
+  let a=pp(u,.5,true),b=pp(u,.5);if(A>.01)out+=`<circle cx="${a[0]}" cy="${a[1]}" r="3" fill="white" stroke="${ref}" stroke-width="1"/>`+arrow(a,b,orange,2.2);
   out+=`<circle cx="${b[0]}" cy="${b[1]}" r="3.5" fill="${purple}" stroke="white" stroke-width="1.4"/>`+txt(b[0]+(i===0?-9:i===2?9:0),b[1]-9,String(i+1),'middle','style="font-size:11px;fill:#8743b1;font-weight:700;paint-order:stroke;stroke:white;stroke-width:3px"');
  }
  out+=txt(9,13,A<.01?'Rovnovážná poloha':'Zkušební radiální výchylka','start','style="font-size:11px;font-weight:600"');
@@ -95,7 +111,36 @@ for(let i=0;i<=4;i++){let x=L+i*W/4;out+=path([[x,T],[x,T+H]],'#fff',1,'none',fa
 if(A>0)for(let k=-turns*n;k<=m;k++){const th=f=>(n*f+TAU*k)/m;out+=path([[X(0),Y(th(0))],[X(turns*TAU),Y(th(turns*TAU))]],'#a45c25',2,'none',false,'stroke-dasharray="5 4" opacity=".95"');}
 for(let j=0;j<5;j++){let t0=TAU*j/5;for(let k=-1;k<=Math.ceil(turns/Q)+1;k++){let a=Math.max(0,Q*(k*TAU-t0)),b=Math.min(turns*TAU,Q*((k+1)*TAU-t0));if(b<=a)continue;let ps=[[X(a),Y(t0+a/Q-k*TAU)],[X(b),Y(t0+b/Q-k*TAU)]];out+=path(ps,j===0?purple:'#6885ae',j===0?3:1.1,'none',false,j===0?'':'opacity=".6"');if(j===0&&b-a>.55){let f=(a+b)/2;out+=arrow([X(f-.12),Y(t0+(f-.12)/Q-k*TAU)],[X(f+.12),Y(t0+(f+.12)/Q-k*TAU)],purple,2)}}}
 let f=turns*TAU*(+$('probe').value/100),t=((f/Q)%TAU+TAU)%TAU;out+=`<circle cx="${X(f)}" cy="${Y(t)}" r="5.5" class="probeDot"/>`;out+='</g>'+txt(X(f)+9,Math.max(T+12,Y(t)-9),'P','start','class="probeLabel"')+path([[L,T],[L+W,T],[L+W,T+H],[L,T+H]],'#9db2bf',1,'none',true);for(let i=0;i<=Math.min(2*turns,4);i++)out+=txt(L+i*W/Math.min(2*turns,4),T+H+17,toroidalTick(i,turns),'middle','class="axis"');for(let j=0;j<=2;j++)out+=txt(L-9,Y(j*Math.PI)+4,['0','π','2π'][j],'end','class="axis"');out+=txt(332,T+H+38,'Toroidální úhel φ','middle','class="axis"')+txt(16,T+H/2,'Poloidální úhel θ','middle',`transform="rotate(-90 16 ${T+H/2})" class="axis"`);$(id).setAttribute('viewBox',`0 0 640 ${T+H+43}`);$(id).innerHTML=out;}
-function trace(id="trace",Q=q(),turns=2){let A=amp(),D=m/Q-n,L=58,W=548,C=64,H=42,out='';for(let y of [C-H,C,C+H])out+=path([[L,y],[L+W,y]],'#b9c8d2',1,'none',false,'stroke-dasharray="4 4"');for(let i=0;i<=Math.min(2*turns,4);i++){let x=L+i*W/Math.min(2*turns,4);out+=path([[x,C-H],[x,C+H]],'#e4eaf0',1)+txt(x,124,toroidalTick(i,turns),'middle','class="axis"')};out+=txt(L-8,C-H+4,'+1','end','class="axis"')+txt(L-8,C+4,'0','end','class="axis"')+txt(L-8,C+H+4,'−1','end','class="axis"');out+=path(sample(400,t=>[L+W*t,C-H*A*Math.cos(D*turns*TAU*t)]),purple,3);let f=+$('probe').value/100,px=L+W*f,py=C-H*A*Math.cos(D*turns*TAU*f);out+=path([[px,C-H],[px,C+H]],purple,1,'none',false,'stroke-dasharray="3 4" opacity=".6"')+`<circle cx="${px}" cy="${py}" r="5.5" class="probeDot"/>`+txt(px+9,Math.max(13,py-9),'P','start','class="probeLabel"');if(id==='trace'||id==='traceB'){const scale=20/Math.max(1,Math.pow(m/q()-n,2));for(let i=1;i<16;i++){const t=i/16,xi=A*Math.cos(D*turns*TAU*t),ff=-D*D*xi,x=L+W*t,y=C-H*xi;if(Math.abs(ff*scale)>1.2)out+=arrow([x,y],[x,y-ff*scale],'#ba354b',2.1);}}out+=txt(15,C,'ξᵣ/Amax','middle','transform="rotate(-90 15 64)" class="axis"')+txt(332,141,'Toroidální úhel podél siločáry φ','middle','class="axis"');$(id).innerHTML=out;}
+function trace(id="trace",Q=q(),turns=2){
+ const svg=$(id), bounds=svg.getBoundingClientRect();
+ const height=bounds.width && bounds.height ? Math.max(115,Math.round(640*bounds.height/bounds.width)) : 150;
+ const left=58,width=548,top=24,bottom=height-39,half=(bottom-top)/2,center=top+half;
+ const amplitude=amp(),detuning=m/Q-n,intervals=Math.min(2*turns,4);
+ const displacement=t=>amplitude*Math.cos(detuning*turns*TAU*t);
+ const X=t=>left+width*t, Y=xi=>center-half*xi;
+ let out=txt(left,15,'Relativní radiální výchylka ξᵣ/Amax','start','class="axis"');
+ for(const [value,label] of [[1,'+1'],[0,'0'],[-1,'−1']]){
+  out+=path([[left,Y(value)],[left+width,Y(value)]],'#b9c8d2',1,'none',false,'stroke-dasharray="4 4"');
+  out+=txt(left-8,Y(value)+4,label,'end','class="axis"');
+ }
+ for(let i=0;i<=intervals;i++){
+  const x=X(i/intervals);
+  out+=path([[x,top],[x,bottom]],'#e4eaf0',1)+txt(x,bottom+17,toroidalTick(i,turns),'middle','class="axis"');
+ }
+ out+=path(sample(400,t=>[X(t),Y(displacement(t))]),purple,3);
+ const f=Number($('probe').value)/100,px=X(f),py=Y(displacement(f));
+ out+=path([[px,top],[px,bottom]],purple,1,'none',false,'stroke-dasharray="3 4" opacity=".6"')+
+  `<circle cx="${px}" cy="${py}" r="5.5" class="probeDot"/>`+txt(px+9,Math.max(top+12,py-9),'P','start','class="probeLabel"');
+ if(id==='trace'||id==='traceB'){
+  const scale=20/Math.max(1,(m/q()-n)**2);
+  for(let i=1;i<16;i++){
+   const t=i/16,xi=displacement(t),dy=detuning*detuning*xi*scale;
+   if(Math.abs(dy)>1.2)out+=arrow([X(t),Y(xi)],[X(t),Y(xi)+dy],'#ba354b',2.1);
+  }
+ }
+ out+=txt(X(.5),height-5,'Toroidální úhel podél siločáry φ','middle','class="axis"');
+ svg.setAttribute('viewBox','0 0 640 '+height);svg.innerHTML=out;
+}
 // Local straight-field model: x=l/R0≈phi, y=xi/R0. The same section and
 // graphical scaling are used on both sides. T is a prescribed constant tension.
 function segmentForces(Q,A,h){
@@ -117,7 +162,7 @@ function forceDetail(id,Q){
  const vec=(p,v,S)=>[p[0]+S*v[0],p[1]+S*magn*v[1]];
  const label=(x,y,t,col=ink,anchor='middle')=>txt(x,y,t,anchor,`style="fill:${col};font-size:12px;font-weight:600"`);
  const va=(p,v,S,col,w=2.3)=>{let e=vec(p,v,S),d=Math.hypot(e[0]-p[0],e[1]-p[1]);return d<.8?'':arrow(p,e,col,w)};
- let out=txt(157,15,'Síly na vybraném úseku siločáry','middle','font-weight="600"')+txt(480,15,'Vektorový součet: T₁ + T₂','middle','font-weight="600"');
+ let out=txt(157,15,'Magnetický tah na koncích úseku','middle','font-weight="600"')+txt(480,15,'Vektorový součet: T₁ + T₂','middle','font-weight="600"');
  out+=path([[320,25],[320,151]],'#dce5ec',1);
  out+=path(sample(100,t=>P((2*t-1)*1.34*h)),purple,2.1)+path(sample(80,t=>P((2*t-1)*h)),purple,4.4);
  for(const [p,v,k] of [[l,F.left,'T₁'],[r,F.right,'T₂']]){
@@ -126,7 +171,7 @@ function forceDetail(id,Q){
  out+=`<circle cx="${mid[0]}" cy="${mid[1]}" r="3.5" fill="${purple}"/>`;
  if(!iszero)out+=va(mid,F.sum,39,red,3)+label(mid[0]+11,mid[1]+Math.max(17,39*magn*F.sum[1]+13),'F',red,'start');
  else out+=label(157,82,'F = 0',red);
- out+=txt(157,126,'Fialově: stejný krátký úsek','middle','style="font-size:12px"')+txt(157,143,'u maxima výchylky (φ = 0)','middle','style="font-size:12px"');
+ out+=txt(157,126,'T₁ na levém konci, T₂ na pravém','middle','style="font-size:12px"')+txt(157,143,'Červeně výsledná síla F','middle','style="font-size:12px"');
  // Head-to-tail triangle: one affine scale for ALL vectors, both cases.
  const o=[535,40],v1=vec(o,F.left,126),v2=vec(v1,F.right,126);
  out+=path([[390,40],[566,40]],ref,1,'none',false,'stroke-dasharray="4 4"');
@@ -140,6 +185,5 @@ function forceDetail(id,Q){
  $(id).innerHTML=out;
  setMath($('forceVal'+id.slice(-1)), String.raw`F/T=${numberTex(Math.abs(F.sum[1]),4)}`);
 }
-function galleryDrawing(M,N,A){let out=txt(155,181,'Poloidální řez při φ = 0','middle','font-weight="600"');const C=[155,235],p=(t,dr)=>[C[0]+(38+dr)*Math.cos(t),C[1]-(38+dr)*Math.sin(t)];out+=path(sample(120,t=>p(TAU*t,0)),ref,1.4,'none',true,'stroke-dasharray="4 3"');out+=path(sample(160,t=>p(TAU*t,(38*.19/.89)*A*Math.cos(M*TAU*t))),purple,2.2,'#8743b10b',true);if(A>0)for(let k=0;k<M;k++){let t=TAU*k/M,pt=p(t,(38*.19/.89)*A);out+=`<circle cx="${pt[0]}" cy="${pt[1]}" r="3.5" fill="#a45c25" stroke="white" stroke-width="1"/>`;}const crest=p(0,(38*.19/.89)*A),strength=A*(M/q()-N)**2;
- out+=arrow(crest,[crest[0]-18*strength/Math.max(1,(4/q()-N)**2,(1/q()-N)**2),crest[1]],'#ba354b',1.8);
+function galleryDrawing(M,A){let out=txt(155,181,'Poloidální řez při φ = 0','middle','font-weight="600"');const C=[155,235],p=(t,dr)=>[C[0]+(38+dr)*Math.cos(t),C[1]-(38+dr)*Math.sin(t)];out+=path(sample(120,t=>p(TAU*t,0)),ref,1.4,'none',true,'stroke-dasharray="4 3"');out+=path(sample(160,t=>p(TAU*t,(38*.19/.89)*A*Math.cos(M*TAU*t))),purple,2.2,'#8743b10b',true);if(A>0)for(let k=0;k<M;k++){let t=TAU*k/M,pt=p(t,(38*.19/.89)*A);out+=`<circle cx="${pt[0]}" cy="${pt[1]}" r="3.5" fill="#a45c25" stroke="white" stroke-width="1"/>`;}
  if(A===0)out+=path(sample(160,t=>p(TAU*t,0)),ref,1.1,'none',true,'stroke-dasharray="4 3"');out+=txt(155,290,A===0?'Bez výchylky':`${M} ${M===1?'maximum':M<5?'maxima':'maxim'} výchylky v řezu`,'middle');return out;}
