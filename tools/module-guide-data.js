@@ -282,5 +282,7 @@
    related:['em04-premena','em01-indukovane-napeti']
   }
  };
+ sources.bremsstrahlung='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 8.2, s. 175–176. Prostorový průlet jednotlivého elektronu je vlastní didaktický model.';
+ add('fu21-zareni','bremsstrahlung',['Přibliž si deuteron a časovým posuvníkem projdi první průlet elektronu.','Oddal oba pohledy na milimetrové měřítko a sleduj šíření pulzu směrem k detektoru.'],['Plná a přerušovaná dráha začínají se stejnou polohou a rychlostí. Porovnej průlet u deuteronu s volnou gyrací.','Barevná mapa ukazuje svislou složku elektrického pole záření a šipky směr toku jeho energie.'],null,['fu17-rozptyl','fu03-drift']);
  window.ModuleGuideData={sources,entries,aliases,subpages};
 })();

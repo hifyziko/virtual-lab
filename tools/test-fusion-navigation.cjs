@@ -15,12 +15,12 @@ class Element{
 const Lab={catalog:[{id:'existing',group:'sync'}],modules:new Map(),home(){},route(){},register(module){this.modules.set(module.id,module);}};
 const c={Lab,LabProgress:{value:key=>'<html>'+key+'</html>'},document:{readyState:'loading',createElement:tag=>new Element(tag)},location:{hash:''},setTimeout:fn=>{timers.add(fn);return fn;},clearTimeout:fn=>timers.delete(fn),addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:(name,fn)=>{if(listeners.get(name)===fn)listeners.delete(name);}};c.window=c;vm.createContext(c);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8'),c);
-assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,24);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,20,'Nineteen fusion modules are listed');
+assert.equal(created,0,'The home page must not load fusion frames');assert.equal(Lab.modules.size,25);assert.equal(Lab.catalog[0].id,'existing');assert.equal(Lab.catalog.length,21,'Twenty fusion modules are listed');
 assert.deepEqual(Lab.catalog.slice(1).map(e=>e.id),[
  'fu07-plazma','fu17-rozptyl','fu15-vodivost','fu01-reakce','fu12-lawson','fu14-milniky',
  'fu03-drift','fu04-udrzeni','fu09-princip','fu06-divertor','fu19-tvar','fu20-rezonance','fu11-rekonexe','fu18-injektor','fu15-nbi','fu13-ohrev','fu16-eccd','fu10-compass',
- 'fu02-galerie']);
-assert.deepEqual(Lab.catalog.slice(1).map(e=>e.num),Array.from({length:19},(_,i)=>String(i+1).padStart(2,'0')));
+ 'fu02-galerie','fu21-zareni']);
+assert.deepEqual(Lab.catalog.slice(1).map(e=>e.num),Array.from({length:20},(_,i)=>String(i+1).padStart(2,'0')));
 assert.equal(Lab.catalog.find(e=>e.id==='fu06-divertor').title,'Tokamak: pole a plazma');
 {
  const create=c.document.createElement;let injected;const area={querySelector:selector=>selector==='.physics-area-heading'?{after(group){injected=group;}}:null};
@@ -42,7 +42,7 @@ assert.equal(Lab.catalog.find(e=>e.id==='fu06-divertor').title,'Tokamak: pole a 
 }
 assert(!Lab.catalog.some(e=>e.id==='fu08-ostrovy'));assert.equal(Lab.modules.get('fu08-ostrovy').sourceId,'fu11-rekonexe');assert(!Lab.catalog.some(e=>e.id==='fu05-rovnovaha'));assert.equal(Lab.modules.get('fu05-rovnovaha').sourceId,'fu06-divertor');
 for(const alias of ['fu02-jadra','fu03-atomy','fu04-castice'])assert.equal(Lab.modules.get(alias).sourceId,'fu02-galerie','Historical aliases keep the gallery');
-const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-rezonance/index.html','fuze-tvar/index.html','fuze-vodivost/index.html','fuze-injektor/index.html','fuze-rozptyl/index.html','fuze-eccd/index.html','fuze-nbi/index.html','fuze-milniky/index.html','fuze-ohrev/index.html','fuze-lawson/index.html','fuze-ostrovy/vznik.html','compass-u/index.html','fuze-plazma/index.html','fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html','fuze-udrzeni/index.html','fuze-rovnovaha/divertor.html','fuze-rovnovaha/princip.html']);
+const ids=new Set(Lab.modules.keys()),expectedPages=new Set(['fuze-rezonance/index.html','fuze-tvar/index.html','fuze-vodivost/index.html','fuze-injektor/index.html','fuze-rozptyl/index.html','fuze-eccd/index.html','fuze-nbi/index.html','fuze-milniky/index.html','fuze-ohrev/index.html','fuze-lawson/index.html','fuze-ostrovy/vznik.html','compass-u/index.html','fuze-plazma/index.html','fuze-bariera/index.html','fuze-seznam/index.html','fuze-drift/index.html','fuze-udrzeni/index.html','fuze-rovnovaha/divertor.html','fuze-rovnovaha/princip.html','fuze-zareni/index.html']);
 let guideRoot,guideHeading;
 c.ModuleGuide={collect(root){guideRoot=root;},prepareHeading(heading,full){guideHeading=heading;assert.equal(full.parentElement,heading);}};
 const windowFit=fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/module-window-fit.js'),'utf8');

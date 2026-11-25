@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="cs"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Brzdné záření elektronu u deuteronu</title>
+<link rel="stylesheet" href="../particles/vendor/katex.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="../navigation/style.css">
+<script>
+    (() => {
+      const root = document.documentElement;
+      function fit() {
+        const portrait = innerWidth <= 740 && innerHeight > innerWidth;
+        const width = portrait ? 510 : 1320;
+        const height = portrait ? 920 : 790;
+        const scale = Math.max(0.01, Math.min((innerWidth - 12) / width, (innerHeight - 12) / height));
+        root.toggleAttribute('data-portrait', portrait);
+        root.style.setProperty('--fusion-fit', scale);
+        let clearance = 0;
+        try {
+          const menu = parent.document.querySelector('.lab-tree-toggle'), frame = window.frameElement;
+          if (frame && menu?.getClientRects().length) {
+            const bounds = menu.getBoundingClientRect(), frameBounds = frame.getBoundingClientRect();
+            if (bounds.right - frameBounds.left > (innerWidth - width * scale) / 2) {
+              clearance = Math.max(0, bounds.bottom - frameBounds.top - 2);
+            }
+          }
+        } catch {}
+        root.style.setProperty('--heading-clearance', clearance / scale + 'px');
+      }
+      fit();
+      addEventListener('load', fit);
+      addEventListener('resize', fit);
+      document.addEventListener('fullscreenchange', fit);
+    })();
+  </script>
+<script defer src="../particles/vendor/katex.js"></script><script defer src="../particles/style.js"></script><script defer src="../particles/nuclear-shader.js"></script><script defer src="../particles/nucleus-view.js"></script><script defer src="model.js"></script><script defer src="app.js"></script><script defer src="../navigation/page.js"></script>
+</head><body data-fusion-page="fu21-zareni"><main>
+<header data-fusion-heading><a class="back" href="../index.html#group-area-plasma" target="_top" aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a>
+<h1 data-module-number="20">Brzdné záření elektronu u deuteronu</h1><button id="help" aria-haspopup="dialog">Ovládání a výklad</button><button data-fusion-full>Celá obrazovka</button></header>
+<div class="controls"><button id="play">Pozastavit</button><button id="detail">Zobrazit pole</button><button id="step" hidden>O krok vpřed</button><label style="display:none">Zvětšení <input id="zoom" type="range" min="-1" max="4.1" step=".01" value="3.05"></label><label style="display:none">Průhlednost pole <input id="opacity" type="range" min="0" max="100" step="1" value="15"></label><label class="timeline"><span id="timeline-label">Průběh ukázky</span> <input id="time" type="range" min="-4" max="4" step=".001" value="-4"><output id="micro-value" for="time"></output></label></div>
+<section class="panel" style="flex:1"><div style="position:relative;flex:1;min-height:0"><canvas id="particles" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1"></canvas><canvas style="position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:default" id="scene" aria-label="Elektron a deuteron, radiační pole a signál ve vzdáleném detektoru"></canvas><div id="field-caption" hidden style="position:absolute;left:54px;bottom:calc(22% + 6px);pointer-events:none;font-size:14px;color:#29434b"><strong>Poyntingův vektor <span data-tex="|\mathbf S_{\mathrm{rad}}|"></span></strong> · rel. jednotky</div></div></section></main>
+<dialog id="guide" aria-labelledby="guide-title"><form method="dialog"><button>Zavřít</button></form><h2 id="guide-title">Ovládání a výklad</h2><h3>Od jednoho průletu k celému plazmatu</h3><p>Sleduj modrou dráhu elektronu při průletu kolem deuteronu. Z boku vidíš také posun elektronu podél magnetického pole. Po první otáčce se pohyb zastaví a pohled se plynule natočí do poloidálního řezu. Při pohledu zepředu roste hlavní poloměr R doprava a výška Z vzhůru. V modelu uvažujeme pouze toroidální magnetické pole. Nyní míří k pozorovateli a vidíš obě složky gyrace. Teprve potom se pohled oddálí. Modrý kroužek v poloidálním řezu označuje místo, které jsi před chvílí pozoroval zblízka. Také jinde v plazmatu prolétají elektrony kolem iontů a přitom vyzařují. Záření, které unikne z plazmatu, odnáší část jeho energie.</p><p>Oblouky schematicky ukazují, odkud se záření šíří. Počet událostí, jejich rozložení a rychlost šíření jsou v přehledu zvoleny pro názornost. Čas průletu je uveden v pikosekundách, posuvník udává sekundy přehrávání. Ukázku můžeš pozastavit nebo se posuvníkem vrátit. Výpočet pole jednotlivého elektronu otevřeš tlačítkem „Zobrazit pole“.</p><h3>Jak deuteron vychýlí elektron?</h3>
+<p>V homogenním magnetickém poli se elektron pohybuje po šroubovici. Otáčí se kolem magnetické siločáry a současně postupuje v jejím směru. Když prolétá kolem deuteronu, kladně nabitý deuteron jej přitahuje. Elektrická síla mění rychlost elektronu. Při tomto vychýlení elektron vyzařuje brzdné záření.</p>
+<p>Přerušovaná čára ukazuje, kudy by elektron letěl pouze v magnetickém poli. Plná čára ukazuje jeho dráhu v přítomnosti deuteronu. V obou případech elektron vychází ze stejného místa se stejnou rychlostí.</p>
+<h3>Co sledovat při průletu</h3>
+<p>V pravém pohledu sleduj první otáčku elektronu podél směru magnetického pole. Kolečkem myši nebo posuvníkem přibliž scénu u deuteronu a porovnej obě dráhy. Porovnej ji s levým pohledem kolmo k poli. Uvidíš také posun elektronu podél siločáry. Číselný údaj udává vzdálenost mezi polohami na obou drahách v témže okamžiku. Proto se při změně pohledu nemění.</p>
+<p>V tomto příkladu má magnetická indukce velikost <span data-tex="5\,\mathrm{T}"></span>. Počáteční rychlost elektronu kolmo k poli je <span data-tex="180\,\mathrm{km/s}"></span>, ve směru pole <span data-tex="13{,}75\,\mathrm{km/s}"></span>. V samotném magnetickém poli trvá jedna otáčka <span data-tex="7{,}14\,\mathrm{ps}"></span>. Za tuto dobu elektron podél siločáry urazí přibližně <span data-tex="0{,}098\,\mathrm{\mu m}"></span>. Díky tak malému posunu může kolem deuteronu proletět několikrát.</p>
+<h3>Kam odchází energie záření?</h3>
+<p>Šipky v barevné mapě ukazují směr šíření energie. Určuje jej Poyntingův vektor <span data-tex="\mathbf{S}"></span>. Jeho velikost udává, jaký výkon záření prochází jednotkovou plochou kolmou ke směru šíření. Barva v obou řezech vyjadřuje svislou složku elektrického pole záření. Červená označuje směr vzhůru, modrá dolů a téměř bílá hodnoty blízké nule. Pulz se po vychýlení elektronu šíří od místa průletu rychlostí světla. Oba řezy jsou pevně spojené s laboratorní soustavou. Změna pohybu elektronu se ve vzdáleném místě projeví až po době, kterou světlo potřebuje k překonání této vzdálenosti. Mapa pokrývá celé zorné pole. Ke vzdálenějším místům už na začátku ukázky dorazilo záření z dřívější části dráhy. Barevná stupnice zvýrazňuje i slabé pole a je v obou pohledech po celou dobu stejná. S rostoucí vzdáleností od elektronu amplituda vyzařovaného pole klesá a barva přechází do bílé. V každém bodě se vyzařované pole počítá z polohy a zrychlení elektronu v okamžiku vyzáření. V detailu u částice zobrazujeme jen složku pole související se zrychlením; celkové elektrické pole zde zahrnuje také silné pole samotného náboje. Částice, jejich dráhy i pole mají stejné délkové měřítko. Při oddálení obě částice splynou do společné značky. Velikost značek je zvětšená. Při přiblížení se citlivost barevné stupnice snižuje. Červená a modrá rozlišují znaménko svislé složky vyzařovaného pole. V blízkosti elektronu převládá pole jeho náboje; to v této mapě nekreslíme. Dobu průchodu světla přes jeden mikrometr (přibližně 0,0033 ps) porovnej s dobou jedné otáčky (7,14 ps). Postup pulzu sleduj po oddálení na milimetrové měřítko.</p>
+<p>Graf ukazuje záření dopadající na vzdálený detektor ve směru kolmém k magnetickému poli. Hodnota 1 na svislé ose odpovídá největší intenzitě, kterou bychom při tomto průletu zaznamenali ve stejné vzdálenosti při pozorování kolmo ke zrychlení elektronu. Výpočet zahrnuje dobu šíření světla. V grafu je čas posunut o dobu, za kterou světlo doletí od deuteronu k detektoru.</p>
+<h3>Model a zdroje</h3><p>Deuteron během krátkého průletu považujeme za nehybný. Dráhu elektronu počítáme z působení magnetického pole a elektrického pole deuteronu. Při výpočtu brzdného záření bereme v úvahu zrychlení způsobené elektrickou silou. Stínění ostatními částicemi plazmatu zanedbáváme.</p>
+<p>S. Entler, V. Kindl, <i>Jaderná fúze a fúzní elektrárny</i>, kap. 8.2, s. 175–176. Kniha zde uvádí výkon brzdného záření celého objemu plazmatu. Animace sleduje jednotlivý průlet s vlastními počátečními podmínkami. Rozptyl dvojice nabitých částic v magnetickém poli podrobně rozebírají <a href="https://arxiv.org/abs/0812.4192" target="_blank" rel="noopener">H. B. Nersisyan a G. Zwicknagel (2009)</a>.</p></dialog></body></html>

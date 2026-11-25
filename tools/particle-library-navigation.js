@@ -19,7 +19,8 @@
   {id:'fu13-ohrev',group:'fusion',topic:'tokamak',num:'16',title:'Vlnový ohřev plazmatu',description:'Nalaď mikrovlnný svazek na rezonanci a sleduj přenos energie do gyrace elektronu.',page:'fuze-ohrev/index.html',kind:'Interaktivní experiment'},
   {id:'fu16-eccd',group:'fusion',topic:'tokamak',num:'17',title:'ECCD – neindukční vlečení proudu',description:'Obrať náklon mikrovlnného svazku a sleduj, které elektrony získají energii a kam poteče proud.',page:'fuze-eccd/index.html',kind:'Interaktivní experiment'},
   {id:'fu10-compass',group:'fusion',topic:'tokamak',num:'18',title:'COMPASS-U',description:'Sestavení celého tokamaku, průlet vnitřní sestavou a plánované parametry pražského zařízení.',page:'compass-u/index.html',kind:'Animace a parametry'},
-  {id:'fu02-galerie',group:'fusion',topic:'reference',num:'19',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'}
+  {id:'fu02-galerie',group:'fusion',topic:'reference',num:'19',title:'Galerie částic, jader a atomů',description:'Částice, složení jader a elektronové obaly na jednom místě. Vyberte model a otáčejte jím.',page:'fuze-seznam/index.html',kind:'Interaktivní galerie'},
+  {id:'fu21-zareni',group:'fusion',topic:'basics',num:'20',title:'Brzdné záření elektronu u deuteronu',description:'Porovnej dráhu elektronu u deuteronu s volnou gyrací a sleduj brzdné záření.',page:'fuze-zareni/index.html',kind:'Interaktivní experiment'}
  ];
  const topics=[
   {id:'basics',title:'Základy plazmatu a fúze',label:'Základy',description:'Od ionizace a srážek částic k fúzní reakci, zapálení plazmatu a energetické bilanci.'},
