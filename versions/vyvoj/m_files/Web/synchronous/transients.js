@@ -1,12 +1,21 @@
-(()=>{'use strict';const $=id=>document.getElementById(id),B=SyncTransientBasis,M=SyncTransients.create(B),math=s=>katex.renderToString(s.replaceAll('@',String.fromCharCode(92)),{throwOnError:false}),fmt=x=>x.toFixed(3).replace('.',','),timeAt=v=>.0002*(Math.pow(1+5/.0002,v/100)-1),limitsD=M.limits(0),limitsQ=M.limits(90);let damper=true,view='states',mode='sub',playing=false,raf=0,previous=0,queued=false;
+(()=>{'use strict';const $=id=>document.getElementById(id),B=SyncTransientBasis,M=SyncTransients.create(B),math=s=>katex.renderToString(s.replaceAll('@',String.fromCharCode(92)),{throwOnError:false}),fmt=x=>x.toFixed(3).replace('.',','),limitsD=M.limits(0),limitsQ=M.limits(90);
+const timeSlider=$('time'),timeOffset=.0002,maxTime=5,logSpan=Math.log1p(maxTime/timeOffset);
+const timeAt=value=>timeOffset*Math.expm1(value/100*logSpan);
+// At this reference time the cage response has weakened and field-winding current persists.
+const sliderStep=+timeSlider.getAttribute('step');
+const transitionPosition=Math.round(100*Math.log1p(.16/timeOffset)/(logSpan*sliderStep))*sliderStep;
+const presets={sub:0,trans:transitionPosition,steady:100},presetRadius=1.2;
+const viewSwitch=document.querySelector('.transient-view-switch'),viewButtons=Array.from(viewSwitch.querySelectorAll('button'));
+$('transitionTick').value=transitionPosition;
+let damper=true,playing=false,raf=0,previous=0,queued=false,pointerOnTime=false;
 const barsOf=c=>{const b=c.slice(1);return [...b,-b.reduce((a,v)=>a+v,0)];},maxF=Math.abs(limitsD.initial[0]),maxK=Math.max(...barsOf(limitsD.initial).map(Math.abs),...barsOf(limitsQ.initial).map(Math.abs));
 const historyPlot=$('history');
-const firstTime=.001,lastTime=5,timeRatio=lastTime/firstTime;
-const histories=[true,false].map(withCage=>Array.from({length:121},(_,i)=>{
- const t=firstTime*Math.pow(timeRatio,i/120);
+const historySteps=120;
+const histories=[true,false].map(withCage=>Array.from({length:historySteps+1},(_,i)=>{
+ const t=timeAt(100*i/historySteps);
  return {t,d:M.at(0,'time',t,withCage).x,q:M.at(90,'time',t,withCage).x};
 }));
-const historyMarks=[[.001,'1@, @mathrm{ms}'],[.01,'10@, @mathrm{ms}'],[.1,'100@, @mathrm{ms}'],[1,'1@, @mathrm{s}'],[5,'5@, @mathrm{s}']];
+const historyMarks=[[0,'0^+'],[.001,'1@, @mathrm{ms}'],[.01,'10@, @mathrm{ms}'],[.1,'100@, @mathrm{ms}'],[1,'1@, @mathrm{s}'],[maxTime,'5@, @mathrm{s}']];
 const historyColors={d:'#985b1d',q:'#007c77'};
 function historyLabel(x,y,w,tex,align='center'){
  return '<foreignObject x="'+x+'" y="'+y+'" width="'+w+'" height="22"><div xmlns="http://www.w3.org/1999/xhtml" class="history-label" style="justify-content:'+align+'">'+math(tex)+'</div></foreignObject>';
@@ -15,9 +24,9 @@ let plotKey='',marker='';
 function chart(){
  const width=Math.max(280,historyPlot.clientWidth||640),height=Math.max(240,historyPlot.clientHeight||400);
  const left=52,right=width-34,top=29,bottom=height-56;
- const x=t=>left+Math.log(t/firstTime)/Math.log(timeRatio)*(right-left);
+ const x=t=>left+Math.log1p(t/timeOffset)/logSpan*(right-left);
  const y=v=>bottom-v/1.28*(bottom-top);
- const historyIndex=view==='states'||damper?0:1;
+ const historyIndex=damper?0:1;
  const key=[width,height,historyIndex].join(':');
  if(plotKey!==key){
   plotKey=key;
@@ -43,36 +52,66 @@ function chart(){
   historyPlot.innerHTML=svg+'<g data-history-cursor></g>';
   marker=null;
  }
- const time=timeAt(+$('time').value);
- let next='';
- if(mode==='time'&&time>=firstTime){
-  const px=x(time);
-  const history=histories[historyIndex];
-  const position=Math.min(history.length-1,Math.log(time/firstTime)/Math.log(timeRatio)*(history.length-1));
-  const index=Math.min(history.length-2,Math.floor(position)),weight=position-index;
-  next='<path d="M'+px+' '+top+'V'+bottom+'" stroke="#435f58" stroke-width="1.6" stroke-dasharray="6 5"/>';
-  for(const [axis,color] of Object.entries(historyColors)){
-   const from=history[index][axis],to=history[index+1][axis],value=from+weight*(to-from);
-   next+='<circle data-cursor-axis="'+axis+'" cx="'+px+'" cy="'+y(value)+'" r="5.5" fill="'+color+'" stroke="white" stroke-width="2"/>';
-  }
+ const sliderPosition=+timeSlider.value;
+ const px=left+sliderPosition/100*(right-left);
+ const position=sliderPosition/100*historySteps;
+ const index=Math.min(historySteps-1,Math.floor(position)),weight=position-index;
+ const history=histories[historyIndex],readings=[];
+ let next='<path d="M'+px+' '+top+'V'+bottom+'" stroke="#435f58" stroke-width="1.6" stroke-dasharray="6 5"/>';
+ for(const [axis,color] of Object.entries(historyColors)){
+  const from=history[index][axis],to=history[index+1][axis],value=from+weight*(to-from);
+  readings.push([axis,value]);
+  next+='<circle data-cursor-axis="'+axis+'" cx="'+px+'" cy="'+y(value)+'" r="5.5" fill="'+color+'" stroke="white" stroke-width="2"/>';
  }
  if(next!==marker){
   historyPlot.querySelector('[data-history-cursor]').innerHTML=next;
+  for(const [axis,value] of readings)$('history'+axis.toUpperCase()).innerHTML=math('X_'+axis+'='+value.toFixed(4).replace('.','{,}'));
   marker=next;
  }
 }
-function draw(){const angle=+$('angle').value,t=timeAt(+$('time').value),a=M.at(angle,mode,t,view==='states'||damper),field=new Float32Array(B.N*B.N);let max=0;for(let i=0;i<field.length;i++){let v=0;for(let j=0;j<a.coefficients.length;j++)v+=a.coefficients[j]*B.fields[j][i];field[i]=v;max=Math.max(max,Math.abs(v));}if(max>0)for(let i=0;i<field.length;i++)field[i]*=1.48/max;
-const contours=MagneticContours(field,B.N,B.R,'#007e6c'),s={...SyncPrinciple.create(),type:'salient',rotor:angle*Math.PI/180,field:0,excitation:true,excitationLevel:0,damper:view==='states'||damper,omega:0,fieldOmega:0},bars=barsOf(a.currents),rotorCurrents={field:a.currents[0]/maxF,bars:bars.map(v=>v/maxK)};let art=SyncMachineArt(s,false,{axes:false,forces:false,rotorCurrents},contours.paths+contours.arrows).replace(/<circle cx="512" cy="267" r="14"[\s\S]*?>Bₛ<\/text>/, '');
+function draw(){const angle=+$('angle').value,position=+timeSlider.value,t=timeAt(position),a=M.at(angle,'time',t,damper),field=new Float32Array(B.N*B.N);let max=0;for(let i=0;i<field.length;i++){let v=0;for(let j=0;j<a.coefficients.length;j++)v+=a.coefficients[j]*B.fields[j][i];field[i]=v;max=Math.max(max,Math.abs(v));}if(max>0)for(let i=0;i<field.length;i++)field[i]*=1.48/max;
+const contours=MagneticContours(field,B.N,B.R,'#007e6c'),s={...SyncPrinciple.create(),type:'salient',rotor:angle*Math.PI/180,field:0,excitation:true,excitationLevel:0,damper,omega:0,fieldOmega:0},bars=barsOf(a.currents),rotorCurrents={field:a.currents[0]/maxF,bars:bars.map(v=>v/maxK)};let art=SyncMachineArt(s,false,{axes:false,forces:false,rotorCurrents},contours.paths+contours.arrows).replace(/<circle cx="512" cy="267" r="14"[\s\S]*?>Bₛ<\/text>/, '');
 art+='<g class="delta-b-axis" opacity=".6"><path d="M32 267H528" fill="none" stroke="#007e6c" stroke-width=".9" stroke-dasharray="4 6"/><path d="M38 264L32 267L38 270M522 264L528 267L522 270" fill="none" stroke="#007e6c" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></g>';
 for(const [delta,label] of [[0,'d'],[Math.PI/2,'q']]){const theta=s.rotor+delta,c=Math.cos(theta),sn=Math.sin(theta),x1=280+164*c,y1=267-164*sn,x2=280+234*c,y2=267-234*sn,lx=280+260*c,ly=267-242*sn;art+=`<path d="M${x1},${y1}L${x2},${y2}" fill="none" stroke="#5c6f70" stroke-width="1" stroke-dasharray="5 5"/><foreignObject class="rotor-axis-label" data-axis="${label}" x="${lx-13}" y="${ly-14}" width="26" height="28"><div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;align-items:center;justify-content:center;height:100%;font-size:19px;color:#304648">${katex.renderToString(label,{throwOnError:true})}</div></foreignObject>`;}
-art+='<g class="delta-b-marker"><circle cx="512" cy="267" r="14" fill="#007e6c" stroke="white" stroke-width="2"/><text x="512" y="271" text-anchor="middle" font-size="11" style="fill:white">ΔB</text></g>';$('machine').innerHTML=art;$('angleOut').textContent=angle+'°';$('axisD').setAttribute('aria-pressed',angle===0);$('axisQ').setAttribute('aria-pressed',angle===90);$('timeOut').textContent=mode==='time'?(t<1?(t*1000).toFixed(t<.01?1:0)+' ms':t.toFixed(2)+' s'):mode==='sub'?'0⁺':mode==='steady'?'t → ∞':'mezní stav';$('xValue').textContent=fmt(a.x);$('xName').textContent=mode==='sub'?'X″':mode==='trans'?'X′':mode==='steady'?'X':'X(t)';$('fieldCurrent').textContent=String(Math.round(100*a.currents[0]/maxF))+' %';const peak=Math.max(...bars.map(Math.abs))/maxK;$('cageCurrent').textContent=(100*peak).toFixed(0)+' %';$('fieldMeter').value=Math.min(1,Math.abs(a.currents[0])/maxF);$('cageMeter').value=Math.min(1,peak);
-const titles={sub:'Rázový stav',trans:'Přechodný stav',steady:'Ustálený stav',time:'Časová odezva'};$('phaseTitle').textContent=titles[mode];
-document.querySelectorAll('[data-mode]').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',b.dataset.mode===mode);});chart();window.transientState={angle,mode,t,damper,view,...a,maxField:max};}
-function stop(){playing=false;cancelAnimationFrame(raf);$('play').textContent='▶ Přehrát od začátku';}
+art+='<g class="delta-b-marker"><circle cx="512" cy="267" r="14" fill="#007e6c" stroke="white" stroke-width="2"/><foreignObject x="498" y="253" width="28" height="28"><div xmlns="http://www.w3.org/1999/xhtml" style="display:grid;place-items:center;height:100%;color:white;font-size:10px">'+math('@Delta@mathbf{B}')+'</div></foreignObject></g>';$('machine').innerHTML=art;$('angleOut').textContent=angle+'°';$('axisD').setAttribute('aria-pressed',angle===0);$('axisQ').setAttribute('aria-pressed',angle===90);
+const timeLabel=t<1?(t*1000).toFixed(t>0&&t<.01?1:0)+'@,@mathrm{ms}':t.toFixed(2)+'@,@mathrm{s}';
+$('timeOut').innerHTML=math(timeLabel.replace('.','{,}'));
+$('xValue').textContent=fmt(a.x);$('fieldCurrent').textContent=String(Math.round(100*a.currents[0]/maxF))+' %';const peak=Math.max(...bars.map(Math.abs))/maxK;$('cageCurrent').textContent=(100*peak).toFixed(0)+' %';$('fieldMeter').value=Math.min(1,Math.abs(a.currents[0])/maxF);$('cageMeter').value=Math.min(1,peak);
+viewButtons.forEach(button=>button.setAttribute('aria-pressed',Math.abs(position-presets[button.dataset.timePreset])<=(playing?presetRadius:1e-6)));
+if(!playing)updatePlayLabel();
+chart();window.transientState={angle,mode:'time',t,damper,...a,maxField:max};}
+function updatePlayLabel(){$('play').textContent=+timeSlider.value>0&&+timeSlider.value<100?'▶ Pokračovat':'▶ Přehrát od začátku';}
+function stop(){playing=false;cancelAnimationFrame(raf);updatePlayLabel();}
 function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;draw();});}
-$('angle').oninput=schedule;$('time').oninput=()=>{stop();mode='time';schedule();};$('axisD').onclick=()=>{$('angle').value=0;schedule();};$('axisQ').onclick=()=>{$('angle').value=90;schedule();};document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{stop();mode=b.dataset.mode;schedule();});
-$('play').onclick=()=>{if(playing){stop();$('play').dataset.paused='true';$('play').textContent='▶ Pokračovat';return;}const resume=$('play').dataset.paused==='true'&&mode==='time'&&+$('time').value>0&&+$('time').value<100;$('play').dataset.paused='false';playing=true;mode='time';if(!resume)$('time').value=0;previous=performance.now();$('play').textContent='❚❚ Pozastavit';function tick(now){if(!playing)return;const dt=now-previous;if(dt>=65){$('time').value=Math.min(100,+$('time').value+dt/100);previous=now;draw();}if(+$('time').value>=100){stop();return;}raf=requestAnimationFrame(tick);}raf=requestAnimationFrame(tick);};
-function setView(next){stop();view=next;mode=view==='states'?'sub':'time';$('stateControls').hidden=view!=='states';$('responseControls').hidden=view!=='response';document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===view));schedule();}
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));$('damper').onchange=()=>{stop();damper=$('damper').checked;mode='time';$('time').value=0;schedule();};
-$('eqD').innerHTML=math("X_d''<X_d'<X_d");$('eqQ').innerHTML=math("X_q''<X_q'=X_q");$('valuesD').textContent=[limitsD.sub,limitsD.trans,limitsD.steady].map(fmt).join(' → ')+' p. j.';$('valuesQ').textContent=[limitsQ.sub,limitsQ.trans,limitsQ.steady].map(fmt).join(' → ')+' p. j.';$('eqContinuity').innerHTML=math('@Delta u_r=R_r@Delta i_r+{d@Delta@psi_r@over dt}=0,@qquad@Delta@psi_r(0^+)=0');$('eqPhysics').innerHTML=math("@Delta@boldsymbol@psi_r=L_{rs}@Delta@boldsymbol i_s+L_{rr}@Delta@boldsymbol i_r,@qquad L_{rr}{d@Delta@boldsymbol i_r@over dt}+R_r@Delta@boldsymbol i_r=0")+'<br>'+math("X=@omega{@Delta@psi_s@over@Delta i_s},@qquad L_s''=L_{ss}-L_{sr}L_{rr}^{-1}L_{rs}");$('historyD').innerHTML=math('X_d');$('historyQ').innerHTML=math('X_q');draw();new ResizeObserver(()=>chart()).observe(historyPlot);document.fonts.ready.then(schedule);window.addEventListener('pagehide',stop);
+$('angle').oninput=schedule;$('axisD').onclick=()=>{$('angle').value=0;schedule();};$('axisQ').onclick=()=>{$('angle').value=90;schedule();};
+timeSlider.onpointerdown=()=>{pointerOnTime=true;};
+window.addEventListener('pointerup',()=>{pointerOnTime=false;});
+window.addEventListener('pointercancel',()=>{pointerOnTime=false;});
+timeSlider.oninput=()=>{
+ if(pointerOnTime){
+  const near=Object.values(presets).find(value=>Math.abs(+timeSlider.value-value)<=presetRadius);
+  if(near!==undefined)timeSlider.value=near;
+ }
+ stop();schedule();
+};
+$('play').onclick=()=>{
+ if(playing){stop();return;}
+ if(+timeSlider.value>=100)timeSlider.value=0;
+ playing=true;previous=performance.now();$('play').textContent='❚❚ Pozastavit';
+ function tick(now){
+  if(!playing)return;
+  const dt=now-previous;
+  if(dt>=65){timeSlider.value=Math.min(100,+timeSlider.value+dt/100);previous=now;draw();}
+  if(+timeSlider.value>=100){stop();return;}
+  raf=requestAnimationFrame(tick);
+ }
+ raf=requestAnimationFrame(tick);
+};
+viewButtons.forEach(button=>button.onclick=()=>{timeSlider.value=presets[button.dataset.timePreset];stop();schedule();});
+const headerActions=window.frameElement?.closest('.imported-workspace')?.querySelector('.modulehead > .actions');
+if(headerActions)headerActions.prepend(viewSwitch);
+else document.querySelector('main > header')?.append(viewSwitch);
+$('damper').onchange=()=>{damper=$('damper').checked;stop();schedule();};
+$('xName').innerHTML=math('X(t)');
+$('eqD').innerHTML=math("X_d''<X_d'<X_d");$('eqQ').innerHTML=math("X_q''<X_q'=X_q");$('valuesD').textContent=[limitsD.sub,limitsD.trans,limitsD.steady].map(fmt).join(' → ')+' p. j.';$('valuesQ').textContent=[limitsQ.sub,limitsQ.trans,limitsQ.steady].map(fmt).join(' → ')+' p. j.';$('eqContinuity').innerHTML=math('@Delta u_r=R_r@Delta i_r+{d@Delta@psi_r@over dt}=0,@qquad@Delta@psi_r(0^+)=0');$('eqPhysics').innerHTML=math("@Delta@boldsymbol@psi_r=L_{rs}@Delta@boldsymbol i_s+L_{rr}@Delta@boldsymbol i_r,@qquad L_{rr}{d@Delta@boldsymbol i_r@over dt}+R_r@Delta@boldsymbol i_r=0")+'<br>'+math("X=@omega{@Delta@psi_s@over@Delta i_s},@qquad L_s''=L_{ss}-L_{sr}L_{rr}^{-1}L_{rs}");draw();new ResizeObserver(()=>chart()).observe(historyPlot);document.fonts.ready.then(schedule);window.addEventListener('pagehide',stop);
 })();

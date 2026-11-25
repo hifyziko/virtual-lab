@@ -164,6 +164,6 @@ function build(directory){
 if(require.main===module){
  const targets=process.argv.slice(2);
  const release=require('./project/release-output.cjs');
- for(const directory of targets.length?targets:[path.join(release.current(),'web'),path.join(release.mirror(),'web')])build(path.resolve(root,directory));
+ for(const directory of targets.length?targets:[path.join(release.current(),'web')])build(path.resolve(root,directory));
 }
 module.exports={transform,build,dataModules,stringEnd};

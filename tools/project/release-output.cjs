@@ -32,5 +32,23 @@ function publishOne(source,target,manifest=verify(source)){
  atomicWrite(path.join(web,'index.html'),fs.readFileSync(path.join(source,'web/index.html')));
  atomicWrite(path.join(target,'manifest.json'),fs.readFileSync(path.join(source,'manifest.json')));
 }
-function publish(){const dir=stage();if(!dir)throw Error('No staged release');const main=verify(current()),secondary=verify(mirror());publishOne(current(),path.join(root,'versions/aktualni'),main);publishOne(mirror(),path.join(root,'versions/vyvoj/versions/aktualni'),secondary);delete process.env.HIFYZIKO_RELEASE_STAGE;if(!path.basename(dir).startsWith('release-build-')||path.dirname(dir)!==temporary)throw Error('Unexpected stage cleanup path');fs.rmSync(dir,{recursive:true,force:true});return dir;}
+function redirectEntry(file,entry){
+ const url=path.relative(path.dirname(file),entry).replaceAll('\\','/');
+ fs.mkdirSync(path.dirname(file),{recursive:true});
+ atomicWrite(file,Buffer.from(`<!doctype html><html lang="cs"><meta charset="utf-8"><title>Virtuální laboratoř fyziky</title><p><a href="${url}">Otevřít aktuální výuku</a></p><script>location.replace(${JSON.stringify(url)}+location.search+location.hash)</script></html>\n`));
+}
+function publish(){
+ const dir=stage();if(!dir)throw Error('No staged release');
+ const destination=path.join(root,'versions/aktualni'),entry=path.join(destination,'web/index.html');
+ publishOne(current(),destination);
+ const legacy=path.join(root,'versions/vyvoj/versions/aktualni');
+ redirectEntry(path.join(legacy,'web/index.html'),entry);
+ const commandPath=path.relative(legacy,entry).replaceAll('/','\\');
+ atomicWrite(path.join(legacy,'SPUSTIT.cmd'),Buffer.from('@echo off\r\nstart "" "%~dp0'+commandPath+'"\r\n'));
+ redirectEntry(path.join(root,'versions/vyvoj/m_files/Web/nahled-usporna-vyuka/index.html'),entry);
+ delete process.env.HIFYZIKO_RELEASE_STAGE;
+ if(!path.basename(dir).startsWith('release-build-')||path.dirname(dir)!==temporary)throw Error('Unexpected stage cleanup path');
+ fs.rmSync(dir,{recursive:true,force:true});
+ return dir;
+}
 module.exports={current,mirror,begin,verify,publishOne,publish};

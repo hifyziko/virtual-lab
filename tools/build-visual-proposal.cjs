@@ -6,7 +6,8 @@ const css=fs.readFileSync(path.join(source,'visual-proposal.css'),'utf8');
 const js=fs.readFileSync(path.join(source,'visual-proposal.js'),'utf8');new vm.Script(js);
 const painter=fs.readFileSync(path.join(source,'visual-proposal-paint.js'),'utf8');new vm.Script(painter);
 const encode=value=>JSON.stringify(value).replace(/</g,'\\u003c');
-for(const target of [release.current(),release.mirror()]){
+{
+ const target=release.current();
  const web=path.join(target,'web'),original=fs.readFileSync(path.join(web,'index.html'),'utf8');
  const manifestPath=path.join(target,'manifest.json'),manifest=JSON.parse(fs.readFileSync(manifestPath,'utf8'));
  const a=original.indexOf('const entries=['),b=original.indexOf(';\nfor(const entry of entries)',a);

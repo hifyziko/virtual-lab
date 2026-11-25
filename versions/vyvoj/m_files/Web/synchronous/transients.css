@@ -1,18 +1,15 @@
 .transient-lesson>.layout{grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:8px;min-height:665px}
+.transient-lesson>header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}
+.transient-lesson>header>.draft{flex-basis:100%}
 .transient-lesson .settings{gap:8px;overflow:visible;min-height:0}
 .transient-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 12px;border-bottom:1px solid var(--line);padding-bottom:6px}
 .transient-modes,.transient-angle{display:grid;gap:5px;align-content:start;min-width:0}
 .transient-angle .row{justify-content:start;gap:4px}
-.view-switch,.phase-switch{display:grid;gap:4px}
-.view-switch{grid-template-columns:repeat(2,minmax(0,1fr))}
-.view-switch [data-view="response"]{background:#ffdfa0;border-color:#aa6d24;color:#57330e}
-.view-switch [data-view="response"]:hover{background:#ffd083;border-color:#8e581b}
-.view-switch [data-view="response"][aria-pressed="true"]{background:#985313;border-color:#7c3e0d;color:#fff}
-.phase-switch{grid-template-columns:repeat(3,minmax(0,1fr))}
-:is(.view-switch,.phase-switch) button,.transient-angle button{font-size:12px;padding:5px}
-.phase-switch button.active{background:#007e6c;color:white}
+.transient-view-switch{display:flex;flex-wrap:wrap;gap:5px}
+.transient-angle button{font-size:12px;padding:5px}
 #responseControls{display:grid;gap:5px}
 #responseControls #play{justify-self:start;padding:4px 8px}
+#timeOut{white-space:nowrap}
 .damper-choice{display:flex;gap:5px;align-items:center;font-size:12px;font-weight:600}
 .settings .control>span{font-size:12px}
 .current-indicators{display:grid;gap:4px}

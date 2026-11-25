@@ -63,7 +63,4 @@ fs.writeFileSync(path.join(dest,'CTETE.txt'),'Zkušební členění Virtuální 
 console.log(JSON.stringify({version,files:files.length,entry:path.join(dest,'web/index.html')}));
 if(activate){
  fs.writeFileSync(path.join(dest,'CTETE.txt'),'Virtuální laboratoř fyziky — verze 1.0. Otevřete web/index.html. Sestavení z kořene projektu: node tools/build-release.cjs. Schválený vizuální rozcestník se přidává automaticky. Elektrostatika a plazma/fúze jsou zatím náměty.');
- const mirror=release.mirror();
- fs.cpSync(path.join(dest,'web'),path.join(mirror,'web'),{recursive:true});
- for(const name of ['manifest.json','CTETE.txt'])fs.copyFileSync(path.join(dest,name),path.join(mirror,name));
 }

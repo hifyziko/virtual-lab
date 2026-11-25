@@ -27,11 +27,11 @@ const p=A.createNucleus('proton'),d=A.createNucleus('deuteron');
 assert.equal(p.particles[0].mesh.material.color.getHex(),0x123456);
 assert.equal(d.particles[0].mesh.material.color.getHex(),0x123456);
 p.dispose();d.dispose();S.colors.p=old;
-for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
+{ const folder='versions/aktualni';
  const base=path.join(root,folder,'web'),html=fs.readFileSync(path.join(base,'fuze-seznam/index.html'),'utf8');
  for(const match of html.matchAll(/(?:src|href)="([^"]+)"/g)){
   const ref=match[1].split(/[?#]/)[0];assert.ok(fs.existsSync(path.resolve(base,'fuze-seznam',ref)),ref);
  }
  for(const file of ['style.js','motion.js','particle-art.js'])assert.ok(fs.readFileSync(path.join(base,'shared/particles',file)).equals(fs.readFileSync(path.join(src,'particles',file))));
 }
-console.log('PASS: species, shared settings, repeatable geometry, deformation bounds, fixed anchors, centered motion and both deliveries.');
+console.log('PASS: species, shared settings, repeatable geometry, deformation bounds, fixed anchors, centered motion and the current delivery.');

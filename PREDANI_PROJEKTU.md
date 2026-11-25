@@ -33,6 +33,8 @@ Nikdy nerozbalujte balíček přes jinou rozpracovanou kopii.
    Úplné sestavení připravuje mezikroky v `tmp/release-build-*`; aktuální
    rozcestník zůstává dostupný. Teprve kompletní dodávka včetně fúzní navigace
    a ověřených dat nahradí aktivní index. Zachovat tento postup i u dalších builderů.
+   Z pomocných pracovních kopií sloučit zdroje. Jejich sestavený web ani
+   manifest nepřenášet do aktivní dodávky.
 6. Nové veřejné soubory registrujte pomocí `node tools/project/files.cjs add cesta`.
 7. Spusťte `node tools/project/files.cjs stage`, zkontrolujte `git diff --cached`
    a vytvořte místní commit. `git push` až na výslovný pokyn uživatele.

@@ -151,7 +151,7 @@
   ['Měňte pracovní bod a sledujte průmět proudu do směru vnitřního napětí.','Porovnávejte elektromagnetický výkon a moment v motorickém i generátorickém režimu.'],
   ['Výkon elektromagnetické přeměny souvisí se vzájemnou orientací vnitřního napětí a proudu.','Průmět nepatří obecně do osy svorkového napětí. Vztah níže platí pro třífázový výkon při fázových efektivních hodnotách; poměrný model používá vlastní výkonovou základnu.'],String.raw`P_{\mathrm{em}}=3\operatorname{Re}\!\left(\overline{U_i}\,\overline{I_a}^{\,*}\right)`,['sm02-schema','em04-premena']);
  add('sm04-transients','transient',
-  ['Porovnejte rázový, přechodný a ustálený mezní stav.','Měňte čas po skoku a sledujte změnové proudy budicího obvodu a klece.'],
+  ['Zkratky v hlavičce nastaví rázový, přibližný přechodný nebo ustálený bod na časové ose. Při dosažení značky na posuvníku se příslušné tlačítko zvýrazní.','Měňte čas po skoku a sledujte změnové proudy budicího obvodu a klece.'],
   ['Konečné napětí nedovoluje okamžitý skok tokové vazby uzavřeného rotorového obvodu. To není zákaz lokální změny indukce v každém bodě.','Předepsaný skok statorového proudu není úplná simulace zkratu. Číselné reaktance a časy jsou vlastnostmi výukového modelu.'],String.raw`u_r=R_ri_r+\frac{\mathrm d\psi_r}{\mathrm dt}`,['sm12-synchronizing','tr08-zkratovy-proud']);
  add('sm05-isolated','regulation',
   ['Měňte buzení, rychlost a druh zátěže; sledujte svorkové napětí a frekvenci.','Porovnejte zatížený bod s napětím naprázdno při stejném buzení a rychlosti.'],

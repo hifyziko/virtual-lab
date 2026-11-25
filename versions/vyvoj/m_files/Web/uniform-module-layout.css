@@ -135,3 +135,9 @@ main.uniform-module-layout:has(#zoomWall){grid-template-rows:100px minmax(0,1fr)
 /* Header controls share fusion’s dimensions; the renderer keeps each control’s state styling. */
 #app :is(.workspace>.modulehead,.module-window-heading)>.actions{align-items:center;gap:6px}
 #app :is(.workspace>.modulehead,.module-window-heading)>.actions :is(button,select,summary){box-sizing:border-box;min-height:34px;padding:5px 10px;font-size:14px;line-height:1.15}
+
+#app .transient-view-switch{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-inline-end:10px;padding-inline-end:10px;border-inline-end:1px solid #dce5e2}
+#app .transient-view-switch button{white-space:nowrap}
+#app .transient-view-switch button[aria-pressed="true"]{background:#007e6c;border-color:#007e6c;color:#fff}
+#app .workspace>.modulehead:has(.transient-view-switch){display:flex!important;flex-wrap:wrap;align-items:center}
+#app .modulehead:has(.transient-view-switch)>.actions{margin-left:auto;max-width:100%}

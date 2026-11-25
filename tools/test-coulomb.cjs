@@ -12,7 +12,7 @@ assert.deepEqual(M.force(M.pair('triton','neutron'),10,3),[0,0]);
 let x=24,v=-Math.sqrt(2*(100-M.potential(dt,24))/dt.mu),min=x;
 for(let i=0;i<20000;i++){const h=.002;v+=M.force(dt,x,0)[0]/dt.mu*h/2;x+=v*h;v+=M.force(dt,x,0)[0]/dt.mu*h/2;min=Math.min(min,x);const energy=dt.mu*v*v/2+M.potential(dt,x);assert.ok(Math.abs(energy-100)<.01);if(x>35)break;}
 assert.ok(Math.abs(min-dt.C/100)<.001);
-for(const base of ['versions/aktualni/web','versions/vyvoj/versions/aktualni/web']){
+{ const base='versions/aktualni/web';
  const file=path.resolve(__dirname,'..',base,'fuze-bariera/index.html'),html=fs.readFileSync(file,'utf8');
  for(const [,ref]of html.matchAll(/(?:src|href)="([^"#]+)"/g))assert.ok(fs.existsSync(path.resolve(path.dirname(file),ref)),ref);
  const manifest=JSON.parse(fs.readFileSync(path.resolve(__dirname,'..',base,'../manifest.json')));

@@ -70,7 +70,7 @@ for(const entry of Lab.modules.values()){
  entry.mount(app);const lateMessage=listeners.get('message'),lateFrame=app.children[0].children[1];Lab.dispose();lateMessage({source:lateFrame.contentWindow,data:{type:'virtual-lab:fusion-ready',id:entry.id}});assert.equal(timers.size,0);
 }
 assert.equal(expectedPages.size,0);
-for(const folder of ['versions/aktualni','versions/vyvoj/versions/aktualni']){
+{ const folder='versions/aktualni';
  const web=path.join(root,folder,'web'),manifest=JSON.parse(fs.readFileSync(path.join(root,folder,'manifest.json'),'utf8'));
  const hub=fs.readFileSync(path.join(web,'index.html'),'utf8'),navigationOffset=hub.indexOf('<!-- particle-library:start -->');
  assert(navigationOffset>=0,'Delivered hub includes the fusion navigation, not only its data files');

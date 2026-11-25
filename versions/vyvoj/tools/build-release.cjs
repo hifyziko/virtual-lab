@@ -1,6 +1,10 @@
 /* Reproducible web delivery; immutable version directories, no destructive cleanup. */
 const fs=require('fs'),path=require('path'),crypto=require('crypto'),{execFileSync}=require('child_process');
 const root=path.resolve(__dirname,'..'),version=process.argv[2]||'aktualni',working=version==='aktualni';
+if(working&&!process.env.HIFYZIKO_RELEASE_STAGE){
+ execFileSync(process.execPath,[path.resolve(root,'../../tools/build-release.cjs')],{stdio:'inherit'});
+ process.exit(0);
+}
 if(!working&&!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(version||''))throw Error('Usage: node tools/build-release.cjs 1.1.0');
 const dest=require('../../../tools/project/release-output.cjs').mirror(version),web=path.join(dest,'web');
 if(!working&&fs.existsSync(dest))throw Error('Version already exists: '+version+'; choose a new version.');

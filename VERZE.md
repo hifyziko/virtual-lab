@@ -30,9 +30,9 @@ souhlasily s balíčkem. Žádné místní změny nebyly zahozeny.
 - **Chráněné zálohy:** `versions/1.0.0-pred-upravami` a `versions/1.5.8-pred-schematem`; zůstávají nedotčené.
 
 Sestavení: `node tools/build-release.cjs`. Kontrola: `node tools/project/check.cjs`.
-Vnořená `versions/vyvoj/versions/aktualni` a
-`versions/vyvoj/m_files/Web/nahled-usporna-vyuka` jsou automatické pracovní
-výstupy stávajícího sestavení, nikoli další verze pro editaci.
+Jedinou spustitelnou dodávkou je `versions/aktualni/web/index.html`.
+Staré vstupní adresy ve vývojovém stromu po sestavení přesměrují na aktuální výuku
+a zachovají odkaz na vybraný modul.
 
 ## Úklid 17. listopadu 2026
 

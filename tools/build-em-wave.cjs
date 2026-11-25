@@ -8,5 +8,5 @@ function build(web){const manifestPath=path.join(web,'../manifest.json'),m=JSON.
  html=html.replace(anchor,()=>'<'+ '!-- em-wave:start --><script>'+fs.readFileSync(path.join(__dirname,'em-wave-navigation.js'),'utf8')+'</script><!-- em-wave:end -->\n'+anchor);fs.writeFileSync(index,html);
  m.files=m.files.filter(f=>!f.path.startsWith('em-vlna/')).concat(entries);const i=m.files.find(f=>f.path==='index.html');i.bytes=Buffer.byteLength(html);i.sha256=crypto.createHash('sha256').update(html).digest('hex');if(m.progressive)m.progressive.shellBytes=i.bytes;m.bytes=m.files.reduce((a,f)=>a+f.bytes,0);fs.writeFileSync(manifestPath,JSON.stringify(m,null,2)+'\n');
 }
-if(require.main===module)for(const dir of ['versions/aktualni/web','versions/vyvoj/versions/aktualni/web']){const web=path.join(root,dir);build(web);require('./build-progressive-web.cjs').build(web);}
+if(require.main===module){const web=path.join(root,'versions/aktualni/web');build(web);require('./build-progressive-web.cjs').build(web);}
 module.exports={build};
