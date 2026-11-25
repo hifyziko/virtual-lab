@@ -193,8 +193,8 @@
   ['Měňte napětí, zatížení a buzení a propojujte pracovní bod se schématem.','Sledujte pořadí změn proudu, momentu a rychlosti po změně zatížení.'],
   ['Zatížení nezvyšuje proud přímo bez vazby na pohyb: pokles rychlosti sníží indukované napětí a změní napěťovou bilanci.','Odbuzení může zvýšit rychlost, ale při stejném proudovém limitu snižuje dostupný moment.'],String.raw`u_a=R_a i_a+L_a\frac{\mathrm di_a}{\mathrm dt}+u_i`,['dc01-princip','em04-premena']);
  add('dc16-bldc-poloha','bldc',
-  ['Porovnejte kroky s Hallovými sondami a s odhadem polohy z napětí.','Použijte podržení dvojice fází a sledujte vztah polohy rotoru k dalšímu přepnutí.'],
-  ['Snímač polohy může poskytovat informaci i při stání. Odhad z pohybového indukovaného napětí potřebuje dostatečnou rychlost.','Průchod napětí nulou a okamžik další komutace nejsou totožné události. Porovnání hvězdy a trojúhelníku vyžaduje rozlišit fázové a napájecí veličiny.'],null,['dc15-bldc','sm09-pmsm-phasor']);
+  ['Při otáčení rotoru sledujte tři značky Hallových sond ve statoru. Vyplněná značka znamená logickou jedničku.','Použijte podržení dvojice fází a sledujte vztah polohy rotoru k dalšímu přepnutí.'],
+  ['Snímač polohy může poskytovat informaci i při stání. Odhad z pohybového indukovaného napětí potřebuje dostatečnou rychlost.','Průchod napětí nulou a okamžik další komutace nejsou totožné události. Porovnání hvězdy a trojúhelníku vyžaduje rozlišit fázové a napájecí veličiny.'],null,['dc03-schema','dc15-bldc','sm09-pmsm-phasor']);
  add('dc15-bldc','bldc',
   ['Krokujte šest komutačních stavů a sledujte sepnuté tranzistory a vodivou cestu.','Porovnávejte proudy fází s indukovaným napětím a momentem.'],
   ['Elektronika nahrazuje mechanické přepojování cívek podle polohy rotoru.','Idealizované proudové průběhy nejsou simulací každého spínacího přechodu měniče. PWM uvnitř komutačního intervalu je jiný děj než vlastní změna komutačního stavu.'],null,['dc16-bldc-poloha','dc06-komutace']);

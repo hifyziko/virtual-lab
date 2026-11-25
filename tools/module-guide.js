@@ -63,7 +63,7 @@
   }
   for(const row of scope.querySelectorAll('.statusline')){if(!row.querySelector('button,input,select,canvas,svg'))row.style.setProperty('display','none','important');}
   const lessonNotes=experimentNotes[location.hash.slice(1)];
-  const candidates=scope.querySelectorAll('main > .footer,main > .footnote,main > .footerbar,main > .mathnote,.sceneFoot,details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]'+(lessonNotes?','+lessonNotes:''));
+  const candidates=scope.querySelectorAll('.dc-workspace .op-note,.dc-workspace #op-insight,.dc-workspace #cm-insight,.dc-workspace .cm-story,.dc-workspace #wc-insight,.dc-workspace #wc-text,.dc-workspace #wc-caption,.dc-workspace .dc-simple-caption,.dc-workspace .dc-intro,.dc-workspace .dc-controls-note,.dc-workspace #dc-step-title,.dc-workspace #dc-step-text,.dc-workspace #dc-model-note,.dc-workspace .arm-foot>span,.dc-workspace #arm-insight,.dc-workspace #compose-explanation,.dc-workspace .compose-note,main > .footer,main > .footnote,main > .footerbar,main > .mathnote,.sceneFoot,details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]'+(lessonNotes?','+lessonNotes:''));
   for(const node of candidates){
    if(nodes.includes(node)||node.closest('[data-guide-source]'))continue;
    if(node.matches('details')){

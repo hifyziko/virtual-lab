@@ -1,5 +1,16 @@
 # Aktuální stav předání
 
+## Stejnosměrné stroje — 25. listopadu 2026
+
+Ovládání je kompaktnější, průvodní texty a odkazy patří do společného
+výkladu. Rovnice jsou u příslušných scén a grafů. Princip řízení BLDC
+má dva grafy nahoře, rotor s tečně natočenými Hallovými sondami dole
+vlevo a tranzistorový můstek se spínací logikou vpravo.
+Elektronická komutace má volbu stavů v pravém dolním panelu.
+Řízení otáček má volby v panelu oblastí řízení a samokompenzaci
+u ovládání. Smyčkové vinutí má přepínače v hlavičce a údaje v pravém panelu.
+
+
 ## Terminologie fúzních modulů, 23. listopadu 2026
 
 Prošlo všech 18 položek aktuálního fúzního rozcestníku podle knihy

@@ -35,12 +35,12 @@ function gapCurve(coeff){const {N,R,fields}=DCFieldBasis,h=2*R/(N-1),r=132;
  // Cartesian interface staircasing, rather than plotting nearest-grid noise.
  return a=>{let sum=0;for(let n=-2;n<=2;n++){const t=a+n*.018;sum+=(sample(t+.035)-sample(t-.035))/(r*.07);}return 35*sum/5;};}
 let plotId=0;
-function plot({curves,x=[0,1],y=[-1.3,1.3],xt='t',yt='i',cursor,point,pointColor=C.pink,yTicks,ticks=true}){
- const l=64,r=476,t=43,b=181,X=v=>l+(v-x[0])/(x[1]-x[0])*(r-l),Y=v=>b-(v-y[0])/(y[1]-y[0])*(b-t);let out='';
+function plot({curves,x=[0,1],y=[-1.3,1.3],xt='t',yt='i',cursor,point,pointColor=C.pink,yTicks,ticks=true,height=234}){
+ const l=64,r=476,t=height===234?43:32,b=height-53,X=v=>l+(v-x[0])/(x[1]-x[0])*(r-l),Y=v=>b-(v-y[0])/(y[1]-y[0])*(b-t);let out='';
  for(const v of (yTicks||Array.from({length:5},(_,k)=>y[0]+(y[1]-y[0])*k/4))){out+=line(l,Y(v),r,Y(v),'#e4ebe7',.8);if(ticks)out+=math(28,Y(v)+3,f(v).toString().replace('.','{,}'),C.muted,11,50);}
  out+=arrow(l,b,0,t-b-5,C.muted,1)+arrow(l,b,r-l+7,0,C.muted,1);if(y[0]<0&&y[1]>0)out+=line(l,Y(0),r,Y(0),'#b5c7bd',1);
- out+=math(64,17,yt,C.muted,13,90)+math(518,210,xt,C.muted,13,40);
- for(let k=0;k<5;k++){const v=x[0]+(x[1]-x[0])*k/4;out+=math(X(v),208,f(v).toString().replace('.','{,}'),C.muted,11,65);}
+ out+=math(64,17,yt,C.muted,13,90)+math(518,b+29,xt,C.muted,13,40);
+ for(let k=0;k<5;k++){const v=x[0]+(x[1]-x[0])*k/4;out+=math(X(v),b+27,f(v).toString().replace('.','{,}'),C.muted,11,65);}
  const clip='dc-plot-'+(++plotId);out+=`<defs><clipPath id="${clip}"><rect x="${l}" y="${t}" width="${r-l}" height="${b-t}"/></clipPath></defs><g clip-path="url(#${clip})">`;
  for(const c of curves){let d='';const arr=c.points||Array.from({length:201},(_,i)=>{const a=x[0]+(x[1]-x[0])*i/200;return[a,c.fn(a)];});for(const [i,p]of arr.entries()){d+=(i?'L':'M')+f(X(p[0]))+' '+f(Y(p[1]));}out+=`<path d="${d}" fill="none" stroke="${c.color||C.green}" stroke-width="${c.width??2.2}" opacity="${c.opacity??1}" stroke-linejoin="round"${c.dash?' stroke-dasharray="5 4"':''}/>`;}out+='</g>';
  if(cursor!==undefined){out+=line(X(cursor),t,X(cursor),b,C.gold,1,'3 4');for(const c of curves.filter(c=>c.fn)){const v=c.fn(cursor);if(v>=y[0]&&v<=y[1])out+=dot(X(cursor),Y(v),c.color||C.green,3.6);}}
@@ -135,21 +135,42 @@ function bridge(theta,step,scale=1,phase=null){const i=phase||bldcCurrents(theta
  out+=math(12,33,'+',C.red,17,25)+math(12,240,'-',C.blue,17,25);return out;
 }
 
-function bldcScene(s,step,kind){const a=s.position*TAU,phase=bldcCurrents(s.commutationAngle??a),space=[phase[0]-.5*(phase[1]+phase[2]),Math.sqrt(3)/2*(phase[1]-phase[2])],fa=Math.atan2(space[1],space[0]),rotor=fa-Math.PI/2; // smooth rotor below uses actual commanded angle, not sector jumps
+function hallSensors(code){
+ // Each axis bisects the 180° interval in which its Hall signal is high.
+ const axes=[-Math.PI/3,Math.PI/3,Math.PI];
+ const labels=["A","B","C"],colors=[C.red,C.blue,C.gold];
+ return axes.map((angle,k)=>{
+  const x=r=>265+r*Math.cos(angle),y=r=>282-r*Math.sin(angle);
+  const active=code[k]==="1",color=colors[k],label=labels[k];
+  const markRadius=240,labelY=y(markRadius)+(k===1?-19:19);
+  return `<g data-hall-sensor="${label}" data-hall-state="${code[k]}"><title>Hallova sonda ${label}: ${code[k]}</title>`
+   +`<rect x="-6" y="-4" width="12" height="8" rx="2" transform="translate(${x(markRadius)} ${y(markRadius)}) rotate(${90-angle*180/Math.PI})" fill="${active?color:"white"}" stroke="${color}" stroke-width="2"/>`
+   +math(x(markRadius),labelY+8,"H_"+label,color,15,42)+"</g>";
+ }).join("");
+}
+function bldcScene(s,step,kind,panels){const a=s.position*TAU,phase=bldcCurrents(s.commutationAngle??a),space=[phase[0]-.5*(phase[1]+phase[2]),Math.sqrt(3)/2*(phase[1]-phase[2])],fa=Math.atan2(space[1],space[0]),rotor=fa-Math.PI/2; // smooth rotor below uses actual commanded angle, not sector jumps
  const theta=a-5*Math.PI/6,fl=s.field?bldcField(phase.map(i=>i*s.amount),theta):'';
  let out=`<g transform="translate(265 282)">${DCMachineArt.bldc(theta,phase.map(v=>v*s.amount),fl)}</g>`;
  out+=`<g transform="translate(265 282)">${arrow(0,0,155*s.amount*Math.cos(fa),-155*s.amount*Math.sin(fa),C.green,3)}${arrow(0,0,112*Math.cos(theta),-112*Math.sin(theta),C.gold,3)}</g>`;
- out+=frame(535,30,340,390,'Třífázový tranzistorový můstek')+`<g transform="translate(555 77)">${bridge(a,step,1,phase)}</g>`;
+ const bridgeDrawing=frame(535,30,340,390,'Třífázový tranzistorový můstek')+`<g transform="translate(555 77)">${bridge(a,step,1,phase)}</g>`;
+ let circuit=bridgeDrawing,sideLogic='';
  if(kind==='bldc-poloha'){
  const driveAngle=s.commutationAngle??a,code=bldcHall(a),held=s.commutationAngle!==null,positive=phase.findIndex(v=>v>0),negative=phase.findIndex(v=>v<0);
- out+=frame(535,440,104,96,'Hallovy sondy')+text(587,493,code,C.blue,22)+math(587,521,'H_A H_B H_C',C.muted,12,100);
- out+=frame(660,440,104,96,'Logika')+text(712,490,held?'Podrženo':bldcHall(driveAngle),C.ink,17)+text(712,517,'6 stavů',C.muted,13);
- out+=frame(785,440,105,96,'Povely')+text(837,491,'T'+[1,3,5][positive]+' + T'+[4,6,2][negative],C.green,17)+text(837,517,['A','B','C'][positive]+'+ → '+['A','B','C'][negative]+'−',C.muted,14);
- out+=arrow(640,487,19,0,C.ink,1.5)+arrow(765,487,19,0,C.ink,1.5)+arrow(837,440,0,-20,C.ink,1.5);
- }else out+=frame(535,440,340,96,'Sepnutá dvojice')+text(705,511,['A+ → B−','A+ → C−','B+ → C−','B+ → A−','C+ → A−','C+ → B−'][Math.floor(wrap(s.commutationAngle??a)/(Math.PI/3))],C.green,21);
+ out+=hallSensors(code);
+ const gatePair='T'+[1,3,5][positive]+' + T'+[4,6,2][negative],phasePath=['A','B','C'][positive]+'+ → '+['A','B','C'][negative]+'−';
+ sideLogic=frame(906,48,125,95,'Hallovy sondy')+text(968,100,code,C.blue,22)+math(968,128,'H_A H_B H_C',C.muted,13,106)
+  +frame(906,177,125,95,'Logika')+text(968,226,held?'Podrženo':bldcHall(driveAngle),C.ink,17)+text(968,252,'6 stavů',C.muted,13)
+  +frame(906,306,125,95,'Povely')+text(968,354,gatePair,C.green,17)+text(968,378,phasePath,C.muted,14)
+  +arrow(968,143,0,33,C.ink,1.5)+arrow(968,272,0,33,C.ink,1.5)+arrow(906,354,-29,0,C.ink,1.5);
+ circuit+=frame(535,440,104,96,'Hallovy sondy')+text(587,493,code,C.blue,22)+math(587,521,'H_A H_B H_C',C.muted,12,100);
+ circuit+=frame(660,440,104,96,'Logika')+text(712,490,held?'Podrženo':bldcHall(driveAngle),C.ink,17)+text(712,517,'6 stavů',C.muted,13);
+ circuit+=frame(785,440,105,96,'Povely')+text(837,491,'T'+[1,3,5][positive]+' + T'+[4,6,2][negative],C.green,17)+text(837,517,['A','B','C'][positive]+'+ → '+['A','B','C'][negative]+'−',C.muted,14);
+ circuit+=arrow(640,487,19,0,C.ink,1.5)+arrow(765,487,19,0,C.ink,1.5)+arrow(837,440,0,-20,C.ink,1.5);
+ }else circuit+=frame(535,440,340,96,'Sepnutá dvojice')+text(705,511,['A+ → B−','A+ → C−','B+ → C−','B+ → A−','C+ → A−','C+ → B−'][Math.floor(wrap(s.commutationAngle??a)/(Math.PI/3))],C.green,21);
 
  if(kind==='bldc-poloha'){const torque=bldcTorque(s);for(const t of [theta,theta+Math.PI])out+=arrow(265+128*Math.cos(t),282-128*Math.sin(t),-42*torque*Math.sin(t),-42*torque*Math.cos(t),C.pink,2.5);}
- out+=text(265,552,kind==='bldc-poloha'?'Táhněte rotorem · růžové šipky ukazují magnetický moment':'Proudový vektor a osa permanentních magnetů',C.muted,16);return out;
+ if(panels){panels.rotor=out;panels.circuit=bridgeDrawing+sideLogic;}
+ out+=text(265,552,kind==='bldc-poloha'?'Táhněte rotorem · růžové šipky ukazují magnetický moment':'Proudový vektor a osa permanentních magnetů',C.muted,16);return out+circuit;
 }
 function energy(s){const I=s.amount,w=Math.max(.05,(1-.18*I)),pin=I+.08,cu=.18*I*I+.08,mech=.06*w,shaft=Math.max(0,pin-cu-mech);let out=text(450,45,'Od svorek až k hřídeli',C.ink,24);const y=210;
  const nodes=[[70,'Elektrický příkon',C.blue],[340,'Přeměněný výkon',C.green],[650,'Výkon na hřídeli',C.gold]];
@@ -189,8 +210,9 @@ function dynamics(load){const rows=[];let i=0,w=0;const dt=.002;for(let k=0;k<=5
 function winding(s,step){const a=s.position*TAU,count=step===2?12:1;return {coil:x=>Math.cos(2*x),out:x=>Array.from({length:count},(_,k)=>Math.abs(Math.cos(2*x+k*Math.PI/count))).reduce((sum,v)=>sum+v,0)/count,count};}
 const configs={
  princip:['Natočení rotoru','Proud kotvy','Příčný řez strojem'],kotva:['Natočení rotoru','Buzení','Cívky, kartáče a komutátor'],schema:['Pracovní bod','Zatěžovací moment','Náhradní schéma'],rozbeh:['Čas děje','Zatížení po skoku','Rozběh a zatížení stroje'],reakce:['Natočení rotoru','Proud kotvy','Budicí pole a reakce kotvy'],komutace:['Průběh komutace','Vliv indukčnosti','Detail komutující cívky'],kompenzace:['Natočení rotoru','Proud kotvy','Kompenzace a pomocné póly'],rizeni:['Pracovní bod','Napětí kotvy','Rodina mechanických charakteristik'],seriovy:['Pracovní bod','Zatěžovací proud','Sériově buzený stroj'],bilance:['Pracovní bod','Zatěžovací proud','Tok výkonu'],brzdeni:['Směr a rychlost','Velikost momentu','Čtyři kvadranty pohonu'],dynamo:['Budicí proud','Odpor buzení','Samobuzení derivačního dynama'],pwm:['Spínací perioda','Střída PWM','Proudové cesty měniče'],univerzalni:['Časová fáze','Amplituda proudu','Síly při střídavém napájení'],bldc:['Elektrický úhel','Proud fází','Elektronická komutace'],'bldc-poloha':['Elektrický úhel','Proud fází','Snímače a spínání']};
-function render(kind,s,step){if(kind==='rozvinuti'){kind='princip';s={...s,mode:'explore',fieldView:'unrolled'};}const a=s.position*TAU,A=kind==='princip'&&s.mode==='explore'?(s.armatureReaction===false?0:s.probe??1):s.amount,F=s.flux,unit='\\mathrm{p.u.}';let scene='',charts=[],note='Lineární výukové pole · homogenizované drážky · zvětšená mezera',mainTitle=configs[kind][2],readout='';
- const pair=(title,curves,opts,items)=>charts.push(plotResult(title,curves,opts,items));
+function render(kind,s,step,plotHeight=234){if(kind==='rozvinuti'){kind='princip';s={...s,mode:'explore',fieldView:'unrolled'};}const a=s.position*TAU,A=kind==='princip'&&s.mode==='explore'?(s.armatureReaction===false?0:s.probe??1):s.amount,F=s.flux,unit='\\mathrm{p.u.}';let scene='',charts=[],note='Lineární výukové pole · homogenizované drážky · zvětšená mezera',mainTitle=configs[kind][2],readout='';
+ const panels=kind==='bldc-poloha'&&step!==2?{}:null;
+ const pair=(title,curves,opts,items)=>charts.push(plotResult(title,curves,{...opts,height:plotHeight},items));
  if(['princip','kotva','rozbeh','reakce','kompenzace','seriovy','univerzalni'].includes(kind)){
   const m=machineScene(s,kind,step);scene=m.out;
   if(['reakce','kompenzace'].includes(kind)){
@@ -251,7 +273,7 @@ function render(kind,s,step){if(kind==='rozvinuti'){kind='princip';s={...s,mode:
   scene=quadrants(s,step);pair('Napěťová bilance ve zvoleném režimu',[{fn:x=>x,color:C.green},{fn:terminal,color:C.blue}],{x:[-1.2,1.2],y:[-1.6,1.6],cursor:(s.position-.5)*2,xt:'\\omega',yt:'U'},[['U_i',C.green],['U_a',C.blue]]);
   pair('Znaménko mechanického výkonu',[{fn:x=>x*current(x),color:C.pink}],{x:[-1.2,1.2],y:[-2,2],cursor:(s.position-.5)*2,xt:'\\omega',yt:'P_{\\mathrm{em}}'},[['M\\omega',C.pink]]);note=step===2?'Odporové brzdění · zdroj odpojen · napětí na svorkách brzdného odporu':'Motorická znaménková konvence · napětí respektuje odporový úbytek pro oba směry';
  }else{
-  scene=bldcScene(s,step,kind);
+  scene=bldcScene(s,step,kind,panels);
   if(kind==='bldc-poloha'){
    if(step===2){scene=connectionScene(s);mainTitle='Proudové cesty ve hvězdě a trojúhelníku';
     pair('Proudy fází v zapojení hvězda',[0,1,2].map(k=>({fn:x=>A*bldcCurrents(x)[k],color:[C.red,C.blue,C.gold][k]})),{x:[0,TAU],y:[-1.5,1.5],cursor:a,xt:'\\theta_e',yt:'i'},[['i_a',C.red],['i_b',C.blue],['i_c',C.gold]]);
@@ -266,7 +288,7 @@ function render(kind,s,step){if(kind==='rozvinuti'){kind='princip';s={...s,mode:
   }
  }
  if(kind==='princip'&&s.mode==='explore'&&s.fieldView==='unrolled'){scene=unrolledField(s);mainTitle='Rozvinutí obvodu · skládání polí';}
- return {scene,charts,note,mainTitle};
+ return {scene,charts,note,mainTitle,panels};
 }
 function principleStep(s,dt){dt=Math.min(.06,Math.max(0,dt));const n=Math.max(1,Math.ceil(dt/.003)),h=dt/n;for(let i=0;i<n;i++){s.omega+=((s.flux*s.amount-.35*s.omega)/s.inertia)*h;s.position=((s.position+s.omega*h/TAU)%1+1)%1;}s.time=(s.time||0)+dt;if(dt>0){s.history??=[];s.history.push({t:s.time,w:s.omega});while(s.history.length>1&&s.history[0].t<s.time-15)s.history.shift();}return s;}
 function bldcTorque(s){const a=s.position*TAU,i=bldcCurrents(s.commutationAngle??a),fa=Math.atan2(Math.sqrt(3)/2*(i[1]-i[2]),i[0]-.5*(i[1]+i[2]));return s.amount*Math.sin(fa-(a-5*Math.PI/6));}
