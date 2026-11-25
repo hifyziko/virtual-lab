@@ -120,6 +120,73 @@
     ctx.stroke();
   }
 
+  let showRadiation = false, showPlots = false;
+  let histories, powerReference, energyReference, plotEnd;
+  function selectAnalysis(visible) {
+    showPlots = visible;
+    document.querySelector('.analysis').hidden = visible;
+    $('radiation-analysis').hidden = !visible;
+  }
+  $('view-radiation').onclick = () => { selectAnalysis(true); render(); };
+  $('view-relaxation').onclick = () => { selectAnalysis(false); render(); };
+  const maps = [];
+  const fluxColor = [174, 83, 18];
+  const fluxLimit = 0.05;
+  const logRange = Math.log1p(40000 * fluxLimit);
+  const fluxIntensity = flux => Math.min(1, Math.log1p(40000 * flux) / logRange);
+
+  for (const name of names) {
+    const ramp = $(name + '-scale').querySelector('.flux-ramp');
+    ramp.style.setProperty('--flux-color', 'rgb(' + fluxColor.join(',') + ')');
+    for (const [flux, tex] of [[0, '0'], [0.0001, '10^{-4}'], [0.001, '10^{-3}'], [0.01, '10^{-2}'], [fluxLimit, '\\geq 0{,}05']]) {
+      const tick = document.createElement('span');
+      tick.className = 'flux-tick';
+      tick.style.left = (100 * fluxIntensity(flux)) + '%';
+      math(tick, tex);
+      ramp.appendChild(tick);
+    }
+  }
+
+  function drawRadiation(index, field, unit, centerX, centerY) {
+    const {ctx, width, height} = field;
+    const cols = Math.max(2, Math.ceil(width / 5)), rows = Math.max(2, Math.ceil(height / 5));
+    let map = maps[index];
+    if (!map || map.canvas.width !== cols || map.canvas.height !== rows) {
+      const canvas = document.createElement('canvas');
+      canvas.width = cols; canvas.height = rows;
+      const brush = canvas.getContext('2d');
+      map = maps[index] = { canvas, brush, image: brush.createImageData(cols, rows) };
+    }
+    const orbit = orbits[index], pixels = map.image.data;
+
+    for (let row = 0, p = 0; row < rows; row++) {
+      const y = (centerY - (row + .5) * height / rows) / unit;
+      for (let col = 0; col < cols; col++, p += 4) {
+        const x = ((col + .5) * width / cols - centerX) / unit;
+        const fieldValue = model.radiationAt(orbit, x, y, clock);
+        // In the outgoing radiation field the Poynting magnitude is proportional to B².
+        const relativeFlux = fieldValue * fieldValue;
+        const intensity = fluxIntensity(relativeFlux);
+        for (let channel = 0; channel < 3; channel++)
+          pixels[p + channel] = 255 + (fluxColor[channel] - 255) * intensity;
+        pixels[p + 3] = 255;
+      }
+    }
+    map.brush.putImageData(map.image, 0, 0);
+    ctx.drawImage(map.canvas, 0, 0, width, height);
+  }
+
+  $('radiation-toggle').onclick = () => {
+    showRadiation = !showRadiation;
+    $('radiation-toggle').setAttribute('aria-pressed', String(showRadiation));
+    for (const name of names) $(name + '-scale').hidden = !showRadiation;
+    selectAnalysis(showRadiation);
+    render();
+  };
+
+  $('coulomb-layer').onchange = () => render();
+  const coulombViews = [];
+
   function drawFlight(index, current) {
     const name = names[index], orbit = orbits[index];
     const [x, y, vx, vy] = current.state;
@@ -142,6 +209,7 @@
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = '#d7eaf38c';
     ctx.fillRect(bandLeft, 0, bandRight - bandLeft, height);
+    if (showRadiation) drawRadiation(index, field, unit, centerX, centerY);
     ctx.beginPath();
     for (let gridX = centerX % unit; gridX < width; gridX += unit) {
       ctx.moveTo(gridX, 0);
@@ -155,12 +223,16 @@
     ctx.strokeStyle = '#c4d6de65';
     ctx.stroke();
     for (const edge of [bandLeft, bandRight]) line(ctx, edge, 0, edge, height, '#8facbb', 1, [4, 5]);
-    for (const ring of [0.42, 0.8, 1.22]) {
+    for (const ring of (showRadiation ? [] : [0.42, 0.8, 1.22])) {
       ctx.beginPath();
       ctx.arc(centerX, centerY, ring * unit, 0, 2 * Math.PI);
       ctx.strokeStyle = '#d3b4a4';
       ctx.lineWidth = 0.8;
       ctx.stroke();
+    }
+    if ($('coulomb-layer').checked) {
+      const view = coulombViews[index] ??= new window.HiFyzikoPlasmaField.SyncFieldView();
+      view.draw(ctx, width, height, [{ x: centerX, y: centerY, q: 1 }, { x: px, y: py, q: -1 }], unit, false);
     }
     line(ctx, 0, mapY(model.impact), width, mapY(model.impact), '#839ba6', 1, [5, 5]);
     const last = orbit.samples.length - 1;
@@ -264,14 +336,56 @@
     drawParticles('meetings', scene, witnessElectrons);
   }
 
+  function drawRadiationPlot(key, reference) {
+    const field = surface(key + '-plot');
+    if (!field) return;
+    const {ctx, width, height} = field;
+    const left = 43, right = width - 25, bottom = height - 28, top = 18;
+    const px = t => left + (right - left) * t / plotEnd;
+    const ceiling = key === 'power' ? powerCeiling : energyCeiling;
+    const py = value => bottom - (bottom - top) * value / (reference * ceiling);
+    for (const fraction of [0.5, 1]) {
+      const y = py(reference * fraction);
+      line(ctx, left, y, right, y, '#d0dfe4', 1, [3, 3]);
+    }
+    arrow(ctx, left, bottom, right - left + 7, 0, referenceColor, 1, 5);
+    arrow(ctx, left, bottom, 0, top - bottom - 7, referenceColor, 1, 5);
+    histories.forEach((history, i) => {
+      function curve(until, color, thickness) {
+        const end = Math.min(until, history[history.length - 1].time);
+        const step = history[1].time;
+        const index = Math.min(history.length - 1, Math.floor(end / step));
+        ctx.beginPath();
+        ctx.moveTo(px(0), py(history[0][key]));
+        for (let n = 1; n <= index; n += 3) ctx.lineTo(px(history[n].time), py(history[n][key]));
+        const a = history[index], b = history[Math.min(index + 1, history.length - 1)];
+        const value = a[key] + (b[key] - a[key]) * (end - a.time) / step;
+        ctx.lineTo(px(end), py(value));
+        if (key === 'energy' && until > end) ctx.lineTo(px(until), py(value));
+        ctx.strokeStyle = color; ctx.lineWidth = thickness; ctx.stroke();
+      }
+      curve(plotEnd, series[i] + '46', 1.4);
+      curve(Math.min(clock, plotEnd), series[i], 2.6);
+    });
+    const cursor = px(Math.min(clock, plotEnd));
+    line(ctx, cursor, top, cursor, bottom, '#627782', 1, [3, 3]);
+    $('axis-' + key).style.top = (py(reference) - 8) + 'px';
+  }
+
+  let powerCeiling, energyCeiling;
   function render() {
     const scale = Number(document.documentElement.style.getPropertyValue('--fusion-fit')) || 1;
     pixelRatio = Math.max(1, Math.min((window.devicePixelRatio || 1) * scale, 3));
     const current = orbits.map(orbit => model.at(orbit, clock));
     current.forEach((sample, i) => drawFlight(i, sample));
-    drawImpulse(current);
-    drawComposition(Math.abs(current[0].state[3]));
-    drawEncounters();
+    if (showPlots) {
+      drawRadiationPlot('power', powerReference);
+      drawRadiationPlot('energy', energyReference);
+    } else {
+      drawImpulse(current);
+      drawComposition(Math.abs(current[0].state[3]));
+      drawEncounters();
+    }
     math($('time-value'), decimal(clock) + '\\,t_0');
     time.value = clock;
   }
@@ -279,6 +393,20 @@
   function refresh() {
     faster = Number(speed.value);
     orbits = [model.integrate(1), model.integrate(faster)];
+    histories = orbits.map(model.radiationHistory);
+    const energies = histories.map(history => history[history.length - 1].energy);
+    const peaks = histories.map(history => Math.max(...history.map(sample => sample.power)));
+    powerReference = peaks[0];
+    energyReference = energies[0];
+    powerCeiling = 1.06 * Math.max(...peaks) / powerReference;
+    energyCeiling = 1.06 * Math.max(...energies) / energyReference;
+    plotEnd = Math.ceil(Math.max(...orbits.map(orbit => orbit.end)));
+    for (const key of ['power', 'energy']) math($('end-' + key), decimal(plotEnd, 0) + '\\,t_0');
+    names.forEach((name, index) => {
+      const percent = 100 * energies[index] / energies[0];
+      math($('energy-' + name), decimal(percent, 1) + '\\,\\%');
+
+    });
     timeMarks = orbits.map(orbit => {
       const marks = [];
       for (let instant = 0; instant < orbit.end; instant += 0.65) {
@@ -297,18 +425,16 @@
     render();
   }
 
-  function lockShotControls(locked) {
-    $('shoot').disabled = locked;
-    speed.disabled = locked;
-    $('reset-speed').disabled = locked;
-    time.disabled = locked;
+  function stopPlayback() {
+    cancelAnimationFrame(animation);
+    animation = 0;
+    previousTime = null;
   }
 
   function shoot() {
-    if ($('shoot').disabled) return;
+    stopPlayback();
     clock = 0;
-    previousTime = null;
-    lockShotControls(true);
+    $('shoot').textContent = 'Vystřelit znovu';
     render();
     animation = requestAnimationFrame(frame);
   }
@@ -321,7 +447,6 @@
     }
     if (clock >= endTime) {
       animation = 0;
-      lockShotControls(false);
       $('shoot').textContent = 'Vystřelit znovu';
       return;
     }
@@ -331,12 +456,17 @@
 
   document.querySelectorAll('[data-tex]').forEach(node => math(node, node.dataset.tex));
   $('help').onclick = () => $('guide').showModal();
-  speed.oninput = refresh;
-  $('reset-speed').onclick = () => {
-    speed.value = speed.defaultValue;
+  speed.oninput = () => {
+    clock = 0;
+    previousTime = null;
     refresh();
   };
+  $('reset-speed').onclick = () => {
+    speed.value = speed.defaultValue;
+    speed.oninput();
+  };
   time.oninput = () => {
+    stopPlayback();
     clock = Math.min(endTime, Number(time.value));
     render();
   };

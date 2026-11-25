@@ -39,6 +39,7 @@
   <script defer src="../particles/style.js"></script>
   <script defer src="../particles/nuclear-shader.js"></script>
   <script defer src="../particles/nucleus-view.js"></script>
+  <script defer src="../plasma/field-view.js"></script>
   <script defer src="model.js"></script>
   <script defer src="app.js"></script>
   <script defer src="../navigation/page.js"></script>
@@ -48,6 +49,7 @@
   <header data-fusion-heading>
     <a class="back" href="../index.html#group-area-plasma" target="_top" aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a>
     <h1 data-module-number="02">Coulombovský rozptyl a kolizní relaxace</h1>
+    <button id="radiation-toggle" type="button" aria-pressed="false">Brzdné záření</button>
     <button id="help" aria-haspopup="dialog">Ovládání a výklad</button>
     <button data-fusion-full>Celá obrazovka</button>
   </header>
@@ -57,6 +59,7 @@
       <input id="speed" type="range" min="1.2" max="2.4" step="0.1" value="1.8">
       <output id="speed-value" for="speed"></output>
     </div>
+    <label><input id="coulomb-layer" type="checkbox"> Elektrostatické pole</label>
     <button id="shoot" type="button">Vystřelit</button>
     <button id="reset-speed">Výchozí rychlost</button>
     <div class="timeline">
@@ -72,6 +75,7 @@
         <div class="canvas-stage">
           <canvas id="slow" role="img" aria-label="Dráha pomalejšího elektronu kolem deuteronu, se šipkami síly a hybnosti"></canvas>
           <canvas id="slow-particles" class="particle-layer" aria-hidden="true"></canvas>
+          <div class="flux-scale" id="slow-scale" hidden><strong>Poyntingův vektor <span data-tex="|\mathbf S_{\mathrm{rad}}|"></span></strong> · rel. jednotky<div class="flux-ramp"></div></div>
           <span id="slow-electron" class="vector-label electron-label" data-tex="\mathrm e^-" aria-hidden="true"></span>
           <span id="slow-ion" class="vector-label ion-label" data-tex="\mathrm D^+" aria-hidden="true"></span>
           <span id="slow-force" class="vector-label electric" data-tex="\mathbf F" aria-hidden="true"></span>
@@ -84,6 +88,7 @@
         <div class="canvas-stage">
           <canvas id="fast" role="img" aria-label="Dráha rychlejšího elektronu kolem deuteronu, se šipkami síly a hybnosti"></canvas>
           <canvas id="fast-particles" class="particle-layer" aria-hidden="true"></canvas>
+          <div class="flux-scale" id="fast-scale" hidden><strong>Poyntingův vektor <span data-tex="|\mathbf S_{\mathrm{rad}}|"></span></strong> · rel. jednotky<div class="flux-ramp"></div></div>
           <span id="fast-electron" class="vector-label electron-label" data-tex="\mathrm e^-" aria-hidden="true"></span>
           <span id="fast-ion" class="vector-label ion-label" data-tex="\mathrm D^+" aria-hidden="true"></span>
           <span id="fast-force" class="vector-label electric" data-tex="\mathbf F" aria-hidden="true"></span>
@@ -94,7 +99,7 @@
     </div>
     <div class="analysis">
       <section class="panel" aria-labelledby="scattering-heading">
-        <h2 id="scattering-heading">Doba u deuteronu a změna hybnosti</h2>
+        <div class="panel-head"><h2 id="scattering-heading">Doba u deuteronu a změna hybnosti</h2><button id="view-radiation">Grafy záření</button></div>
         <table class="comparison">
           <thead><tr><th scope="col">Elektron</th><th scope="col">Doba u deuteronu</th><th scope="col">Příčný impuls <span data-tex="|\Delta p_\perp|"></span></th></tr></thead>
           <tbody>
@@ -124,6 +129,16 @@
         <div class="relationship encounter-results"><span class="slow">Pomalejší <output id="count-slow"></output></span><span class="fast">Rychlejší <output id="count-fast"></output></span><span data-tex="\nu_{\mathrm D}\propto v^{-3}" title="Frekvence rozptylu směru"></span></div>
       </section>
     </div>
+    <div id="radiation-analysis" class="analysis" hidden>
+      <section class="panel"><div class="panel-head"><h2>Okamžitý vyzářený výkon</h2><button id="view-relaxation">Relaxace</button></div>
+        <div class="canvas-stage"><span class="plot-percent" id="axis-power" data-tex="100\,\%"></span><span class="plot-end" id="end-power"></span><canvas id="power-plot" aria-label="Výkon obou elektronů během průletu"></canvas></div>
+        <div class="plot-key"><span>Pomalejší</span><span>Rychlejší</span></div>
+      </section>
+      <section class="panel"><h2>Vyzářená energie od výstřelu</h2>
+        <div class="canvas-stage"><span class="plot-percent" id="axis-energy" data-tex="100\,\%"></span><span class="plot-end" id="end-energy"></span><canvas id="energy-plot" aria-label="Nasčítaná energie vzhledem k celému průletu pomalejšího elektronu"></canvas></div>
+        <div class="plot-key"><strong>Za celý průlet</strong><span>Pomalejší <output id="energy-slow"></output></span><span>Rychlejší <output id="energy-fast"></output></span></div>
+      </section>
+    </div>
   </div>
 </main>
 <dialog id="guide" aria-labelledby="guide-title">
@@ -131,11 +146,18 @@
   <h2 id="guide-title">Ovládání a výklad</h2>
   <h3>Porovnej dva průlety</h3>
   <ol>
-    <li>Nastav rychlost druhého elektronu. Stiskni Vystřelit. Rychlejší elektron po 25. setkání počká. Pomalejší pokračuje ke svému 25. iontu. Pak zůstane výsledek obou řádků na obrazovce. Tlačítkem Vystřelit znovu spustíš další pokus. Obě částice začínají ve stejné vzdálenosti od deuteronu a se stejným dopadovým parametrem. Po doběhu se časovým posuvníkem můžeš přesunout do libovolné části průletu.</li>
+    <li>Nastav rychlost druhého elektronu. Stiskni Vystřelit. Rychlejší elektron po 25. setkání počká. Pomalejší pokračuje ke svému 25. iontu. Pak zůstane výsledek obou řádků na obrazovce. Tlačítkem Vystřelit znovu spustíš další pokus. Obě částice začínají ve stejné vzdálenosti od deuteronu a se stejným dopadovým parametrem. Časovým posuvníkem můžeš kdykoli zastavit děj ve vybraném okamžiku. Nový výstřel můžeš spustit i během letu.</li>
     <li>Ve scéně sleduj jantarovou sílu <span data-tex="\mathbf F"></span> mířící k deuteronu a změnu směru hybnosti <span data-tex="\mathbf p"></span>. Šedá přerušovaná čára ukazuje původní směr, světlé pásmo vymezuje oblast měření času. Obě scény používají stejné měřítko a značky v již uražené dráze dělí čas na stejné kroky.</li>
     <li>V pravém panelu porovnej dobu a příčný impuls. Pod nimi sleduj, jak stejný příčný impuls změní směr dvou různě velkých počátečních hybností. Značky <span data-tex="\mathbf p_{\text{vst}}"></span> a <span data-tex="\mathbf p_{\text{výsl}}"></span> označují vstupní a výsledný vektor hybnosti.</li>
     <li>V panelu Více setkání sleduj, kolik iontů každý elektron mine a jak se rozbíhají šipky v obou skupinách. Každá šipka představuje výsledný směr samostatného elektronu.</li>
   </ol>
+  <h3>Brzdné záření</h3>
+  <p>Zapni tlačítko Brzdné záření a vystřel oba elektrony. Sleduj mapu za elektronem i před ním. Výraznější část impulsu se šíří od místa, kde se dráha stáčí nejsilněji. V obou scénách má stejná barva stejný význam. Posuvníkem vrať čas k průletu kolem iontu.</p>
+  <p>Jantarová mapa ukazuje velikost Poyntingova vektoru radiačního pole <span data-tex="|\mathbf S_{\mathrm{rad}}|"></span> v rovině průletu. Tato velikost je úměrná druhé mocnině radiačního pole. Tmavší barva znamená více energie procházející jednotkovou plochou za jednotku času. Obě scény mají společnou logaritmickou barevnou stupnici. Číselné značky udávají relativní jednotky modelu. Od poslední značky zůstává barva sytá. Vpravo sleduješ výkon a energii vyzářenou do všech směrů.</p>
+  <p>Výpočet používá radiační člen Liénardova–Wiechertova pole záporného náboje na vypočtené dráze. Každý bod mapy ukazuje účinek zrychlení v čase emise <span data-tex="t_{\mathrm e}=t-R/c"></span>, kde <span data-tex="R"></span> je vzdálenost od tehdejší polohy elektronu. Pro názornost je rychlost šíření <span data-tex="c=8v_0"></span>. Sledujeme záření během zobrazeného průletu. Elektrické pole nehybného iontu určuje dráhu elektronu. Zpětný účinek záření na pohyb zanedbáváme.</p>
+  <p>S. Entler, V. Kindl, <i>Jaderná fúze a fúzní elektrárny</i>, kap. 8.2, s. 175–176. Prostorová mapa je rozšířením výukového modelu.</p>
+  <p>Elektrostatické pole ukazují siločáry se směrovými šipkami. Vycházejí z kladného deuteronu a míří k zápornému elektronu podle okamžitých poloh obou částic. Jde o kvazistatickou Coulombovu složku pro srovnání s šířícím se zářením.</p>
+  <p>Dolní graf sčítá vyzářenou energii od výstřelu. Údaje pod grafem porovnávají energii vyzářenou do všech směrů za jeden celý průlet. Horní graf vyjadřuje výkon vzhledem k maximu pomalejšího elektronu. U energie je celý průlet pomalejšího elektronu reference <span data-tex="100\,\%"></span>. Energie je časový integrál výkonu. Při malé rychlosti je výkon úměrný druhé mocnině zrychlení. Rovnoměrný přímočarý pohyb záření nevyvolá. Při stejném dopadovém parametru mění rychlost dobu působení síly i dráhu elektronu. Pro energii na zobrazené dráze počítáme Liénardův výkon s týmž <span data-tex="c"></span> jako v mapě.</p>
   <h3>Průlet kolem iontu</h3>
   <p>Poloha elektronu vůči iontu je <span data-tex="\mathbf r"></span>, vzdálenost <span data-tex="r=|\mathbf r|"></span>, rychlost <span data-tex="\mathbf v"></span> a hybnost <span data-tex="\mathbf p=m_{\mathrm e}\mathbf v"></span>. Sílu určuje <span data-tex="\mathbf F=m_{\mathrm e}\mathrm d\mathbf v/\mathrm dt=-\kappa\mathbf r/r^3"></span>. Hmotnost elektronu je <span data-tex="m_{\mathrm e}"></span> a kladná konstanta <span data-tex="\kappa=|q_{\mathrm i}q_{\mathrm e}|/(4\pi\varepsilon_0)"></span> závisí na nábojích iontu a elektronu a permitivitě vakua.</p>
   <p>Rychlost, čas a hybnost jsou v jednotkách <span data-tex="v_0,\ t_0=\ell_0/v_0,\ p_0=m_{\mathrm e}v_0"></span>, kde <span data-tex="\ell_0"></span> je zvolená jednotka délky. Počáteční dopadový parametr je <span data-tex="b=1{,}45\,\ell_0"></span> a čas u iontu měříme v pásmu <span data-tex="|x|\le2\,\ell_0"></span>, kde <span data-tex="x"></span> je podélná poloha. Odklon je okamžitý úhel vůči vstupnímu směru. Výsledná hodnota se odečítá v konečné vzdálenosti. Vlastní názorný model počítá dráhu u nehybného iontu v rovině, bez pohybu iontu, magnetického pole a stínění.</p>

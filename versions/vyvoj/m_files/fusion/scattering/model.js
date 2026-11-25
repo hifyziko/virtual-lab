@@ -59,7 +59,51 @@
     return { distance, count, angles: walks.map(sums => sums[count] * 0.09 / speed ** 2) };
   }
 
-  const model = { acceleration, integrate, at, encounters, impact, start, exit, zone, maxEncounters };
+  // Acceleration term of the Liénard–Wiechert field in the orbital plane.
+  // Return c³ Bz in common relative units for an electron (negative charge).
+  // In the radiation field |E| = c |B|. Both layers share the same solver.
+  const lightSpeed = 8;
+  function radiationAt(orbit, x, y, time) {
+    const samples = orbit.samples, last = samples.length - 1;
+    const firstState = samples[0].state, lastState = samples[last].state;
+    if (time < Math.hypot(x - firstState[0], y - firstState[1]) / lightSpeed ||
+        time > orbit.end + Math.hypot(x - lastState[0], y - lastState[1]) / lightSpeed) return 0;
+    let emission = Math.min(orbit.end, time);
+    for (let pass = 0; pass < 7; pass++) {
+      const pos = emission / step, i = Math.min(last - 1, Math.floor(pos)), blend = pos - i;
+      const u = samples[i].state, v = samples[i + 1].state;
+      const sx = u[0] + blend * (v[0] - u[0]), sy = u[1] + blend * (v[1] - u[1]);
+      const dx = x - sx, dy = y - sy, radius = Math.hypot(dx, dy);
+      if (radius < 1e-7) return 0;
+      const nx = dx / radius, ny = dy / radius;
+      const bx = (u[2] + blend * (v[2] - u[2])) / lightSpeed;
+      const by = (u[3] + blend * (v[3] - u[3])) / lightSpeed;
+      const k = 1 - nx * bx - ny * by;
+      const residual = emission + radius / lightSpeed - time;
+      if (Math.abs(residual) < 1e-6 || pass === 6) {
+        const [ax, ay] = acceleration(sx, sy);
+        return ((nx - bx) * ay - (ny - by) * ax) / (k * k * k * radius);
+      }
+      emission = Math.max(0, Math.min(orbit.end, emission - residual / k));
+    }
+  }
+
+  // Liénard power integrated over the prescribed orbit. The common
+  // dimensional coefficient cancels in the two-flight energy comparison.
+  function radiationHistory(orbit) {
+    let previous = 0, sum = 0;
+    return orbit.samples.map(({ state: [x, y, vx, vy] }, index) => {
+      const [ax, ay] = acceleration(x, y);
+      const betaSquared = (vx * vx + vy * vy) / lightSpeed ** 2;
+      const cross = (vx * ay - vy * ax) / lightSpeed;
+      const power = (ax * ax + ay * ay - cross * cross) / (1 - betaSquared) ** 3;
+      if (index) sum += step * (power + previous) / 2;
+      previous = power;
+      return {time: index * step, power, energy: sum};
+    });
+  }
+
+  const model = { radiationHistory, radiationAt, lightSpeed, acceleration, integrate, at, encounters, impact, start, exit, zone, maxEncounters };
   root.HiFyzikoScattering = model;
   if (typeof module !== 'undefined') module.exports = model;
 })(typeof window === 'undefined' ? globalThis : window);

@@ -2,7 +2,7 @@
 (()=>{'use strict';
  const entries=[
   {id:'fu07-plazma',group:'fusion',topic:'basics',num:'01',title:'Plyn, ionizovaný plyn a plazma',description:'Od jediného atomu k souboru částic: teplota, ionizace, vlastní elektrické pole a odezva na magnetické pole.',page:'fuze-plazma/index.html',kind:'Interaktivní experiment'},
-  {id:'fu17-rozptyl',group:'fusion',topic:'basics',num:'02',title:'Coulombovský rozptyl a kolizní relaxace',description:'Porovnej dva průlety kolem deuteronu a sleduj, proč rychlejší elektrony mění svůj směr pomaleji.',page:'fuze-rozptyl/index.html',kind:'Interaktivní experiment'},
+  {id:'fu17-rozptyl',group:'fusion',topic:'basics',num:'02',title:'Coulombovský rozptyl a kolizní relaxace',description:'Porovnej průlety elektronů kolem deuteronu a sleduj jejich odklon, brzdné záření a vyzářenou energii.',page:'fuze-rozptyl/index.html',kind:'Interaktivní experiment'},
   {id:'fu15-vodivost',group:'fusion',topic:'basics',num:'03',title:'Teplotní závislost měrného odporu kovu a plazmatu',description:'Zahřej kov i plazma a porovnej kmity mřížky, rozptyl elektronů a měrný elektrický odpor.',page:'fuze-vodivost/index.html',kind:'Interaktivní experiment'},
   {id:'fu01-reakce',group:'fusion',topic:'basics',num:'04',title:'Fúzní reakce a coulombovská bariéra',description:'Přibližování jader, průchod bariérou a názorné ukázky jaderných reakcí.',page:'fuze-bariera/index.html',kind:'Interaktivní experiment'},
   {id:'fu12-lawson',group:'fusion',topic:'basics',num:'05',title:'Lawsonovo kritérium',description:'Změř dobu chladnutí plazmatu a zjisti, jak hustota a teplota paliva ovlivňují podmínku zapálení.',page:'fuze-lawson/index.html',kind:'Interaktivní experiment'},

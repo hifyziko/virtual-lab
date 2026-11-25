@@ -91,3 +91,31 @@ html[data-portrait] body header[data-fusion-heading] > .back { margin-right: aut
 html[data-portrait] .controls { gap: 4px 10px; }
 html[data-portrait] .setting input { width: 112px; }
 html[data-portrait] .timeline { flex-basis: 100%; padding: 0; border: 0; }
+
+#radiation-toggle {
+  min-width: 9.5em; padding-inline: 1.5em; font-weight: 650;
+  color: #632d07; background: #ffe3ad; border: 1px solid #c17f2a;
+}
+#radiation-toggle:hover { background: #ffd187; }
+#radiation-toggle[aria-pressed="true"] { color: white; background: #954309; border-color: #783506; }
+.analysis[hidden] { display: none; }
+#radiation-analysis { grid-template-rows: 1fr 1fr; }
+.plot-key { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px 12px; font-size: 13px; }
+.plot-key > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.plot-key > span::before { content: ""; display: inline-block; width: 16px; height: 3px; margin-right: 5px; vertical-align: middle; background: var(--slow); }
+.plot-key > span:last-child::before { background: var(--fast); }
+.plot-percent, .plot-end { position: absolute; z-index: 1; font-size: 12px; pointer-events: none; }
+.plot-percent { left: 3px; }
+.plot-end { right: 12px; bottom: 4px; }
+.flux-scale {
+  position: absolute; bottom: 5px; left: 5px; pointer-events: none;
+  width: max-content; min-width: 196px; white-space: nowrap;
+  padding: 3px 8px 17px; border-radius: 5px;
+  color: #344c55; background: rgba(255,255,255,.92); font-size: 11px;
+}
+.flux-ramp {
+  position: relative; margin: 3px 14px 0 4px; height: 6px;
+  background: linear-gradient(to right, white, var(--flux-color)); outline: 1px solid #a49c91;
+}
+.flux-tick { position: absolute; top: 7px; transform: translateX(-50%); font-size: 10px; white-space: nowrap; }
+.flux-tick::before { content: ""; position: absolute; left: 50%; bottom: 100%; height: 3px; border-left: 1px solid #574533; }

@@ -41,7 +41,8 @@
   'hf-skin-proximity':'main > .modelNotes,#hfMatrix > .matrix-note',
   'em04-premena':'.energy-grid .energy-caption:not([id]),.energy-section-note',
   'em04-pohybove-napeti':'.sp-rod-demo p,.sp-cause p',
-  'em05-reluktance':'.energy-grid .energy-caption:not([id]),.energy-bottom > p'
+  'em05-reluktance':'.energy-grid .energy-caption:not([id]),.energy-bottom > p',
+  'fu12-lawson':'.hero > #heroIntro'
  };
  let active=null;
  // Keep original nodes and IDs alive for the lesson's renderers. Only the
@@ -63,9 +64,10 @@
   }
   for(const row of scope.querySelectorAll('.statusline')){if(!row.querySelector('button,input,select,canvas,svg'))row.style.setProperty('display','none','important');}
   const lessonNotes=experimentNotes[location.hash.slice(1)];
-  const candidates=scope.querySelectorAll('.dc-workspace .op-note,.dc-workspace #op-insight,.dc-workspace #cm-insight,.dc-workspace .cm-story,.dc-workspace #wc-insight,.dc-workspace #wc-text,.dc-workspace #wc-caption,.dc-workspace .dc-simple-caption,.dc-workspace .dc-intro,.dc-workspace .dc-controls-note,.dc-workspace #dc-step-title,.dc-workspace #dc-step-text,.dc-workspace #dc-model-note,.dc-workspace .arm-foot>span,.dc-workspace #arm-insight,.dc-workspace #compose-explanation,.dc-workspace .compose-note,main > .footer,main > .footnote,main > .footerbar,main > .mathnote,.sceneFoot,details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]'+(lessonNotes?','+lessonNotes:''));
+  const candidates=scope.querySelectorAll('main > p:not([id]),main > .hero p:not([id]),.dc-workspace .op-note,.dc-workspace #op-insight,.dc-workspace #cm-insight,.dc-workspace .cm-story,.dc-workspace #wc-insight,.dc-workspace #wc-text,.dc-workspace #wc-caption,.dc-workspace .dc-simple-caption,.dc-workspace .dc-intro,.dc-workspace .dc-controls-note,.dc-workspace #dc-step-title,.dc-workspace #dc-step-text,.dc-workspace #dc-model-note,.dc-workspace .arm-foot>span,.dc-workspace #arm-insight,.dc-workspace #compose-explanation,.dc-workspace .compose-note,main > .footer,main > .footnote,main > .footerbar,main > .mathnote,.sceneFoot,details,dialog#theory,dialog#explanation,dialog#guide,dialog.arm-explanation,dialog.energy-help,section.explain#help,#dd-theory-panel,#eddy-model-notes,[data-guide-fusion-theory]'+(lessonNotes?','+lessonNotes:''));
   for(const node of candidates){
    if(nodes.includes(node)||node.closest('[data-guide-source]'))continue;
+   if(node.matches('p')&&node.querySelector('button,input,select,textarea,canvas,svg'))continue;
    if(node.matches('details')){
     if(node.matches('.precisePositions,.matrix-advanced,.experiment'))continue;
     if(node.querySelector('input,select,textarea,button,canvas,[contenteditable]'))continue;
