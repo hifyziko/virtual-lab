@@ -354,8 +354,8 @@
 /* Scope to the BLDC heading even after it is moved by the window fitter. */
 #app .modulehead:has(>.actions>.learning-tabs>[data-dc-step]){margin-bottom:5px}
 #app .modulehead>.actions:has(>.learning-tabs>[data-dc-step]){align-items:center;flex-wrap:nowrap;gap:6px}
-#app .modulehead>.actions:has(>.learning-tabs>[data-dc-step])>.learning-tabs{display:flex;align-items:center;gap:6px;height:32px;margin:0 20px 0 0;padding:0}
-#app .modulehead>.actions:has(>.learning-tabs>[data-dc-step]) button{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;height:32px;min-height:32px;max-height:32px;align-self:center;margin:0;padding:4px 10px;line-height:20px;white-space:nowrap}
+#app .modulehead>.actions:has(>.learning-tabs>[data-dc-step])>.learning-tabs{display:flex;align-items:center;gap:6px;height:34px;margin:0 20px 0 0;padding:0}
+#app .modulehead>.actions:has(>.learning-tabs>[data-dc-step]) button{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;height:34px;min-height:34px;max-height:34px;align-self:center;margin:0;padding:4px 10px;line-height:20px;white-space:nowrap}
 #app>.workspace.dc-bldc-position>.dc-controls{margin:0 0 5px;gap:10px}
 
 /* Keep the plot area flexible and the legends compact in both BLDC views. */

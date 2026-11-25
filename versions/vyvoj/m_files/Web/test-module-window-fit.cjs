@@ -115,8 +115,9 @@ for(const height of [864,780,740]){
  for(let pass=0;pass<30;pass++){
   const result=geometry.fit(1492,1000,height-130,heading);
   assert(result.scale>.49,'125% Full HD layout must retain a usable scene');
-  assert.equal(Number(heading.style.zoom),result.scale);assert.equal(heading.style.width,'1600px');
-  assert(result.scale*(1000+heading.offsetHeight+12)<=height-130+.2,'header and scene fit the height');
+  assert.equal(Number(heading.style.zoom),Math.min(1,result.scale/.8));
+  assert(Math.abs(parseFloat(heading.style.width)*Number(heading.style.zoom)-1600*result.scale)<.01);
+  assert(1000*result.scale+(heading.offsetHeight+12)*Number(heading.style.zoom)<=height-130+.2,'header and scene fit the height');
  }
 }
 const windingCss=fs.readFileSync(__dirname+'/winding-window-layout.css','utf8');

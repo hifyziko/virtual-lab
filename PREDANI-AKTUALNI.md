@@ -1,5 +1,13 @@
 # Aktuální stav předání
 
+## Sjednocení hlaviček modulů — 25. listopadu 2026
+
+Běžné moduly mají velikost názvu a ovládacích prvků podle fúzních.
+Při měřítku scény alespoň 80 % drží hlavička stálou velikost. Při dalším
+zmenšení se mění pozvolněji. Její šířka sleduje šířku zobrazeného modulu
+u nativních i vložených lekcí. Změna připravena nad commitem 217c8f2.
+
+
 ## Stejnosměrné stroje — 25. listopadu 2026
 
 Ovládání je kompaktnější, průvodní texty a odkazy patří do společného

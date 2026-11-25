@@ -7,20 +7,32 @@
   function boundedScale(width,height,available,designWidth=DESIGN_WIDTH){
     return Math.max(.0001,Math.floor(Math.min(width/designWidth,Math.max(1,available)/height)*10000)/10000);
   }
-  function measureHeading(heading,width){
+  // Match the fusion header: compensate for scene scale down to 80% and cap at 1.
+  function measureHeading(heading,width,sceneScale){
     if(!heading)return 0;
-    heading.style.width=width+'px';
+    const zoom=Math.min(1,sceneScale/.8);
+    heading.style.width=(width*sceneScale/zoom)+'px';
+    heading.style.zoom=String(zoom);
     const style=getComputedStyle(heading);
-    return heading.offsetHeight+(parseFloat(style.marginTop)||0)+(parseFloat(style.marginBottom)||0);
+    const height=heading.offsetHeight+(parseFloat(style.marginTop)||0)+(parseFloat(style.marginBottom)||0);
+    return height*zoom;
   }
   function fillHeight(heading,logicalWidth,availableWidth,headingWidth=logicalWidth){
     const widthScale=availableWidth/logicalWidth;
-    return Math.max(DESIGN_HEIGHT,Math.floor(availableHeight(heading)/widthScale-measureHeading(heading,headingWidth)));
+    const headingHeight=measureHeading(heading,headingWidth,widthScale);
+    return Math.max(DESIGN_HEIGHT,Math.floor((availableHeight(heading)-headingHeight)/widthScale));
   }
   function layoutScale(width,height,available,heading,designWidth=DESIGN_WIDTH,headingWidth=designWidth){
-    const headingHeight=measureHeading(heading,headingWidth);
-    const scale=boundedScale(width,height+headingHeight,available,designWidth);
-    if(heading)heading.style.zoom=String(scale);
+    let scale=boundedScale(width,height,available,designWidth);
+    if(!heading)return {scale,headingHeight:0};
+    let headingHeight=measureHeading(heading,headingWidth,scale);
+    while(scale>.0001&&height*scale+headingHeight>available+.001){
+      // A narrower row can wrap. Remeasure using its displayed width before accepting.
+      const logicalHeight=headingHeight/Math.min(1,scale/.8);
+      const next=available>=.8*height+logicalHeight?(available-logicalHeight)/height:available/(height+logicalHeight/.8);
+      scale=Math.max(.0001,Math.floor(Math.min(scale-.0001,next)*10000+1e-8)/10000);
+      headingHeight=measureHeading(heading,headingWidth,scale);
+    }
     return {scale,headingHeight};
   }
   const lifted=new WeakMap();
@@ -245,7 +257,7 @@
     if(saved.length)lifted.set(content,saved);
   }
 
-  function fit(element,content,naturalHeight,available,width){
+  function fit(element,content,naturalHeight,available,width,layoutZoom){
     if(!desktop.matches&&!content.classList?.contains('uniform-module-layout')){
       element.style.removeProperty('zoom');
       element.style.removeProperty('width');
@@ -266,7 +278,7 @@
     const fittedWidth=element===content?naturalWidth(content,width):(frameWidths.get(element)||naturalWidth(content,width));
     // The viewport is a hard bound in BOTH dimensions, for every module.
     // A width-only scale (or a minimum zoom floor) can push most of a tall lesson off screen.
-    const scale=Math.min(width/Math.max(1,fittedWidth),Math.max(1,available)/Math.max(1,closedHeight));
+    const scale=layoutZoom??Math.min(width/Math.max(1,fittedWidth),Math.max(1,available)/Math.max(1,closedHeight));
     const topOffset=element===content?0:content.getBoundingClientRect().top;
     positionSummaries(content,closedHeight*scale<=available+(lifted.has(content)?-12:.5)?Infinity:available/scale-topOffset,innerScale);
     element.classList.add('module-window-fit');
@@ -298,8 +310,7 @@
         for(const property of ['transform','left','position'])heading.style.removeProperty(property);
         heading.style.marginLeft='auto';
         heading.style.marginRight='auto';
-        heading.style.width=fittedWidth+'px';
-        heading.style.zoom=String(zoom);
+        measureHeading(heading,fittedWidth,zoom);
       }
     }else{
       // CSS transforms do not resize the child viewport, unlike CSS zoom.
@@ -318,9 +329,7 @@
         heading.style.transform='translateX(-50%)';
         heading.style.marginLeft='0px';
         heading.style.marginRight='0px';
-        const headingWidth=fittedWidth+'px';
-        heading.style.zoom=String(zoom);
-        if(heading.style.width!==headingWidth)heading.style.width=headingWidth;
+        measureHeading(heading,fittedWidth,zoom);
       }
 
       element.style.marginLeft='0px';
@@ -357,9 +366,10 @@
     }
     const heading=frameHost(frame).querySelector(':scope > .modulehead');
     const height=Math.max(1,naturalHeight);
-    const {scale}=layoutScale(width,height,availableHeight(heading||frame),heading,frameWidths.get(frame)||DESIGN_WIDTH);
+    const designWidth=frameWidths.get(frame)||naturalWidth(content,width);
+    const {scale}=layoutScale(width,height,availableHeight(heading||frame),heading,designWidth);
     frame.style.height=height+'px';
-    fit(frame,content,height,height*scale,width);
+    fit(frame,content,height,height*scale,width,heading?scale:undefined);
   };
 
   let native=null,pending=false,observedHeading=null;
@@ -404,7 +414,7 @@
     const width=widthOf(app);
     const available=availableHeight(native);
     if(heading){
-      // Native and embedded lessons share the same unscaled navigation row.
+      // Native and embedded lessons use the same heading size and scene fitting.
       // The lesson remains a direct app child so its renderers and CSS keep working.
       native.style.zoom='1';
       const fill=winding||['energy-workspace','dc-workspace','sp-transition'].some(name=>native.classList.contains(name))||!!native.querySelector(':scope > .gridplots');

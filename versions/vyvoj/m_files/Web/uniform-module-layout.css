@@ -49,7 +49,7 @@ main.uniform-module-layout:has(#zoomWall){--module-flexible-height:1;height:var(
 #app :is(.workspace>.modulehead,.module-window-heading){display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:12px;row-gap:6px;margin:0 0 12px;min-width:0;width:100%;box-sizing:border-box}
 #app :is(.workspace>.modulehead,.module-window-heading)>a.back{grid-column:1/-1;grid-row:1;justify-self:start;margin:0;font-size:14px;line-height:1.4;text-align:left}
 #app :is(.workspace>.modulehead,.module-window-heading)>.num{grid-column:1;grid-row:2}
-#app :is(.workspace>.modulehead,.module-window-heading)>h1{grid-column:2;grid-row:2;margin:0;font-size:24px;line-height:1.25;min-width:0}
+#app :is(.workspace>.modulehead,.module-window-heading)>h1{grid-column:2;grid-row:2;margin:0;font:700 24px/1.25 system-ui,sans-serif;letter-spacing:-.6px;min-width:0}
 #app :is(.workspace>.modulehead,.module-window-heading):not(:has(>.num))>h1{grid-column:1/3}
 #app :is(.workspace>.modulehead,.module-window-heading)>.actions{grid-column:3;grid-row:2;margin:0;justify-self:end;display:flex;flex-wrap:wrap;gap:8px}
 #app :is(.workspace>.modulehead,.module-window-heading)>.badge{grid-column:1/-1;grid-row:3;justify-self:start}
@@ -104,7 +104,7 @@ body:has(>main.uniform-module-layout){margin:0!important;padding:0!important}
 
 /* Energy experiments use the same viewport budget as the other lessons. */
 #app .hf-heading-modes{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-#app .hf-heading-modes button{min-height:40px;font-size:15px;font-weight:650;padding:7px 11px;white-space:nowrap}
+#app .hf-heading-modes button{min-height:34px;font-size:14px;font-weight:650;padding:5px 10px;white-space:nowrap}
 #app .hf-heading-modes button[aria-pressed="true"]{background:#007e6c;color:#fff;border-color:#007e6c}
 /* HF modes must not squeeze the title while the frame fits by height. */
 #app .workspace>.modulehead:has(.hf-heading-modes){display:flex!important;flex-wrap:wrap;align-items:center}
@@ -131,3 +131,7 @@ main.uniform-module-layout:has(#zoomWall){grid-template-rows:100px minmax(0,1fr)
 
 /* Tighten the gutters of the principal panel groups, including custom layouts. */
 :is(main,.workspace).uniform-module-layout :is(.layout,.lab,.views,.plots,.gridplots,.duo,.workarea,.rightplots,.experiment,.learning-grid):has(> :is(.card,.panel,.plotcard,.learning-panel)){gap:var(--lesson-gap)!important}
+
+/* Header controls share fusion’s dimensions; the renderer keeps each control’s state styling. */
+#app :is(.workspace>.modulehead,.module-window-heading)>.actions{align-items:center;gap:6px}
+#app :is(.workspace>.modulehead,.module-window-heading)>.actions :is(button,select,summary){box-sizing:border-box;min-height:34px;padding:5px 10px;font-size:14px;line-height:1.15}
