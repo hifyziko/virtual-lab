@@ -259,3 +259,19 @@ main[data-machine-viewport="sm08-rotor-dq"] .transform-guide .numbers>div{min-wi
 main[data-machine-viewport="sm08-rotor-dq"] .transform-guide .numbers strong{font-size:21px}
 /* The consolidated guide releases the former bottom explanation row. */
 main.uniform-module-layout[data-machine-viewport="sm08-rotor-dq"]:has(>.theory[data-guide-source]){grid-template-rows:auto minmax(0,1fr)}
+
+/* The synchronous principle fills the fitted viewport. The central row absorbs the free height. */
+main.uniform-module-layout[data-machine-viewport="sm01-princip"]{
+ height:var(--module-host-height,1000px);
+ display:flex;
+ flex-direction:column;
+ gap:var(--lesson-gap);
+}
+main.uniform-module-layout[data-machine-viewport="sm01-princip"] > .workspace{
+ flex:1 1 0;
+ height:auto;
+ min-height:0;
+}
+main.uniform-module-layout[data-machine-viewport="sm01-princip"] > :not(.workspace){
+ flex-shrink:0;
+}

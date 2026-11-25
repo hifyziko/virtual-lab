@@ -15,6 +15,10 @@ Závazné zadání vycházející z odsouhlasených úprav projektu. Platí pro 
 
 - Hlavní prostor patří grafům a technickým schématům. Ovládání má být kompaktní, se sjednocenými rozměry a čitelnými hodnotami.
 - Respektovat stejné mezery mezi panely; panely, popisky, rovnice ani číselná políčka se nesmějí dotýkat či překrývat.
+- Pod hlavičkou všech modulů držet základní odstup 8 px před škálováním. Mezi hlavními panely a řadami ovládání používat 5 px. Odstup skládat jen jednou, ze společné mezery a případného doplnění v hlavičce.
+- Ovladače pokusu pohromadě tvoří viditelný kompaktní panel, i když jsou v jediné řadě. Horní panel má jemný rámeček, vodorovný vnitřní okraj 7 px, svislý 4 px a mezery mezi ovladači 6 px. Rychlé kroky a tlačítka v této řadě mají základní výšku 30 px. Při zalomení smí řada vyrůst podle obsahu.
+- Hlavičky používají společnou typografii s výchozím názvem 24 px. U strojů mají nadpisy panelů 16 px a ovládání 14 px. Fúzní lekce používají původní sazbu uvnitř pokusu. Popisky uvnitř grafů a technických výkresů se řídí čitelností daného grafu.
+- Odstupy a rámec ovládání udržovat ve společných stylech. Při změně rozložení zkontrolovat hlavičku, ovládání a první graf v běžném okně i na celé obrazovce.
 - Nechat pouze informace potřebné k danému vysvětlení. Nevracet odstraněné duplicitní karty nebo ovladače bez důvodu.
 - Využívat volný prostor pro větší grafiku a čitelnost. Nezvětšovat samoúčelně výplně a prázdné mezery.
 - Související moduly mají mít srovnatelně velká fyzická a náhradní schémata; přidání prvku nesmí zmenšit celé schéma.

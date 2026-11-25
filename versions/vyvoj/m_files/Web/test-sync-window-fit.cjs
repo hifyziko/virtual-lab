@@ -7,7 +7,7 @@ const heading={style:style(),get offsetHeight(){return parseFloat(this.style.wid
 const host={get clientWidth(){return width},querySelector:()=>heading};
 const stage={style:style(),classList:{contains:n=>n==='machine-frame-stage'},parentElement:host};
 const frame={style:style(),classList:cls,parentElement:stage,getBoundingClientRect:()=>({top:156})};
-const main={classList:cls,dataset:{machineViewport:'sm01-princip'},offsetLeft:0,scrollWidth:1600,querySelectorAll:()=>[],getBoundingClientRect:()=>({top:0})};
+const main={style:style(),classList:cls,dataset:{machineViewport:'sm01-princip'},offsetLeft:0,scrollWidth:1600,querySelectorAll:()=>[],getBoundingClientRect:()=>({top:0})};
 const doc={querySelector:()=>main,querySelectorAll:()=>[],documentElement:{style:style()}};
 const ctx={console,innerHeight:1800,document:{addEventListener(){},body:{},getElementById:id=>id==='app'?{}:{getBoundingClientRect:()=>({top:height})}},matchMedia:()=>({matches:true}),getComputedStyle:()=>({paddingLeft:'22',paddingRight:'22',marginTop:'0',marginBottom:'12'}),ResizeObserver:class{observe(){}disconnect(){}},MutationObserver:class{observe(){}},requestAnimationFrame(){},addEventListener(){}};
 ctx.window=ctx;vm.createContext(ctx);vm.runInContext(fs.readFileSync(__dirname+'/module-window-fit.js','utf8'),ctx);
@@ -20,6 +20,7 @@ for(const id of ['am01-princip','sm01-princip','sm02-schema','sm03-torque','sm04
    ctx.prepareImportedViewport(frame,doc,h);ctx.fitImportedModule(frame,main,1000);
    assert.equal(parseFloat(frame.style.width),extent);
    const scale=+frame.style.transform.match(/scale\(([^)]+)/)[1];enlarged ||= scale>1;
+   assert(Math.abs(+main.style.getPropertyValue('--module-scene-scale')-scale)<.00011,'Text correction uses the fitted scene scale');
    assert(extent*scale<=w-44+.01,'no right clipping');
    const headZoom=Number(heading.style.zoom),headHeight=heading.offsetHeight+12;
    assert(Math.abs(headZoom-Math.min(1,scale/.8))<.0002,'heading uses fusion scale');

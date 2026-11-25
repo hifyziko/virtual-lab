@@ -1,5 +1,6 @@
 const fs=require('fs'),path=require('path');
-const root=__dirname,css=fs.readFileSync(path.join(root,'uniform-module-layout.css'),'utf8');
+const root=__dirname,css=fs.readFileSync(path.join(root,'uniform-module-layout.css'),'utf8')
+ .replace('@import "./module-ui.css";',()=>fs.readFileSync(path.join(root,'module-ui.css'),'utf8'));
 function lesson(source,id){
  // Legacy standalone lessons sometimes omit optional head/body tags. Insert
  // explicit boundaries before injecting styles instead of silently skipping them.

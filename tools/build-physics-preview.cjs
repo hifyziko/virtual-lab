@@ -9,7 +9,7 @@ if(fs.existsSync(dest)&&!activate&&!process.argv.includes('--update-preview'))th
 let html=fs.readFileSync(path.join(source,'web/index.html'),'utf8');
 html=html.replace(/<style id="physics-(?:preview|visual)-style">[\s\S]*?<\/style>/g,'').replace(/<script id="(?:physics-(?:preview|visual)|iter-card)">[\s\S]*?<\/script>/g,'');
 let js=fs.readFileSync(path.join(__dirname,'physics-preview.js'),'utf8');
-if(activate)js=js.replace(/footer\.innerHTML = '[^']*';/,"footer.innerHTML = 'Virtuální laboratoř fyziky · Verze 1.0 · Interaktivní výuka v češtině · Dostupná také offline<br>Číselné modely jsou výukové idealizace.';");
+if(activate)js=js.replace(/footer\.innerHTML = '[^']*';/,"footer.innerHTML = 'Virtuální laboratoř fyziky · Interaktivní výuka v češtině · Dostupná také offline<br>Číselné modely jsou výukové idealizace.';");
 new vm.Script(js);
 const css=fs.readFileSync(path.join(__dirname,'physics-preview.css'),'utf8');
 html=html.replaceAll('Virtuální laboratoř elektrických strojů','Virtuální laboratoř fyziky');

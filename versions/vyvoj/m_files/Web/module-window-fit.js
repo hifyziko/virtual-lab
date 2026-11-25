@@ -4,6 +4,12 @@
   const desktop=matchMedia('(min-width:851px)');
   const DESIGN_WIDTH=1600,DESIGN_HEIGHT=1000;
   // Shared by native workspaces and iframe lessons; round down to stay in bounds.
+  function setModuleTextScale(content,scale){
+    const style=content?.style;
+    if(style&&style.getPropertyValue('--module-scene-scale')!==String(scale)){
+      style.setProperty('--module-scene-scale',String(scale));
+    }
+  }
   function boundedScale(width,height,available,designWidth=DESIGN_WIDTH){
     return Math.max(.0001,Math.floor(Math.min(width/designWidth,Math.max(1,available)/height)*10000)/10000);
   }
@@ -168,6 +174,7 @@
     }
     const available=Math.max(1,Math.floor(widthOf(frameHost(frame))));
     const standard=main?.classList?.contains('uniform-module-layout');
+    if(standard)setModuleTextScale(main,.8);
     const width=standard?1600:main?naturalWidth(main,available):available;
     frameWidths.set(frame,width);
     if(frame.style.width!==width+'px')frame.style.width=width+'px';
@@ -281,6 +288,7 @@
     const scale=layoutZoom??Math.min(width/Math.max(1,fittedWidth),Math.max(1,available)/Math.max(1,closedHeight));
     const topOffset=element===content?0:content.getBoundingClientRect().top;
     positionSummaries(content,closedHeight*scale<=available+(lifted.has(content)?-12:.5)?Infinity:available/scale-topOffset,innerScale);
+    if(standard)setModuleTextScale(content,scale);
     element.classList.add('module-window-fit');
     if(element.style.width!==fittedWidth+'px')element.style.width=fittedWidth+'px';
     if(element===content&&content.dataset.windingViewport){
@@ -391,6 +399,8 @@
     app.classList.toggle('module-window-host',!!native);
     if(!native)return;
     native.classList.add('workspace','uniform-module-layout');
+    // Measure at the largest logical text size before applying the fitted scale.
+    setModuleTextScale(native,.8);
     native.dataset.nativeViewport='true';
     prepareExplanations(native);
     let heading=nativeHeadings.get(native)||native.querySelector?.(':scope > .modulehead');
@@ -430,6 +440,7 @@
       const naturalHeight=Math.max(native.offsetHeight,native.scrollHeight);
       const result=layoutScale(width,naturalHeight,availableHeight(heading),heading,naturalWidth,naturalWidth-inset);
       native.style.zoom=String(result.scale);
+      setModuleTextScale(native,result.scale);
       heading.style.marginLeft='auto';heading.style.marginRight='auto';
       return;
     }
@@ -444,6 +455,7 @@
       const {scale,headingHeight}=layoutScale(width,DESIGN_HEIGHT,available,heading);
       native.style.setProperty('height',(1000+headingHeight)+'px','important');
       native.style.zoom=String(scale);
+      setModuleTextScale(native,scale);
       if(heading)heading.style.zoom='1';
       return;
     }

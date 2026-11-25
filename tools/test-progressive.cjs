@@ -5,15 +5,38 @@ const manifest=JSON.parse(fs.readFileSync(path.join(web,'../manifest.json'),'utf
 assert(p,'Build the progressive delivery before testing');
 const html=fs.readFileSync(path.join(web,'index.html'),'utf8'),sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 assert.equal(Buffer.byteLength(html),p.shellBytes);assert(p.shellBytes<p.originalBytes*.1,'Initial shell must exclude the large lesson data');
+const visibleVersion=/>\s*Verze\s+1\.0\b/i;
+for(const entry of manifest.files.filter(item=>item.path.endsWith('.html'))){
+ assert(!visibleVersion.test(fs.readFileSync(path.join(web,entry.path),'utf8')),'Visible release version in '+entry.path);
+}
 const chunks=new Map();
 for(const [key,asset] of Object.entries(p.assets)){
  assert.match(asset.path,/^lazy\/[a-z0-9-]+-[a-f0-9]{16}\.js$/);
  const bytes=fs.readFileSync(path.join(web,asset.path));assert.equal(bytes.length,asset.bytes);assert.equal(sha(bytes),asset.sha256);
  assert(manifest.progressiveFiles.includes(asset.path));new vm.Script(bytes.toString());chunks.set(key,bytes.toString());
 }
+const fusionStyle=fs.readFileSync(path.join(web,'shared/fusion/style.css'),'utf8');
+const commonStyle=fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web/module-ui.css'),'utf8');
+const machineStyle=html.match(/<style id="uniform-module-shell">([\s\S]*?)<\/style>/)[1];
+assert(machineStyle.includes(commonStyle),'Shared typography missing in machine shell');
+assert(fusionStyle.includes(commonStyle),'Shared typography missing in fusion stylesheet');
+assert.match(fusionStyle,/zoom:calc\(1 \/ var\(--lesson-ui-scale\)\)/);
+assert.match(fusionStyle,/main > header\[data-fusion-heading\]\s*\{[^}]*padding-block-end:calc\(var\(--lesson-header-gap\) - var\(--lesson-gap\)\)/);
+assert.match(fusionStyle,/main > :is\(\.controls,\.story,\.toolbar,\.tools,\.current-controls\)\s*\{[^}]*border:1px solid/);
 for(const record of p.preserved){
  if(record.kind==='html'){
   let source;vm.runInNewContext(chunks.get(record.key),{LabProgress:{accept(key,value){assert.equal(key,record.key);source=value;}}});
+  assert(!visibleVersion.test(source),'Visible release version in '+record.key);
+  if(record.key==='lesson-sm01-princip'){
+   const layout=source.match(/<style id="machine-window-layout">([\s\S]*?)<\/style>/)[1];
+   assert.match(layout,/main\.uniform-module-layout\[data-machine-viewport="sm01-princip"\]\s*>\s*\.workspace\s*\{[^}]*flex:1 1 0;[^}]*height:auto;/);
+  }
+  const lessonStyle=source.match(/<style id="uniform-module-layout">([\s\S]*?)<\/style>/);
+  if(lessonStyle)assert(lessonStyle[1].includes(commonStyle),'Shared typography missing in '+record.key);
+  if(record.key.startsWith('fusion-')){
+   const embeddedStyle=source.match(/<style data-fusion-source="shared\/fusion\/style\.css">([\s\S]*?)<\/style>/);
+   assert.equal(embeddedStyle?.[1],fusionStyle,'Shared layout CSS missing or stale: '+record.key);
+  }
   assert.equal(sha(Buffer.from(source)),record.sha256,'Embedded lesson changed: '+record.key);
  }else{
   const original=fs.readFileSync(path.join(root,'versions/vyvoj/m_files/Web',record.file),'utf8');

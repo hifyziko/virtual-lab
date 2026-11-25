@@ -1,3 +1,4 @@
+@import "./module-ui.css";
 /* One width and one visual language across all lessons; SVG coordinate systems stay intact. */
 html:has(:is(main,.workspace).uniform-module-layout){scrollbar-gutter:auto;overflow-anchor:none}
 :is(main,.workspace).uniform-module-layout{box-sizing:border-box;width:100%;max-width:1600px!important;min-width:0;margin:0 auto!important;padding:5px 0 6px!important;overflow-anchor:none}
@@ -16,10 +17,8 @@ body.em-lesson #sceneExplain{min-height:4.2em}
 body.em-lesson #modeExpl{min-height:5.6em}
 
 /* Shared typography applies to HTML labels, not SVG geometry or KaTeX internals. */
-:root{--lesson-width:1600px;--lesson-gap:5px;--lesson-text:14px;--lesson-heading:16px;--lesson-math:1.12em}
+:root{--lesson-width:1600px;--lesson-math:1.12em}
 :is(main,.workspace).uniform-module-layout{font-family:system-ui,"Segoe UI",sans-serif;font-size:var(--lesson-text);line-height:1.45;max-width:var(--lesson-width)!important}
-:is(main,.workspace).uniform-module-layout :is(.card,.panel)>h2{font-size:var(--lesson-heading);line-height:1.35}
-:is(main,.workspace).uniform-module-layout :is(.controls,.controlbox,.ctrlgrid,.fieldControls,.phaseControls) :is(label,button,select,input,output){font-size:var(--lesson-text);line-height:1.35}
 :is(main,.workspace).uniform-module-layout :is(.tiny,.miniNote,.note,.carddesc,.descline,.matrix-note){font-size:13px;line-height:1.45}
 :is(main,.workspace).uniform-module-layout :is(.equation,.formula,.eqRow)>:is(p,span)>.katex{font-size:var(--lesson-math)}
 :is(main,.workspace).uniform-module-layout :is(.controlbox,.controls){padding:10px 12px}
@@ -46,10 +45,10 @@ main.uniform-module-layout:has(#zoomWall)>.mathnote{grid-row:4;margin:0;font-siz
 main.uniform-module-layout:has(#zoomWall){--module-flexible-height:1;height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;max-height:var(--module-host-height,1000px)!important}
 
 /* A predictable back-link row, independent of title length and action buttons. */
-#app :is(.workspace>.modulehead,.module-window-heading){display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:12px;row-gap:6px;margin:0 0 12px;min-width:0;width:100%;box-sizing:border-box}
+#app :is(.workspace>.modulehead,.module-window-heading){display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:12px;row-gap:6px;margin:0 0 var(--lesson-header-gap);min-width:0;width:100%;box-sizing:border-box}
 #app :is(.workspace>.modulehead,.module-window-heading)>a.back{grid-column:1/-1;grid-row:1;justify-self:start;margin:0;font-size:14px;line-height:1.4;text-align:left}
 #app :is(.workspace>.modulehead,.module-window-heading)>.num{grid-column:1;grid-row:2}
-#app :is(.workspace>.modulehead,.module-window-heading)>h1{grid-column:2;grid-row:2;margin:0;font:700 24px/1.25 system-ui,sans-serif;letter-spacing:-.6px;min-width:0}
+#app :is(.workspace>.modulehead,.module-window-heading)>h1{grid-column:2;grid-row:2;margin:0;font:700 var(--lesson-module-title-size)/1.25 system-ui,sans-serif;letter-spacing:-.6px;min-width:0}
 #app :is(.workspace>.modulehead,.module-window-heading):not(:has(>.num))>h1{grid-column:1/3}
 #app :is(.workspace>.modulehead,.module-window-heading)>.actions{grid-column:3;grid-row:2;margin:0;justify-self:end;display:flex;flex-wrap:wrap;gap:8px}
 #app :is(.workspace>.modulehead,.module-window-heading)>.badge{grid-column:1/-1;grid-row:3;justify-self:start}
@@ -134,7 +133,7 @@ main.uniform-module-layout:has(#zoomWall){grid-template-rows:100px minmax(0,1fr)
 
 /* Header controls share fusion’s dimensions; the renderer keeps each control’s state styling. */
 #app :is(.workspace>.modulehead,.module-window-heading)>.actions{align-items:center;gap:6px}
-#app :is(.workspace>.modulehead,.module-window-heading)>.actions :is(button,select,summary){box-sizing:border-box;min-height:34px;padding:5px 10px;font-size:14px;line-height:1.15}
+#app :is(.workspace>.modulehead,.module-window-heading)>.actions :is(button,select,summary){box-sizing:border-box;min-height:34px;padding:5px 10px;font-size:var(--lesson-control-size);line-height:1.15}
 
 #app .transient-view-switch{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-inline-end:10px;padding-inline-end:10px;border-inline-end:1px solid #dce5e2}
 #app .transient-view-switch button{white-space:nowrap}

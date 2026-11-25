@@ -4,9 +4,12 @@ require('./build-atom-preview.cjs');
 {
  const release=require('./project/release-output.cjs'),dest=release.current(),web=path.join(dest,'web'),entries=[];
  function write(rel,data){const out=path.join(web,rel);fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,data);entries.push({path:rel,bytes:data.length,sha256:crypto.createHash('sha256').update(data).digest('hex')});}
- function copy(dir,prefix,base=dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory()){if(p===path.join(source,'confinement','helicity-data'))continue;copy(p,prefix,base);}else{const rel=prefix+path.relative(base,p).replaceAll('\\','/');let data=fs.readFileSync(p);if(rel.endsWith('.html'))data=Buffer.from(data.toString().replaceAll('../particles/','../shared/particles/').replaceAll('../navigation/','../shared/fusion/').replaceAll('../confinement/','../fuze-udrzeni/').replaceAll('../plasma/','../fuze-plazma/').replaceAll('../equilibrium/','../fuze-rovnovaha/').replaceAll('../heating/','../fuze-ohrev/'));write(rel,data);}}}
+ const navigationStyle=fs.readFileSync(path.join(source,'navigation/style.css'),'utf8')
+  .replace('@import "../../Web/module-ui.css";',()=>fs.readFileSync(path.join(source,'../Web/module-ui.css'),'utf8'));
+ function copy(dir,prefix,base=dir){for(const e of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,e.name);if(e.isDirectory()){if(p===path.join(source,'confinement','helicity-data'))continue;copy(p,prefix,base);}else{const rel=prefix+path.relative(base,p).replaceAll('\\','/');let data=rel==='shared/fusion/style.css'?Buffer.from(navigationStyle):fs.readFileSync(p);if(rel.endsWith('.html'))data=Buffer.from(data.toString().replaceAll('../particles/','../shared/particles/').replaceAll('../navigation/','../shared/fusion/').replaceAll('../confinement/','../fuze-udrzeni/').replaceAll('../plasma/','../fuze-plazma/').replaceAll('../equilibrium/','../fuze-rovnovaha/').replaceAll('../heating/','../fuze-ohrev/'));if(rel.endsWith('.html')&&/>\s*Verze\s+1\.0\b/i.test(data.toString()))throw Error('Visible release version in '+rel);write(rel,data);}}}
  copy(path.join(source,'particles'),'shared/particles/');copy(path.join(source,'particle-list'),'fuze-seznam/');copy(path.join(source,'barrier'),'fuze-bariera/');
- copy(path.join(source,'navigation'),'shared/fusion/');copy(path.join(source,'drift'),'fuze-drift/');copy(path.join(source,'confinement'),'fuze-udrzeni/');
+ copy(path.join(source,'navigation'),'shared/fusion/');
+ copy(path.join(source,'drift'),'fuze-drift/');copy(path.join(source,'confinement'),'fuze-udrzeni/');
  require('./pack-helicity.cjs').pack(path.join(source,'confinement/helicity-data'),(name,raw)=>{
   const rel='fuze-udrzeni/helicity-chunks/'+name+'.js',data=Buffer.from('window.HiFyzikoHelicityData=window.HiFyzikoHelicityData||{};window.HiFyzikoHelicityData['+JSON.stringify(name)+']='+JSON.stringify(raw)+';\n');
   const out=path.join(web,rel);fs.mkdirSync(path.dirname(out),{recursive:true});fs.writeFileSync(out,data);entries.push({path:rel,bytes:data.length,sha256:crypto.createHash('sha256').update(data).digest('hex')});
@@ -30,7 +33,7 @@ require('./build-atom-preview.cjs');
  }
  write('fuze-ostrovy/index.html',Buffer.from('<!doctype html><html lang="cs"><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=vznik.html"><title>Magnetické přepojení a vznik ostrova</title><a href="vznik.html">Magnetické přepojení a vznik ostrova</a></html>'));
  const index=path.join(web,'index.html');let html=fs.readFileSync(index,'utf8').replace(/<!-- particle-library:start -->[\s\S]*?<!-- particle-library:end -->\s*/g,'').replace(/<style id="fusion-navigation-style">[\s\S]*?<\/style>/g,'');
- html=html.replace('</head>',()=>'<style id="fusion-navigation-style">'+fs.readFileSync(path.join(source,'navigation/style.css'),'utf8')+'</style></head>');
+ html=html.replace('</head>',()=>'<style id="fusion-navigation-style">' +navigationStyle+'</style></head>');
  html=html.replace(/<script id="module-guide-data">[\s\S]*?<\/script>/g,()=>'<script id="module-guide-data">'+fs.readFileSync(path.join(__dirname,'module-guide-data.js'),'utf8')+'</script>');
  const js=fs.readFileSync(path.join(__dirname,'particle-library-navigation.js'),'utf8');
  const anchor=html.includes('<script id="progressive-web-install">')?'<script id="progressive-web-install">':'</body>';

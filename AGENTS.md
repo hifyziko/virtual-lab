@@ -38,11 +38,11 @@
 
 - Výchozí standard pro všechny moduly: obsah je vodorovně vystředěný od prvního vykreslení. Odkaz zpět do rozcestníku/skupiny i celá hlavička jsou od začátku zarovnané s levou hranou zobrazeného modulu a sledují ji při změně měřítka, velikosti okna i celé obrazovky. Nesmí nejprve vzniknout zarovnání vlevo a následný skok doprostřed. Zachovat automatické zvětšování i zmenšování podle dostupné šířky a výšky.
 
-- Aktuální dodávka má podle pokynu uživatele z 12. 11. 2026 stálé označení 1.0 v patičce. Nevytvářet další meziverze. Stav plánované čistky viz VERZE.md v kořeni projektu.
+- Označení vydání 1.0 zůstává v metadatech sestavení. Text verze se ve výukovém rozhraní ani v patičce nezobrazuje. Další meziverze nevytvářet. Stav plánované čistky viz VERZE.md v kořeni projektu.
 
 ## GitHub, publikace a přesun mezi počítači — schváleno 15. 11. 2026
 
-- Jediný sdílený vývoj je `https://github.com/hifyziko/virtual-lab`, hlavní větev `main`. Historii tvoří commity; označení aplikace zůstává 1.0. Existující historii a README zachovat. Nikdy force push ani přepis historie.
+- Jediný sdílený vývoj je `https://github.com/hifyziko/virtual-lab`, hlavní větev `main`. Historii tvoří commity a označení vydání v metadatech zůstává 1.0. Existující historii a README zachovat. Nikdy force push ani přepis historie.
 - **Push pouze na výslovný pokyn uživatele** (upřesnění 15. 11. 2026). Úpravy, místní commit, sestavení ani pokyn k přesunu na jiný počítač samy o sobě push nepovolují. Neodesílat ani další opravy či tagy automaticky. Nasazený web odpovídá poslednímu výslovně odeslanému stavu.
 - Než začne práce na jiném počítači: přečíst tento soubor, `PREDANI_PROJEKTU.md`, `PREDANI-AKTUALNI.md` a vnořená pravidla; zkontrolovat `git status`, větev a `origin`; s čistým stromem `git pull --ff-only`. Místní změny ani konflikty nikdy nezahodit. Nesouběžně upravovat stejnou práci na dvou počítačích bez větví a sloučení.
 - Veřejný Git obsahuje jen upravitelné zdroje, potřebná data animací, pravidla a nutné nástroje. Výběr spravuje `config/project-files.json`; `.gitignore` generuje `node tools/project/files.cjs sync`. Nový soubor přidat vědomě příkazem `node tools/project/files.cjs add cesta`; před commitem `node tools/project/files.cjs audit` a `git diff --cached --stat`. Nepoužívat plošné přidání všeho ani `git add -f`.
@@ -66,3 +66,5 @@
 - Upřesnění 20. 11. 2026: ve všech modulech odstranit neúčelné prázdné okraje a rezervované řádky po skrytém či přesunutém obsahu. Uvolněnou šířku a výšku přidělit scéně a grafům, nikoli prázdné výplni panelů. Ponechat pouze malé funkční odstupy pro čitelnost a zabránění překryvům; neodstraňovat je plošným nulováním všech mezer.
 
 - Ve všech modulech používat malé funkční mezery mezi panely. Grafy a scény mají růst podle dostupné plochy panelu. U grafů přepočítat kreslicí oblast podle rozměrů, u technických řezů zachovat poměr stran. Pevný rozměr ponechat jen tam, kde jej vyžaduje čitelnost nebo funkce ovladače.
+
+- Pro závazné rozestupy hlaviček, panelů a ovládání ve všech modulech platí část 2 v [Pravidlech ladění modulů](versions/PRAVIDLA_LADENI_MODULU.md). Používat společné styly a při úpravách ověřit odstup hlavičky i čitelné oddělení ovládacího panelu.

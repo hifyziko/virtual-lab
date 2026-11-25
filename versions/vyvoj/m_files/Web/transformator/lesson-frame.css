@@ -182,11 +182,11 @@ main[data-transformer-lesson="tr03-schema"] .grid :is(td,th){padding:5px 8px;fon
 main[data-transformer-lesson="tr03-schema"] .grid hr{margin:8px 0!important}
 main[data-transformer-lesson="tr03-schema"] .grid p{margin:4px 0}
 
-/* Reserve independent rows for the drawing, results and closed explanation. */
-main.uniform-module-layout[data-transformer-lesson="tr03-schema"]{display:grid;grid-template-rows:20px 76px minmax(340px,1fr) 156px 36px;gap:12px}
+/* Keep controls and results at their own sizes as optional prose leaves the layout. */
+main.uniform-module-layout[data-transformer-lesson="tr03-schema"]{display:flex;flex-direction:column;gap:12px}
 main[data-transformer-lesson="tr03-schema"]>p.muted{margin:0;min-height:0}
 main[data-transformer-lesson="tr03-schema"]>.controls{height:76px;min-height:0}
-main[data-transformer-lesson="tr03-schema"]>.grid{height:100%;min-height:0;grid-template-columns:minmax(0,1fr) minmax(0,1.85fr);grid-template-rows:minmax(0,1fr)}
+main[data-transformer-lesson="tr03-schema"]>.grid{height:156px;min-height:0;grid-template-columns:minmax(0,1fr) minmax(0,1.85fr);grid-template-rows:minmax(0,1fr)}
 main[data-transformer-lesson="tr03-schema"]>.grid>.card{height:100%;min-height:0}
 main[data-transformer-lesson="tr03-schema"]>details.card{display:block;height:36px;min-height:36px;padding:0;margin:0}
 main[data-transformer-lesson="tr03-schema"] .grid :is(.eq,div[data-tex]){overflow:visible;line-height:1.4;padding:3px 0;font-size:18px}
@@ -278,11 +278,10 @@ main[data-transformer-lesson="tr08-zkratovy-proud"] .equations>.envelope-results
 main[data-transformer-lesson="tr08-zkratovy-proud"] .envelope-results #phaseSummary table{font:14px/1.4 system-ui!important}
 
 /* Share additional host height between the equivalent circuit and equations. */
-main[data-transformer-lesson="tr03-schema"]>section.card:not(.controls){height:100%;min-height:0}
+main[data-transformer-lesson="tr03-schema"]>section.card:not(.controls){flex:1 1 0;height:auto;min-height:340px}
 main[data-transformer-lesson="tr03-schema"] .diagram>#diagram{display:block;flex:1 1 0;height:100%!important;max-height:none!important;object-fit:contain}
 
 /* Closed explanations live in the guide, so their grid rows return to drawings. */
-main.uniform-module-layout[data-transformer-lesson="tr03-schema"]:has(>details[data-guide-source]){grid-template-rows:20px 76px minmax(340px,1fr) 156px}
 main.uniform-module-layout[data-transformer-lesson="tr08-zkratovy-proud"]:has(>details[data-guide-source]){grid-template-rows:auto minmax(0,1fr)}
 
 main[data-transformer-lesson="tr01-matematicky"] .control-panel-grid{align-items:start}

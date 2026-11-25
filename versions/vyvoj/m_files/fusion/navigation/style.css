@@ -1,3 +1,4 @@
+@import "../../Web/module-ui.css";
 /* Project framing only; scientific colours and renderers remain shared. */
 #app.fusion-module-host{width:100%;max-width:none;margin:0;padding:0}
 .fusion-module-shell{position:relative;box-sizing:border-box;width:100%;height:calc(100dvh - var(--project-credit-space,30px));min-height:360px;margin:0 auto;background:#f7f3fa}
@@ -91,16 +92,16 @@ html:has(body[data-fusion-page]),body[data-fusion-page],body[data-fusion-page] m
 /* Shared module heading, following the transformer workspace. */
 body[data-fusion-page] header[data-fusion-heading]{
  /* Match the machine headers in screen pixels while the experiment scales. */
- zoom:calc(1 / max(.8, var(--fusion-fit, var(--compass-fit, var(--fit, 1)))));
+ zoom:calc(1 / var(--lesson-ui-scale));
  box-sizing:border-box;
  flex:none;
  display:flex;
  align-items:center;
  flex-wrap:wrap;
- gap:4px 10px;
+ gap:4px 6px;
  height:auto;
- min-height:42px;
- padding:5px 0 8px;
+ min-height:34px;
+ padding:0;
  border:0;
 }
 body[data-fusion-page] header[data-fusion-heading] > .back{
@@ -128,7 +129,7 @@ body[data-fusion-page] header[data-fusion-heading] > h1{
  min-width:0;
  margin:0;
  color:#142e3d;
- font:700 24px/1.25 system-ui,sans-serif;
+ font:700 var(--lesson-module-title-size)/1.25 system-ui,sans-serif;
  letter-spacing:-.6px;
  overflow-wrap:anywhere;
 }
@@ -142,20 +143,18 @@ body[data-fusion-page] header[data-fusion-heading] > h1::before{
 }
 body[data-fusion-page] header[data-fusion-heading] > button,
 body[data-fusion-page] header[data-fusion-heading] > details > summary{
+ box-sizing:border-box;
  min-height:34px;
- padding:6px 12px;
+ padding:5px 10px;
  border:1px solid #d3dedc;
  border-radius:7px;
  background:#fff;
  color:#142e3d;
- font:500 14px/1.15 'Segoe UI',Arial,sans-serif;
+ font:500 var(--lesson-control-size)/1.15 'Segoe UI',Arial,sans-serif;
  white-space:nowrap;
 }
 body[data-fusion-page] header[data-fusion-heading] > button:hover,
 body[data-fusion-page] header[data-fusion-heading] > details > summary:hover{background:#f1f7f4}
-@media(max-width:650px){
- body[data-fusion-page] header[data-fusion-heading] > h1{font-size:18px}
-}
 
 /* Tight gutters between the main experiment panels. */
 body[data-fusion-page] :is(.layout,.workspace,.experiment,.analysisRail):has(> :is(.panel,.card,.scene,.controlRail,.analysisRail)){gap:5px!important}
@@ -175,4 +174,40 @@ body:has(#app > [data-fusion-lesson="fu19-tvar"]) > .lab-tree-toggle{
 }
 .physics-area-link .fusion-review-notice{display:block;grid-column:1/-1;font-size:14px;font-weight:650;line-height:1.35;color:#714c20}
 
-body[data-fusion-page] .fusion-version{position:absolute;right:10px;bottom:1px;pointer-events:none;color:#6c6174;font:10px/1 system-ui,sans-serif}
+
+/* Shared spacing for the heading and the experiment rows below it. */
+body[data-fusion-page] main:has(> header[data-fusion-heading]){
+ row-gap:var(--lesson-gap);
+}
+body[data-fusion-page] main > header[data-fusion-heading]{
+ margin-block:0;
+ padding-block-end:calc(var(--lesson-header-gap) - var(--lesson-gap));
+}
+
+/* Keep the experiment controls together in a compact panel. */
+body[data-fusion-page] main > :is(.controls,.story,.toolbar,.tools,.current-controls){
+ box-sizing:border-box;
+ gap:4px 6px;
+ margin-block:0;
+ padding:4px 7px;
+ border:1px solid #d3dedc;
+ border-radius:7px;
+ background:#f8fbfa;
+}
+body:is([data-fusion-page="fu13-ohrev"],[data-fusion-page="fu16-eccd"]) main > .controls{
+ display:flex;
+ flex-wrap:wrap;
+ align-items:center;
+ height:auto;
+ min-height:0;
+ font-size:14px;
+}
+body[data-fusion-page] main > :is(.controls,.story,.toolbar,.tools,.current-controls) > :is(button,select){
+ min-height:30px;
+ padding:4px 8px;
+ line-height:1.15;
+}
+body[data-fusion-page="fu16-eccd"] .controls input[type="range"]{width:108px}
+body[data-fusion-page="fu16-eccd"] .controls :is(#tune,#doppler-help){width:auto;min-width:0}
+body[data-fusion-page="fu16-eccd"] .controls #reset{margin-inline-start:0}
+body[data-fusion-page] main > .tools{flex-basis:auto}

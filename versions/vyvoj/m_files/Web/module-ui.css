@@ -1,0 +1,34 @@
+/* Shared typography for machine lessons and fusion experiments. */
+:root{
+ --lesson-gap:5px;
+ --lesson-header-gap:8px;
+ --lesson-module-title-size:24px;
+ --lesson-panel-title-size:16px;
+ --lesson-control-size:14px;
+ --lesson-detail-size:12px;
+}
+body[data-fusion-page]{
+ --module-scene-scale:var(--fusion-fit,var(--compass-fit,var(--fit,1)));
+}
+:is(.uniform-module-layout,body[data-fusion-page]){
+ --lesson-ui-scale:max(.8,var(--module-scene-scale,1));
+ --lesson-text:calc(var(--lesson-control-size) / var(--lesson-ui-scale));
+ --lesson-heading:calc(var(--lesson-panel-title-size) / var(--lesson-ui-scale));
+ --lesson-detail:calc(var(--lesson-detail-size) / var(--lesson-ui-scale));
+}
+
+/* Machine interface typography, including embedded lessons. */
+.uniform-module-layout :is(article,.card,.panel,.plotcard,.scene) :is(h2,h3):not(dialog *,svg *){
+ font-family:system-ui,"Segoe UI",sans-serif;
+ font-size:var(--lesson-heading)!important;
+ line-height:1.3;
+}
+.uniform-module-layout :is(.controls,.controlbox,.ctrlgrid,.fieldControls,.phaseControls,.controlRail,.experiment-controls,.toolbar,.tools,.current-controls,.guided-action,.story,.tabs,.schema-tabs) :is(label,output,button,select,input,summary):not(dialog *,svg *),
+.uniform-module-layout :is(article,.card,.panel,.plotcard,.scene) label:not(dialog *,svg *){
+ font-family:system-ui,"Segoe UI",sans-serif;
+ font-size:var(--lesson-text)!important;
+ line-height:1.25;
+}
+.uniform-module-layout > :is(.controls,.story,.toolbar,.tools,.current-controls,.guided-action){
+ font-size:var(--lesson-text);
+}
