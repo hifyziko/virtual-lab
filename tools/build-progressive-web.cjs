@@ -95,7 +95,7 @@ function addFusionPages(output,web){
  const pages=[...navigation.matchAll(/id:'(fu\d+-[a-z]+)'[^\n]+?page:'([^']+)'/g)];
  const ids=new Set(pages.map(p=>p[1]));if(ids.size!==pages.length||!['fu01-reakce','fu02-galerie','fu03-drift','fu04-udrzeni','fu06-divertor'].every(id=>ids.has(id)))throw Error('Incomplete or duplicate fusion module routes');
  const waveNavigation=fs.readFileSync(path.join(__dirname,'em-wave-navigation.js'),'utf8');
- pages.push(...waveNavigation.matchAll(/id:'(em06-vlna)'[^\n]+?page:'([^']+)'/g));
+ pages.push(...waveNavigation.matchAll(/id:'(em\d+-[a-z]+)'[^\n]+?page:'([^']+)'/g));
  const published=new Set(require('./project/common.cjs').policy().webFiles);
  output.preserved=output.preserved.filter(item=>!item.key.startsWith('fusion-'));
  for(const key of Object.keys(output.assets))if(key.startsWith('fusion-'))delete output.assets[key];

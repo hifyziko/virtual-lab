@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Příběh elektronu · Virtuální laboratoř</title>
+  <link rel="stylesheet" href="../fusion/particles/vendor/katex.css">
+  <link rel="stylesheet" href="../fusion/navigation/style.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="../fusion/confinement/layout.js"></script>
+  <script>
+    function fitElectronPortrait() {
+      document.documentElement.style.setProperty('--electron-portrait-fit', Math.min((innerWidth - 16) / 760, (innerHeight - 16) / 1230));
+    }
+    fitElectronPortrait();
+    addEventListener('resize', fitElectronPortrait);
+  </script>
+  <script defer src="../fusion/particles/vendor/katex.js"></script>
+  <script defer src="model.js"></script>
+  <script defer src="slits.js"></script>
+  <script defer src="orbitals.js"></script>
+  <script defer src="details.js"></script>
+  <script defer src="lessons.js"></script>
+  <script defer src="render.js"></script>
+  <script defer src="experiments.js"></script>
+  <script defer src="quantum-scenes.js"></script>
+  <script defer src="historical-models.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="../fusion/navigation/page.js"></script>
+</head>
+<body data-fusion-page="em07-elektron">
+  <main>
+    <header data-fusion-heading>
+      <a class="back" href="../index.html#group-electromagnetism" target="_top">← Zpět</a>
+      <h1 data-module-number="13">Příběh elektronu</h1>
+      <button id="guide">Ovládání a výklad</button>
+      <button data-fusion-full>Celá obrazovka</button>
+    </header>
+    <nav class="timeline mode-bar" aria-label="Ovládání pohledu">
+      <div class="toolbar-group mode-switch" role="group" aria-label="Hlavní režim modulu">
+        <button id="atomMode" aria-controls="atomDesk" aria-pressed="true">Dobové modely atomu</button>
+        <button id="experimentMode" aria-controls="experimentDesk" aria-pressed="false">Pokusy s elektronem</button>
+      </div>
+      <div id="atomPairs" class="toolbar-group" role="group" aria-label="Navazující modely">
+        <button data-atom-pair="0">Thomson a Rutherford</button>
+        <button data-atom-pair="1">Rutherford a Bohr</button>
+        <button data-atom-pair="2">Bohr a kvantový model</button>
+      </div>
+      <div id="atomCameraTools" class="toolbar-group" role="group" aria-label="Otáčení modelů">
+        <button id="atomRotate" aria-pressed="false">Otáčet pohledem</button>
+        <button id="atomHome">Výchozí pohled</button>
+      </div>
+    </nav>
+    <div id="atomDesk" class="atom-desk" aria-label="Srovnání modelů atomu">
+      <div class="atom-views">
+        <section class="scene atom-scene" aria-labelledby="atomTitle0">
+          <div class="scene-heading"><small id="atomYear0"></small><h2 id="atomTitle0"></h2></div>
+          <svg id="atomCanvas0" role="img" tabindex="0" aria-label="Levý model. Otáčením změníš pohled na oba atomy."></svg>
+          <ul id="atomLegend0" class="atom-legend" aria-label="Legenda modelu"></ul>
+        </section>
+        <section class="scene atom-scene" aria-labelledby="atomTitle1">
+          <div class="scene-heading"><small id="atomYear1"></small><h2 id="atomTitle1"></h2></div>
+          <svg id="atomCanvas1" role="img" tabindex="0" aria-label="Pravý model. Otáčením změníš pohled na oba atomy."></svg>
+          <ul id="atomLegend1" class="atom-legend" aria-label="Legenda modelu"></ul>
+        </section>
+      </div>
+      <div class="timeline atom-evidence">
+        <button id="atomExperiment"></button>
+        <div id="atomStateRow" class="atom-state-controls" hidden>
+          <label>Stav vodíku <select id="atomState"><option value="0">Základní</option><option value="1">Excitovaný, kulově symetrický</option><option value="2">Excitovaný, dvoulaločný</option></select></label>
+          <label><input id="atomSection" type="checkbox"> Prostorový řez</label>
+        </div>
+      </div>
+    </div>
+    <div id="experimentDesk" class="experiment-desk" hidden>
+    <nav class="timeline" aria-label="Historické etapy">
+      <button id="previous" aria-label="Předchozí etapa">←</button>
+      <div id="milestones" role="group" aria-label="Časová osa"></div>
+      <button id="next" aria-label="Další etapa">→</button>
+    </nav>
+    <div class="desk">
+      <aside aria-label="Podmínky a výsledky pokusu">
+        <h2>Parametry pokusu</h2>
+        <div id="controls"></div>
+        <div id="actions"></div>
+        <div class="transport">
+          <button id="play">Pozastavit</button><button id="step">Krok</button><button id="restart">Od začátku</button>
+        </div>
+        <label id="rateRow">Rychlost animace
+          <select id="rate"><option value=".25">Čtvrtinová</option><option value="1" selected>Základní</option><option value="3">Trojnásobná</option></select>
+        </label>
+        <div id="reading" aria-label="Naměřené hodnoty"></div>
+      </aside>
+      <div class="work">
+        <div class="views">
+          <section class="scene model-scene" aria-labelledby="modelTitle">
+            <div class="scene-heading"><small>Dobová představa</small><h2 id="modelTitle"></h2></div>
+            <svg id="modelCanvas" role="img" tabindex="0" aria-label="Prostorový model. Otáčení šipkami nebo tažením."></svg>
+            <div class="scene-tools"><span id="modelKey"></span><button id="modelHome" aria-label="Obnovit pohled na model">Výchozí pohled</button></div>
+          </section>
+          <section class="scene experiment" aria-labelledby="title">
+            <div class="scene-heading"><small>Pokus</small><h2 id="title"></h2></div>
+            <svg id="canvas" role="img" tabindex="0" aria-label="Interaktivní fyzikální scéna. Otáčení šipkami nebo tažením."></svg>
+            <div class="scene-tools"><span id="scale"></span><div class="camera"><button id="out" aria-label="Oddálit pokus">−</button><button id="home" aria-label="Obnovit pohled na pokus">Výchozí pohled</button><button id="in" aria-label="Přiblížit pokus">+</button></div></div>
+            <div id="busy" hidden><strong role="status">Výpočet šíření vlnového balíku</strong><progress max="1" aria-label="Průběh výpočtu"></progress><button hidden>Opakovat výpočet</button></div>
+          </section>
+        </div>
+        <section class="chart" aria-labelledby="chartTitle">
+          <div class="chart-heading"><h2 id="chartTitle"></h2><ul id="chartLegend" aria-label="Legenda grafu" hidden></ul></div>
+          <div class="plot">
+            <svg id="graph" role="img" aria-labelledby="chartTitle"></svg><div id="ticks"></div><div id="axes"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+    </div>
+    <footer id="electronCredit" hidden>© Vladimír Kindl · Fakulta elektrotechnická, Západočeská univerzita v Plzni</footer>
+  </main>
+  <dialog id="dialog">
+    <form method="dialog"><button>Zavřít</button></form>
+    <small id="dialogYear"></small><h2 id="dialogTitle"></h2>
+    <label>Výklad <select id="depth"><option>Průvodce pokusem</option><option>Podrobný fyzikální výklad</option><option>Srovnání historických představ</option></select></label>
+    <article id="text"></article>
+    <button id="guideNext">Vyzkoušet v pokusu</button>
+  </dialog>
+</body>
+</html>

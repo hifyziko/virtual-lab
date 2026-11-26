@@ -1,0 +1,123 @@
+* { box-sizing: border-box; }
+body[data-fusion-page="em07-elektron"] { margin: 0; overflow: hidden; background: #f4f7f8; font: 14px 'Segoe UI', sans-serif; }
+main {
+  position: fixed; top: 8px; left: 50%; width: 1360px; height: 820px;
+  transform: translateX(-50%) scale(var(--fusion-fit, 1)); transform-origin: top center;
+  display: flex; flex-direction: column; gap: var(--lesson-gap, 5px);
+}
+header { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 3px; }
+h1, h2, p { margin: 0; }
+h1 { flex: 1; font-size: var(--lesson-module-title-size, 24px); }
+h2 { font-size: 16px; font-weight: 650; }
+button, select, .back { color: inherit; font: inherit; border: 1px solid #c9d8dc; border-radius: 7px; background: white; padding: 4px 8px; }
+button { cursor: pointer; }
+button:hover:not(:disabled), .back:hover { background: #e9f2f6; }
+button:disabled { opacity: .45; cursor: default; }
+.back { text-decoration: none; }
+:is(button, select, input, .scene > svg):focus-visible { outline: 3px solid #b57825; outline-offset: -3px; }
+.timeline, aside, .scene, .chart { background: white; border: 1px solid #cddce1; border-radius: 9px; }
+.timeline { display: flex; align-items: stretch; gap: 6px; padding: 4px 7px; }
+.timeline > button { min-width: 34px; font-size: 18px; }
+.mode-bar { flex-wrap: wrap; align-items: center; gap: 5px 7px; }
+.toolbar-group { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.toolbar-group + .toolbar-group { padding-left: 7px; border-left: 1px solid #dce7ec; }
+.toolbar-group > button, .atom-evidence > button { min-height: 30px; font-size: 14px; }
+.mode-bar [aria-pressed="true"] { color: white; background: #215b70; border-color: #215b70; }
+.mode-bar [aria-pressed="true"]:hover { background: #215b70; }
+.mode-switch { padding-inline: 3px; border-radius: 8px; background: #f6e8d8; box-shadow: 0 0 0 1px #e1c4a5; }
+.mode-switch > button { background: #fff8ef; border-color: #ddc0a2; color: #6c3f22; }
+.mode-switch > button:hover { background: #f5e4d2; }
+.mode-bar .mode-switch > [aria-pressed="true"], .mode-bar .mode-switch > [aria-pressed="true"]:hover { background: #854c27; border-color: #854c27; color: #fff; }
+.atom-desk, .experiment-desk { display: flex; flex: 1; flex-direction: column; min-height: 0; gap: var(--lesson-gap, 5px); }
+.atom-views { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--lesson-gap, 5px); }
+.atom-scene .scene-heading { padding: 16px 18px 2px; }
+.atom-scene .scene-heading h2 { font-size: 24px; }
+.atom-legend { min-height: 38px; list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin: 0; padding: 6px 12px; border-top: 1px solid #dce7ec; color: #405b66; }
+.atom-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.atom-legend li::before { content: ''; display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--swatch); }
+.atom-evidence { align-items: center; }
+.atom-state-controls { display: flex; margin-left: auto; align-items: center; gap: 10px; }
+.atom-evidence label { display: flex; align-items: center; gap: 5px; }
+#milestones { flex: 1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+#milestones button { min-width: 0; min-height: 42px; padding: 3px 1px; border-color: transparent; font-size: 12px; line-height: 1.35; }
+#milestones time { display: block; color: #536d78; font-size: 11px; font-variant-numeric: tabular-nums; }
+#milestones [aria-current="step"] { background: #215b70; color: white; }
+#milestones [aria-current="step"] time { color: #e2f4fa; }
+.desk { flex: 1; min-height: 0; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--lesson-gap, 5px); }
+aside { min-width: 0; padding: 9px; display: flex; flex-direction: column; gap: 5px; }
+aside h2 { margin-bottom: 3px; }
+#controls { display: grid; gap: 5px; }
+aside label { display: block; font-size: 13px; }
+aside label output { float: right; color: #245d70; }
+aside label:has(input[data-snapped]) output { color: #08765d; font-weight: 650; }
+aside select, aside input { display: block; width: 100%; margin: 2px 0 0; min-width: 0; }
+aside select { padding: 3px 4px; }
+input[type="range"] { accent-color: #287d8a; }
+#actions, .transport { display: flex; gap: 4px; flex-wrap: wrap; }
+aside button { font-size: 12px; }
+#play { color: white; background: #245e70; border-color: #245e70; }
+#reading:not(:empty) { margin-top: 4px; border-top: 1px solid #dae5e8; padding-top: 6px; display: grid; gap: 4px; font-size: 13px; }
+.work { min-height: 0; display: grid; grid-template-rows: minmax(0, 2.15fr) minmax(0, 1fr); gap: var(--lesson-gap, 5px); }
+.views { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.62fr); gap: var(--lesson-gap, 5px); min-height: 0; }
+.scene { position: relative; min-width: 0; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; background: radial-gradient(ellipse at 46% 43%, #fff 28%, #f3f8fb 78%, #e8f1f7); }
+.scene-heading { padding: 12px 13px 2px; }
+.scene-heading small, #dialogYear { color: #536e7a; font-weight: 600; }
+.scene-heading h2 { font-size: 20px; margin-top: 3px; letter-spacing: -.022em; }
+.scene > svg, .chart .plot > svg { display: block; width: 100%; height: 100%; min-height: 0; min-width: 0; overflow: hidden; }
+.scene > svg { touch-action: none; cursor: grab; }
+.scene > svg:active { cursor: grabbing; }
+.vector-label { font: 600 13px 'Segoe UI', sans-serif; fill: #294b60; stroke: #f9fcff; stroke-width: 3px; paint-order: stroke; stroke-linejoin: round; }
+.scene-tools { min-height: 37px; display: flex; justify-content: space-between; align-items: center; gap: 7px; padding: 4px 8px; border-top: 1px solid #dce7ec; background: #f8fbfcd9; font-size: 12px; }
+.camera { display: flex; flex: none; gap: 3px; }
+#modelKey, #scale { color: #405b66; }
+#stageFeedback { margin: 0; font-size: 12px; color: #405b66; }
+#busy { position: absolute; inset: 29% 9%; display: grid; align-content: center; justify-items: center; gap: 12px; padding: 16px; border: 1px solid #bad0d9; border-radius: 10px; background: #f7fbfbed; box-shadow: 0 8px 27px #193b5222; }
+progress { width: 100%; height: 20px; accent-color: #287d8a; }
+.chart { min-height: 0; min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); padding: 8px 12px 6px; }
+.chart-heading, #chartLegend { display: flex; flex-wrap: wrap; align-items: center; column-gap: 16px; row-gap: 2px; }
+#chartLegend { list-style: none; padding: 0; margin: 0; font-size: 12px; color: #365566; }
+#chartLegend li { display: inline-flex; align-items: center; gap: 5px; }
+#chartLegend li::before { content: ''; width: 12px; height: 2px; background: var(--legend-color); }
+#chartLegend .legend-bar::before { width: 9px; height: 9px; }
+.plot { position: relative; min-height: 0; }
+#ticks, #axes { position: absolute; inset: 0; pointer-events: none; }
+#ticks > span, #axes > span { position: absolute; color: #365566; white-space: nowrap; }
+#ticks > span { font-size: 12px; }
+#ticks .tick-x { transform: translateX(-50%); }
+#ticks .tick-y { text-align: right; transform: translate(-100%, -50%); }
+#axes > span { font-size: 13px; }
+.axis-label { margin-inline-end: 6px; font-weight: 600; }
+#axes .axis-x { transform: translateX(-100%); }
+.katex { font-size: 1em; }
+body[data-fusion-page="em07-elektron"] footer { justify-content: center; font-size: 11px; }
+dialog { width: min(840px, 94vw); max-height: 88vh; overflow: auto; border: 1px solid #bbced6; border-radius: 12px; padding: 22px; color: #233f49; }
+dialog form { float: right; }
+dialog h2 { font-size: 23px; margin: 3px 0 10px; }
+dialog h3 { font-size: 16px; margin: 14px 0 4px; }
+dialog p { line-height: 1.55; margin: 6px 0 12px; }
+.guide-investigation { display: grid; grid-template-columns: max-content 1fr; column-gap: 14px; line-height: 1.5; }
+.guide-investigation dd { margin: 0 0 9px; }
+.guide-investigation ol { margin: 0; padding-inline-start: 20px; }
+.guide-investigation ol > :first-child { margin-top: 0; }
+#guideNext { margin-top: 8px; background: #215b70; border-color: #215b70; color: white; min-height: 32px; }
+@media (max-width: 540px) { .guide-investigation { display: block; } }
+dialog li { margin: 4px 0; }
+dialog a { color: #245e70; }
+dialog::backdrop { background: #17384766; }
+dialog details { margin: 10px 0; }
+dialog summary { cursor: pointer; font-weight: 600; }
+dialog .formula { padding: 4px 0; overflow-x: auto; }
+dialog dt { font-weight: 650; }
+dialog dd { margin: 2px 0 8px; }
+[hidden] { display: none !important; }
+
+@media (max-aspect-ratio: 5/6) {
+  main { width: 760px; height: 1230px; transform: translateX(-50%) scale(var(--electron-portrait-fit, 1)); }
+  body[data-fusion-page="em07-elektron"] { --module-scene-scale: var(--electron-portrait-fit, 1); }
+  #milestones { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .desk { grid-template-columns: 207px minmax(0, 1fr); }
+  .views { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1.25fr); }
+  .atom-views { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .atom-evidence { flex-wrap: wrap; }
+  .work { grid-template-rows: minmax(0, 3.5fr) minmax(0, 1fr); }
+}

@@ -8,7 +8,7 @@ for(const m of html.matchAll(/const entry=\{id:'([^']+)',group:'([^']+)'[^;]*?ti
  if(!Lab.catalog.some(e=>e.id===m[1]))Lab.catalog.push({id:m[1],group:m[2],title:m[3]});
 }
 const c={Lab,EnergyExperiments:{},location:{search:'',hash:''},document:{readyState:'loading'}};c.window=c;vm.createContext(c);
-for(const file of ['versions/vyvoj/m_files/Web/direct-current/lessons.js','versions/vyvoj/m_files/Web/energy-experiments/ui.js','tools/particle-library-navigation.js','tools/module-guide-data.js'])vm.runInContext(fs.readFileSync(file,'utf8'),c);
+for(const file of ['versions/vyvoj/m_files/Web/direct-current/lessons.js','versions/vyvoj/m_files/Web/energy-experiments/ui.js','tools/particle-library-navigation.js','tools/em-wave-navigation.js','tools/module-guide-data.js'])vm.runInContext(fs.readFileSync(file,'utf8'),c);
 const {entries,sources,aliases}=c.ModuleGuideData;
 assert(!/STEJNOSMERNE|SYNCHRONNI_|prezentac|TEs|TES kni/i.test(Object.values(sources).join(' ')),'no presentation or working scan-folder citations in the guide');
 assert(Object.values(sources).some(s=>s.includes('Bartoš: Teorie elektrických strojů')),'use the correct book identity');

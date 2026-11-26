@@ -31,6 +31,12 @@ for(const record of p.preserved){
    const layout=source.match(/<style id="machine-window-layout">([\s\S]*?)<\/style>/)[1];
    assert.match(layout,/main\.uniform-module-layout\[data-machine-viewport="sm01-princip"\]\s*>\s*\.workspace\s*\{[^}]*flex:1 1 0;[^}]*height:auto;/);
   }
+  if(record.key==='fusion-em07-elektron'){
+   for(const id of ['atomCanvas0','atomCanvas1','modelCanvas','canvas','graph'])assert(source.includes('<svg id="'+id+'"'),'Missing vector scene: '+id);
+   assert(!/<canvas\b|drawImage\(|data-fusion-source="pribeh-elektronu\/atom-renderer\.js"/.test(source),'Electron scenes must use the common vector renderer');
+   assert.match(source,/#ticks > span, #axes > span \{ position: absolute/);
+   assert.doesNotMatch(source,/#(?:ticks|axes) span\s*\{/,'Chart positioning must leave nested KaTeX spans in the text flow');
+  }
   const lessonStyle=source.match(/<style id="uniform-module-layout">([\s\S]*?)<\/style>/);
   if(lessonStyle)assert(lessonStyle[1].includes(commonStyle),'Shared typography missing in '+record.key);
   if(record.key.startsWith('fusion-')){
@@ -46,6 +52,7 @@ for(const record of p.preserved){
 }
 assert.deepEqual(p.dependencies['dc18-dve-pole'],['dc-simple-fields']);
 assert.deepEqual(p.dependencies['em05-reluktance'],['armature-fields']);
+assert.deepEqual(p.dependencies['em07-elektron'],['fusion-em07-elektron']);
 assert.deepEqual(p.dependencies['fu15-vodivost'],['fusion-fu15-vodivost']);
 assert(!html.includes('function relaxPlasma('),'Plasma trajectories load only on opening the lesson');
 assert(p.assets['dialog-transformer-field'],'Transformer field document must load on demand');

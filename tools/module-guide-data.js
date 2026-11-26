@@ -256,6 +256,10 @@
  add('em06-vlna','emwave',
   ['Začněte před pohybem a zvolte Vznik ohybu. Porovnejte bílé siločáry s původním polem; zelený kruh vyznačuje čelo změny.','Zvolte Vlna odchází. Vpravo sledujte magnetické pole, jeho znaménko a směr. Přepněte na dipólovou anténu nebo prostorový detail.'],
   ['Vzdálené pole odpovídá dřívějšímu pohybu náboje. Změna se šíří konečnou rychlostí světla; siločáry nejsou hmotná vlákna.','Model počítá retardované pole pohybujících se bodových nábojů. Neřeší impedanci ani rezonanci antény; prostorový detail je rovinné přiblížení.'],String.raw`\mathbf S=\frac{1}{\mu_0}\mathbf E\times\mathbf B`,['em01-indukovane-napeti','em03-silove-ucinky']);
+ sources.electron='J. J. Thomson, Cathode Rays (1897). E. Rutherford, The Scattering of α and β Particles by Matter and the Structure of the Atom (1911). Další zdroje jsou u jednotlivých etap.';
+ add('em07-elektron','electron',
+  ['Vyber etapu na časové ose a otáčej modelem vlevo. Měň podmínky pokusu a sleduj odečet v grafu.','V rozptylu porovnej dva způsoby rozložení kladného náboje. U dvojštěrbiny přidávej jednotlivé zásahy na detektoru.'],
+  ['Velké odchylky částic alfa ukazují na soustředěný kladný náboj. Spektrum vodíku ukazuje přechody mezi diskrétními energiemi.','Orbital ukazuje rozložení pravděpodobnosti měření. Na dvojštěrbině se v jednotlivých zásazích postupně projeví interference.'],null,['em06-vlna']);
  sources.reconnection='S. Entler, V. Kindl, Jaderná fúze a fúzní elektrárny, kap. 7.18, s. 171–172, rámeček 7.10 a kap. 7.19, s. 172–173. Vlastní názorný model helikálního toku.';
  add('fu11-rekonexe','reconnection',
   ['Nahoře sleduj rovnoběžné siločáry. Značka pod nimi ukazuje proud plazmatu do řezu. Vnes poruchu a porovnej původní a výsledný směr pole v P.','V kroku Přepojení najdi ve výseči vlevo bod A. V horním zvětšení sleduj, kam z A vede průsečnice magnetické plochy před průchodem bodem X a po něm.'],
