@@ -51,6 +51,9 @@
 .harmonic-action{margin:4px 4px 0}
 .harmonics .harm-line{display:contents}
 .time-gain{margin-top:4px;max-width:310px}
+.curve-key{display:inline-flex;align-items:center;gap:5px;color:var(--curve-color)}
+.curve-key::before{content:"";width:16px;border-top:2px solid var(--curve-color)}
+.curve-key.dashed::before{border-top-style:dashed}
 .plot-math.start-tick{color:#865818}
 .cursor{padding-top:8px;margin-top:6px}
 .bar-pane #barPlot{display:block;height:auto;max-height:177px}
@@ -242,7 +245,7 @@ aside h2{font-size:14px;margin-bottom:5px}
 .harmonics .card{height:auto;padding:7px 10px;overflow:visible}
 .harmonics .harm-row{height:auto;min-height:28px}
 .harmonics .time-gain,.harmonics .space-gain{position:static;width:100%;margin:4px 0 0}
-.harmonics .time-gain[hidden],#gainNotice:empty{display:none!important}
+.harmonics .time-gain[hidden],#componentsLegend[hidden],#gainNotice:empty{display:none!important}
 .operating-panel{display:flex;flex-direction:column;gap:8px}
 .bar-pane{display:flex;flex:1;min-height:0;flex-direction:column}
 .bar-pane #barPlot{width:100%;height:auto;aspect-ratio:255 / 165;max-height:none;margin:0}
@@ -343,8 +346,7 @@ aside h2{font-size:14px;margin-bottom:5px}
 <li><b>Odečet skluzu:</b> posuvníkem vyberte pracovní bod. Vpravo se zobrazí jeho moment, skluz, frekvence a parametry rotoru. Nejde o přehrávání rozběhu.</li>
 <li><b>Harmonické:</b> zaškrtnutí zobrazí příspěvek; sousední tlačítko <b>+</b> jej zahrne do celkového momentu. Samotné zobrazení součet nemění.</li>
 <li><b>Zesílení zobrazení:</b> zvětšuje zobrazené harmonické příspěvky. Teprve volba <b>× i do součtu</b> použije zesílení také při jejich započtení.</li>
-<li><b>Náhradní schéma:</b> přepínejte základní, časové a prostorové harmonické. Rozptyl statoru závisí u klece na proudu a impedance klece na skluzu. Zkuste změnit skluz a sledujte proudovou hustotu ve vodiči. Náhled otevírá modul skinefektu.</li>
-<li>Časové harmonické mají vlastní obvody. Při změně skluzu se jejich rotorové parametry přepočítají podle příslušné frekvence. Prostorové harmonické sdílejí stator. Každý započtený řád přidá modální větev. U vyšších prostorových řádů model zanedbává ztráty v železe.</li>
+<li><b>Náhradní schéma:</b> přepínejte základní, časové a prostorové harmonické. U klece sledujte i proudovou hustotu po hloubce tyče; její náhled nabízí přechod ke skin efektu.</li>
 <li><b>Obnovit parametry:</b> kruhová šipka vrátí výchozí nastavení. Pokud je nabídnuta <b>Osa Y</b>, přizpůsobí rozsah momentu aktuálním křivkám.</li>
 </ul></section><section><h3>Co vyzkoušet</h3><ol><li>U vinuté kotvy zvětšujte přídavný odpor. Sledujte posun zvratu k většímu skluzu a porovnejte jeho výšku.</li><li>Přepněte na klec a porovnejte proud v tyči při malém skluzu a při záběru. Všímejte si změny účinného odporu.</li><li>Zobrazte jednu harmonickou a potom ji přidejte do součtu. Odlište její názorné zesílení od změny celkového momentu.</li></ol></section></template>
 </main><script>(()=>{const kd=(q,n)=>Array.from({length:q},(_,k)=>Math.cos(n*(k-(q-1)/2)*Math.PI/(3*q))).reduce((a,b)=>a+b,0)/q;
@@ -676,7 +678,7 @@ function graph(){if(!data.length)return;const el=$('torquePlot'),w=Math.max(270,
  svg+=`<path data-start-slip d="M${xStart} ${T}V${bottom}" fill="none" stroke="#865818" stroke-width="1.4" stroke-dasharray="5 4"/>`;
  svg+=plotMath('s=1',Math.max(L+32,Math.min(right-32,xStart)),bottom-16,64,28,'start-tick');
  for(const c of curves){
-  svg+=`<path data-component="${c.kind||''}" clip-path="url(#plotClip)" d="${curvePath(c.values)}" fill="none" stroke="${c.color}" stroke-width="${c.width}" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="${c.dash||''}">${c.label?`<title>${c.label}</title>`:''}</path>`;
+  svg+=`<path data-component="${c.kind||''}" clip-path="url(#plotClip)" d="${curvePath(c.values)}" fill="none" stroke="${c.color}" stroke-width="${c.width}" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="${c.dash||''}"/>`;
  }
  const value=M.point(p,p.speed),cursorX=x(p.speed),cursorY=y(shownMoment(value)*100/normalizer);
  if(Math.abs(cursorX-xStart)>1)svg+=line(cursorX,T,cursorX,bottom,'#627e83','3 4');
@@ -794,7 +796,9 @@ const schemaPane=schemaInfo.closest('.schema-pane');
 const harmonicBar=document.querySelector('main[data-machine-viewport="am02-momentova-charakteristika"]>.harmonics');
 function fitHarmonics(){
  if(!harmonicBar?.clientWidth)return;
+ const spatial=harmonicBar.querySelector('.spatial-harmonics');
  harmonicBar.style.removeProperty('--harmonics-fit');
+ spatial.classList.remove('stacked');
  const fits=()=>harmonicBar.scrollWidth<=harmonicBar.clientWidth+1;
  const fitsSideBySide=()=>fits()&&[...harmonicBar.children].every(card=>card.scrollWidth<=card.clientWidth+1);
  harmonicBar.classList.remove('compact-labels');
@@ -803,6 +807,8 @@ function fitHarmonics(){
  harmonicBar.classList.add('compact-labels');
  if(fitsSideBySide())return;
  harmonicBar.classList.remove('side-by-side','compact-labels');
+ if(fits())return;
+ spatial.classList.add('stacked');
  if(fits())return;
  let lower=.45,upper=1;
  // Keep the largest size that fits the complete strip, including active controls.
@@ -817,10 +823,12 @@ function fitHarmonics(){
 function fitSchemaInfo(){
  schemaInfo.style.removeProperty('font-size');
  if(!schemaPane.clientHeight)return;
- const fits=()=>schemaInfo.scrollWidth<=schemaInfo.clientWidth+1;
+ const paneStyle=getComputedStyle(schemaPane);
+ const contentBottom=schemaPane.getBoundingClientRect().bottom-parseFloat(paneStyle.paddingBottom)-parseFloat(paneStyle.borderBottomWidth);
+ const fits=()=>schemaInfo.scrollWidth<=schemaInfo.clientWidth+1&&schemaInfo.getBoundingClientRect().bottom<=contentBottom+1;
  if(fits())return;
  const start=parseFloat(getComputedStyle(schemaInfo).fontSize);
- const minimum=parseFloat(getComputedStyle(schemaPane).getPropertyValue('--lesson-detail-size'))||12;
+ const minimum=parseFloat(paneStyle.getPropertyValue('--lesson-detail-size'))||12;
  for(let size=Math.floor(start)-1;size>=minimum;size--){
   schemaInfo.style.fontSize=size+'px';
   if(fits())return;
@@ -834,6 +842,7 @@ document.querySelectorAll('[data-schema]').forEach(button=>button.onclick=()=>{
 });
 function schema(){
  baseSchema();
+ $('schema').closest('.schema-pane').querySelector('h2').textContent=schemaMode==='space'?'Rozšířený obvod · prostorové harmonické':schemaMode==='time'?'T článek · časová harmonická':'T článek · základní harmonická';
  const emphasize=t=>t.replace(/\\mu/g,String.raw`{\textcolor{#b45c16}{\boldsymbol{\mu}}}`).replace(/\\nu/g,String.raw`{\textcolor{#0039a6}{\boldsymbol{\nu}}}`);
  const math=t=>katex.renderToString(emphasize(t),{throwOnError:true});
  $('schema').closest('.schema-pane').dataset.mode=schemaMode;
@@ -868,7 +877,7 @@ function schema(){
  const formulas=schemaMode==='time'
   ?[String.raw`U_\mu=U_1/\mu,\quad n_{s\mu}=\pm\mu n_s`,String.raw`s_\mu=1-n/n_{s\mu},\quad f_{2\mu}=|s_\mu|\mu f_1`]
   :[String.raw`n_{s\nu}=\pm n_s/\nu,\quad s_\nu=1-n/n_{s\nu}`,String.raw`q_\nu=|k_{w\nu}/k_{w1}|,\quad X_{m\nu}=q_\nu^2X_m/\nu^2`];
- schemaInfo.innerHTML=formulas.map(t=>'<div>'+math(t)+'</div>').join('');
+ $('schemaInfo').innerHTML=formulas.map(t=>'<div>'+math(t)+'</div>').join('')+'<div class="schema-caption">'+(schemaMode==='time'?'Samostatný obvod pro každý řád. R₂′ a X₂σ′ se přepočítají při f₂μ.':'Společný stator; další blok pro každý započtený řád. R₂ν′ a X₂σν′ obsahují qν². Vyšší řády bez ztrát v železe.')+'</div>';
  fitSchemaInfo();
 }
 function baseSchema(){
@@ -892,9 +901,14 @@ function baseSchema(){
   String.raw`L_{\mathrm m}=81\,\mathrm{mH}`,
   String.raw`R_{\mathrm{Fe}}=370\,\Omega`
  ];
- if(p.rotor==='wound')parameters.push(String.raw`L_{1\sigma}=3{,}2\,\mathrm{mH}`);
- const row=values=>'<div>'+values.map(math).join(' · ')+'</div>';
- schemaInfo.innerHTML=row(parameters.slice(0,2))+row(parameters.slice(2));
+ const rotorInfo=p.rotor==='cage'
+  ? 'Rozptyl statoru závisí na proudu, impedance klece na skluzu.'
+  : math(String.raw`L_{1\sigma}=3{,}2\,\mathrm{mH}`)+'.';
+ const spaceInfo=p.includedSpaceOrders.length?' Prostorové harmonické přidávají modální obvody.':'';
+ const timeInfo=p.includedTimeOrders.length
+  ? ' Časové obvody: '+p.includedTimeOrders.map(order=>math(String.raw`${order}f_1`)).join(', ')+'.'
+  : '';
+ $('schemaInfo').innerHTML=parameters.map(math).join(' · ')+'. '+rotorInfo+spaceInfo+timeInfo;
 
 }
 function update(){read();document.querySelectorAll('.cage').forEach(e=>e.hidden=p.rotor!=='cage');document.querySelectorAll('.wound').forEach(e=>e.hidden=p.rotor!=='wound');

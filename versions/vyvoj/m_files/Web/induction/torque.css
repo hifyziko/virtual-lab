@@ -48,6 +48,9 @@
 .harmonic-action{margin:4px 4px 0}
 .harmonics .harm-line{display:contents}
 .time-gain{margin-top:4px;max-width:310px}
+.curve-key{display:inline-flex;align-items:center;gap:5px;color:var(--curve-color)}
+.curve-key::before{content:"";width:16px;border-top:2px solid var(--curve-color)}
+.curve-key.dashed::before{border-top-style:dashed}
 .plot-math.start-tick{color:#865818}
 .cursor{padding-top:8px;margin-top:6px}
 .bar-pane #barPlot{display:block;height:auto;max-height:177px}
