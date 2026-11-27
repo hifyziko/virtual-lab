@@ -21,7 +21,12 @@ function lesson(source,id){
   const viewportId=id==='09-synchronni'?'sm-stability':id;
   source=source.replace(/<main\b([^>]*)>/,(_,attrs)=>'<main'+attrs.replace(/\sdata-machine-viewport="[^"]*"/g,'')+' data-machine-viewport="'+viewportId+'">');
   source=source.replace(/<style id="machine-window-layout">[\s\S]*?<\/style>/g,'');
-  source=source.replace('</body>',()=>'<style id="machine-window-layout">'+fs.readFileSync(path.join(root,'machine-window-layout.css'),'utf8')+'</style></body>');
+  let machineCSS=fs.readFileSync(path.join(root,'machine-window-layout.css'),'utf8');
+  if(id==='am02-momentova-charakteristika'){
+   // Pilot: the experiment text scales together with the module, as in the electron story.
+   machineCSS+='\nmain.uniform-module-layout[data-machine-viewport="am02-momentova-charakteristika"]{--lesson-ui-scale:1}\n';
+  }
+  source=source.replace('</body>',()=>'<style id="machine-window-layout">'+machineCSS+'</style></body>');
  }
 
  if(/^(mag|em|hf-)/.test(id)){
