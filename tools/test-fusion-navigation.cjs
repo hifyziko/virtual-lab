@@ -23,11 +23,12 @@ assert.deepEqual(Lab.catalog.slice(1).map(e=>e.id),[
 assert.deepEqual(Lab.catalog.slice(1).map(e=>e.num),Array.from({length:20},(_,i)=>String(i+1).padStart(2,'0')));
 assert.equal(Lab.catalog.find(e=>e.id==='fu06-divertor').title,'Tokamak: pole a plazma');
 {
- const create=c.document.createElement;let injected;const area={querySelector:selector=>selector==='.physics-area-heading'?{after(group){injected=group;}}:null};
- c.document.createElement=tag=>tag==='template'?{content:{querySelector:selector=>selector==='#group-area-plasma'?area:null},set innerHTML(value){},get innerHTML(){return injected?.markup||'';}}:new Element(tag);
+ const create=c.document.createElement;let injected;let tiles;const area={querySelector:selector=>selector==='.physics-area-heading'?{after(group){injected=group;}}:null};
+ c.document.createElement=tag=>tag==='template'?{content:{querySelector:selector=>selector==='#group-area-plasma'?area:null,querySelectorAll(selector){assert.ok(selector.includes('#group-area-plasma'));assert.ok(selector.includes('#group-area-drives'));tiles=[new Element('a'),new Element('a')];return tiles;}},set innerHTML(value){},get innerHTML(){return injected?.markup||'';}}:new Element(tag);
  c.location.hash='#group-area-plasma';let markup;
  try{
   markup=Lab.home();
+  for(const tile of tiles)assert.match(tile.children[0].textContent,/odborná revize dosud neproběhla/);
   for(const id of ['fu15-nbi','fu15-vodivost','fu07-plazma','fu08-ostrovy']){
    const entry=Lab.modules.get(id);entry.mount(new Element('main'));Lab.dispose();
    const opened=[...Lab.home().matchAll(/<details\b[^>]*data-fusion-subgroup="([^"]+)"[^>]*\sopen\b[^>]*>/g)];
