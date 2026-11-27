@@ -3,10 +3,11 @@
   const originalHome = Lab.home;
   const areas = [
     {id:'electricity', title:'Elektřina a magnetismus', intro:'Od základních zákonů k elektrickému a magnetickému poli.', groups:['electromagnetism','materials'], topics:'Elektromagnetická indukce · silové účinky · materiály'},
-    {id:'machines', title:'Elektrické stroje', intro:'Využití elektromagnetických principů ve strojích a pohonech.', groups:['transformer','common','induction','sync','dc','drive'], topics:'Transformátory · vinutí · motory · generátory · pohony'},
+    {id:'machines', title:'Elektrické stroje', intro:'Využití elektromagnetických principů v transformátorech, motorech a generátorech.', groups:['transformer','common','induction','sync','dc'], topics:'Transformátory · vinutí · motory · generátory'},
+    {id:'drives', title:'Pohony a výkonová elektronika', intro:'Od spínání polovodičů k napájení motoru a pohybu vozidla.', groups:['converters','drive'], topics:'Usměrňovače · pulzní měniče · střídače · pohony'},
     {id:'plasma', title:'Jaderná fúze a tokamaky', intro:'Od částic a fúzních reakcí k magnetickému udržení a tokamaku.', groups:['fusion'], topics:'Plazma a fúzní reakce · magnetické udržení · tokamak'}
   ];
-  const groupTitles = {electromagnetism:'Základní elektromagnetické principy',materials:'Materiály',transformer:'Transformátory',common:'Vinutí',induction:'Asynchronní stroje',sync:'Synchronní stroje',dc:'Stejnosměrné stroje',drive:'Elektrické pohony vozidel',fusion:'Jaderná fúze a tokamaky'};
+  const groupTitles = {electromagnetism:'Základní elektromagnetické principy',materials:'Materiály',transformer:'Transformátory',common:'Vinutí',induction:'Asynchronní stroje',sync:'Synchronní stroje',dc:'Stejnosměrné stroje',converters:'Výkonové měniče',drive:'Elektrické pohony vozidel',fusion:'Jaderná fúze a tokamaky'};
   const areaForGroup = group => areas.find(a => a.groups.includes(group)) || areas[0];
   const esc = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function context() {
@@ -56,6 +57,15 @@
       section.id = 'group-area-' + area.id;
       section.setAttribute('aria-labelledby', 'heading-' + area.id);
       section.innerHTML = `<header class="physics-area-heading"><div><h2 id="heading-${area.id}">${area.title}</h2><p>${area.intro}</p></div><a href="#">↑ Všechny oblasti</a></header>`;
+      if(area.id==='drives'){
+        const converters=document.createElement('details');
+        converters.id='group-converters';converters.className='group-block topic-group';converters.name='home-topic';
+        converters.open=current.group==='converters'||(!current.group&&current.area===area);
+        converters.innerHTML='<summary class="group-banner"><h2>Výkonové měniče</h2><span class="topic-count"></span></summary><div class="cards"></div>';
+        const count=Lab.catalog.filter(m=>m.group==='converters').length;
+        converters.querySelector('.topic-count').textContent=count+(count===1?' modul':count<5?' moduly':' modulů');
+        section.append(converters);
+      }
       for (const group of groups) {
         const id = group.id.replace(/^group-/, '');
         // Unknown future groups remain visible in the fundamentals area.

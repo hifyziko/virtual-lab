@@ -130,12 +130,12 @@ function machineScene(s,kind,step){
  }
  return {out,coeff,bgap};
 }
-function bridge(theta,step,scale=1,phase=null){const i=phase||bldcCurrents(theta),colors=[C.red,C.blue,C.gold];let out='';
+function bridge(i){const colors=[C.red,C.blue,C.gold];let out='';
  out+=wire('M25 35H245M25 235H245',C.ink,2);for(let k=0;k<3;k++){const x=50+k*80,active=i[k];out+=wire(`M${x} 35V235`,C.line,1.6);for(const side of [0,1]){const on=side===0?active>0:active<0,y=side?181:76;out+=`<rect x="${x-13}" y="${y-16}" width="26" height="32" rx="3" fill="${on?colors[k]:'#f5f7f3'}" stroke="${on?colors[k]:C.line}" stroke-width="1.5"/>`+text(x-24,y+5,'T'+(side?[4,6,2][k]:[1,3,5][k]),C.ink,12,'end');}out+=dot(x,135,colors[k],4)+wire(`M${x} 135H${x+18}V${267+k*25}H285`,active?colors[k]:C.line,active?2.5:1)+math(x,15,['A','B','C'][k],colors[k],16,40);}
  out+=math(12,33,'+',C.red,17,25)+math(12,240,'-',C.blue,17,25);return out;
 }
 
-function hallSensors(code){
+function hallSensors(code,focus){
  // Each axis bisects the 180° interval in which its Hall signal is high.
  const axes=[-Math.PI/3,Math.PI/3,Math.PI];
  const labels=["A","B","C"],colors=[C.red,C.blue,C.gold];
@@ -144,6 +144,7 @@ function hallSensors(code){
   const active=code[k]==="1",color=colors[k],label=labels[k];
   const markRadius=240,labelY=y(markRadius)+(k===1?-19:19);
   return `<g data-hall-sensor="${label}" data-hall-state="${code[k]}"><title>Hallova sonda ${label}: ${code[k]}</title>`
+   +(focus?`<circle cx="${x(markRadius)}" cy="${y(markRadius)}" r="10" fill="none" stroke="${color}" stroke-width="1.5"/>`:'')
    +`<rect x="-6" y="-4" width="12" height="8" rx="2" transform="translate(${x(markRadius)} ${y(markRadius)}) rotate(${90-angle*180/Math.PI})" fill="${active?color:"white"}" stroke="${color}" stroke-width="2"/>`
    +math(x(markRadius),labelY+8,"H_"+label,color,15,42)+"</g>";
  }).join("");
@@ -152,11 +153,11 @@ function bldcScene(s,step,kind,panels){const a=s.position*TAU,phase=bldcCurrents
  const theta=a-5*Math.PI/6,fl=s.field?bldcField(phase.map(i=>i*s.amount),theta):'';
  let out=`<g transform="translate(265 282)">${DCMachineArt.bldc(theta,phase.map(v=>v*s.amount),fl)}</g>`;
  out+=`<g transform="translate(265 282)">${arrow(0,0,155*s.amount*Math.cos(fa),-155*s.amount*Math.sin(fa),C.green,3)}${arrow(0,0,112*Math.cos(theta),-112*Math.sin(theta),C.gold,3)}</g>`;
- const bridgeDrawing=frame(535,30,340,390,'Třífázový tranzistorový můstek')+`<g transform="translate(555 77)">${bridge(a,step,1,phase)}</g>`;
+ const bridgeDrawing=frame(535,30,340,390,'Třífázový tranzistorový můstek')+`<g transform="translate(555 77)">${bridge(phase)}</g>`;
  let circuit=bridgeDrawing,sideLogic='';
  if(kind==='bldc-poloha'){
  const driveAngle=s.commutationAngle??a,code=bldcHall(a),held=s.commutationAngle!==null,positive=phase.findIndex(v=>v>0),negative=phase.findIndex(v=>v<0);
- out+=hallSensors(code);
+ out+=hallSensors(code,step===0);
  const gatePair='T'+[1,3,5][positive]+' + T'+[4,6,2][negative],phasePath=['A','B','C'][positive]+'+ → '+['A','B','C'][negative]+'−';
  sideLogic=frame(906,48,125,95,'Hallovy sondy')+text(968,100,code,C.blue,22)+math(968,128,'H_A H_B H_C',C.muted,13,106)
   +frame(906,177,125,95,'Logika')+text(968,226,held?'Podrženo':bldcHall(driveAngle),C.ink,17)+text(968,252,'6 stavů',C.muted,13)

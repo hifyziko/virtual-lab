@@ -14,10 +14,8 @@ window.SkewCompactLayout=app=>{
  root.querySelector('.learning-presets').append(pitch,settings);
  settings.append(...main.querySelectorAll(':scope>.learning-stats,:scope>.learning-equation'));
  const footer=document.createElement('div');footer.className='sk-scene-footer';
- const bottom=main.querySelector('.sk-cancel-bottom'),note=main.querySelector('.sk-scene-note');
- bottom.before(footer);footer.append(bottom,note);
-
- main.querySelector('h2+p').textContent='Příspěvky řezů přesuneme na společnou osu a sledujeme jejich vyrušení.';
+ const bottom=main.querySelector('.sk-cancel-bottom');
+ bottom.before(footer);footer.append(bottom);
 
  app.querySelector('#sk-signed').previousElementSibling.textContent='Činitel zešikmení';
  const explanation=root.querySelector('.learning-explanation'),formula=app.querySelector('#sk-formula');

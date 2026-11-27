@@ -53,6 +53,7 @@
 #app>.workspace[data-module="12-krok"] #play{width:145px;min-width:145px;flex:0 0 145px;white-space:nowrap}
 #app>.workspace[data-module="12-krok"]>.controls :is(#play,.control:has(#tempo),#reset){order:1}
 #app>.workspace:is([data-module="02-rozloha"],[data-module="04-cinitel"])>.gridplots{grid-template-rows:repeat(2,minmax(0,1fr))}
+#app>.workspace[data-module="02-rozloha"] .plotlegend{font-size:var(--lesson-text)!important}
 #app>.workspace[data-module="04-cinitel"] .plotlegend{min-height:28px;align-items:center}
 #app>.workspace[data-module="12-krok"] #timeValue{width:110px;min-width:110px;flex:0 0 110px;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
 #app>.workspace[data-module="12-krok"]>.modulehead h1{white-space:nowrap}

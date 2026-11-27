@@ -1,0 +1,105 @@
+*{box-sizing:border-box}
+body[data-fusion-page]{margin:0;overflow:hidden;background:#f3f7f7;color:#173945;font:16px 'Segoe UI',sans-serif;--fusion-accent:#08766a}
+main{width:1360px;height:820px;position:absolute;top:8px;left:50%;transform:translateX(-50%) scale(var(--fusion-fit,1));transform-origin:top center;display:flex;flex-direction:column;gap:7px}
+header,.transport,#settings,#signals,.control,.control label{display:flex;align-items:center;gap:10px}
+header h1{margin-right:auto}
+button,select{font:inherit;border:1px solid #afc4c6;background:white;color:inherit;border-radius:6px;padding:5px 10px}
+#play{min-width:108px;background:#126b60;color:white;border-color:#105d54;font-weight:650}
+#play:hover{background:#09594f}
+#play:focus-visible{outline:3px solid #186eae;outline-offset:2px}
+button,select,input[type=range],input[type=checkbox],input[type=radio]{cursor:pointer;accent-color:#08766a}
+input:disabled{cursor:default}
+#settings,.transport,.panel{border:1px solid #bccfce;background:#fff;border-radius:10px;padding:12px 16px}
+#settings{min-height:42px;gap:5px 14px;padding:5px 12px;flex-wrap:wrap}
+#settings>.control,header>.control{flex:0 0 auto;flex-wrap:nowrap}
+header>.control{margin-inline:5px}
+body:is([data-lesson=pwm],[data-lesson=pulzni],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet],[data-lesson=aktivni]) #settings{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:18px}
+body:is([data-lesson=stridavy],[data-lesson=kmitocet]) #settings{grid-template-columns:minmax(0,1fr)}
+body[data-lesson=aktivni] #settings:empty{display:none}
+body:is([data-lesson=pulzni],[data-lesson=jednofazovy]) #settings{grid-template-columns:repeat(2,minmax(0,1fr))}
+body:is([data-lesson=pwm],[data-lesson=pulzni],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet],[data-lesson=aktivni]) #settings>.control{display:grid;grid-template-columns:auto minmax(0,1fr) auto}
+body:is([data-lesson=pwm],[data-lesson=pulzni],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet],[data-lesson=aktivni]) #settings input[type=range]{width:100%;min-width:0}
+body:is([data-lesson=pwm],[data-lesson=pulzni],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet],[data-lesson=aktivni]) #settings output{min-width:50px;text-align:right}
+body:is([data-lesson=pwm],[data-lesson=pulzni],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet],[data-lesson=aktivni]) #settings #carrierOut{min-width:68px}
+.control{gap:5px;font-size:14px;flex-wrap:wrap}
+.control>span{font-weight:600}
+.control:has(:disabled){opacity:.48}
+.control input[type=range]{width:95px}
+.control output{min-width:46px}
+body[data-fusion-page] main{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto}
+body:is([data-lesson=diody],[data-lesson=tyristory],[data-lesson=aktivni]) main{grid-template-rows:auto minmax(0,1fr) auto}
+body:is([data-lesson=diody],[data-lesson=tyristory]) header #settings{min-height:0;padding:0;margin-inline:5px;border:0;background:transparent}
+.workspace{min-height:0;display:grid;grid-template-columns:42% 1fr;grid-template-rows:minmax(0,1fr);gap:7px}
+.panel{min-width:0;min-height:0;display:flex;flex-direction:column}
+.transport{position:static}
+.panel h2{margin:0 0 6px;font-size:21px}
+#diagram,#plot{width:100%;min-height:0;flex:1}
+#diagram{background:white}
+.key{display:flex;align-items:center;gap:7px;margin:7px 0 10px;color:#3e5661;font-size:13px}
+.key i{width:19px;height:3px;background:#13796d}
+.key i:nth-of-type(2){margin-left:10px;background:#b36916}
+.key.commands i{background:#1266a0}.key.commands i:nth-of-type(2){background:#96a7ad}
+.bridgeHead{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.bridgeHead h2{font-size:18px}
+.bridgeHead label,.bridgeHead select{font-size:13px}
+#loadSetup{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;margin:5px 0;border-block:1px solid #d5e2df;padding:7px 0}
+#loadSetup .control{display:grid;grid-template-columns:auto minmax(40px,1fr) auto;gap:5px;align-items:center}
+#loadSetup .control:has(input[type=radio]){display:flex;grid-column:1/-1}
+body:is([data-lesson=diody],[data-lesson=tyristory],[data-lesson=pwm],[data-lesson=pulzni],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet],[data-lesson=aktivni]) #loadSetup .control:has(#emf){grid-column:1/-1;grid-template-columns:auto minmax(0,1fr) 72px}
+body:is([data-lesson=diody],[data-lesson=tyristory],[data-lesson=pwm],[data-lesson=pulzni],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet],[data-lesson=aktivni]) #emfOut{text-align:right;font-variant-numeric:tabular-nums}
+body:is([data-lesson=tyristory],[data-lesson=pwm],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet]) #loadSetup .control:has(input[type=radio]){grid-area:1/1}
+body[data-lesson=tyristory] header #settings:empty{display:none}
+body[data-lesson=tyristory] #loadSetup .control:has(#angle),body:is([data-lesson=pwm],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet]) #loadSetup .control:has(#lag){grid-area:1/2}
+body:is([data-lesson=tyristory],[data-lesson=pwm],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet]) #loadSetup .control:has(#resistance){grid-area:2/1}
+body:is([data-lesson=tyristory],[data-lesson=pwm],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet]) #loadSetup .control:has(#inductance){grid-area:2/2}
+body:is([data-lesson=tyristory],[data-lesson=pwm],[data-lesson=jednofazovy],[data-lesson=stridavy],[data-lesson=kmitocet]) #loadSetup .control:has(#emf){grid-row:3}
+#loadSetup .control input[type=range]{width:100%;min-width:0}
+#loadSetup .control label{border:1px solid #c1d2cf;border-radius:4px;padding:2px 7px}
+#loadSetup .control label:has(:checked){background:#eaf5f2;border-color:#61958c}
+#loadSetup .control input[type=radio]{appearance:none;width:14px;height:14px;border:1px solid #819d97;border-radius:3px;display:grid;place-content:center;margin:0}
+#loadSetup .control input[type=radio]:checked{background:#176d64;border-color:#176d64}
+#loadSetup .control input[type=radio]:checked::after{content:'';width:7px;height:4px;border:solid white;border-width:0 0 2px 2px;transform:translateY(-1px) rotate(-45deg)}
+#diagram text{font:600 14px 'Segoe UI',sans-serif;fill:#183744}
+.wire,.device path,.source{stroke:#405860;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.source,.block{fill:white}
+.block{stroke:#68848b;stroke-width:1.8}
+.selected{fill:#e0f4ee;stroke:#00806f}
+.junction{fill:#304952}
+.device path{stroke:#73858a}
+.on path,.diode-on path{stroke:#00796b;stroke-width:4}
+.diode-on path{stroke:#b35c0c}
+.command{stroke:#456ca7;stroke-width:2;stroke-dasharray:3 3;fill:none}
+.axis,.eq{text-align:center;color:#264551;font-size:14px}
+#readings{padding:12px 2px 5px;border-top:1px solid #cadad8;font-size:23px;text-align:left;color:#086b60}
+#readings small{float:right;margin-top:5px;font-size:15px;color:#425d66}
+#signals{min-height:36px;flex-wrap:wrap}
+.verticalScale{display:flex;gap:4px;align-items:center;font-size:13px}
+.verticalScale label{display:flex;align-items:center;gap:6px}
+.verticalScale :is(select,button){padding:3px 8px}
+.workspace .scope{display:grid;grid-template-rows:auto minmax(0,1fr);gap:3px}
+.scopeHeader{display:flex;align-items:center;gap:8px}
+.scopeHeader h2{margin:0}
+.scopeHeader .verticalScale{margin-left:auto}
+#plot{height:100%;display:block}
+#channelMenu{position:relative}
+#channelMenu summary{cursor:pointer;border:1px solid #afc4c6;background:white;border-radius:5px;padding:3px 8px;font-size:14px}
+.channelPanel{position:absolute;z-index:3;top:calc(100% + 4px);left:0;width:350px;padding:10px;border:1px solid #afc4c6;background:white;border-radius:6px;box-shadow:0 4px 12px #25475020}
+.channelPanel #signals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;font-size:13px}
+.channelPanel button{margin-top:8px}
+.plotLegend,.plotLegend>span{display:flex;align-items:center}
+.plotLegend{height:22px;gap:12px;font-size:13px;color:#25424e}
+.plotLegend>span{gap:3px}
+.plotLegend i{display:inline-block;width:18px}
+#signals label{display:flex;align-items:center;gap:3px}
+#signals label:has(:disabled){opacity:.35}
+#signals i{width:18px;height:3px;background:var(--signal)}
+.graticule{fill:#f7faf9;stroke:#b1c8c6}
+.grid{stroke:#d5e2e0;stroke-width:1}
+.trace{fill:none;stroke-width:2.3;stroke-linejoin:round}
+.marker{stroke:#233e47;stroke-width:1.6;stroke-dasharray:5 4;pointer-events:none}
+.transport label{display:flex;align-items:center;gap:8px}
+.transport label:first-of-type,.transport label:first-of-type input{flex:1}
+dialog{max-width:620px;border:1px solid #9bb7b4;border-radius:12px;color:#173945;padding:25px;line-height:1.65}
+dialog::backdrop{background:#17394555}
+
+#slowFactor{min-width:5ch;text-align:right;font-variant-numeric:tabular-nums}

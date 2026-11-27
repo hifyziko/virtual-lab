@@ -4,13 +4,13 @@ const ElectronDetails=[
   "Nárazový parametr $b$ je kolmá vzdálenost přímky příletu od středu. $E_k$ je kinetická energie před srážkou, $Z$ je protonové číslo a $z=2$. Úhel $\\theta$ měří odklon od směru příletu. Účinný průřez má jednotku $\\mathrm{m^2}$, prostorový úhel steradián.",
   "Poloměr $r$ určuje rychlost $v$, dostředivé zrychlení $a$ a celkovou energii $E$. Výkon $P_{\\rm rad}$ ve wattech je úbytek energie za sekundu. Kružnice ve scéně označuje výchozí poloměr. Křivka u částice ukazuje poslední část skutečně vypočtené dráhy.",
   "Hlavní kvantové číslo $n$ určuje energii a poloměr. Indexy $i,f$ označují počáteční a konečný stav. $m_p$ je hmotnost protonu, $\\mu$ redukovaná hmotnost, $\\nu$ frekvence fotonu a $\\lambda$ jeho vakuová vlnová délka.",
-  "Vlnové číslo $k=2\\pi/\\lambda$ má jednotku $\\mathrm{m^{-1}}$, úhlová frekvence $\\omega$ jednotku $\\mathrm{s^{-1}}$. Pro relativistickou vlnovou délku se počítá celková hybnost. Obálka volného balíku pracuje v nízkoenergetickém přiblížení.",
+  "Zkoušený obvod obsahuje $2\\pi r/\\lambda$ vlnových délek. Pro kruhový oběh v poli jádra současně platí $p^2/(\\mu r)=\\kappa/r^2$. S hybností danou tímto vztahem obvod obsahuje $\\sqrt{r/a_\\mu}$ vlnových délek. Odtud vycházejí povolené poloměry $r_n=a_\\mu n^2$.",
   "Kvantová čísla $n,\\ell,m$ určují radiální průběh, moment hybnosti a jeho projekci. $L$ je zobecněný Laguerreův polynom, $P$ přidružená Legendreova funkce a $N_{\\ell m}$ normalizace na jednotkové sféře. $w$ má jednotku $\\mathrm{m^{-3}}$, radiální hustota $\\mathrm{m^{-1}}$. Zvolený podíl $f$ je kvadrát amplitudy druhého stavu. Pro $1s$ je největší hustota u jádra. Objem slupek roste jako $4\\pi r^2\\,\\mathrm dr$, proto maximum radiální hustoty leží až při $a_\\mu$.",
-  "Vektor $\\mathbf R_j$ označuje polohu atomu, $\\mathbf k_i,\\mathbf k_f$ vlnové vektory před srážkou a po ní. Braggův úhel $\\theta_{\\rm B}$ se měří od odrážejících rovin vzdálených $d$. Ovladač detektoru měří úhel od normály povrchu.",
-  "Hybnost je uvedena v jednotkách $m_ec$. Matice $\\boldsymbol\\alpha,\\beta$ působí na čtyřsložkový spinor $\\Psi$. Horní graf používá celkové energie a dolní kinetické energie po odečtení klidové energie.",
+  "Vektor $\\mathbf R_j$ označuje polohu atomu, $\\mathbf k_i$ a $\\mathbf k_f$ popisují směr a vlnovou délku dopadající a rozptýlené vlny. Vektor $\\mathbf q$ je jejich rozdíl. Fáze příspěvku každého atomu je $\\mathbf q\\cdot\\mathbf R_j$. Značka $i$ je imaginární jednotka, $A$ součet komplexních amplitud a $I$ intenzita. Detektor měří úhel $\\theta$ od kolmice k povrchu.",
+  "Hybnost je uvedena v jednotkách $m_ec$. Matice $\\boldsymbol\\alpha,\\beta$ působí na čtyřsložkový spinor $\\Psi$, $\\hat{\\mathbf p}$ je operátor hybnosti a $\\hbar$ redukovaná Planckova konstanta. Vlevo jsou obě matematické větve celkové energie $E_\\pm$. Dole se porovnává kinetická energie. Vztah $v/c=p/\\sqrt{p^2+(m_ec)^2}$ dává skutečnou rychlost k zadané hybnosti.",
   "Bariéra má výšku $5\\,\\mathrm{eV}$ a tloušťku $1\\,\\mathrm{nm}$. Šířka otvoru $a$ a rozteč $d$ určují obálku a periodu vzdáleného obrazce. $W\\ge0$ je absorpční energie. Celková pravděpodobnost záchytu integruje pravděpodobnostní tok do absorbéru. Difrakční aproximace předpokládá široké rovnoměrné osvětlení a vzdálené stínítko.",
   "Hybnost je podélná, polarizace podél pohybu je pevná. $a(p)$ je Gaussova amplituda v hybnostním prostoru. Zobrazená hustota $\\Psi^\\dagger\\Psi$ má po integraci přes příčné souřadnice jednotku $\\mathrm{m^{-1}}$. Odstranění společné klidové fáze neovlivní hustotu.",
-  "Zorné pole $L$ udává metry na zvolenou délku scény. Veličina $qc$ v elektronvoltech spojuje přenos hybnosti $q$ s rychlostí světla. Odhad $\\Delta x$ je rozlišení hypotetické sondy. Hranice grafu nepředstavuje změřenou mez struktury."
+  "Zorné pole $L$ je šířka zobrazeného výřezu v metrech. V příkladu rozptylu dopadá foton na elektron v klidu a elektron získá rozdíl mezi hybností fotonu před rozptylem a po něm. Veličina $qc$ v elektronvoltech je velikost tohoto přenosu vynásobená rychlostí světla. Graf dává odhad rozlišení hypotetické sondy $\\Delta x$. Mez struktury elektronu se určuje z výsledků skutečných rozptylových měření."
 ];
 const ElectronDerivations=[
   [
@@ -32,16 +32,14 @@ const ElectronDerivations=[
     "\\mu=\\frac{m_em_p}{m_e+m_p},\\quad a_\\mu=\\frac{\\hbar^2}{\\mu\\kappa},\\quad h\\nu=|E_f-E_i|"
   ],
   [
-    "v_{\\rm g}=\\mathrm d\\omega/\\mathrm dk,\\quad v_{\\rm f}=\\omega/k,\\quad \\omega=\\hbar k^2/(2m_e)"
+    "\\lambda_{\\text{pro oběh}}=2\\pi\\sqrt{a_\\mu r},\\quad 2\\pi r/\\lambda_{\\text{pro oběh}}=\\sqrt{r/a_\\mu}"
   ],
   [
     "\\left[-\\frac{\\hbar^2}{2\\mu}\\nabla^2-\\frac{\\kappa}{r}\\right]\\psi=E\\psi,\\quad \\rho=\\frac{2r}{na_\\mu}",
     "R_{n\\ell}=\\sqrt{\\left(\\frac{2}{na_\\mu}\\right)^3\\frac{(n-\\ell-1)!}{2n(n+\\ell)!}}\\,e^{-\\rho/2}\\rho^\\ell L_{n-\\ell-1}^{2\\ell+1}(\\rho)",
     "Y_\\ell^m=N_{\\ell m}P_\\ell^m(\\cos\\theta)e^{im\\varphi}"
   ],
-  [
-    "2d\\sin\\theta_{\\rm B}=n\\lambda,\\quad I=\\left|\\sum_j e^{i(\\mathbf k_f-\\mathbf k_i)\\cdot\\mathbf R_j}\\right|^2"
-  ],
+  [],
   [
     "E_k^{\\rm NR}=p^2/(2m_e),\\quad E_k^{\\rm rel}=E_+-m_ec^2"
   ],
@@ -89,7 +87,9 @@ const ElectronBibliography=[
   "Shianjeng, Quantum Wave Lab",
   "Francisco Kim, DoubleSlitSimulator",
   "NIST, Atomic Spectra Database",
-  "C. D. Anderson (1933), The Positive Electron"
+  "C. D. Anderson (1933), The Positive Electron",
+  "P. A. M. Dirac (1931), Quantised Singularities in the Electromagnetic Field",
+  "ATLAS, CERN (2021), New Insight into the Internal Structure of the Proton"
 ];
 
 const ElectronComparison=[

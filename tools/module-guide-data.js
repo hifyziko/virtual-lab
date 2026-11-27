@@ -2,6 +2,7 @@
 (() => {
  'use strict';
  const sources = {
+  inverter:'Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 6.2–6.4, s. 65–72.',
   magnetic:'Bartoš: Teorie elektrických strojů, str. 6–7 (magnetický obvod a tokové vazby); Fitzgerald: Electric Machinery, kap. 1.2–1.4 (materiály a střídavé buzení).',
   energy:'Chmelík: kap. 33–34, tištěné str. 110 a 113 (napěťová a pohybová rovnice); Fitzgerald: Electric Machinery, kap. 3 (síla, moment a energetická bilance).',
   transformer:'Fitzgerald: Electric Machinery, kap. 2.2–2.5 a 2.7 (transformátor a náhradní schéma).',
@@ -73,10 +74,10 @@
   ['Měňte zátěž a porovnávejte napětí, proudy a úbytky na prvcích schématu.','Sledujte zvlášť příčnou větev a podélné impedance.'],
   ['Příčná větev reprezentuje magnetování a ztráty v železe; podélné prvky odpor vinutí a rozptyl.','Přepočet na jednu stranu zachovává výkonovou bilanci; přepočtený proud není skutečný proud druhého vinutí.'],null,['tr04-pricna-vetev','tr05-rozptylova-reaktance']);
  add('tr04-pricna-vetev','transformer',
-  ['Měňte parametry magnetizační větve a porovnávejte složky proudu naprázdno.','Propojte náhradní schéma s vykresleným polem a energetickým pokusem.'],
+  ['Posuňte ovladač od ideálního ke skutečnému jádru a sledujte, jak konečná permeabilita zvyšuje potřebné magnetické napětí a proud naprázdno.','Přidejte odporovou zátěž a sledujte, jak se v náhradním schématu objeví proud sekundáru.'],
   ['Magnetizační proud vytváří tok. Činná složka proudu naprázdno kryje zejména ztráty v železe.','Lineární náhradní větev je aproximace pracovního bodu; sama nevystihuje hysterezi ani proudové špičky při nasycení.'],null,['tr02-magnetizacni','mag03-hysterezni-ztraty']);
  add('tr05-rozptylova-reaktance','transformer',
-  ['Měňte zatížení a sledujte rozptylové pole i úbytky napětí.','Porovnejte tok společný oběma vinutím s tokem vázaným pouze na část soustavy.'],
+  ['Zvětšete rozptylovou indukčnost a sledujte, jak roste sériová reaktance. Připojte odporovou zátěž a porovnejte úbytky napětí po objevení proudu sekundáru.','Porovnejte tok společný oběma vinutím s tokem vázaným pouze na část soustavy.'],
   ['Rozptyl představuje energii pole, která se neúčastní ideální společné vazby obou vinutí.','Rozptylová reaktance způsobuje úbytek napětí a omezuje zkratový proud. Sama ideální reaktance činný výkon nespotřebovává.'],String.raw`X_\sigma=\omega L_\sigma`,['tr03-schema','tr08-zkratovy-proud']);
  add('tr06-hodinove-cislo','transformer',
   ['Přepínejte zapojení vinutí a porovnávejte fázory příslušných sdružených napětí.','Sledujte orientaci vinutí a sled fází; teprve potom odečítejte hodinové číslo.'],
@@ -115,8 +116,8 @@
   ['Měňte časové a prostorové harmonické odděleně.','Porovnávejte průběh v pevném místě s obrazem pole po obvodu v jednom okamžiku.'],
   ['Časový řád určuje časový kmitočet, prostorový řád počet pólových dvojic.','Stejný prostorový tvar může mít při jiném časovém kmitočtu jinou rychlost pohybu.'],null,['03-pohyb','tocive-pole']);
  add('08-zesikmeni','winding',
-  ['Měňte zešikmení a sledujte skládání příspěvků podél délky stroje.','Porovnejte potlačení drážkové harmonické s poklesem základní vlny.'],
-  ['Axiálně posunuté řezy dávají různě natočené příspěvky, které se mohou vzájemně rušit.','Zešikmení není bez následků pro základní složku a nenahrazuje úplný výpočet ztrát nebo momentového zvlnění.'],null,['05-drazkove','04-cinitel']);
+  ['Přesuňte vlny z řezů na společnou osu. Zelená vlna nahoře odpovídá začátku a červená polovině délky. Čárkovaná šedá vlna ukazuje stav bez zešikmení. Zlatá čára sleduje jednu drážku.','Zvolte zešikmení o jednu drážkovou rozteč. Porovnejte potlačení drážkové harmonické s poklesem základní vlny. V režimu Celá tyč A–C sledujte součet místních příspěvků k napětí mezi svorkami.'],
+  [String.raw`Vlny jednotlivých řezů zůstávají. Při rozpětí fáze \(360^\circ\) jsou příspěvky ze začátku a poloviny délky opačné. Spodní zelená křivka je průměr příspěvků všech řezů po celé délce.`,'Axiálně posunuté řezy dávají příspěvky s různou fází. Zešikmení zeslabí i základní složku. Úplný výpočet ztrát a momentového zvlnění vyžaduje podrobnější model.'],null,['05-drazkove','04-cinitel']);
  add('am01-princip','induction',
   ['Porovnejte stojící rotor s rotorem blízko rychlosti pole.','Při stejném skluzu změňte odpor klece. Potom nastavte synchronní otáčky a porovnejte magnetická napětí a spřažené toky.'],
   ['Proud v rotoru vzniká díky relativnímu pohybu vůči poli.','Při přesně synchronní rychlosti ideální základní vlna neindukuje rotorový proud, a proto nevytváří asynchronní moment.'],String.raw`s=\frac{n_s-n}{n_s}`,['am02-momentova-charakteristika','10-asynchronni']);
@@ -133,7 +134,7 @@
   ['Spusťte rozběh z klidu a sledujte pracovní bod na momentové charakteristice.','Změňte zátěž a sledujte, při kterých otáčkách se hnací a zatěžovací moment vyrovnají.'],
   ['Frekvence rotorového proudu je určena relativním pohybem pole vůči rotoru.','Zvětšené řezy a značky proudů slouží názornosti; jejich geometrie není výrobním výkresem.'],String.raw`f_2=|s|f_1`,['am01-princip','03-pohyb']);
  add('sm01-princip','synchronous',
-  ['Měňte vzájemné natočení polí a porovnávejte směr momentu.','Porovnejte generátorický a motorický pracovní bod.'],
+  ['Měňte vzájemné natočení polí a porovnávejte směr momentu.','Spusťte Běh se zátěží a porovnejte oba směry momentu na hřídeli. Kladná hodnota stroj zatěžuje, záporná jej pohání jako generátor. Sledujte, jak se při změně zatížení mění úhel mezi rotorem a polem.'],
   ['V synchronním ustáleném stavu se rotor a základní pole otáčejí stejnou rychlostí, ale mezi jejich osami zůstává zátěžný úhel.','Znaménko momentu a výkonu čtěte v motorické konvenci projektu; samotné natočení obrázku neurčuje tok energie.'],null,['sm02-schema','sm07-dq']);
  add('sm07-dq','synchronous',
   ['Táhněte směrem magnetického napětí a porovnávejte podélný a příčný příspěvek.','Sledujte základní harmonickou i deformovaný průběh v mezeře.'],
@@ -193,7 +194,7 @@
   ['Měňte napětí, zatížení a buzení a propojujte pracovní bod se schématem.','Sledujte pořadí změn proudu, momentu a rychlosti po změně zatížení.'],
   ['Zatížení nezvyšuje proud přímo bez vazby na pohyb: pokles rychlosti sníží indukované napětí a změní napěťovou bilanci.','Odbuzení může zvýšit rychlost, ale při stejném proudovém limitu snižuje dostupný moment.'],String.raw`u_a=R_a i_a+L_a\frac{\mathrm di_a}{\mathrm dt}+u_i`,['dc01-princip','em04-premena']);
  add('dc16-bldc-poloha','bldc',
-  ['Při otáčení rotoru sledujte tři značky Hallových sond ve statoru. Vyplněná značka znamená logickou jedničku.','Použijte podržení dvojice fází a sledujte vztah polohy rotoru k dalšímu přepnutí.'],
+  ['Otočte rotorem a sledujte Hallovy sondy. Kroužky označí polohy tří sond ve statoru. Vyplněná značka uvnitř kroužku znamená logickou jedničku. V grafu sledujte změnu signálů.','Při otáčení sledujte sepnuté tranzistory v můstku, proudovou cestu a graf fázových proudů. Podržte dvojici fází a otočte rotorem. Kód sond se dál mění, sepnutá dvojice zůstává stejná.'],
   ['Snímač polohy může poskytovat informaci i při stání. Odhad z pohybového indukovaného napětí potřebuje dostatečnou rychlost.','Průchod napětí nulou a okamžik další komutace nejsou totožné události. Porovnání hvězdy a trojúhelníku vyžaduje rozlišit fázové a napájecí veličiny.'],null,['dc03-schema','dc15-bldc','sm09-pmsm-phasor']);
  add('dc15-bldc','bldc',
   ['Krokujte šest komutačních stavů a sledujte sepnuté tranzistory a vodivou cestu.','Porovnávejte proudy fází s indukovaným napětím a momentem.'],
@@ -257,6 +258,25 @@
   ['Začněte před pohybem a zvolte Vznik ohybu. Porovnejte bílé siločáry s původním polem; zelený kruh vyznačuje čelo změny.','Zvolte Vlna odchází. Vpravo sledujte magnetické pole, jeho znaménko a směr. Přepněte na dipólovou anténu nebo prostorový detail.'],
   ['Vzdálené pole odpovídá dřívějšímu pohybu náboje. Změna se šíří konečnou rychlostí světla; siločáry nejsou hmotná vlákna.','Model počítá retardované pole pohybujících se bodových nábojů. Neřeší impedanci ani rezonanci antény; prostorový detail je rovinné přiblížení.'],String.raw`\mathbf S=\frac{1}{\mu_0}\mathbf E\times\mathbf B`,['em01-indukovane-napeti','em03-silove-ucinky']);
  sources.electron='J. J. Thomson, Cathode Rays (1897). E. Rutherford, The Scattering of α and β Particles by Matter and the Structure of the Atom (1911). Další zdroje jsou u jednotlivých etap.';
+ sources["kus-diody"]="Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 4.2.3–4.2.5, obr. 4-5 až 4-7.";
+ add("em09-diody","kus-diody",["Zvolte trojfázové uzlové spojení.","Posuňte kurzor přes průsečík dvou fázových napětí. Která dioda převzala proud? Porovnejte průběh na zátěži s jednofázovým můstkovým spojením."],["V trojfázovém uzlovém spojení komutuje proud na následující diodu v průsečíku kladných půlvln fázových napětí.","Na zátěži je napětí fáze, jejíž dioda vede proud."],null,[]);
+ sources["kus-tyristory"]="Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 4.3.4–4.4, obr. 4-12 a 4-15.";
+ add("em10-tyristory","kus-tyristory",["Zvětšujte úhel řízení. Vyberte zátěž s protinapětím, nastavte jeho zápornou hodnotu a zvětšete indukčnost.","Sledujte, zda je proud nepřerušovaný, a porovnejte znaménka středního napětí a proudu."],["Změnou okamžiku zapnutí tyristoru se mění úhel řízení a střední hodnota usměrněného napětí.","Při nepřerušovaném kladném proudu a záporném středním napětí se energie předává ze stejnosměrné strany na střídavou."],"U_d=U_{d0}\\cos\\alpha",[]);
+ sources["kus-pwm"]="Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 5.1 a 5.4, obr. 5-2 a 5-5, a 6.4.2, obr. 6-10.";
+ add("em11-pwm","kus-pwm",["Zvolte konstantní řídicí napětí.","Na horním průběhu najděte okamžik rovnosti obou napětí a pod ním změnu výstupního napětí. Prodlužte poměrnou dobu sepnutí a odečtěte střední hodnotu napětí. Přepněte z odporu na odpor a indukčnost. Při stejné poměrné době sepnutí zvyšte kmitočet spínání a porovnejte zvlnění proudu. Nakonec zvolte sinusový řídicí signál a sledujte šířku jednotlivých pulzů."],["Řídicí sinusový signál má frekvenci odpovídající požadované výstupní frekvenci střídače.","V komparátoru se porovnává řídicí napětí s nosným signálem pilovitého charakteru. Podle výsledku porovnání jsou jednotlivé spínače spínány nebo vypínány."],"D=T_1/T,\\qquad U_{\\text{stř}}=D\\,U_d",[]);
+ sources["kus-pulzni"]="Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 5.1–5.2, obr. 5-2 a 5-3.";
+ add("em12-pulzni","kus-pulzni",["Vyberte měnič pro snižování napětí.","Porovnejte proud v době sepnutí a v době vypnutí spínače. Zvětšete poměrnou dobu sepnutí a odečtěte výstupní napětí. Pokus zopakujte u měniče pro zvyšování napětí."],["Při sepnutí spínače přechází energie ze zdroje do zátěže a část se akumuluje v indukčnosti.","Po vypnutí se energie nahromaděná v indukčnosti uvolní. Proud se uzavírá přes nulovou diodu."],"U_{2,\\text{sniž}}=D U_1,\\qquad U_{2,\\text{zvyš}}=U_1/(1-D)",[]);
+ sources["kus-jednofazovy"]="Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 6.2–6.2.2, s. 65, a 6.4.2, obr. 6-10.";
+ add("em13-jednofazovy","kus-jednofazovy",["Při obdélníkovém řízení vyhledejte změnu polarity napětí.","Porovnejte průchod proudu nulou při ohmické zátěži a při zatížení do odporu a indukčnosti. Sledujte ve schématu, kdy vedou nulové diody."],["Spínáním spínačů je u napěťových střídačů vytvářen průběh výstupního napětí.","Průběh proudu je následně dán charakterem zátěže. Při zatížení do odporu a indukčnosti převezmou po vypnutí spínačů vedení proudu nulové diody."],null,[]);
+ sources["kus-stridavy"]="Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 7, obr. 7-1 a 7-2, s. 77–79.";
+ add("em14-stridavy","kus-stridavy",["Zvolte odporovou zátěž. Zvětšujte úhel řízení a odečítejte efektivní hodnotu výstupního napětí.","Pak připojte odpor a indukčnost. Porovnejte okamžik průchodu napětí nulou s okamžikem zániku proudu."],["Střídavé měniče napětí se používají k řízení napětí, proudu a výkonu střídavé zátěže.","Základním zapojením jsou dva antiparalelně spojené tyristory."],null,[]);
+ sources["kus-kmitocet"]="Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 8.2.1, obr. 8-3, a 12.5.5.";
+ add("em15-kmitocet","kus-kmitocet",["Snižte výstupní kmitočet. Porovnejte periody napětí před meziobvodem a za střídačem.","Přepněte z konstantního napětí na konstantní poměr napětí a kmitočtu. Sledujte amplitudu výstupního napětí."],["V usměrňovači se usměrní napájecí napětí vstupního kmitočtu.","Střídač vytváří střídavé napětí požadovaného výstupního kmitočtu. Oba střídavé obvody odděluje stejnosměrný meziobvod. Výstupní kmitočet lze řídit nezávisle na vstupním."],"U_{a1}/f=\\mathrm{konst.}",[]);
+ sources["kus-aktivni"]="Václav Kůs, Elektrické pohony a výkonová elektronika, kap. 4.9, s. 52–53, a 9, s. 86–93.";
+ add("em16-aktivni","kus-aktivni",["Porovnejte proud téže fáze u neřízeného a pulzního usměrňovače.","Přepněte zapojení a odečtěte střední činný výkon fáze. Změňte odpor zátěže a porovnejte oba průběhy znovu."],["U pulzního usměrňovače se vhodným spínáním tranzistorů dosahuje přibližně sinusového průběhu odebíraného proudu.","Současně se požaduje odběr proudu první harmonické s dobrým účiníkem."],"p_a=u_a i_a",[]);
+ add('em08-stridac','inverter',
+  ['Zpomalte přehrávání obdélníkového řízení a při zastaveném kurzoru přepojte sondy ze středu meziobvodu na uzel zátěže.','Zvolte sinusovou PWM. Při stejné výstupní frekvenci zvyšte spínací frekvenci a porovnejte zvlnění proudu.'],
+  ['U napěťového střídače je průběh výstupního napětí vytvářen spínáním spínačů. Průběh proudu je dán charakterem zátěže.','Při zatížení do odporu a indukčnosti mohou po vypnutí spínačů převzít vedení proudu nulové diody.'],null,[]);
  add('em07-elektron','electron',
   ['Vyber etapu na časové ose a otáčej modelem vlevo. Měň podmínky pokusu a sleduj odečet v grafu.','V rozptylu porovnej dva způsoby rozložení kladného náboje. U dvojštěrbiny přidávej jednotlivé zásahy na detektoru.'],
   ['Velké odchylky částic alfa ukazují na soustředěný kladný náboj. Spektrum vodíku ukazuje přechody mezi diskrétními energiemi.','Orbital ukazuje rozložení pravděpodobnosti měření. Na dvojštěrbině se v jednotlivých zásazích postupně projeví interference.'],null,['em06-vlna']);

@@ -30,11 +30,19 @@ function secondL(){return C.L2_2*(n2()/2)**2;}
 function maths(){if(!window.katex)return;document.querySelectorAll('[data-tex]').forEach(node=>{const t=node.dataset.tex;if(node.dataset.done===t)return;try{window.katex.render(t,node,{throwOnError:false,displayMode:node.dataset.display==='1'});node.dataset.done=t;}catch(err){node.textContent=t}});}
 window.addEventListener('katex-ready',maths);
 function mark(id,formula){$(id).setAttribute('data-tex',formula);maths()}
-function renderSourceCoils(){const g=$('sourceCoils');g.replaceChildren();for(let ix of C.x1){let points=[];for(let j=0;j<=96;j++){let t=2*PI*j/96;points.push(project([ix,C.r1*Math.cos(t),C.r1*Math.sin(t)]));}drawRing(g,points,true)}
- svg('text',{x:ORX,y:415,'font-size':14,fill:'#36505b','text-anchor':'middle','font-weight':700},$('sceneText'),'Cívka 1 · budicí');
- svg('text',{x:ORX+SCALE*C.d-75,y:415,'font-size':14,fill:'#36505b','text-anchor':'start','font-weight':700},$('sceneText'),'Cívka 2 · rozpojená');
- svg('text',{x:36,y:29,'font-size':19,fill:'#668089','text-anchor':'start','font-weight':600},$('sceneText'),'Magnetické napětí Uₘ = N₁ i₁ = '+fmt(n1()*I,1)+' A');
- svg('text',{x:ORX+SCALE*C.d-75,y:438,'font-size':17,fill:'#64858b','text-anchor':'start'},$('sceneText'),'2 zobrazené závity, N₂ efektivních');
+// Fit the physical cross-section uniformly; move its captions and inset into
+// the available height instead of stretching the coil geometry.
+function sceneFrame(){
+ const el=$('scene'),ratio=el.clientWidth/Math.max(1,el.clientHeight);
+ if(!(ratio>0))return {left:0,top:0,width:660,height:450};
+ const width=clamp(450*ratio,575,660),height=Math.max(450,width/ratio);
+ return {left:0,top:(450-height)/2,width,height};
+}
+function renderSourceCoils(frame=sceneFrame()){const g=$('sourceCoils');g.replaceChildren();for(let ix of C.x1){let points=[];for(let j=0;j<=96;j++){let t=2*PI*j/96;points.push(project([ix,C.r1*Math.cos(t),C.r1*Math.sin(t)]));}drawRing(g,points,true)}
+ svg('text',{x:ORX,y:415-frame.top,'font-size':14,fill:'#36505b','text-anchor':'middle','font-weight':700},$('sceneText'),'Cívka 1 · budicí');
+ svg('text',{x:ORX+SCALE*C.d-75,y:415-frame.top,'font-size':14,fill:'#36505b','text-anchor':'start','font-weight':700},$('sceneText'),'Cívka 2 · rozpojená');
+ svg('text',{x:18,y:29+frame.top,'font-size':19,fill:'#668089','text-anchor':'start','font-weight':600},$('sceneText'),'Magnetické napětí Uₘ = N₁ i₁ = '+fmt(n1()*I,1)+' A');
+ svg('text',{x:ORX+SCALE*C.d-75,y:438-frame.top,'font-size':17,fill:'#64858b','text-anchor':'start'},$('sceneText'),'2 zobrazené závity, N₂ efektivních');
 }
 function drawRing(g,pts,source=false){
  if(true){
@@ -118,8 +126,13 @@ function drawInset(g,a,current){
  svg('text',{x:cx,y:cy+43,fill:bn<0?'#a64bb4':'#b35f21','font-size':11,'font-weight':750,'text-anchor':'middle'},g,'B₁·n₂ = '+fmt(bn*1e6,1)+' µT');
 }
 function scene(a,current){
+ const frame=sceneFrame();
+ $('scene').setAttribute('viewBox',[frame.left,frame.top,frame.width,frame.height].join(' '));
+ const clip=$('sceneClip').querySelector('rect');
+ clip.setAttribute('y',frame.top+36);clip.setAttribute('width',frame.width-30);
+ clip.setAttribute('height',frame.height-90);
  I=current;angle=a;let rad=a*PI/180, n=ringNormal(rad);
- $('sourceCoils').replaceChildren();$('sceneText').replaceChildren();renderSourceCoils();
+ $('sourceCoils').replaceChildren();$('sceneText').replaceChildren();renderSourceCoils(frame);
  const disk=$('receiveDisk'),vec=$('fieldSamples'),c2=$('receiveCoils');disk.replaceChildren();vec.replaceChildren();c2.replaceChildren();
  let surf=[];for(let j=0;j<=100;j++){let t=2*PI*j/100;surf.push(project(receivePoint(rad,0,C.r2,t)));}
  let phi=baseM(a)*(n1()/2)*(n2()/2)*current;let rel=clamp(Math.abs(baseM(a))/Math.abs(C.M0_2),0,1);
@@ -149,7 +162,7 @@ function scene(a,current){
  svg('text',{x:nP.x+9,y:nP.y-6,fill:'#647b84','font-size':13,'font-weight':700},vec,'n₂');
  for(let xi of C.x2){let ring=[];for(let j=0;j<=120;j++){let t=2*PI*j/120;ring.push(project(receivePoint(rad,xi,C.r2,t)));}drawRing(c2,ring);}
  // Enlargement of the normal component: a geometric measurement, not a color-coded guess.
- const detail=svg('g',{transform:'translate(0 -35)'},c2);drawInset(detail,a,current);
+ const detail=svg('g',{transform:'translate('+(frame.width-660)+' '+(frame.top-8)+')'},c2);drawInset(detail,a,current);
  return phi;
 }
 function graph(curves,xmarker,axis='percent',scales=[1,1],units=['','']){
@@ -263,7 +276,7 @@ function init(){
  document.querySelectorAll('input[type=range]').forEach(e=>e.addEventListener('input',()=>{if(e.id==='phase'){phase=Number(e.value)/1000;run=false;setData('play', '▶ Přehrát');}render();}));
  let play=$('play');if(play)play.onclick=()=>{run=!run;play.textContent=run?'Ⅱ Pozastavit':'▶ Přehrát';};
  maths();render();requestAnimationFrame(currentSignField);
- if(MODULE==='EM02'||document.body.dataset.voltage){let lastSize='',queued=false;const observer=new ResizeObserver(()=>{const box=$('chart').getBoundingClientRect(),size=box.width.toFixed(2)+'/'+box.height.toFixed(2);if(size===lastSize||queued)return;lastSize=size;queued=true;requestAnimationFrame(()=>{queued=false;render()})});observer.observe(document.querySelector('.chartBox'));document.fonts.ready.then(()=>render())}
+ if(MODULE==='EM02'||document.body.dataset.voltage){let lastSize='',queued=false;const observer=new ResizeObserver(()=>{const box=$('chart').getBoundingClientRect(),size=[box.width,box.height,$('scene').clientWidth,$('scene').clientHeight].map(v=>v.toFixed(2)).join('/');if(size===lastSize||queued)return;lastSize=size;queued=true;requestAnimationFrame(()=>{queued=false;render()})});observer.observe(document.querySelector('.chartBox'));observer.observe(document.querySelector('.sceneBox'));document.fonts.ready.then(()=>render())}
  function frame(t){if(!lastT)lastT=t;let dt=Math.min(.045,(t-lastT)/1000);lastT=t;
   if(run&&MODULE==='EM01'&&!document.body.classList.contains('rod-view-active')){
     let rate=mode==='transform'?.12:Number($('omega').value)/360;

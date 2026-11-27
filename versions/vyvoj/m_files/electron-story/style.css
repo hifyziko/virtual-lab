@@ -50,12 +50,44 @@ aside h2 { margin-bottom: 3px; }
 aside label { display: block; font-size: 13px; }
 aside label output { float: right; color: #245d70; }
 aside label:has(input[data-snapped]) output { color: #08765d; font-weight: 650; }
+aside .photon-control { display: grid; grid-template-columns: minmax(0, 1fr) 80px; align-items: center; gap: 0 6px; }
+.photon-control output { text-align: right; white-space: nowrap; }
+.photon-control input { grid-column: 1 / -1; }
 aside select, aside input { display: block; width: 100%; margin: 2px 0 0; min-width: 0; }
 aside select { padding: 3px 4px; }
+.hydrogen-levels { min-width: 0; margin: 0 0 4px; padding: 0; border: 0; display: grid; gap: 4px; }
+.hydrogen-levels legend { margin-bottom: 4px; padding: 0; font-size: 13px; font-weight: 650; }
+aside .hydrogen-levels label { display: flex; align-items: center; gap: 7px; min-height: 28px; padding: 3px 7px; border: 1px solid #d9e4eb; border-radius: 6px; color: var(--level-color); background: #fff; cursor: pointer; }
+.hydrogen-levels label:has(input:checked) { background: var(--level-tint); border-color: var(--level-color); font-weight: 650; }
+.hydrogen-levels label > :last-child { margin-left: auto; white-space: nowrap; }
+.hydrogen-levels input[type="radio"] { flex: none; width: auto; margin: 0; accent-color: var(--level-color); }
+.orbital-presets { min-width: 0; margin: 0; padding: 0; border: 0; display: grid; gap: 4px; }
+.orbital-presets legend { margin-bottom: 4px; padding: 0; font-weight: 650; }
+aside .orbital-presets label { display: grid; grid-template-columns: auto 25px 1fr; align-items: center; gap: 6px; min-height: 29px; padding: 3px 7px; border: 1px solid #d9e4eb; border-radius: 6px; cursor: pointer; }
+.orbital-presets label:has(input:checked) { background: #e9f4f8; border-color: #558497; color: #214c60; }
+.orbital-presets input[type="radio"] { width: auto; margin: 0; accent-color: #245e70; }
+aside .orbital-cut-toggle { display: flex; align-items: center; gap: 6px; min-height: 27px; }
+.orbital-cut-toggle input, .compact-radio-options input { width: auto; margin: 0; accent-color: #245e70; }
+#orbitalSection { display: grid; gap: 5px; }
+.compact-radio-options { min-width: 0; margin: 0; padding: 0; border: 0; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; }
+.compact-radio-options.dirac-field { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.compact-radio-options legend { margin-bottom: 3px; padding: 0; font-size: 13px; }
+aside .compact-radio-options label { display: flex; justify-content: center; align-items: center; gap: 4px; padding: 4px; border: 1px solid #d9e4eb; border-radius: 5px; cursor: pointer; }
+.compact-radio-options label:has(input:checked) { border-color: #558497; background: #e9f4f8; }
+#orbitalOptions { margin-top: 3px; min-width: 0; }
+#orbitalOptions summary { cursor: pointer; color: #365566; font-weight: 600; font-size: 13px; }
+#orbitalOptions label { margin-top: 5px; }
 input[type="range"] { accent-color: #287d8a; }
 #actions, .transport { display: flex; gap: 4px; flex-wrap: wrap; }
 aside button { font-size: 12px; }
 #play { color: white; background: #245e70; border-color: #245e70; }
+#actions[data-bohr] { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+#actions[data-bohr] > button { white-space: nowrap; min-height: 28px; padding-inline: 4px; }
+#bohrStart { background: #245e70; border-color: #245e70; color: white; }
+#bohrStart:hover:not(:disabled) { background: #1b4d60; }
+#bohrTarget, #bohrFeedback { grid-column: 1 / -1; min-height: 18px; color: #405b66; font-size: 12px; white-space: nowrap; }
+#bohrTarget { font-weight: 650; }
+#actions[data-bohr] ~ #reading > div { min-height: 17px; white-space: nowrap; }
 #reading:not(:empty) { margin-top: 4px; border-top: 1px solid #dae5e8; padding-top: 6px; display: grid; gap: 4px; font-size: 13px; }
 .work { min-height: 0; display: grid; grid-template-rows: minmax(0, 2.15fr) minmax(0, 1fr); gap: var(--lesson-gap, 5px); }
 .views { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.62fr); gap: var(--lesson-gap, 5px); min-height: 0; }
@@ -66,6 +98,7 @@ aside button { font-size: 12px; }
 .scene > svg, .chart .plot > svg { display: block; width: 100%; height: 100%; min-height: 0; min-width: 0; overflow: hidden; }
 .scene > svg { touch-action: none; cursor: grab; }
 .scene > svg:active { cursor: grabbing; }
+#modelCanvas[data-flat] { cursor: ns-resize; touch-action: none; }
 .vector-label { font: 600 13px 'Segoe UI', sans-serif; fill: #294b60; stroke: #f9fcff; stroke-width: 3px; paint-order: stroke; stroke-linejoin: round; }
 .scene-tools { min-height: 37px; display: flex; justify-content: space-between; align-items: center; gap: 7px; padding: 4px 8px; border-top: 1px solid #dce7ec; background: #f8fbfcd9; font-size: 12px; }
 .camera { display: flex; flex: none; gap: 3px; }
@@ -79,7 +112,9 @@ progress { width: 100%; height: 20px; accent-color: #287d8a; }
 #chartLegend li { display: inline-flex; align-items: center; gap: 5px; }
 #chartLegend li::before { content: ''; width: 12px; height: 2px; background: var(--legend-color); }
 #chartLegend .legend-bar::before { width: 9px; height: 9px; }
+#chartLegend .legend-dash::before { height: 0; background: none; border-top: 2px dashed var(--legend-color); }
 .plot { position: relative; min-height: 0; }
+#graph[data-tune] { cursor: ew-resize; touch-action: none; }
 #ticks, #axes { position: absolute; inset: 0; pointer-events: none; }
 #ticks > span, #axes > span { position: absolute; color: #365566; white-space: nowrap; }
 #ticks > span { font-size: 12px; }

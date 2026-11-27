@@ -1,6 +1,6 @@
 main {gap:8px}
 .toolbar, article {border:1px solid #ded2e8;border-radius:13px;background:white;padding:13px 16px}
-.toolbar {display:grid;grid-template-columns:auto 1fr 1fr auto;align-items:center;gap:22px}
+.toolbar {display:grid;grid-template-columns:auto 1fr 1fr auto;align-items:center;gap:6px;padding:4px 7px}
 .toolbar b,.toolbar label {font-size:14px}
 .toolbar label {display:block}
 .toolbar input {accent-color:#725198}

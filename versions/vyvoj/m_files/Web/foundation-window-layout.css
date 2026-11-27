@@ -11,6 +11,9 @@ main.uniform-module-layout{--module-flexible-height:1;min-height:var(--module-ho
 .hf-embedded #ctrlGrid .ctrl{flex:1 1 0}
 .hf-embedded #ctrlGrid .ctrl:has(.selector){flex:0 0 auto}
 .hf-embedded #hfPanel .ctrl label{font-size:12px;margin-bottom:2px}
+.hf-embedded #ctrlGrid .ctrl:has(#gapCtl){flex-grow:1.45}
+.hf-embedded #hfPanel label:has(output){display:flex;align-items:baseline;justify-content:space-between;gap:3px;flex-wrap:nowrap;white-space:nowrap}
+.hf-embedded #hfPanel .ctrl output{white-space:nowrap}
 .hf-embedded #hfPanel .selector{margin-top:2px;gap:3px}
 .hf-embedded #hfPanel .pill,.hf-embedded #hfPanel .pill[data-setting="sign"]{padding:3px 4px;font-size:11px}
 .hf-embedded #hfPanel .barline{flex:none;align-self:center;border:0;padding:0}
@@ -43,7 +46,7 @@ main.uniform-module-layout:has(#hardness)>.layout{flex:1 1 0;min-height:0}
 main.uniform-module-layout:has(#hardness)>.layout>.card{display:flex;flex-direction:column;min-height:0;padding:10px;gap:4px}
 main.uniform-module-layout:has(#hardness) .chart{height:0;min-height:100px;max-height:none;flex:1 1 0}
 main.uniform-module-layout:has(#hardness) .layout>.card>:not(.chart){flex-shrink:0}
-main.uniform-module-layout:has(#hardness) .controls{padding:10px 12px}
+main.uniform-module-layout:has(#hardness) .controls{padding:var(--lesson-control-padding)}
 main.uniform-module-layout:has(#hardness) .equations>.card{padding:10px}
 main.uniform-module-layout:has(#hardness) .formula{font-size:20px;line-height:1.35;margin:5px 0}
 main.uniform-module-layout:has(#hardness) .energy{padding:8px;margin-top:4px}

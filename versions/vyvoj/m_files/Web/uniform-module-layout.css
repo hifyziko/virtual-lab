@@ -21,7 +21,7 @@ body.em-lesson #modeExpl{min-height:5.6em}
 :is(main,.workspace).uniform-module-layout{font-family:system-ui,"Segoe UI",sans-serif;font-size:var(--lesson-text);line-height:1.45;max-width:var(--lesson-width)!important}
 :is(main,.workspace).uniform-module-layout :is(.tiny,.miniNote,.note,.carddesc,.descline,.matrix-note){font-size:13px;line-height:1.45}
 :is(main,.workspace).uniform-module-layout :is(.equation,.formula,.eqRow)>:is(p,span)>.katex{font-size:var(--lesson-math)}
-:is(main,.workspace).uniform-module-layout :is(.controlbox,.controls){padding:10px 12px}
+:is(main,.workspace).uniform-module-layout :is(.controlbox,.controls){padding:var(--lesson-control-padding)}
 :is(main,.workspace).uniform-module-layout :is(.card,.panel){min-width:0}
 @media(max-width:700px){:is(main,.workspace).uniform-module-layout{max-width:100%!important}}
 
@@ -31,9 +31,9 @@ body.em-lesson #modeExpl{min-height:5.6em}
 
 /* Hysteresis: reserve text/control rows and let the drawings use the remaining
    height. Preserve each SVG viewBox; no cropped content or internal scrolling. */
-main.uniform-module-layout:has(#zoomWall){display:grid;grid-template-rows:100px minmax(0,1fr) 64px 36px;gap:12px;overflow:visible;padding:5px 0 6px!important}
+main.uniform-module-layout:has(#zoomWall){display:grid;grid-template-rows:auto minmax(0,1fr) 64px 36px;gap:var(--lesson-gap);overflow:visible;padding:5px 0 6px!important}
 main.uniform-module-layout:has(#zoomWall)>.hero,main.uniform-module-layout:has(#zoomWall)>#launchInfo{display:none!important}
-main.uniform-module-layout:has(#zoomWall)>.controls{grid-row:1;margin:0;padding:10px 12px;min-height:0;grid-template-columns:minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1fr);align-items:center}
+main.uniform-module-layout:has(#zoomWall)>.controls{grid-row:1;margin:0;padding:var(--lesson-control-padding);min-height:0;grid-template-columns:minmax(0,1.2fr) minmax(0,1.1fr) minmax(0,1fr);align-items:center}
 main.uniform-module-layout:has(#zoomWall)>.layout{grid-row:2;min-height:0;height:100%;grid-template-columns:minmax(0,1.05fr) minmax(0,.73fr) minmax(0,1.2fr);align-items:stretch}
 main.uniform-module-layout:has(#zoomWall)>.layout>.card{display:flex;flex-direction:column;gap:8px;min-height:0;height:100%;grid-column:auto;overflow:visible}
 main.uniform-module-layout:has(#zoomWall) .card>svg{flex:1 1 0;min-height:0;height:0;max-height:none;width:100%;display:block;object-fit:contain}
@@ -47,7 +47,9 @@ main.uniform-module-layout:has(#zoomWall){--module-flexible-height:1;height:var(
 /* A predictable back-link row, independent of title length and action buttons. */
 #app :is(.workspace>.modulehead,.module-window-heading){display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:12px;row-gap:6px;margin:0 0 var(--lesson-header-gap);min-width:0;width:100%;box-sizing:border-box}
 #app :is(.workspace>.modulehead,.module-window-heading)>a.back{grid-column:1/-1;grid-row:1;justify-self:start;margin:0;font-size:14px;line-height:1.4;text-align:left}
-#app :is(.workspace>.modulehead,.module-window-heading)>.num{grid-column:1;grid-row:2}
+#app :is(.workspace>.modulehead,.module-window-heading)>.num{
+ grid-column:1;grid-row:2;font:var(--lesson-module-number-font);color:var(--lesson-module-number-color);
+}
 #app :is(.workspace>.modulehead,.module-window-heading)>h1{grid-column:2;grid-row:2;margin:0;font:700 var(--lesson-module-title-size)/1.25 system-ui,sans-serif;letter-spacing:-.6px;min-width:0}
 #app :is(.workspace>.modulehead,.module-window-heading):not(:has(>.num))>h1{grid-column:1/3}
 #app :is(.workspace>.modulehead,.module-window-heading)>.actions{grid-column:3;grid-row:2;margin:0;justify-self:end;display:flex;flex-wrap:wrap;gap:8px}
@@ -133,7 +135,7 @@ main.uniform-module-layout:has(#zoomWall){grid-template-rows:100px minmax(0,1fr)
 
 /* Header controls share fusion’s dimensions; the renderer keeps each control’s state styling. */
 #app :is(.workspace>.modulehead,.module-window-heading)>.actions{align-items:center;gap:6px}
-#app :is(.workspace>.modulehead,.module-window-heading)>.actions :is(button,select,summary){box-sizing:border-box;min-height:34px;padding:5px 10px;font-size:var(--lesson-control-size);line-height:1.15}
+#app :is(.workspace>.modulehead,.module-window-heading)>:is(.actions,.inrush-switches) :is(button,select,summary){box-sizing:border-box;min-height:34px;padding:5px 10px;font-size:var(--lesson-control-size);line-height:1.15}
 
 #app .transient-view-switch{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-inline-end:10px;padding-inline-end:10px;border-inline-end:1px solid #dce5e2}
 #app .transient-view-switch button{white-space:nowrap}

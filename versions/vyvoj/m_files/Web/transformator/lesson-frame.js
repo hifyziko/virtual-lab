@@ -8,6 +8,14 @@
   const duo=main.querySelector('.duo'),panels=duo?.querySelectorAll(':scope > .panel');
   if(panels?.length>=2){
    panels[0].classList.add('tr04-scene');panels[1].classList.add('tr04-circuit');
+   const readings=panels[0].querySelector('#sceneInstantValues');
+   const mmf=panels[0].querySelector('.mmf');
+   if(readings&&mmf){
+    const footer=document.createElement('div');
+    footer.className='tr04-readings';
+    readings.before(footer);
+    footer.append(readings,mmf);
+   }
    const cause=document.getElementById('magneticCause'),results=document.getElementById('rmsOverview');
    if(cause){cause.classList.add('tr04-cause');duo.append(cause)}
    if(results){results.classList.add('tr04-results');duo.append(results)}

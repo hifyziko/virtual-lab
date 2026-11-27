@@ -127,10 +127,23 @@
     const curve=points.map(x=>[x*sx,y(M.energy(x,voltage))]);
     if(!gas)curve.push([stop*sx,y(0)]);
     for(const x of M.grids)art.line(ctx,[[x*sx,y(0)],[x*sx,y(1000)]],'#d5dede',.7,[2,4]);
-    art.line(ctx,curve,'#869eaa',1.4,[4,4]);
     const flown=points.filter(x=>x<f.x).map(x=>[x*sx,y(M.energy(x,voltage))]);
     if(f.impact)flown.push([f.x*sx,y(voltage)]);
-    flown.push([f.x*sx,y(f.kinetic)]);art.line(ctx,flown,art.neutral,2.7);
+    flown.push([f.x*sx,y(f.kinetic)]);
+    if(flown.length>1){
+      const gradient=ctx.createLinearGradient(0,y(voltage),0,y(0));
+      gradient.addColorStop(0,art.neutral+'3d');
+      gradient.addColorStop(1,art.neutral+'03');
+      ctx.beginPath();
+      ctx.moveTo(flown[0][0],y(0));
+      for(const [px,py] of flown)ctx.lineTo(px,py);
+      ctx.lineTo(flown.at(-1)[0],y(0));
+      ctx.closePath();
+      ctx.fillStyle=gradient;
+      ctx.fill();
+    }
+    art.line(ctx,curve,'#869eaa',1.4,[4,4]);
+    art.line(ctx,flown,art.neutral,2.7);
     art.dot(ctx,f.x*sx,y(f.kinetic),4.8,art.neutral);
   }
   function setText(el,s){if(el.textContent!==s)el.textContent=s;}

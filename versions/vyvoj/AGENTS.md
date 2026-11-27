@@ -1,5 +1,9 @@
 # Uživatelské konvence pro výukovou grafiku
 
+- Při společném ladění oznámit každou dokončenou úpravu, jakmile ji uživatel může otevřít v aktuálním sestavení. Připojit odkaz přímo na upravený pokus.
+
+- Ve skupině Výkonové měniče přebírat odborný výklad a názvosloví výhradně ze skript Václava Kůse, Elektrické pohony a výkonová elektronika. Uvést kapitolu a podle možnosti obrázek. Pokyny k ovládání a předpoklady konkrétní simulace oddělit od výkladu. Katederní video lze uvést jako zdroj záběru stanoviště a číslování součástek.
+
 Pravidla Gitu, publikace a přesunu mezi počítači z 15. 11. 2026 jsou v `../../AGENTS.md` a `../../PREDANI_PROJEKTU.md`. Jsou závazná i zde. Veřejný výběr zdrojů řídí `../../config/project-files.json`; knihy a výpočetní mezivýsledky do Gitu nepatří.
 
 - Prostorové vektory polí a souvisejících veličin sázet tučně stojatě v KaTeXu (`\mathbf{E}`, `\mathbf{B}`, `\mathbf{H}`, `\mathbf{J}`, obdobně síla a rychlost), včetně rovnic, výkladu a popisků scén. Nepoužívat pro ně kurzivní `\boldsymbol` ani šipku nad značkou. Skalární velikosti a složky zůstávají běžnou matematickou kurzivou; komplexní fázory zachovávají pruh nahoře.
@@ -10,7 +14,7 @@ Pravidla Gitu, publikace a přesunu mezi počítači z 15. 11. 2026 jsou v `../.
 - Vnější zátěžný úhel beta je mezi Ua a Uib; ovládání a oblouk používají beta a solve. Vnitřní úhel Ui/Uib se značí beta s čárkou a používá internalBeta. Samostatný modul Momentová charakteristika dovoluje obě úhlové osy.
 - Úhel beta je orientovaný od Ua k Uib, beta s čárkou od Ui k Uib; kladný směr je proti směru hodinových ručiček. Generátor má kladný úhel, motor záporný (ideální běžná provozní větev). Úhlová osa roste doprava. Proud, elektromagnetický výkon a moment zachovávají motorickou konvenci, proto sinusové momentové vztahy mají záporné znaménko a synchronizační tuhost je minus derivace motorického momentu podle beta. V názorném principu platí beta = p(theta_r - theta_s). S nenulovým odporem určovat režim podle výkonu, ne pouze podle znaménka úhlu.
 - Pro tvary strojů používat existující renderer machine-art.js, nikoli nové zjednodušené náhražky.
-- Aktivní práci průběžně aktualizovat v versions/aktualni; nevytvářet další číslované verze bez výslovné žádosti uživatele. Sestavení: node tools/build-release.cjs (výchozí cíl aktualni). Starší meziverze jsou ve versions/archiv. Zálohy 1.0.0-pred-upravami a 1.5.8-pred-schematem nepřepisovat. Prohlížeč automaticky nespouštět; uživateli předat stálý odkaz.
+- Aktivní zdroje jsou zde v `m_files`. Z kořene projektu spustit `node tools/build-release.cjs`. Jediný místní vstup je [aktuální rozcestník](../aktualni/web/index.html). Prohlížeč automaticky nespouštět. Další číslované verze bez výslovného pokynu nevytvářet. Chráněné zálohy nepřepisovat.
 
 - Podklady pro další moduly: m_files/reference/synchronous/; přiložené učebnice Fitzgerald a Chapman v kořeni projektu. Uchovávat je ve zdrojových předávacích archivech, s poznámkami o ověřených vztazích a nepřesnostech. Chapmanův soubor je Instructor’s Manual, nikoli plný text učebnice.
 
@@ -32,4 +36,4 @@ Pro další ladění modulů dodržuj také [PRAVIDLA_LADENI_MODULU.md](../PRAVI
 
 - Výchozí standard pro všechny moduly: obsah je vodorovně vystředěný od prvního vykreslení. Odkaz zpět do rozcestníku/skupiny i celá hlavička jsou od začátku zarovnané s levou hranou zobrazeného modulu a sledují ji při změně měřítka, velikosti okna i celé obrazovky. Nesmí nejprve vzniknout zarovnání vlevo a následný skok doprostřed. Zachovat automatické zvětšování i zmenšování podle dostupné šířky a výšky.
 
-- Aktuální dodávka má podle pokynu uživatele z 12. 11. 2026 stálé označení 1.0 v patičce. Nevytvářet další meziverze. Stav plánované čistky viz VERZE.md v kořeni projektu.
+- Označení vydání 1.0 je součástí metadat sestavení. V rozhraní ani v patičce se text verze nezobrazuje.

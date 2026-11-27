@@ -350,8 +350,9 @@
     }
     arrow(ctx, left, bottom, right - left + 7, 0, referenceColor, 1, 5);
     arrow(ctx, left, bottom, 0, top - bottom - 7, referenceColor, 1, 5);
+    const elapsed = Math.min(clock, plotEnd);
     histories.forEach((history, i) => {
-      function curve(until, color, thickness) {
+      function curve(until, color, thickness, shade = false) {
         const end = Math.min(until, history[history.length - 1].time);
         const step = history[1].time;
         const index = Math.min(history.length - 1, Math.floor(end / step));
@@ -362,10 +363,24 @@
         const value = a[key] + (b[key] - a[key]) * (end - a.time) / step;
         ctx.lineTo(px(end), py(value));
         if (key === 'energy' && until > end) ctx.lineTo(px(until), py(value));
+        if (shade && end > 0) {
+          const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+          gradient.addColorStop(0, color + '3d');
+          gradient.addColorStop(1, color + '03');
+          ctx.save();
+          ctx.lineTo(px(key === 'energy' ? until : end), bottom);
+          ctx.lineTo(left, bottom);
+          ctx.closePath();
+          ctx.fillStyle = gradient;
+          ctx.fill();
+          ctx.restore();
+          return;
+        }
         ctx.strokeStyle = color; ctx.lineWidth = thickness; ctx.stroke();
       }
+      if (elapsed > 0) curve(elapsed, series[i], 2.6, true);
       curve(plotEnd, series[i] + '46', 1.4);
-      curve(Math.min(clock, plotEnd), series[i], 2.6);
+      curve(elapsed, series[i], 2.6);
     });
     const cursor = px(Math.min(clock, plotEnd));
     line(ctx, cursor, top, cursor, bottom, '#627782', 1, [3, 3]);

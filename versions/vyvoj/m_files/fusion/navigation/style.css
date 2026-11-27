@@ -137,8 +137,8 @@ body[data-fusion-page] header[data-fusion-heading] > h1::before{
  content:attr(data-module-number);
  display:inline-block;
  margin:0 10px 0 2px;
- color:#006c5e;
- font:13px/1 ui-monospace,monospace;
+ color:var(--lesson-module-number-color);
+ font:var(--lesson-module-number-font);
  vertical-align:middle;
 }
 body[data-fusion-page] header[data-fusion-heading] > button,

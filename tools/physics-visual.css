@@ -84,3 +84,18 @@ html[data-tone] body{background:var(--tone-paper)}
 @media(max-width:600px){.lab-tree-toggle{top:8px;left:8px;min-width:120px;min-height:46px;font-size:16px;padding:10px 14px}}
 
 .lab-tree-dialog a.lab-tree-home{margin:0 0 16px;padding:14px 12px;background:#006d5b;color:#fff;border:2px solid #005344;border-radius:10px;font-size:17px;font-weight:750;box-shadow:0 2px 7px #173f3a25}.lab-tree-dialog a.lab-tree-home:hover{background:#005344;color:#fff}
+.wow-home .physics-area-link.area-drives{background:#fbf4e8;border-color:#e8d8bb}
+.drive-card-art .drive-valve{color:#78848b;animation:drive-upper 6s steps(1,end) infinite}
+.drive-card-art .lower{animation-name:drive-lower}
+@keyframes drive-upper{0%,100%{color:#075888;stroke-width:5.7px}50%{color:#829099;stroke-width:2.8px}}
+@keyframes drive-lower{0%,100%{color:#829099;stroke-width:2.8px}50%{color:#075888;stroke-width:5.7px}}
+.drive-sweep{animation:drive-sweep 6s linear infinite}
+.drive-sample{animation:drive-sample 6s steps(1,end) infinite}
+@keyframes drive-sweep{to{transform:translateX(366px)}}
+@keyframes drive-sample{0%,33.3333%,100%{transform:translateY(0)}16.6667%{transform:translateY(-11px)}50%,83.3333%{transform:translateY(22px)}66.6667%{transform:translateY(33px)}}
+@media(prefers-reduced-motion:reduce){.drive-card-art .drive-valve,.drive-sweep,.drive-sample{animation-play-state:paused}}
+
+.wow-home .wow-scene>.drive-card-art{width:100%;max-width:100%;overflow:visible}
+#group-converters .group-banner{background:#faf2e5;color:#543c25}
+
+.wow-home[data-physics-area="drives"] .physics-section-hero{background:linear-gradient(110deg,#fff 39%,#faf5e9 79%,#f3e6c9)}

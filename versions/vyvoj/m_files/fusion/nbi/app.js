@@ -679,7 +679,9 @@
           points.push(right+','+start);
           if(i===0)points.push(right+','+bottom);
         }
-        return '<polyline fill="none" stroke="'+color+'" stroke-width="2.5" points="'+points.join(' ')+'"/>'+
+        const fill=i===0?'<defs><linearGradient id="nbi-energy-fill" x2="0" y2="1"><stop stop-color="'+color+'" stop-opacity=".24"/><stop offset="1" stop-color="'+color+'" stop-opacity=".012"/></linearGradient></defs>'+
+          '<polygon points="'+left+','+bottom+' '+points.join(' ')+' '+right+','+bottom+'" fill="url(#nbi-energy-fill)"/>':'';
+        return fill+'<polyline fill="none" stroke="'+color+'" stroke-width="2.5" points="'+points.join(' ')+'"/>'+
           '<circle id="energy-marker-'+i+'" r="4" fill="'+color+'" stroke="#fff"/>';
       }).join('');
     }

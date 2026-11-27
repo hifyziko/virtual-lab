@@ -3,7 +3,7 @@
  const entries=[
   {id:'fu07-plazma',group:'fusion',topic:'basics',num:'01',title:'Plyn, ionizovaný plyn a plazma',description:'Od jediného atomu k souboru částic: teplota, ionizace, vlastní elektrické pole a odezva na magnetické pole.',page:'fuze-plazma/index.html',kind:'Interaktivní experiment'},
   {id:'fu17-rozptyl',group:'fusion',topic:'basics',num:'02',title:'Coulombovský rozptyl a kolizní relaxace',description:'Porovnej průlety elektronů kolem deuteronu a sleduj jejich odklon, brzdné záření a vyzářenou energii.',page:'fuze-rozptyl/index.html',kind:'Interaktivní experiment'},
-  {id:'fu15-vodivost',group:'fusion',topic:'basics',num:'03',title:'Teplotní závislost měrného odporu kovu a plazmatu',description:'Zahřej kov i plazma a porovnej kmity mřížky, rozptyl elektronů a měrný elektrický odpor.',page:'fuze-vodivost/index.html',kind:'Interaktivní experiment'},
+  {id:'fu15-vodivost',group:'fusion',topic:'basics',num:'03',title:'Teplotní závislost odporu',description:'Zahřej kov i plazma a porovnej kmity mřížky, rozptyl elektronů a měrný elektrický odpor.',page:'fuze-vodivost/index.html',kind:'Interaktivní experiment'},
   {id:'fu01-reakce',group:'fusion',topic:'basics',num:'04',title:'Fúzní reakce a coulombovská bariéra',description:'Přibližování jader, průchod bariérou a názorné ukázky jaderných reakcí.',page:'fuze-bariera/index.html',kind:'Interaktivní experiment'},
   {id:'fu12-lawson',group:'fusion',topic:'basics',num:'05',title:'Lawsonovo kritérium',description:'Změř dobu chladnutí plazmatu a zjisti, jak hustota a teplota paliva ovlivňují podmínku zapálení.',page:'fuze-lawson/index.html',kind:'Interaktivní experiment'},
   {id:'fu14-milniky',group:'fusion',topic:'basics',num:'06',title:'Energetické milníky fúze',description:'Měň bilanci plazmatu a účinnosti elektrárny. Sleduj, kdy se tok elektřiny v síti obrátí.',page:'fuze-milniky/index.html',kind:'Interaktivní experiment'},
@@ -60,8 +60,8 @@
  const home=Lab.home;
  Lab.home=function(...args){
   const template=document.createElement('template');template.innerHTML=home.apply(this,args);
-  const tile=template.content.querySelector('.physics-area-link[href="#group-area-plasma"]');
-  if(tile){
+  const tiles=template.content.querySelectorAll('.physics-area-link[href="#group-area-plasma"], .physics-area-link[href="#group-area-drives"]');
+  for(const tile of tiles){
    const notice=document.createElement('span');
    notice.className='fusion-review-notice';
    notice.textContent='Pracovní verze – odborná revize dosud neproběhla.';

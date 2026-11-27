@@ -1,19 +1,22 @@
 <!doctype html><html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Plyn, ionizovaný plyn a plazma</title>
 <link rel="stylesheet" href="../particles/vendor/katex.css"><link rel="stylesheet" href="../navigation/style.css"><link rel="stylesheet" href="style.css"><script src="layout.js"></script><script defer src="../particles/vendor/katex.js"></script><script defer src="../particles/style.js"></script><script defer src="model.js"></script><script defer src="field-view.js"></script><script defer src="app.js"></script><script defer src="../navigation/page.js"></script></head>
 <body data-fusion-page="fu07-plazma"><main><header data-fusion-heading><a class="back" href="../index.html#group-area-plasma" target="_top" aria-label="Zpět do skupiny Jaderná fúze a tokamaky"><span aria-hidden="true">←</span> Zpět</a><h1 data-module-number="01">Plyn, ionizovaný plyn a plazma</h1><button id="help">Ovládání a výklad</button><button data-fusion-full>Celá obrazovka</button></header>
-<div class="desk"><aside><section class="controls"><label id="playbackRow" class="control" for="playback">Rychlost přehrávání <output id="playbackValue"></output><input id="playback" type="range" min="0.25" max="4" value="1" step="0.25"></label><div class="statePresets" role="group" aria-label="Rychlé porovnání míry ionizace"><button id="presetGas" type="button">Plyn</button><button id="presetPartial" type="button">Částečná ionizace</button><button id="presetFull" type="button">Plná ionizace</button></div>
+<div class="desk"><aside><section class="controls"><div class="control-group" role="group" aria-label="Přehrávání a ionizace">
+<label id="playbackRow" class="control" for="playback">Rychlost přehrávání <output id="playbackValue"></output><input id="playback" type="range" min="0.25" max="4" value="1" step="0.25"></label><div class="statePresets" role="group" aria-label="Rychlé porovnání míry ionizace"><button id="presetGas" type="button">Plyn</button><button id="presetPartial" type="button">Částečná ionizace</button><button id="presetFull" type="button">Plná ionizace</button></div>
 <label class="control" for="count">Počet zobrazených atomů <output id="countValue"></output><input id="count" type="range" min="1" max="100" value="1" step="1"></label>
 <label class="control" for="temperature">Teplota <output id="temperatureValue"></output><input id="temperature" type="range" min="0.15" max="1.2" value="0.2" step="0.001"></label>
 <div class="readout"><span>Ionizace ve scéně</span><output id="fractionValue"></output></div><div class="bar"><div id="fractionBar"></div></div>
+</div><div class="control-group" role="group" aria-label="Magnetické pole">
 <label class="check"><input id="magnet" type="checkbox">Zapnout magnetické pole</label>
 <label class="control" for="b">Magnetická indukce <output id="bValue"></output><input id="b" type="range" min="1" max="12" value="6" step="0.1"></label>
 <button id="reverse">Obrátit směr pole</button>
+</div><div class="control-group" role="group" aria-label="Elektrické pole a pohyb částic">
 <label class="check"><input id="fields" type="checkbox" checked>Záře nábojů a elektrické pole</label>
 <label class="check"><input id="lines" type="checkbox" checked>Siločáry elektrického pole</label>
 <label class="control" for="lineDensity">Hustota siločar <output id="lineDensityValue"></output><input id="lineDensity" type="range" min="0.5" max="4" step="0.5" value="1"></label><label class="check"><input id="mutual" type="checkbox" checked>Vzájemné elektrické působení</label>
 <label class="check"><input id="collisions" type="checkbox" checked>Srážky částic</label>
 <label class="check"><input id="centers" type="checkbox">Středy nábojových složek</label><label class="check"><input id="trails" type="checkbox" checked>Stopy pohybu</label>
-
+</div>
 <div class="buttons"><button id="play">Pozastavit</button><button id="reset">Od začátku</button></div>
 </section></aside>
 <section class="scene"><div class="scenehead"><div><h2 id="state">Jeden neutrální atom</h2><p id="hint">Jádro a elektronový obal: z dálky se náboje vyruší.</p></div><span class="badge" id="fieldState">Magnetické pole vypnuté</span></div>

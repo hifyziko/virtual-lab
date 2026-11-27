@@ -1,6 +1,8 @@
 const ElectronSources = ["https://doi.org/10.1080/14786449708621070","https://history.aip.org/exhibits/electron/","https://doi.org/10.1080/14786440409463107","https://doi.org/10.1002/andp.201300732","https://web.mit.edu/8.13/8.13c/references-fall/rutherford/rutherford-scattering-of-alpha-and-beta-particles.pdf","https://doi.org/10.1080/14786441308634955","https://openstax.org/books/university-physics-volume-3/pages/6-4-bohrs-model-of-the-hydrogen-atom","https://physics.nist.gov/PhysRefData/Handbook/Tables/hydrogentable2.htm","https://www.nobelprize.org/uploads/2016/04/broglie-lecture.pdf","https://openstax.org/books/university-physics-volume-3/pages/8-1-the-hydrogen-atom","https://books.physics.oregonstate.edu/GCF/hydroform.html","https://www.nobelprize.org/uploads/2018/06/born-lecture.pdf","https://doi.org/10.1103/PhysRev.30.705","https://www.math.ucsd.edu/~nwallach/Dirac1928.pdf","https://www.damtp.cam.ac.uk/user/tong/qft/qfthtml/S4.html","https://doi.org/10.1119/1.16104","https://doi.org/10.1088/1367-2630/15/3/033018","https://digitalcommons.unl.edu/physicsfacpub/105/","https://www.damtp.cam.ac.uk/user/tong/qft.htm","https://www.damtp.cam.ac.uk/user/tong/qft/qfthtml/S0.html","https://www.damtp.cam.ac.uk/user/tong/qft/qfthtml/S6.html","https://physics.nist.gov/cuu/Constants/","https://pdg.lbl.gov/","https://phet.colorado.edu/en/simulations/models-of-the-hydrogen-atom","https://github.com/phetsims/models-of-the-hydrogen-atom","https://github.com/phetsims/models-of-the-hydrogen-atom/blob/main/doc/model.md","https://www.jlab.org/physics/visualizingthequantumworld","https://github.com/Niuskir/Electron-Orbitals-Blender-3D","https://github.com/Niuskir/orbitals","https://github.com/shianjeng/quantum-wave-lab","https://github.com/francisco-kim/DoubleSlitSimulator","https://www.nist.gov/pml/atomic-spectra-database"];
 /* Controls: key, Czech caption, range and initial value, KaTeX unit; or a list of choices. */
 const electronAndersonSource=ElectronSources.push('https://journals.aps.org/pr/abstract/10.1103/PhysRev.43.491')-1;
+const electronDiracAntiparticleSource=ElectronSources.push('https://www.physics.mcgill.ca/~keshav/551III/dirac1931.pdf')-1;
+const electronProtonStructureSource=ElectronSources.push('https://atlas.cern/updates/briefing/insight-proton-structure')-1;
 const ElectronLessons=[
 {year:'1897',title:'Stopa v katodové trubici',caption:'Moderní rekonstrukce principu Thomsonova měření',controls:[
 ['U','Urychlovací napětí',100,1000,10,300,'V'],['E','Elektrické pole',0,20,.01,8,'kV/m'],['B','Magnetická indukce',0,2,.01,1,'mT'],['vectors','Vektory',['Pole a síly','Pouze svazek']]],
@@ -24,34 +26,34 @@ eq:['E=-\\kappa/(2r),\\quad P=2\\kappa^3/(3m_e^2c^3r^4)','r^3=r_0^3-4\\kappa^2t/
 story:'Vodík září při určitých vlnových délkách. Bohr připustil jen vybrané hodnoty momentu hybnosti a stacionární stavy bez záření. Energii fotonu určuje rozdíl energií dvou hladin. Tím získaly čáry spektra společné vysvětlení.',
 task:'Ponech cílovou hladinu druhou a zvyšuj výchozí od třetí do šesté. Sleduj přechod od červené k fialové. Obrať pořadí hladin a nalaď dopadající foton na jejich energetický rozdíl.',
 eq:['L=n\\hbar,\\quad r_n=a_\\mu n^2/Z,\\quad E_n=-Z^2\\kappa/(2a_\\mu n^2)','\\lambda=hc/|E_f-E_i|'],detail:'Redukovaná hmotnost zahrnuje pohyb vybraného jádra. Pro vodík je jeho protonové číslo jedna. U jednoelektronových iontů s rostoucím nábojem jádra klesá poloměr a roste vazebná energie. Model udává vakuovou vlnovou délku bez jemné struktury. Pro srovnání Balmerových čar ve vzduchu se používá přibližný index 1,00028. Absorpce ve výukovém ovládání má toleranci 0,005 eV pro naladění posuvníku.',src:[5,6,7,31]},
-{year:'1924',title:'Vlna se musí uzavřít',caption:'Fáze na kružnici a volný vlnový balík',controls:[['U','Urychlovací napětí',10,200,1,54,'V'],['r','Poloměr',30,250,1,80,'pm'],['sigma','Šířka balíku',.15,.8,.01,.4,'nm'],['view','Zobrazení',['Uzavřená fáze','Volný balík']]],
-story:'Když světlo přenáší hybnost v jednotlivých kvantech, mohla by mít i hmota vlnovou délku? De Broglie spojil hybnost s prostorovou periodou fáze. Po oběhu uzavřené dráhy se musí fáze reprodukovat.',
-task:'Měň poloměr a sleduj spoj křivky po jednom oběhu. V režimu balíku sleduj pohyb obálky a hřebenů uvnitř ní. Širší balík vyžaduje užší rozdělení hybnosti.',
-eq:['\\lambda=h/p,\\quad pc=\\sqrt{eU(eU+2m_ec^2)}','\\Delta\\varphi=2\\pi(2\\pi r/\\lambda),\\quad pr=n\\hbar'],detail:'Kružnice je semiklasická analogie. Volný balík používá nerelativistickou Gaussovu obálku s disperzí. S kinetickou energií jako nulou klidové fáze je fázová rychlost p/(2m) a grupová p/m. Při započtení klidové energie se fázová rychlost změní.',src:[8,13]},
-{year:'1926',title:'Kde elektron naměříme?',caption:'Vodíkové orbitaly • Bornova interpretace',controls:[['state','Orbital',['1s','2s','2p z','2p x','2p y','2p m=1','3s','3p z','3d z²','3d m=2']],['quality','Jemnost objemu',['Běžná','Jemná']],['view','Zobrazení',['Výsledky měření','Objem hustoty','Izoplocha hustoty','Pohyblivý řez','Fáze','Srovnání s Bohrem']],['cut','Poloha řezu',-.8,.8,.02,0,'R_{\\mathrm{okna}}'],['level','Hladina izoplochy',.01,.8,.01,.12,'w_{\\max}'],['mix','Podíl druhého stavu',0,1,.02,0,''],['phase','Relativní fáze',0,360,2,0,'{}^\\circ']],
+{year:'1924',title:'Najdi povolenou dráhu vodíku',caption:'Návaznost fáze a oběh v poli jádra',controls:[['reference','Cílová hladina',['První','Druhá','Třetí']],['r','Zkoušený poloměr dráhy',25,500,1,85,'pm'],['lambda','Vlnová délka',.12,1.12,.001,.4,'nm']],
+story:'De Broglie spojil hybnost elektronu s vlnovou délkou. Na uzavřené dráze musí po jednom oběhu navázat fáze vlny.',
+task:'Zkoušej dvojice poloměru a vlnové délky. Sleduj, kdy fáze naváže a kdy zvolená vlnová délka zároveň odpovídá oběhu v poli jádra.',
+eq:['p(r)=\\sqrt{\\mu\\kappa/r},\\quad \\lambda=h/p','\\Delta\\varphi=2\\pi(2\\pi r/\\lambda),\\quad r_n=a_\\mu n^2'],detail:'V klasickém pokusu s Larmorovým výkonem elektron při oběhu průběžně ztrácí energii a dráha se smršťuje. Bohrova povolená kružnice představuje stacionární stav. V kvantovém popisu má základní stav stálé rozložení náboje. Excitovaný vodík může vyzářit foton při přechodu na nižší hladinu. Prostorové rozložení pravděpodobnosti polohy ukazují orbitaly v další etapě.',src:[5,8]},
+{year:'1926',title:'Kde elektron naměříme?',caption:'Vodíkové orbitaly • Bornova interpretace',controls:[['state','Orbital',['1s','2s','2p z','2p x','2p y','2p m=1','3s','3p z','3d z²','3d m=2']],['quality','Jemnost objemu',['Běžná','Jemná']],['view','Zobrazení',['Výsledky měření','Objem hustoty','Izoplocha hustoty','Rovinný řez orbitalem','Fáze','Srovnání s Bohrem']],['cut','Posun řezu',-.8,.8,.02,0,'R_{\\mathrm{okna}}'],['level','Hladina izoplochy',.01,.8,.01,.12,'w_{\\max}'],['mix','Příměs orbitalu',0,1,.02,0,''],['phase','Relativní fáze',0,360,2,0,'{}^\\circ']],
 story:'Schrödinger našel stacionární vlny v Coulombově poli. Born přiřadil jejich čtverci význam pravděpodobnosti na jednotku objemu. Každý bod oblaku je jedna poloha v jiné, stejně připravené soustavě. Uzly vznikají tam, kde amplituda vymizí.',
-task:'Začni stavem 1s. Porovnej hustotu u jádra s pravděpodobností v kulové slupce. Přepni na 2s a vyhledej kulový uzel. Přimíchej druhý stav a měň relativní fázi. V čase pak sleduj interferenční člen hustoty.',
-eq:['\\psi=R_{n\\ell}Y_\\ell^m,\\quad w=|\\psi|^2,\\quad P_r=r^2|R_{n\\ell}|^2','\\Psi=\\sqrt{1-f}\\,\\psi_a+\\sqrt f\\,e^{i(\\varphi-\\Delta E t/\\hbar)}\\psi_b'],detail:'Druhým stavem je 2p z, případně 1s, pokud už je zvolen 2p z. Izoplocha udává podíl maximální hustoty v zobrazené mřížce. Barva fáze rozlišuje fáze amplitudy, elektrický náboj je všude záporný. Objem i statistika mají konečné zorné pole.',src:[9,10,11]},
-{year:'1927',title:'Niklový krystal jako mřížka',caption:'Kinematická difrakce na konečném krystalu',controls:[['U','Urychlovací napětí',20,160,1,54,'V'],['inc','Odklon dopadu od normály',-30,30,1,0,'{}^\\circ'],['det','Detektor od normály',0,85,1,50,'{}^\\circ']],
-story:'Davisson a Germer měřili směr, ve kterém z monokrystalu niklu vystupují téměř pružně rozptýlené elektrony. V původní geometrii dopadal svazek kolmo na plochu (111). Výrazná maxima se měnila s napětím. Fáze příspěvků od různých atomů se mohla sejít právě ve směru detektoru.',
-task:'Při pevném napětí projdi detektorem přes maximum. Pak změň napětí. Změnila se vlnová délka i podmínka pro konstruktivní interferenci.',
-eq:['A(\\mathbf q)=\\sum_j e^{i\\mathbf q\\cdot\\mathbf R_j},\\quad I=|A|^2','\\mathbf q=\\mathbf k_f-\\mathbf k_i,\\quad |\\mathbf k|=2\\pi/\\lambda'],detail:'Geometrie používá konečný výřez fcc niklu s normálou [111]. Všechny atomové rozptylové faktory jsou rovny jedné. Povrchová rekonstrukce, vnitřní potenciál a vícenásobný rozptyl mění skutečné nízkoenergetické spektrum. Výška píků slouží pro srovnání uvnitř modelu.',src:[12]},
-{year:'1928–1932',title:'Dvě větve energie',caption:'Volná Diracova rovnice',controls:[['p','Hybnost',0,4,.01,1,'m_ec']],
-story:'Schrödingerova kinetická energie roste kvadraticky s hybností. Dirac hledal rovnici slučitelnou s relativitou. Její volná řešení mají dvě energetické větve a spinorovou strukturu. Spin jedna polovina je vnitřní vlastnost elektronu. Dirac předpověděl antičástici elektronu. Carl Anderson ji v roce 1932 rozpoznal podle stopy v mlžné komoře v magnetickém poli.',
-task:'Začni blízko nulové hybnosti. Porovnej kinetické energie po odečtení klidové energie. Posouvej hybnost výše a sleduj, jak rychle se klasická parabola vzdaluje.',
-eq:['i\\hbar\\partial_t\\Psi=(c\\boldsymbol\\alpha\\cdot\\hat{\\mathbf p}+\\beta m_ec^2)\\Psi','E_\\pm=\\pm\\sqrt{p^2c^2+m_e^2c^4}'],detail:'Záporná větev byla historickým interpretačním problémem. Kvantování Diracova pole dává vznik operátorům tvorby antičástic. Pozitron má kladnou energii, stejnou klidovou hmotnost a opačný náboj.',src:[13,14,electronAndersonSource]},
-{year:'1989 / 2013',title:'Jedna detekce za druhou',caption:'Dvojštěrbina • časový vývoj ve dvou rozměrech',controls:[['mode','Příprava',['Obě koherentně','Horní štěrbina','Dolní štěrbina','Nekoherentní směs']],['width','Šířka otvoru',1,2,.25,1.5,'nm'],['gap','Vzdálenost středů',3,6,.25,4,'nm'],['energy','Energie svazku',.12,.5,.02,.3,'eV'],['view','Detektor',['Hustota','Reálná amplituda','Jednotlivé zásahy']],['quality','Výpočetní mřížka',['96 × 96','128 × 128']]],
+task:'Zaškrtni Zobrazit řez a ponech posun na nule. U orbitalu $2\\mathrm{p}_z$ porovnej rovinu $xy$, která leží mezi laloky, s rovinou $xz$, která oba laloky protíná. Pak zkus posunout řez ve směru kolmém k rovině. Příměs druhého orbitalu najdeš pod Další stavy a zobrazení.',
+eq:['\\psi=R_{n\\ell}Y_\\ell^m,\\quad w=|\\psi|^2,\\quad P_r=r^2|R_{n\\ell}|^2','\\Psi=\\sqrt{1-f}\\,\\psi_a+\\sqrt f\\,e^{i(\\varphi-\\Delta E t/\\hbar)}\\psi_b'],detail:'Posun řezu udává vzdálenost roviny od středu ve směru její kolmice. Rovina $xy$ se posouvá ve směru $z$, $xz$ ve směru $y$ a $yz$ ve směru $x$. Při nulovém posunu prochází rovina jádrem. Pravá scéna ukazuje tenkou vrstvu kolem této roviny. V superpozici je $\\psi_a$ vybraný orbital a $\\psi_b$ příměs pojmenovaná u posuvníku. Údaj udává váhu $f$ příměsi v procentech. Při $0\\,\\%$ máš pouze vybraný orbital, při $100\\,\\%$ pouze příměs. Mezi těmito hodnotami se skládají amplitudy obou orbitalů a tvar závisí na jejich relativní fázi. Izoplocha udává podíl maximální hustoty v zobrazené mřížce. Barva fáze rozlišuje fáze amplitudy, elektrický náboj je všude záporný. Objem i statistika mají konečné zorné pole.',src:[9,10,11]},
+{year:'1927',title:'Difrakce elektronů na niklu',caption:'Zdroj elektronů, niklový krystal a otočný detektor',controls:[['U','Urychlovací napětí',20,160,1,54,'V'],['det','Úhel detektoru',0,85,.05,25,'{}^\\circ']],
+story:'Davisson a Germer měnili rychlost elektronového svazku a měřili, kolik elektronů se od niklu rozptýlí do různých směrů. Ve vybraných směrech zachytili výrazně silnější signál. Polohy těchto maxim vysvětlili vzájemným zesilováním vln rozptýlených na pravidelně uspořádaných atomech.',
+task:'Přesuň detektor na nejvyšší vrchol grafu a odečti úhel. Zvyš napětí a zjisti, kam musíš detektor přemístit, abys znovu zachytil nejsilnější signál.',
+eq:['A(\\mathbf q)=\\sum_j e^{i\\mathbf q\\cdot\\mathbf R_j},\\quad I=|A|^2','\\mathbf q=\\mathbf k_f-\\mathbf k_i,\\quad |\\mathbf k_i|=|\\mathbf k_f|=2\\pi/\\lambda'],detail:'Model používá konečný výřez plošně středěné kubické mřížky niklu s normálou $[111]$ a kolmým dopadem svazku. Všechny atomy mají stejnou rozptylovou amplitudu. Vliv povrchu, vnitřního potenciálu a vícenásobného rozptylu model zanedbává. Uvedené úhly patří k výpočtu pro tuto geometrii. Graf používá při každém napětí vlastní maximum jako jednotku intenzity.',src:[12]},
+{year:'1928–1932',title:'Elektron a pozitron v magnetickém poli',caption:'Diracova rovnice a rozlišení náboje z dráhy',controls:[['p','Velikost hybnosti',0,4,.01,1,'m_ec'],['field','Směr magnetického pole',['Do obrazovky','Z obrazovky']]],
+story:'Dirac hledal kvantovou rovnici pro elektron, která by platila i při vysokých rychlostech. Rovnice z roku 1928 měla dvě energetické větve a popisovala také spin elektronu. V roce 1931 Dirac předpověděl částici se stejnou hmotností jako elektron a s opačným nábojem. Carl Anderson v roce 1932 pozoroval stopu pozitronu v mlžné komoře v magnetickém poli.',
+task:'Při stejné hybnosti obrať magnetické pole a porovnej stáčení obou stop. Pak zvětši hybnost a sleduj, jak se mění zakřivení stop a rozdíl mezi výsledky v dolním grafu.',
+eq:['i\\hbar\\partial_t\\Psi=(c\\boldsymbol\\alpha\\cdot\\hat{\\mathbf p}+\\beta m_ec^2)\\Psi','E_\\pm=\\pm\\sqrt{p^2c^2+m_e^2c^4}'],detail:'Záporná větev patří k matematickým řešením volné rovnice. V teorii kvantového pole odpovídají příslušné módy antičástici s kladnou fyzikální energií. Pravá scéna znázorňuje dráhy připraveného elektronu a pozitronu v homogenním poli. Jejich hybnost míří kolmo na pole, její velikost se podél dráhy nemění. Na Andersonově fotografii pomohla určit směr letu olověná deska. Částice v ní ztratila energii a za deskou se její stopa zakřivila víc. Ve schématu směr letu ukazuje šipka.',src:[13,electronDiracAntiparticleSource,14,electronAndersonSource]},
+{year:'1989 / 2013',title:'Jedna detekce za druhou',caption:'Dvojštěrbina • časový vývoj ve dvou rozměrech',controls:[['mode','Příprava',['Obě koherentně','Horní štěrbina','Dolní štěrbina','Nekoherentní směs']],['width','Šířka otvoru',1,2,.05,1.5,'nm'],['gap','Vzdálenost středů',3,6,.25,4,'nm'],['energy','Energie svazku',.12,.5,.02,.3,'eV'],['view','Detektor',['Hustota','Reálná amplituda','Jednotlivé zásahy']],['quality','Výpočetní mřížka',['96 × 96','128 × 128']]],
 story:'Jednotlivý průchod končí lokalizovanou detekcí. Mnoho stejně připravených elektronů vytvoří rozdělení, které závisí na tom, zda jsou obě cesty koherentní. Tonomura použil elektronový biprizmatický interferometr. Bach a spoluautoři ovládali dvě skutečné štěrbiny.',
 task:'Otevři obě štěrbiny a přidávej zásahy. Pak zvol statistickou směs dvou samostatných příprav. Minimum může při ztrátě koherence zmizet. Jedna tečka na stínítku neprozradí předchozí klasickou dráhu.',
-eq:['i\\hbar\\partial_t\\psi=[-\\hbar^2\\nabla^2/(2m_e)+V-iW]\\psi','P_{\\rm det}(y)=\\int (2W_{\\rm det}/\\hbar)|\\psi|^2\\,\\mathrm dx\\,\\mathrm dt'],detail:'Gaussův balík dopadá na konečnou bariéru. Absorbér na pravém okraji zaznamenává úbytky pravděpodobnosti, ostatní okraje ji odvádějí. Počet vypuštěných elektronů zahrnuje i ty, které detektor nezachytí. Směs průměruje dvě samostatná řešení s jedním otvorem.',src:[15,16,17]},
-{year:'Současnost',title:'Kvantum elektronového pole',caption:'Volný jednočásticový stav s určeným spinem',controls:[['p','Střední hybnost',0,3,.05,1,'m_ec'],['width','Šířka v hybnosti',.1,.6,.01,.25,'m_ec']],
+eq:['i\\hbar\\partial_t\\psi=[-\\hbar^2\\nabla^2/(2m_e)+V-iW]\\psi','P_{\\rm det}(y)=\\int (2W_{\\rm det}/\\hbar)|\\psi|^2\\,\\mathrm dx\\,\\mathrm dt'],detail:'Gaussův balík dopadá na konečnou bariéru. Na hraně štěrbiny se potenciál v buňce mřížky určuje podle podílu její zakryté výšky. Absorbér na pravém okraji zaznamenává úbytky pravděpodobnosti, ostatní okraje ji odvádějí. Počet vypuštěných elektronů zahrnuje i ty, které detektor nezachytí. Směs průměruje dvě samostatná řešení s jedním otvorem.',src:[15,16,17]},
+{year:'Současnost',title:'Kde najdeš jeden elektron?',caption:'Měření polohy ve volném jednočásticovém stavu',controls:[['p','Střední hybnost',0,3,.05,1,'m_ec'],['width','Nejistota hybnosti',.1,.6,.01,.25,'m_ec']],
 story:'Dnes je elektron elementární fermion se záporným elementárním nábojem, nenulovou klidovou hmotností a spinem jedna polovina. V kvantové teorii pole je kvantem elektronového pole. V jednočásticovém sektoru lze připravit prostorově rozprostřený stav.',
-task:'Zvětši rozptyl hybnosti a sleduj počáteční šířku balíku. Pusť čas a porovnej pohyb jeho středu při různých hybnostech. Bodová interakce ve standardním modelu připouští i rozlehlý kvantový stav.',
+task:'Porovnej výsledky opakovaného měření polohy pro dvě přípravy s různým rozptylem hybnosti. Sleduj vodorovnou šířku shluku bodů a odečet rozptylu polohy.',
 eq:['E_p^2=p^2c^2+m_e^2c^4','\\Psi(x,t)=\\int a(p)u(p)e^{i(px-E_pt)/\\hbar}\\,\\mathrm dp/\\sqrt{2\\pi\\hbar}'],detail:'Jednorozměrná superpozice kladných energií má pevnou spinovou polarizaci. Graf zobrazuje součet čtverců spinorových amplitud. Operátorové pole a tvorba párů vyžadují širší formalismus.',src:[14,18,19,20]},
-{year:'Měřítka',title:'Jak velký je elektron?',caption:'Logaritmická cesta od atomu k rozlišení sondy',controls:[['zoom','Zorné pole • mocnina deseti',-20,-9,.05,-10,''],['q','Přenos hybnosti • logaritmus',2,14,.05,7,'\\log_{10}(qc/\\mathrm{eV})']],
+{year:'Měřítka',title:'Jak malý detail rozliší sonda?',caption:'Rozptyl jako způsob zkoumání struktury',controls:[['zoom','Zorné pole',-20,-9,.05,-10,'m'],['q','Přenos hybnosti',2,14,.05,7,'\\mathrm{eV}/c']],
 story:'Rozměr orbitalu popisuje připravený stav. Redukovaná Comptonova délka spojuje hmotnost s relativistickou kvantovou škálou. Klasický poloměr vzniká porovnáním elektrostatické energie s klidovou energií. Každá z těchto délek odpovídá jiné otázce.',
-task:'Změň zvlášť zorné pole a přenos hybnosti. Pouze druhým ovladačem měníš odhad rozlišení experimentu. V detailu se neobjeví povrch elektronu. Jak lze přitom naměřit elektron na různých místech?',
-eq:['a_0=\\hbar^2/(m_e\\kappa),\\quad \\bar\\lambda_C=\\hbar/(m_ec),\\quad r_e=\\kappa/(m_ec^2)','\\Delta x\\sim\\hbar/q'],detail:'Standardní model zachází s elektronem jako s bodovou částicí bez známé vnitřní struktury. Přenos hybnosti určuje řád rozlišení sondy. Převod mezí konkrétních modelů kompozitnosti na geometrický poloměr není univerzální.',src:[21,22,19]}
+task:'Porovnej hybnost příchozího a rozptýleného fotonu. Jejich vektorový rozdíl získá elektron. Pak sleduj, jak se s velikostí tohoto přenosu mění rozlišení.',
+eq:['a_0=\\hbar^2/(m_e\\kappa),\\quad \\bar\\lambda_C=\\hbar/(m_ec),\\quad r_e=\\kappa/(m_ec^2)','\\Delta x\\sim\\hbar/q'],detail:'Standardní model zachází s elektronem jako s bodovou částicí bez známé vnitřní struktury. Proton je složený. Jeho valenční obsah tvoří dva kvarky $u$ a jeden kvark $d$. Uvnitř přispívají také gluony a moře párů kvarků a antikvarků. Světelná vlákna a pohyblivé značky jsou názorná ilustrace dynamického kvantového stavu. Jejich pohyb má výtvarně zvolené tempo. Jantarová úsečka platí pro odhad rozlišení z nastaveného přenosu hybnosti. Převod mezí konkrétních modelů kompozitnosti na geometrický poloměr není univerzální.',src:[21,22,19,electronProtonStructureSource]}
 ];
 
 const electronLabNotes=[
@@ -122,74 +124,98 @@ const electronLabNotes=[
   {
     motivation:'Spektrum vodíku obsahuje čáry na určitých vlnových délkách. Bohr hledal pravidlo, které stabilnímu atomu přiřadí právě takové rozdíly energií, jaké odpovídají pozorovaným čarám.',
     goal:'Propoj změnu energetické hladiny s posunem čáry ve spektru vodíku.',
-    scene:'Jádro je ve společném středu obou nakreslených drah. Zvýrazněná dráha patří právě obsazené hladině. Při přechodu dolů se od místa, kde elektron opustil vyšší dráhu, šíří vlnový balík znázorňující foton. Svislé čáry v grafu označují vlnové délky.',
+    scene:'Jádro je ve společném středu šesti zobrazených drah. Z vybrané dvojice právě obsazenou dráhu poznáš podle plné modré čáry a druhou podle čárkované čáry. Ostatní jsou světlejší. Rozestupy drah jsou v nákresu upravené kvůli čitelnosti. Skutečný poloměr obsazené dráhy ukazuje odečet $r_n$. Kolem přechodu se oběh zpomalí, abys stihl sledovat foton. Svislé čáry v grafu označují vlnové délky.',
     reason:'Zkoušíš, zda vybrané energetické hladiny dokážou vysvětlit konkrétní barvy vodíku.',
-    step:'Ponech Cílovou hladinu na druhé a spusť pokus s Výchozí hladinou na třetí. Sleduj, odkud vyletí foton a kde po přechodu zůstane elektron. Pak zvyšuj Výchozí hladinu a porovnej zvýrazněné čáry v grafu. Chceš-li znovu vidět okamžik emise, použij Od začátku.',
+    step:[
+      'Ponech výchozí hladinu na třetí a cílovou na druhé. Klikni na Spustit emisi a sleduj záblesk při přechodu i odlet fotonu. Energii v tomto případě určí zvolené hladiny.',
+      'Pro absorpci nastav výchozí hladinu na druhou a cílovou na třetí. Čárkovanou čáru posuň přímo v grafu nebo posuvníkem, až se přichytí ke spektrální čáře zvoleného přechodu. Ovladač se zarovná na potřebnou energii $\\Delta E$. Pak klikni na Vyslat foton.',
+      'Zkus vyslat ho i s energií dál od rezonance. Porovnej oba průlety a sleduj, zda se obsazená hladina změní.'
+    ],
     calculation:{
       formula:String.raw`\lambda=\frac{hc}{|E_f-E_i|}`,
       explanation:'Energie fotonu je velikost rozdílu počáteční a konečné energie atomu $E_i$ a $E_f$. Planckova konstanta je $h$, rychlost světla $c$ a vlnová délka fotonu $\\lambda$.'
     },
-    clue:'Přechod ze třetí na druhou hladinu dává červenou čáru asi $656\\,\\mathrm{nm}$. Při větším rozdílu energií se čára posune ke kratším vlnovým délkám.',
+    clue:'Přechod ze třetí na druhou hladinu dává červenou čáru asi $656\\,\\mathrm{nm}$. Při opačném přechodu se elektron dostane na vyšší hladinu po pohlcení fotonu naladěného na $\\Delta E$. Mimo rezonanci foton proletí a obsazená hladina se nezmění. Plynulé předání zvýraznění mezi drahami znázorňuje změnu stavu. Obě dráhy odpovídají diskrétním hladinám.',
     conclusion:'Každá čára odpovídá určitému rozdílu energií mezi dvěma povolenými stavy vodíku. Z vlnových délek čar tak lze zjistit rozdíly energií uvnitř atomu.'
   },
   {
     motivation:'Bohrovy povolené dráhy vysvětlily spektrum, jejich výběr ale vstupoval do modelu jako předpoklad. De Broglieho vztah mezi hybností a vlnovou délkou nabízí názorné vysvětlení, proč na uzavřené dráze vyhoví jen určité stavy.',
-    goal:'Najdi poloměr, při kterém fáze vlny po oběhu plynule naváže na svůj začátek.',
-    scene:'Křivka na obvodu kreslí fázi vlny. Popisek Spoj označuje místo, kde kruh uzavíráš.',
-    reason:'Vlnová představa dává názorný důvod, proč na kružnici vyhovují jen určité kombinace poloměru a hybnosti.',
-    step:'Při urychlovacím napětí $54\\,\\mathrm{V}$ vyzkoušej poloměr kolem $80\\,\\mathrm{pm}$. Měň poloměr a sleduj spoj. Potom změň urychlovací napětí.',
+    goal:'Najdi dvojici poloměru a vlnové délky, při které může elektron podle Bohrova modelu zůstat ve stacionárním stavu.',
+    scene:'Vlevo vybereš cílovou hladinu z barevných řádků. V diagramu je stejnou barvou zvýrazněná plná čára cíle. Čárkovaná čára ukazuje energii kruhového oběhu při zkoušeném poloměru. Vpravo sleduješ samotnou vlnu kolem jádra. Jakmile se její fáze ve Spoji potkají, vlna zezelená.',
+    reason:'Poloměr mění obvod dráhy a vlnová délka mění, kolik vln se na něj vejde. Zelená vlna potvrzuje návaznost fáze. U vodíku musí vlnová délka zároveň odpovídat hybnosti, se kterou lze při daném poloměru obíhat kolem jádra.',
+    step:[
+      'Zkus poloměr $100\\,\\mathrm{pm}$ a vlnovou délku kolem $0{,}314\\,\\mathrm{nm}$. Posuvník se přichytí ke dvěma celým vlnám. Srovnej nastavenou vlnovou délku s odečtem $\\lambda_{\\text{pro oběh}}$.',
+      'Vyber první cílovou hladinu. Táhni čárkovanou čáru v diagramu nebo použij posuvník poloměru. U $53\\,\\mathrm{pm}$ čárkovaná čára dosedne na plnou a obě kružnice se vpravo překryjí. Potom dolaď vlnovou délku kolem $0{,}333\\,\\mathrm{nm}$ a sleduj, kdy se objeví Povolená dráha vodíku.',
+      'Vyber druhou cílovou hladinu a postup zopakuj poblíž $212\\,\\mathrm{pm}$. Odečty energie a frekvence pak ukazují, jaký foton vodík potřebuje pro přechod z první na druhou hladinu.'
+    ],
     calculation:{
-      formula:String.raw`\lambda=\frac{h}{p},\qquad \frac{2\pi r}{\lambda}=j\quad (j\in\mathbb Z)`,
-      explanation:'Vlnovou délku $\\lambda$ určuje hybnost elektronu $p$ a Planckova konstanta $h$. Obvod kružnice o poloměru $r$ musí obsahovat celý počet vln $j$.'
+      formula:String.raw`p=\sqrt{\frac{\mu\kappa}{r}},\qquad \lambda=\frac{h}{p},\qquad \frac{2\pi r}{\lambda}=n`,
+      explanation:'První vztah vychází z rovnosti dostředivé a Coulombovy síly. Značka $\\mu$ je redukovaná hmotnost elektronu a protonu, $\\kappa=e^2/(4\\pi\\varepsilon_0)$, $e$ je elementární náboj a $\\varepsilon_0$ permitivita vakua. Druhý vztah určí vlnovou délku z hybnosti a Planckovy konstanty $h$. Po celém obvodu se musí vejít kladný celý počet vln $n$.'
     },
-    clue:'Při $54\\,\\mathrm{V}$ vyjde $\\lambda\\approx0{,}167\\,\\mathrm{nm}$. Okolo poloměru $80\\,\\mathrm{pm}$ se posuvník přichytí k hodnotě, při které spoj plynule naváže a na kružnici vyjdou tři vlny. Mimo okolí této hodnoty uvidíš ve spoji nesoulad.',
-    conclusion:'Při dané hybnosti se fáze uzavře jen na kružnicích, do jejichž obvodu se vejde celý počet vln. Tato podmínka názorně vysvětluje výběr určitých poloměrů v modelu s kružnicí.'
+    clue:'Při $100\\,\\mathrm{pm}$ může být spoj zelený a odečty kinetické energie se ještě liší. Na povolené dráze se shodnou. Druhý povolený poloměr je čtyřikrát větší a celková energie stavu vzroste zhruba z $-13{,}6\\,\\mathrm{eV}$ na $-3{,}4\\,\\mathrm{eV}$. Pro přechod je potřeba dodat přibližně $10{,}2\\,\\mathrm{eV}$.',
+    conclusion:'Spojení Coulombovy přitažlivosti a návaznosti fáze určuje povolené poloměry $r_n=a_\\mu n^2$. $a_\\mu$ je Bohrova délka s korekcí na pohyb jádra. Bohr samostatným postulátem stanovil, že elektron ve stacionárním stavu průběžně nezáří. Nejkratší nastavitelná vlna leží u meze vazby na zvolené dráze. Frekvenci fotonu určuje rozdíl celkových energií hladin, $\\nu_{1\\to n}=(E_n-E_1)/h$.'
   },
   {
     motivation:'Vlnová mechanika nahradila představu jedné kruhové dráhy vázaným stavem v prostoru. Aby šlo tento stav porovnat s měřením, potřebujeme z vlnové funkce předpovědět četnost různých poloh.',
-    goal:'Porovnej nejhustší část oblaku s vrcholem grafu vzdálenosti od jádra a najdi v orbitalu místo s nulovou hustotou.',
-    scene:'Každá tečka představuje možnou naměřenou polohu. Graf sčítá pravděpodobnost v tenkých kulových slupkách podle vzdálenosti od jádra.',
-    reason:'Zkoušíš rozlišit dvě otázky. Jak pravděpodobná je poloha v malém objemu a jak pravděpodobná je určitá vzdálenost od jádra?',
-    step:'Vyber orbital $1\\mathrm{s}$ a srovnej střed oblaku s vrcholem grafu. Pak přepni na $2\\mathrm{s}$ a vyhledej pokles v grafu.',
+    goal:'Zjisti, kde bys při opakovaných měřeních nejčastěji našel elektron a kde ho v daném stavu vůbec nenaměříš.',
+    scene:'Vlevo je pro srovnání základní stav vodíku. Vpravo vybíráš ze tří tvarů. Každá tečka je jeden možný výsledek měření polohy. Hustší části oblaku znamenají častější nálezy v malém objemu. Graf dole sčítá polohy podle vzdálenosti od jádra.',
+    reason:'Chceš rozlišit, co se dovíš z tvaru oblaku a co z grafu vzdálenosti. Oblak ukáže i směr od jádra. Graf shrnuje všechny směry do jedné křivky.',
+    step:[
+      'Začni u $2\\mathrm{p}$. Zapni Otáčet oblaky a porovnej dva laloky s kulovým základním stavem vlevo. Najdi rovinu mezi laloky, v níž je hustota nulová.',
+      'Přepni na $2\\mathrm{s}$. Najdi kulový uzel, který odděluje vnitřní a vnější část oblaku. V grafu je jeho vzdálenost vyznačena čárkovanou čarou.',
+      'Vyber $1\\mathrm{s}$. Porovnej nejhustší místo oblaku u jádra s vyznačeným vrcholem grafu. Řez zapneš zaškrtávátkem Zobrazit řez. Fázi a další orbitaly najdeš pod Další stavy a zobrazení.'
+    ],
     calculation:{
       formula:String.raw`w=|\psi|^2,\qquad \mathrm dP=P_r(r)\,\mathrm dr=r^2|R_{n\ell}(r)|^2\,\mathrm dr`,
       explanation:'Ze stavu $\\psi$ určíš pravděpodobnost na jednotku objemu $w$. Pravděpodobnost $\\mathrm dP$ v tenké slupce o tloušťce $\\mathrm dr$ určuje radiální hustota $P_r$. Faktor $r^2$ zohledňuje větší objem vzdálených slupek a $R_{n\\ell}$ je radiální část stavu s kvantovými čísly $n,\\ell$.'
     },
-    clue:'Ve stavu $1\\mathrm{s}$ je prostorová hustota největší u jádra, zatímco radiální graf vrcholí kolem $r/a_\\mu=1$. Ve stavu $2\\mathrm{s}$ najdeš uzel při $r/a_\\mu=2$. Veličina $a_\\mu$ je Bohrova délka s korekcí na pohyb jádra.',
-    conclusion:'Pravděpodobnost určité vzdálenosti zahrnuje všechna místa na kulové slupce, proto má graf jiné maximum než prostorová hustota. Uzel je místo, kde hustota pravděpodobnosti klesá k nule.'
+    clue:'Stav $2\\mathrm{p}$ má prázdnou rovinu mezi laloky. Stav $2\\mathrm{s}$ má kulový uzel při $r/a_\\mu=2$. Ve stavu $1\\mathrm{s}$ je hustota největší u jádra a graf vzdálenosti vrcholí kolem $r/a_\\mu=1$. Veličina $a_\\mu$ je Bohrova délka s korekcí na pohyb jádra.',
+    conclusion:'Orbital předpovídá, jaké polohy naměříš v daném stavu. Prostorový oblak ukáže tvar i uzly. Graf vzdálenosti zahrnuje všechna místa na kulové slupce, proto může vrcholit i dál od nejhustší části oblaku.'
   },
   {
-    motivation:'Vlnovou délku elektronu lze ověřit rozptylem na pravidelně uspořádaných atomech. Davisson a Germer proto měřili, v jakých směrech se od monokrystalu niklu rozptylují elektrony o různých rychlostech.',
-    goal:'Najdi směr nejsilnějšího rozptylu a sleduj, kam se maximum posune po změně napětí.',
-    scene:'Modré body označují atomy niklu. Graf ukazuje, kolik rozptýleného svazku detektor najde v různých směrech.',
-    reason:'Zkoušíš, zda na posun intenzity stačí představa jedné dráhy, nebo zda výsledek určují fáze vln od mnoha atomů.',
-    step:'Najdi výrazné maximum v grafu. Namiř tam detektor a změň urychlovací napětí.',
+    motivation:'De Broglie předpověděl, že i elektron má vlnovou délku danou jeho hybností. Davisson a Germer hledali měřitelný projev této vlny. Jako terč použili monokrystal niklu, kovu, jehož atomy v krystalu tvoří pravidelnou prostorovou mřížku.',
+    goal:'Máš jeden detektor a chceš zachytit co nejvíc elektronů. Najdi mu nejlepší místo. Pak zjisti, jestli tam může zůstat, když zvýšíš napětí.',
+    scene:'Vlevo vidíš uspořádání atomů niklu. Vpravo letí elektrony kolmo na krystal. Detektor zachytává elektrony rozptýlené do směru, ve kterém právě stojí. Plná křivka ukazuje, jaký signál model předpovídá v jednotlivých směrech. Tečka označuje hodnotu v místě detektoru.',
+    reason:'Kdyby změna napětí ovlivnila jen množství vyslaných elektronů, nejsilnější signál by přicházel ze stejného směru. Zkus ověřit, jestli se vrchol přesune, i když polohu krystalu ani detektoru nezměníš.',
+    step:[
+      'Nech urychlovací napětí na $54\\,\\mathrm{V}$. Pohybuj posuvníkem Úhel detektoru nebo táhni přímo v grafu. Sleduj společně polohu detektoru ve scéně a tečku na křivce.',
+      'Přesuň tečku na nejvyšší vrchol. Detektor se v jeho okolí přichytí a na nejsilnějším směru zezelená. Odečti úhel.',
+      'Tipni si, jestli detektor zůstane na nejlepším místě. Přibliž posuvník napětí k $72\\,\\mathrm{V}$, kde se přichytí, a nejdřív s detektorem nehýbej. Čárkovaná křivka ukazuje výchozí stav při $54\\,\\mathrm{V}$. Porovnej polohu obou vrcholů a pak přesuň detektor na nový vrchol.'
+    ],
     calculation:{
-      formula:String.raw`\lambda=\frac{h}{p},\qquad \frac{I}{N^2}=\left|\frac1N\sum_{j=1}^{N}\exp\!\bigl(i(\mathbf k_f-\mathbf k_i)\cdot\mathbf R_j\bigr)\right|^2`,
-      explanation:'Planckova konstanta $h$ a hybnost $p$ určují vlnovou délku $\\lambda$. Vektory $\\mathbf k_i$ a $\\mathbf k_f$ popisují dopadající a rozptýlenou vlnu. Poloha každého atomu $\\mathbf R_j$ určuje jeho fázový příspěvek. Z jejich součtu získáš normalizovanou intenzitu $I/N^2$ pro $N$ atomů. Značka $i$ je imaginární jednotka.'
+      formula:String.raw`\lambda=\frac{h}{p}\approx\frac{h}{\sqrt{2m_e eU}},\qquad \text{údaj v grafu}=\frac{I(\theta)}{I_{\max}}`,
+      explanation:'Planckova konstanta $h$ a hybnost $p$ určují vlnovou délku $\\lambda$. Vyšší urychlovací napětí $U$ dává elektronu větší hybnost. Ve vztahu je $m_e$ hmotnost elektronu a $e$ velikost jeho náboje. $\\theta$ je úhel detektoru od kolmice a $I(\\theta)$ je intenzita v tomto směru. Každá křivka má vlastní maximum $I_{\\max}$. Mezi křivkami proto porovnávej úhly vrcholů.'
     },
-    clue:'Při $54\\,\\mathrm{V}$ vyjde $\\lambda\\approx0{,}167\\,\\mathrm{nm}$. Se zvýšením napětí se vlnová délka zkrátí a některá maxima v úhlovém grafu změní polohu nebo výšku.',
-    conclusion:'Výrazná maxima vznikají ve směrech, kde se rozptýlené vlny vzájemně zesílí. Změnou hybnosti se změní jejich vlnová délka a tím i podmínky zesílení. Úhlový graf tak umožňuje vlnovou povahu elektronů ověřit.'
+    clue:'V tomto modelu leží nejsilnější vrchol při $54\\,\\mathrm{V}$ v úhlu $43{,}9^\\circ$. Při $72\\,\\mathrm{V}$ se vlnová délka zkrátí zhruba z $0{,}167\\,\\mathrm{nm}$ na $0{,}145\\,\\mathrm{nm}$ a nejsilnější směr leží v úhlu $5{,}55^\\circ$.',
+    conclusion:'Přes různé atomy urazí vlna k detektoru různé vzdálenosti. Tam, kde se vrcholy rozptýlených vln sejdou, je signál silný. Kratší vlnová délka znamená, že se vrcholy mohou sejít v jiném směru. Krystal tak umožňuje poznat vlnové chování elektronu podle toho, kam dopadá nejvíc elektronů.'
   },
   {
     motivation:'Nerelativistický popis elektronu přestával při vysokých rychlostech stačit. Dirac hledal kvantovou rovnici slučitelnou se speciální relativitou, která by zároveň popsala spin elektronu.',
-    goal:'Zjisti, při jakých hybnostech se už viditelně liší klasická a relativistická kinetická energie.',
-    scene:'Horní scéna ukazuje dvě větve řešení Diracovy rovnice. V dolním grafu jsou klasická a relativistická kinetická energie.',
-    reason:'Zjistíš, v jaké oblasti můžeš při výpočtu energie dál používat jednoduché klasické přiblížení.',
-    step:'Začni téměř u nulové hybnosti a pomalu ji zvětšuj. Porovnej obě křivky dole.',
+    goal:'Poznej podle stopy, která částice má kladný náboj. Pak zjisti, jak moc se při vysoké hybnosti liší dva výpočty kinetické energie.',
+    scene:'Vlevo jsou dvě matematické větve celkové energie. Čárkovaná čára označuje zvolenou hybnost. Vpravo letí elektron a pozitron stejným směrem do magnetického pole. Křížky označují pole do obrazovky, tečky pole ven. Značky v dolním grafu ukazují relativistickou a klasickou kinetickou energii při zvolené hybnosti.',
+    reason:'Dráha umožní rozlišit opačné náboje, i když obě částice mají stejnou hmotnost a stejnou velikost hybnosti. Srovnáním energií uvidíš, proč bylo potřeba spojit kvantový popis s relativitou.',
+    step:[
+      'Ponech hybnost na $p=m_ec$ a pole směrem do obrazovky. Sleduj šipku vstupu zleva. Která stopa se stáčí vzhůru?',
+      'Tipni si, co se stane po obrácení pole. Přepni ho směrem z obrazovky. Porovnej stopy a ověř, jestli se zároveň změnily hodnoty kinetické energie.',
+      'Porovnej v dolním grafu značky při $p=0{,}25\\,m_ec$ a $p=3\\,m_ec$. Všimni si také, jak větší hybnost ovlivní zakřivení stop.'
+    ],
     calculation:{
-      formula:String.raw`\begin{aligned} E_{\text{k, rel}}&=\sqrt{p^2c^2+m_e^2c^4}-m_ec^2\\[3pt] E_{\text{k, klas}}&=\frac{p^2}{2m_e}\end{aligned}`,
-      explanation:'Pro stejnou hybnost $p$ počítáš kinetickou energii dvěma způsoby. V relativistickém vztahu odečteš od celkové energie klidovou energii $m_ec^2$. Značky $m_e$ a $c$ označují klidovou hmotnost elektronu a rychlost světla.'
+      formula:String.raw`\begin{gathered}\mathbf F=q\,\mathbf v\times\mathbf B,\quad r=\frac{p}{eB}\\ E_{\text{k, rel}}=\sqrt{p^2c^2+m_e^2c^4}-m_ec^2,\quad E_{\text{k, klas}}=\frac{p^2}{2m_e}\end{gathered}`,
+      explanation:'Síla $\\mathbf F$ působí kolmo na rychlost $\\mathbf v$, takže mění směr letu. $q$ je náboj se znaménkem a $e$ jeho velikost. $B$ je velikost magnetické indukce $\\mathbf B$, $r$ poloměr dráhy a $p$ velikost hybnosti. $m_e$ je klidová hmotnost elektronu i pozitronu a $c$ rychlost světla. Od celkové energie se při výpočtu kinetické energie odečte klidová energie $m_ec^2$.'
     },
-    clue:'U malých hybností jsou křivky blízko sebe. Pro $p=m_ec$ je relativistická kinetická energie asi $0{,}212\\,\\mathrm{MeV}$ a klasický výpočet dává $0{,}255\\,\\mathrm{MeV}$.',
-    conclusion:'Při malé hybnosti stačí klasický vztah. Když se hybnost blíží měřítku $m_ec$, klasický výpočet energii výrazně nadhodnocuje. Pro takové elektrony použij relativistický vztah.'
+    clue:'Při poli do obrazovky se pozitron stáčí nahoru a elektron dolů. Po obrácení pole se stopy vymění, energetické značky zůstanou na místě. S větší hybností rostou poloměry drah. Při $p=3\\,m_ec$ vychází přibližně $1{,}10\\,\\mathrm{MeV}$ relativisticky a $2{,}30\\,\\mathrm{MeV}$ klasicky.',
+    conclusion:'Znáš-li směr letu a pole, směr zakřivení prozradí znaménko náboje. Pozitron má kladný náboj a při stejné hybnosti stejnou kladnou fyzikální energii jako elektron. Klasický výpočet při vysoké hybnosti energii výrazně nadhodnocuje.'
   },
   {
     motivation:'Difrakce svazku ukázala vlnové chování elektronů. Jednotlivé detekce umožnily zjistit, zda se interferenční obrazec skládá i tehdy, když elektrony procházejí aparaturou postupně po jednom.',
     goal:'Sestav ze zásahů interferenční obrazec a porovnej ho se statistickou směsí dvou samostatných průchodů.',
-    scene:'Svazek prochází otvory v cloně a končí v detektoru. Graf ukazuje rozdělení záchytů podél stínítka.',
+    scene:'Vlevo vidíš clonu se štěrbinami. Vpravo se na stínítku objevují jednotlivé záchyty. V grafu zelená křivka ukazuje očekávané rozložení a okrové sloupce záchyty z tvé série. Místa s málo zásahy mezi dvěma vrcholy jsou interferenční minima.',
     reason:'Prověříš, jestli stejný obrazec vznikne společnou vlnovou přípravou a obyčejným smícháním zásahů z jednoho či druhého otvoru.',
-    step:'Zvol Obě koherentně a klikni na Jeden elektron. Po průchodu vlnového balíku sleduj, zda detektor přidal zásah. Potom přidej Tisíc elektronů. Přepni na Nekoherentní směs a zopakuj dávku při stejné geometrii.',
+    step:[
+      'Zvol Obě koherentně a klikni na Jeden elektron. Sleduj, zda na stínítku přibude bod. Potom klikni na Tisíc elektronů a najdi v grafu směry, kde je zásahů málo.',
+      'Přepni na Nekoherentní směs a zopakuj dávku při stejné geometrii. Porovnej, co se stalo s místy, kde předtím skoro žádné zásahy nebyly.',
+      'Změň vzdálenost štěrbin. Při tažení sleduj clonu a po puštění posuvníku se podívej na nově vypočtené rozložení.'
+    ],
     calculation:{
       formula:String.raw`\begin{aligned} w_{\text{koher}}&\propto|\psi_1+\psi_2|^2\\[3pt] w_{\text{směs}}&\propto|\psi_1|^2+|\psi_2|^2\end{aligned}`,
       explanation:'Amplitudy $\\psi_1$ a $\\psi_2$ označují příspěvky z obou otvorů v názorném popisu na detektoru. U koherentní přípravy záleží na jejich relativní fázi. Ve stejně vážené směsi se sčítají pravděpodobnosti. Symbol $\\propto$ ponechává stranou normalizaci.'
@@ -198,27 +224,35 @@ const electronLabNotes=[
     conclusion:'Interferenční obrazec může vzniknout i z jednotlivých zásahů. Při koherentní přípravě určuje jejich četnost součet amplitud včetně vzájemné fáze. Ve směsi se sčítají četnosti obou samostatných příprav a minima se vyplní.'
   },
   {
-    motivation:'Relativistická kvantová teorie popisuje elektron i jako částicový stav pole. Při přípravě jednoho elektronu potřebujeme rozlišit prostorový rozsah tohoto stavu od otázky vnitřní struktury částice.',
-    goal:'Zjisti, jak změna šířky rozdělení hybnosti ovlivní počáteční šířku vlnového balíku.',
-    scene:'Obálka představuje hustotu jednočásticového stavu. Graf ji vykresluje podél směru pohybu.',
-    reason:'Zkoušíš, jak souvisí příprava hybnosti s tím, jak přesně lze na začátku určit polohu.',
-    step:'Pozastav animaci, dej Od začátku a zvyš Šířku v hybnosti. Porovnej vzdálenost od středu k bodům na stejné výšce obálky podle čísel na vodorovné ose.',
+    motivation:'V kvantové teorii pole je elektron jedním kvantem elektronového pole. Jeden takto připravený elektron můžeš při měření najít na různých místech. To, jak široce jsou možná místa rozložená, závisí na přípravě.',
+    goal:'Zjisti, jestli lze stejným způsobem zpřesnit polohu i hybnost elektronu.',
+    scene:'Posuvník mění nejistotu hybnosti zobrazenou vlevo. Vpravo každý bod představuje jedno měření polohy na novém, stejně připraveném elektronu. Odečítej vodorovnou souřadnici bodu. Pod body je vidět předpověď pravděpodobnosti a vyznačená nejistota polohy. Výsledky měření se losují pro zobrazený výřez.',
+    reason:'Změnou přípravy zkoušíš, zda užšímu rozdělení jedné veličiny odpovídá užší, nebo širší rozdělení druhé.',
+    step:[
+      'V počátečním stavu klikni na Změřit jednou. Vpravo přibude jediný bod. Klikni na Zopakovat stokrát a všimni si, kolem kterých poloh se body nahromadí.',
+      'Zvyš Nejistotu hybnosti z $0{,}25\\,m_ec$ na $0{,}50\\,m_ec$ a zopakuj měření. Fialové body výchozí série zůstanou v horním řádku. Modré body nové série přibývají přímo pod nimi. Porovnej vodorovnou šířku obou shluků a obě křivky v grafu.',
+      'Tlačítkem Přehrát můžeš sledovat posun a rozšiřování balíku. Při kliknutí na měření se čas zastaví, aby všechny body patřily ke stejnému okamžiku.'
+    ],
     calculation:{
       formula:String.raw`\Delta x\,\Delta p\geq\frac{\hbar}{2}`,
-      explanation:'Značky $\\Delta x$ a $\\Delta p$ označují směrodatné odchylky polohy a hybnosti. Redukovaná Planckova konstanta je $\\hbar$. Pro jednoduchý gaussovský stav v počátečním čase je součin blízko dolní meze.'
+      explanation:'Značky $\\Delta x$ a $\\Delta p$ označují směrodatné odchylky polohy a hybnosti. Redukovaná Planckova konstanta je $\\hbar$. Počáteční gaussovský stav má součin blízko dolní meze. Osa polohy používá jednotku $\\bar\\lambda_C=\\hbar/(m_ec)$, kde $m_e$ je hmotnost elektronu a $c$ rychlost světla.'
     },
-    clue:'Širší rozdělení hybnosti dává na začátku užší obálku polohy. Protože se osa grafu přizpůsobuje, porovnej číselnou šířku na ose.',
+    clue:'Po zdvojnásobení počátečního rozptylu hybnosti se předpovězený rozptyl polohy přibližně zmenší na polovinu. Rozdíl uvidíš na rozestupu bodů i na šířce křivek v pevném měřítku.',
     conclusion:'V tomto balíku získáš přesnější počáteční polohu za cenu větší nejistoty hybnosti. Šířka obálky popisuje, jak byl stav elektronu připraven.'
   },
   {
-    motivation:'Otázku, zda má elektron vnitřní strukturu, lze zkoumat rozptylem při vysokém přenosu hybnosti. K interpretaci měření potřebuješ vědět, jak malé vzdálenosti daná sonda vůbec rozliší.',
+    motivation:'Když chceš zkoumat velmi malý objekt, můžeš na něj vyslat částici a změřit její rozptyl. Představ si foton namířený na volný elektron. Foton se odkloní a elektron odletí s hybností, kterou mu foton předal.',
     goal:'Ověř, který z ovladačů mění nejmenší délku, již může sonda rozlišit.',
-    scene:'V obraze se střídají fyzikální délková měřítka. Graf dole ukazuje odhad rozlišení podle přenosu hybnosti.',
+    scene:'Vlevo vidíš rozptyl fotonu na elektronu. Vpravo se přibližuješ od elektronového oblaku vodíku k protonu. Na konci se objeví názorný model dvou kvarků $u$, jednoho kvarku $d$ a gluonového pole. Rozlišitelnou délku ukazuje jantarová úsečka. Teplý závoj označuje výřez menší než rozlišení nastavené sondy.',
     reason:'Prověříš rozdíl mezi zobrazeným výřezem a rozlišením, které skutečně poskytuje sonda.',
-    step:'Nejprve změň jen Zorné pole. Potom ponech stejný výřez a zvyš Přenos hybnosti.',
+    step:[
+      'Sleduj vlevo, co přilétá k elektronu a kam se foton po rozptylu odkloní. Přenos závisí na změně velikosti i směru hybnosti fotonu.',
+      'Stiskni Spustit průlet k jádru. Při přibližování sleduj, kdy výřez klesne pod mez rozlišení. U konečného pohledu rozliš názorný model kvarků od údaje o rozlišení sondy. Pohyb modelu můžeš pozastavit.',
+      'Nastav Zorné pole na $10^{-13}\\,\\mathrm{m}$ a zvyš Přenos hybnosti z $10^7\\,\\mathrm{eV}/c$ na $10^8\\,\\mathrm{eV}/c$. Porovnej délku úsečky a odečet $\\Delta x$.'
+    ],
     calculation:{
       formula:String.raw`\Delta x\sim\frac{\hbar c}{qc}`,
-      explanation:'Přenos hybnosti je $q$, rychlost světla $c$ a redukovaná Planckova konstanta $\\hbar$. Graf používá veličinu $qc$ v jednotkách energie. Vztah odhaduje nejmenší rozlišitelnou délku $\\Delta x$.'
+      explanation:'Označ hybnost příchozího fotonu $\\mathbf p_{\\text{před}}$ a hybnost rozptýleného fotonu $\\mathbf p_{\\text{po}}$. Elektron získá hybnost $\\mathbf q=\\mathbf p_{\\text{před}}-\\mathbf p_{\\text{po}}$. Ovladač udává velikost $q=|\\mathbf q|$ v $\\mathrm{eV}/c$. Graf používá součin $qc$ v elektronvoltech. Značky $c$ a $\\hbar$ jsou rychlost světla a redukovaná Planckova konstanta. $\\Delta x$ odhaduje nejmenší rozlišitelnou délku.'
     },
     clue:'Desetinásobný přenos hybnosti zlepší odhad rozlišení desetkrát. Samotná změna zorného pole posune pohled na scénu a odečet $\\Delta x$ zůstane stejný.',
     conclusion:'Menší struktury můžeš hledat větším přenosem hybnosti. Zvětšení obrazu mění jen zobrazený výřez. Výsledek rozptylu vypovídá o struktuře elektronu pouze do meze rozlišení sondy.'

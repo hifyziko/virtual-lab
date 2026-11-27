@@ -113,6 +113,10 @@ function addFusionPages(output,web){
    return '<style data-fusion-source="'+rel+'">'+text+'</style>';
   });
   // Media stays lazy and external; srcdoc inherits the hub base URL.
+  if(id==='em08-stridac'){
+   if(!published.has('stridac/stanoviste.jpg'))throw Error('Missing inverter laboratory photo');
+   html=html.replace('src="stanoviste.jpg"','src="stridac/stanoviste.jpg"');
+  }
   html=html.replace(/(data-(?:video-src|video-poster))="([^"]+)"/g,(_,attribute,ref)=>{const url=new URL(ref,'https://bundle.invalid/'+page),rel=url.pathname.slice(1);if(url.origin!=='https://bundle.invalid'||!published.has(rel))throw Error('Unexpected fusion media: '+ref);return attribute+'="'+rel+'"';});
   const scripts=[];
   html=html.replace(/<script\b[^>]*src="([^"]+)"[^>]*>\s*<\/script>/g,(_,ref)=>{

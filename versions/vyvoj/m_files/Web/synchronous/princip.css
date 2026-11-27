@@ -18,19 +18,18 @@
 /* Keep plot geometry proportional; allow unused space instead of stretching SVG. */
 @media(min-width:1150px){.charts svg{object-fit:contain}.workspace{max-height:none}}
 
-#loadLimit{color:var(--green)}#loadLimit.overload{color:#ae4c28;font-weight:600}
 
 /* Reserve space for changing instructional text without moving adjacent panels. */
-#loadLimit{min-height:2.6em;line-height:1.3}.inspector .status{min-height:2.8em;align-items:flex-start}.inspector .status-dot{margin-top:.45em}.inspector .explanation{min-height:7em}.inspector .angle-reading p{min-height:2.6em}.energy-flow{min-height:3.8em}.charts>.card>p{min-height:3.9em;line-height:1.3}.inspector{overflow-y:auto;scrollbar-gutter:stable}.operating-controls output,.torque-row b,.torque-total b{font-variant-numeric:tabular-nums}
+.inspector .status{min-height:2.8em;align-items:flex-start}.inspector .status-dot{margin-top:.45em}.inspector .explanation{min-height:7em}.inspector .angle-reading p{min-height:2.6em}.energy-flow{min-height:3.8em}.charts>.card>p{min-height:3.9em;line-height:1.3}.inspector{overflow-y:auto;scrollbar-gutter:stable}.operating-controls output,.torque-row b,.torque-total b{font-variant-numeric:tabular-nums}
 
 .inspector .angle-reading p{min-height:1.4em}.inspector .explanation{min-height:6em}.energy-flow{min-height:2.8em}.charts>.card>p{min-height:2.6em}
 
 .katex{font-size:1em}.charts foreignObject,.machine foreignObject{overflow:visible}.operating-controls .katex{font-size:1em}.scene-footer .katex{font-size:1em}.theory [data-tex]{display:inline-block;vertical-align:middle}.theory p{overflow-wrap:anywhere}
 @media(min-width:851px) and (max-width:1149px){.machine{height:clamp(340px,calc(var(--window-height,100dvh) - 330px),62vw)}}
 
-/* Field motion controls share the width of the inspector. */
-.inspector .field-actions{display:grid;grid-template-columns:minmax(0,1fr);align-self:stretch;gap:3px;flex:none}
-.field-actions button{width:100%;min-width:0;padding:4px 8px;line-height:1.25;white-space:normal;background:#e5effb;border-color:#a8c3e7;color:#234a77;font-weight:600}
+/* Keep the motion controls on two stable rows. */
+.inspector .field-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-self:stretch;gap:5px;flex:none}
+.field-actions button{min-width:0;min-height:30px;padding:4px;line-height:1.25;white-space:normal;background:#e5effb;border-color:#a8c3e7;color:#234a77;font-weight:600}
 .field-actions button:hover{background:#d1e3f8}
 .field-actions button[aria-pressed=true]{background:#315f9c;border-color:#315f9c;color:white}
 #loadedRun{background:#e8f4ef;border-color:#a5cdbf;color:#174c43;font-weight:600}
@@ -40,7 +39,6 @@
 .controls .machine-controls .shaft-load{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;min-width:0;flex:1 1 340px;margin:0}
 .shaft-load input{grid-column:1/-1;grid-row:2;width:100%;margin:0}
 .shaft-load output{grid-column:2;grid-row:1;color:var(--green);text-align:right}
-.shaft-load small{grid-column:1/-1;line-height:1.25;color:var(--muted)}
 .operating-controls .inertia{margin:0}
 .operating-controls .inertia input{width:100%}
 @media(max-width:1149px){.controls .operating-controls{grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr))}}
@@ -58,13 +56,12 @@
  main .controls .operating-controls output{grid-column:2;grid-row:1}
  main .controls .angle-control output{font-size:14px}
  main .controls .angle-control input{height:18px;margin:0}
- main .controls #loadLimit{min-height:1.3em}
 }
 
-/* A square machine panel; give the remaining width to the live charts. */
+/* Keep the machine drawing proportional inside a full-height panel. */
 @media(min-width:1150px){
  main .workspace{grid-template-columns:minmax(0,min(var(--workspace-height,600px),calc(100% - 568px))) minmax(330px,1fr) 220px}
- main .workspace>.scene-card{width:100%;height:auto;aspect-ratio:1 / 1;min-height:0;max-height:100%;align-self:start}
+ main .workspace>.scene-card{width:100%;height:100%;min-height:0;align-self:stretch}
  main .workspace>.scene-card .machine{height:0;min-height:0;flex:1 1 0}
  main .workspace>.scene-card .scene-head,main .workspace>.scene-card .scene-footer{flex-shrink:0}
 }

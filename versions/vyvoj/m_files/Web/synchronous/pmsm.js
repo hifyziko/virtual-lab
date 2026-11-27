@@ -149,7 +149,20 @@ function graph(id,{xmin=0,xmax=9000,ymin=0,ymax=100,xtex='n\\;[\\mathrm{min}^{-1
  for(let i=0;i<=3;i++){const v=xmin+(xmax-xmin)*i/3,x=X(v);h+=path([[x,T],[x,B]],'#e5ece8',1)+label(x,B+19,fmt(v,0),C.muted,12);}
  h+=path([[L,T],[L,B],[R,B]],'#9ab1a7',1)+label(125,16,ytex,C.ink,14,225)+label(570,250,xtex,C.ink,14,245);
  h+=`<g clip-path="url(#${clip})">`;if(vertical!==null)h+=path([[X(vertical),T],[X(vertical),B]],'#bdc9c2',1,'4 3');
- for(const row of series){let part=[];const flush=()=>{h+=path(part.map(p=>[X(p[0]),Y(p[1])]),row.color,row.width||2,row.dash||'');part=[];};for(const p of row.points){if(!p||!p.every(Number.isFinite)){flush();continue;}part.push(p);}flush();}
+ let fills='',curves='';
+ for(const row of series){let part=[];const flush=()=>{
+  const points=part.map(([x,y])=>[X(x),Y(y)]);
+  if(row.area&&points.length>1){
+   const base=Y(0),gradient=id+'-area';
+   fills+=`<polygon points="${points[0][0]},${base} ${points.join(' ')} ${points.at(-1)[0]},${base}" fill="url(#${gradient})"/>`;
+  }
+  curves+=path(points,row.color,row.width||2,row.dash||'');part=[];
+ };for(const p of row.points){if(!p||!p.every(Number.isFinite)){flush();continue;}part.push(p);}flush();}
+ if(fills){
+  const color=series.find(row=>row.area).color;
+  h+=`<defs><linearGradient id="${id}-area" x2="0" y2="1"><stop stop-color="${color}" stop-opacity=".24"/><stop offset="1" stop-color="${color}" stop-opacity=".012"/></linearGradient></defs>`+fills;
+ }
+ h+=curves;
  for(const p of dots)h+=dot(X(p.x),Y(p.y),p.color||C.i);h+='</g>';$(id).innerHTML=h;
 }
 function limitPlots(a){
@@ -183,7 +196,7 @@ function plots(a){
  put('machineParams','L_d='+val(s.Ld*1000,'mH')+String.raw`,\quad L_q=`+val(s.Lq*1000,'mH')+String.raw`\quad p=`+s.p);
  $('lowerLegend').innerHTML=math('M_{\\mathrm{PM}}='+val(a.mag,'N\\,m')+'\\qquad M_{\\mathrm{rel}}='+val(a.rel,'N\\,m'));
  }else if(step===2){const rows=run.history,xmax=Math.max(12,Math.ceil(run.t/6)*6),xmin=Math.max(0,xmax-30);
- graph('upper',{xmin,xmax,ymax:Math.max(3000,target*1.15,run.n*1.1),xtex:'t\\;[\\mathrm{s}]',ytex:'n\\;[\\mathrm{min}^{-1}]',series:[{color:C.muted,dash:'5 4',points:rows.map(r=>[r.t,r.ref])},{color:C.i,points:rows.map(r=>[r.t,r.n])}]});
+ graph('upper',{xmin,xmax,ymax:Math.max(3000,target*1.15,run.n*1.1),xtex:'t\\;[\\mathrm{s}]',ytex:'n\\;[\\mathrm{min}^{-1}]',series:[{color:C.muted,dash:'5 4',points:rows.map(r=>[r.t,r.ref])},{color:C.i,area:true,points:rows.map(r=>[r.t,r.n])}]});
  const forecast=preview?.rows||[],maxTorque=Math.max(100,...curves.map(p=>p.M),...curves.map(p=>F.loadTorque(p.n,load,$('loadKind').value)+.002*p.n*Math.PI/30));
  graph('lower',{ymax:maxTorque*1.12,series:[
   {color:C.muted,dash:'3 5',points:curves.map(p=>p.feasible?[p.n,p.M]:null)},

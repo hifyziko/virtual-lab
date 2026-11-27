@@ -80,14 +80,62 @@ const ElectronPhysics = (() => {
     const time=radiating?end*(1-(1-progress)**3):animationTime*Math.sqrt(m*r0**3/k);
     return {time,end,angle:2.1*(radiating?progress*collapseDuration:animationTime),state:collapse(r0,radiating?time:0)};
   }
-  function bohrView(S,time){
-    const initial=S.ni,requested=S.nf,Z=S.ion+1,delta=energy(requested,Z)-energy(initial,Z);
-    const allowed=delta<0||delta>0&&Math.abs(delta-S.photon)<.005;
-    const wavelength=delta?h*c/(Math.abs(delta)*e)*1e9:0;
-    const photonColor=wavelength<380?'#8a60c8':wavelength<455?'#674cc4':wavelength<495?'#2677ba':wavelength<570?'#268463':wavelength<625?'#c67722':'#d34f4c';
-    return {initial,final:allowed?requested:initial,shownFinal:requested,highest:Math.max(initial,requested),
-      angle:(time-2)*1.45-.48,transition:allowed?(delta<0?'emission':'absorption'):null,
-      progress:(time-2)/1.4,photonColor,wavelength};
+  const bohrDuration=7.2,bohrOrbitRate=.90;
+  const bohrGap=S=>energy(S.nf,S.ion+1)-energy(S.ni,S.ion+1);
+  const bohrResonant=S=>Math.abs(bohrGap(S)-S.photon)<.005;
+  const photonNmEv=h*c/e*1e9;
+  const photonEnergy=wavelength=>photonNmEv/wavelength;
+  function bohrSpectrum(S){
+    const Z=S.ion+1,gap=Math.abs(bohrGap(S)),reference=gap?photonNmEv/gap:0;
+    const balmer=Math.min(S.ni,S.nf)===2&&Math.max(S.ni,S.nf)>2;
+    const min=reference&&!balmer?.74*reference:380/Z**2;
+    const max=reference&&!balmer?1.35*reference:Math.max(700/Z**2,1.15*reference);
+    return {min,max,reference,balmer,photonMin:photonEnergy(max),photonMax:Math.min(photonEnergy(min),-energy(S.ni,Z)),incident:photonNmEv/S.photon};
+  }
+  function bohrView(S,time=null,freeAngle=-1.66){
+    const initial=S.ni,shownFinal=S.nf,delta=bohrGap(S),impact=2.6,endTransfer=4;
+    const emission=delta<0,resonant=delta>0&&bohrResonant(S);
+    const ease=x=>{const u=Math.min(1,Math.max(0,x));return u*u*(3-2*u);};
+    const final=emission||resonant?shownFinal:initial;
+    const transfer=final!==initial&&time!==null?ease((time-impact)/(endTransfer-impact)):0;
+    const wavelength=delta?photonNmEv/Math.abs(delta):0;
+    const wave=emission?wavelength:photonNmEv/S.photon;
+    const photonColor=wave<380?'#8a60c8':wave<455?'#674cc4':wave<495?'#2677ba':wave<570?'#268463':wave<625?'#c67722':'#d34f4c';
+    const t=time??0,slowRate=.10,slowSpan=1.25,slowStart=impact-slowSpan;
+    const extraRate=bohrOrbitRate-slowRate;
+    const approach=Math.min(1,Math.max(0,(t-slowStart)/slowSpan));
+    const departure=Math.min(1,Math.max(0,(t-endTransfer)/slowSpan));
+    const eventAngle=(S.angle??freeAngle)+slowRate*impact+extraRate*(slowStart+.5*slowSpan);
+    const elapsedOrbit=Math.min(t,slowStart)+slowSpan*(approach-.5*approach**2)+
+      slowSpan*(departure**3-.5*departure**4)+Math.max(0,t-endTransfer-slowSpan);
+    const angle=time===null?freeAngle:(S.angle??freeAngle)+slowRate*t+extraRate*elapsedOrbit;
+    let photon=null,status=emission?'Připraveno k emisi':delta>0?'Připraveno k vyslání':'Stejná hladina';
+    if(time!==null&&delta!==0){
+      if(emission){
+        status=t<impact?'Před emisí':t<endTransfer?'Přechod na nižší hladinu':t<bohrDuration?'Foton opouští atom':'Foton emitován';
+        if(t>=impact&&t<bohrDuration)photon={travel:ease((t-impact)/(bohrDuration-impact)),offset:0};
+      }else{
+        status=t<impact?'Foton přilétá':resonant?t<endTransfer?'Rezonanční přechod':'Foton absorbován':'Průlet mimo rezonanci';
+        if(t<impact||(!resonant&&t<bohrDuration))photon={travel:t<impact?1-ease(t/impact):-ease((t-impact)/(bohrDuration-impact)),offset:resonant?0:.17};
+      }
+    }
+    return {initial,final,shownFinal,highest:Math.max(initial,shownFinal),angle,eventAngle,transfer,photon,photonColor,wavelength,status};
+  }
+  function bohrScene(S,cache,time){
+    const trial=cache.bohrTrial,angle=cache.bohrAngle??-1.66;
+    const view=bohrView(trial??S,trial?time:null,angle);
+    view.showAllLevels=true;
+    if(trial&&time>=bohrDuration)view.angle=angle;
+    return view;
+  }
+  function hydrogenRing(radius,wavelength,time){
+    const r=radius*1e-12,p=h/(wavelength*1e-9),required=h/Math.sqrt(mu*k/r)*1e9;
+    const turns=tau*r/(wavelength*1e-9),whole=Math.max(1,Math.round(turns));
+    const kinetic=p*p/(2*mu),circularKinetic=k/(2*r);
+    const phase=(2*circularKinetic-kinetic)*time*1e-15/hb;
+    const closed=Math.abs(turns-whole)<1e-8;
+    return {required,turns,whole,phase,kineticEv:kinetic/e,circularKineticEv:circularKinetic/e,
+      closed,allowed:closed&&Math.abs(wavelength-required)<1e-8};
   }
   function factorial(n){let f=1;for(let i=2;i<=n;i++)f*=i;return f;}
   function laguerre(n,alpha,x){let prev=0,cur=1;for(let i=1;i<=n;i++)[prev,cur]=[cur,((2*i-1+alpha-x)*cur-(i-1+alpha)*prev)/i];return cur;}
@@ -115,6 +163,23 @@ const ElectronPhysics = (() => {
       const re=amp*u*Math.cos(phase),im=amp*u*Math.sin(phase);ur+=re;ui+=im;lr+=re*q/(g+1);li+=im*q/(g+1);norm+=amp*amp;}
     return (ur*ur+ui*ui+lr*lr+li*li)*dq/(tau*norm);
   }
-  return {e,m,c,h,hb,k,mu,a,a0,rest,tau,energy,bohrLength,momentum,speed,random,boris,tube,verlet,sphereForce,ring,scatter,mixSamples,samplePath,sampleRing,collapse,collapseView,collapseDuration,bohrView,radial,angular,orbital,dirac,packet};
+  function packetProfile(q0,width,time){
+    const min=-16,max=28,segments=320,dx=(max-min)/segments;
+    const points=Array.from({length:segments+1},(_,i)=>{
+      const x=min+i*dx;
+      return [x,packet(q0,width,x,time)];
+    });
+    const cumulative=[0];
+    let mass=0,first=0,second=0;
+    for(let i=1;i<points.length;i++){
+      const [x1,y1]=points[i-1],[x2,y2]=points[i],weight=(y1+y2)*dx/2;
+      const x=(x1+x2)/2;
+      mass+=weight;first+=weight*x;second+=weight*x*x;
+      cumulative.push(mass);
+    }
+    const mean=first/mass;
+    return {time,min,max,points,cumulative,mass,mean,deviation:Math.sqrt(Math.max(0,second/mass-mean*mean))};
+  }
+  return {e,m,c,h,hb,k,mu,a,a0,rest,tau,energy,bohrLength,momentum,speed,random,boris,tube,verlet,sphereForce,ring,scatter,mixSamples,samplePath,sampleRing,collapse,collapseView,collapseDuration,bohrView,bohrScene,bohrGap,bohrResonant,bohrSpectrum,bohrDuration,bohrOrbitRate,photonEnergy,hydrogenRing,radial,angular,orbital,dirac,packet,packetProfile};
 })();
 if(typeof module!=='undefined')module.exports=ElectronPhysics;

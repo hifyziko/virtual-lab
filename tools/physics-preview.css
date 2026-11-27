@@ -1,4 +1,4 @@
-.physics-areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 32px}
+.physics-areas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0 0 32px}
 .physics-area-link{display:flex;flex-direction:column;padding:24px;border:1px solid #cdded6;border-top:4px solid #007c69;border-radius:16px;background:#fff;text-decoration:none;transition:box-shadow .15s}
 .physics-area-link:hover{box-shadow:0 8px 24px #173b3518}.physics-area-link h2{font-size:23px;line-height:1.2;margin:14px 0 4px;letter-spacing:-.5px}.physics-area-link p{font-size:14px;flex:1}.physics-area-link strong{font-size:13px;color:#007363}
 .physics-area-link.area-machines{border-top-color:#426ed4}.physics-area-link.area-plasma{border-top-color:#8860aa;background:#faf8fd}
@@ -16,3 +16,5 @@
 @media(max-width:650px){.physics-level-navigation .physics-up-primary{width:100%}}
 .discovery-home,.wow-home{box-sizing:border-box;width:100%;max-width:1600px;margin-left:auto;margin-right:auto;padding-left:22px;padding-right:22px}
 @media(max-width:650px){.discovery-home,.wow-home{padding-left:10px;padding-right:10px}}
+
+@media(min-width:801px) and (max-width:1199px){.physics-areas{grid-template-columns:repeat(2,minmax(0,1fr))}}

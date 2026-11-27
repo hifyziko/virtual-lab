@@ -22,7 +22,14 @@ main :is(.experiment,.plots,.controls,.toolbar,.timebar){min-width:0;max-width:1
 .controls .damper-control{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;min-width:0;font-size:15px}.controls .damper-control label{display:flex;gap:6px;align-items:center}.controls .damper-control input[type=checkbox]{width:16px;height:16px;margin:0;grid-column:auto}.controls .damper-control input[type=range]{grid-column:1/-1}.controls .damper-control input:disabled{opacity:.4}
 
 /* One stable logical canvas, with all remaining space assigned to diagrams. */
-main.uniform-module-layout[data-machine-viewport="sm-stability"]{height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;max-height:var(--module-host-height,1000px)!important;display:grid;grid-template-rows:82px 40px minmax(0,1fr) 48px 24px;gap:8px}
+main.uniform-module-layout[data-machine-viewport="sm-stability"]{height:var(--module-host-height,1000px)!important;min-height:var(--module-host-height,1000px)!important;max-height:var(--module-host-height,1000px)!important;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;gap:var(--lesson-gap)}
+main[data-machine-viewport="sm-stability"]>.controls{padding:var(--lesson-control-padding);align-items:start;column-gap:12px}
+main[data-machine-viewport="sm-stability"] .controls>:is(label,.damper-control){grid-template-rows:auto auto;row-gap:2px}
+main[data-machine-viewport="sm-stability"] input[type=range]{margin:0;min-width:0}
+main[data-machine-viewport="sm-stability"]>.toolbar{justify-content:flex-start;gap:5px 16px}
+main[data-machine-viewport="sm-stability"]>.toolbar button{min-height:30px;padding:4px 8px}
+main[data-machine-viewport="sm-stability"] .view-switch{min-width:0}
+main[data-machine-viewport="sm-stability"]>.timebar{padding:var(--lesson-control-padding)}
 main[data-machine-viewport="sm-stability"]>.toolbar,main[data-machine-viewport="sm-stability"]>.timebar,main[data-machine-viewport="sm-stability"]>.footnote{margin:0}
 main[data-machine-viewport="sm-stability"] .experiment{height:100%;min-height:0}
 main[data-machine-viewport="sm-stability"] .plots{height:100%;min-height:0}
@@ -32,4 +39,4 @@ main[data-machine-viewport="sm-stability"] .plots{grid-template-rows:minmax(0,1.
 main[data-machine-viewport="sm-stability"] .graph-view .plots{grid-template-rows:minmax(0,1fr)}
 
 /* The guide owns the footnote; its former row must return to the experiment. */
-main.uniform-module-layout[data-machine-viewport="sm-stability"]:has(>.footnote[data-guide-source]){grid-template-rows:82px 40px minmax(0,1fr) 48px;padding-bottom:4px!important}
+main.uniform-module-layout[data-machine-viewport="sm-stability"]:has(>.footnote[data-guide-source]){grid-template-rows:auto auto minmax(0,1fr) auto;padding-bottom:4px!important}

@@ -4,13 +4,13 @@ const electronMilestones = [
   ['Rozptyl', 'Atom s jádrem', 'Kladný náboj soustředěný v jádře'],
   ['Stabilita', 'Klasická oběžná dráha', 'Pohyb elektronu v poli jádra'],
   ['Bohrův atom', 'Povolené dráhy', 'Pevné poloměry a energie'],
-  ['Vlna hmoty', 'Vlna na kružnici', 'Fáze vlny podél obvodu'],
+  ['Vlna hmoty', 'Energetické hladiny vodíku', 'Energie vodíku'],
   ['Orbitaly', 'Kvantový stav', 'Bod značí možný výsledek měření'],
-  ['Difrakce', 'Vlna v krystalu', 'Vlnoplochy · niklová mřížka'],
-  ['Dirac', 'Elektron a pozitron', 'Záporný a kladný náboj'],
+  ['Difrakce', 'Uspořádání atomů v niklu', 'Každá kulička představuje atom niklu'],
+  ['Dirac', 'Dvě větve Diracovy rovnice', 'Celková energie podle velikosti hybnosti'],
   ['Dvojštěrbina', 'Amplitudy ze dvou otvorů', 'Příprava · clona · detekce'],
-  ['Kvantové pole', 'Jednočásticový stav', 'Model hustoty podél směru pohybu'],
-  ['Rozlišení', 'Elektron a sonda', 'Dosah rozlišení sondy']
+  ['Kvantové pole', 'Rozdělení hybnosti', 'Hybnost při přípravě elektronu'],
+  ['Rozlišení', 'Rozptyl fotonu na elektronu', 'Příklad přenosu hybnosti']
 ];
 
 const electronModelTransitions = [
@@ -21,7 +21,7 @@ const electronModelTransitions = [
   'Přesné frekvence hlavních čar podpořily kvantování energie. Samotné povolené kružnice však nevysvětlují intenzity čar ani původ kvantovací podmínky.',
   'Uzavření fáze dává názornou podmínku pro jednu kružnici. Kvantová mechanika hledá stav v celém prostoru a dovoluje určit pravděpodobnosti měření.',
   'Přepni srovnání s Bohrem a sleduj kružnici vedle rozložení možných poloh. Měřitelným projevem vlnové fáze je také difrakce v následující etapě.',
-  'Slabě odchýlené a silně odchýlené svazky závisejí na fázi a vlnové délce. Vlnová povaha sama neřeší chování elektronu při relativistických rychlostech.',
+  'Směry silného rozptylu závisejí na vlnové délce elektronu. Další otázka je, jak se mění energie elektronu při rychlostech blízkých rychlosti světla.',
   'Relativita mění závislost energie na hybnosti. Diracova rovnice otevřela cestu k předpovědi antičástice. V teorii pole lze popsat také vznik či zánik párů.',
   'Při koherentní přípravě se skládají amplitudy a v detektoru vznikají minima. Směs samostatných příprav sčítá pravděpodobnosti a tutéž strukturu obecně nedá.',
   'Šířka balíku se mění podle přípravy. Pro otázku vnitřní struktury elektronu je rozhodující rozlišovací schopnost sondy, kterou nastavíš v poslední etapě.',
@@ -124,17 +124,15 @@ function drawAtomGallery(p,index,galleryCache,state=0,section=false){
     return;
   }
   const active=state?2:1;
-  drawBohrAtom(p,{initial:active,final:active,shownFinal:3-active,highest:2,angle:.62,progress:0});
+  drawBohrAtom(p,{initial:active,final:active,shownFinal:3-active,highest:2,angle:.62});
 }
 
 
 // Orthographic cutaways use the same camera convention as the experiment.
 function drawHistoricalElectron(p, chapter, S, T, cache) {
   const {electron:blue,path:aqua,positive:amber,nucleus:coral,level:purple}=electronInk;
-  const tau=ElectronPhysics.tau;
   const {proj,line,dot,ring,sphere,tube,arrow}=p;
   const sample=(count,fn)=>Array.from({length:count},(_,i)=>fn(i/(count-1),i));
-  const orbit=(r,theta)=>[r*Math.cos(theta),0,r*Math.sin(theta)];
   const points=(positions,r)=>positions.map(([pos,color])=>[pos,color,proj(pos)[2]])
     .sort((a,b)=>a[2]-b[2]).forEach(([pos,color])=>dot(pos,r,color,true));
   switch(chapter){
@@ -168,22 +166,13 @@ function drawHistoricalElectron(p, chapter, S, T, cache) {
       drawClassicalOrbit(p,t=>P.collapseView(r0,t,S.rad),T,r0,S.rad);
       break;
     }
-    case 4:drawBohrAtom(p,ElectronPhysics.bohrView(S,T));break;
-    case 5:{
-      if(S.view){
-        const width=S.sigma*1.8;
-        const envelope=sample(161,f=>{const x=(f-.5)*1.7;return [x,.32*Math.exp(-x*x/(width*width)),0];});
-        p.waveEnvelope(envelope,envelope.map(([x,y,z])=>[x,-y,z]),aqua);
-        line([[-.85,0,0],[.85,0,0]],'#90a9b5',1,null,'4 4');
-        p.trace(envelope.map(([x,y,z])=>[x,y*Math.cos(50*x-6*T),z]),aqua);
-      }else{
-        const P=ElectronPhysics,turns=tau*S.r*1e-12/(P.h/P.momentum(S.U));
-        ring([0,0,0],.66,'#8faab6','xz',null,'4 4');
-        p.trace(sample(300,f=>{const [x,,z]=orbit(.66,f*tau);return [x,.15*Math.cos(tau*turns*f-T*3),z];}),aqua);
-      }
-      break;
-    }
+    case 4:drawBohrAtom(p,ElectronPhysics.bohrScene(S,cache,T));break;
+    case 5:drawHydrogenLevels(p,S.reference+1,S.r);break;
     case 6:{
+      if(!S.orbitalAdvanced&&S.view!==3){
+        drawAtomGallery(p,3,cache.orbitalReference??={},0);
+        break;
+      }
       const volume=cache.volume;
       if(!volume)break;
       const {cells,h,extent,s,b}=volume,R=.73/extent;
@@ -199,24 +188,31 @@ function drawHistoricalElectron(p, chapter, S, T, cache) {
       }
       if(S.view===4)p.marks(cache.modelSamples.map(({pos,color})=>{const [x,y]=proj(pos);return [x,y,color];}),1.9,.55,true);
       else p.depthCloud(cache.modelSamples.map(({pos})=>pos));
+      if(S.view===3){
+        const plane=OrbitalVolume.planes[S.plane],offset=S.cut*.73,side=.65;
+        const corners=[[-side,-side],[side,-side],[side,side],[-side,side]];
+        line(corners.map(([u,v])=>OrbitalVolume.planePoint(plane,offset,u,v)),'#ad7845',1.5,'#eeb97929');
+      }
       p.glow([0,0,0],.07,coral);dot([0,0,0],.023,coral,true);
       break;
     }
-    case 7:{
+    case 7:
       drawNickelCrystal(p);
-      const angle=S.inc*Math.PI/180;
-      for(let j=0;j<4;j++){
-        const y=.37+.31*((j/4-T*.35+100)%1);
-        line([[-.44-Math.sin(angle)*y,y,-.28],[.44-Math.sin(angle)*y,y,-.28],[.44-Math.sin(angle)*y,y,.28],[-.44-Math.sin(angle)*y,y,.28]],'#2b899f87',1,'#75b8c423');
+      break;
+    case 8:{
+      const x=q=>-.68+.34*q,y=q=>.115*Math.hypot(1,q),selected=x(S.p);
+      line([[x(0),-.55,0],[x(0),.55,0]],'#809eaf');
+      line([[x(0),0,0],[x(4),0,0]],'#809eaf');
+      line([[selected,-.51,0],[selected,.51,0]],'#90a8b5',1,null,'4 4');
+      for(const [sign,color,caption] of [[1,aqua,'Kladná větev'],[-1,'#657e90','Záporná větev']]){
+        p.trace(sample(200,f=>[x(f*4),sign*y(f*4),0]),color,2.5);
+        dot([selected,sign*y(S.p),0],.023,color,true);
+        p.label([x(.15),sign*.34,0],caption);
       }
+      p.label([x(0),.54,0],'Energie');
+      p.label([x(3),-.11,0],'Hybnost');
       break;
     }
-    case 8:
-      for(const [x,color,label] of [[-.36,blue,'Elektron'],[.36,purple,'Pozitron']]){
-        p.glow([x,.04,0],.32,color);dot([x,.04,0],.175,color,true);
-        const [u,v]=proj([x,-.26,0]);p.text(u,v+12,label,'middle');
-      }
-      break;
     case 9:{
       const shape=(x,y0,y1)=>[[x,y0,-.38],[x,y1,-.38],[x,y1,.38],[x,y0,.38]];
       const g=S.gap*.05,w=S.width*.05;
@@ -239,17 +235,31 @@ function drawHistoricalElectron(p, chapter, S, T, cache) {
       break;
     }
     case 10:{
-      const P=ElectronPhysics,time=T*1.5,center=S.p/Math.hypot(1,S.p)*time,range=10/S.width,peak=S.width*Math.sqrt(2/Math.PI);
-      drawPacketBody(p,sample(111,f=>{const u=f-.5;return [1.7*u,.41*Math.sqrt(P.packet(S.p,S.width,center+u*range,time)/peak)];}));
-      arrow([-.72,-.49,0],[.72,-.49,0],blue);
+      const x=q=>-.82+(q+2)*1.64/7,base=-.28;
+      const profile=sample(320,f=>{
+        const q=-2+7*f;
+        return [x(q),base+.68*Math.exp(-.5*((q-S.p)/S.width)**2),0];
+      });
+      const left=x(S.p-S.width),right=x(S.p+S.width);
+      line([[left,base,0],[right,base,0],[right,.44,0],[left,.44,0]],'none',0,'#2279b61f');
+      p.waveEnvelope(profile,profile.map(([u])=>[u,base,0]),blue);p.trace(profile,blue,2.4);
+      line([[x(S.p),base,0],[x(S.p),.46,0]],blue,1,null,'4 4');
+      line([[-.82,base,0],[.82,base,0]],'#7897a9',1.1);
+      const [u,v]=proj([0,.53,0]);p.text(u,v,'Rozdělení v okamžiku přípravy','middle');
+      const [a,b]=proj([0,-.42,0]);p.text(a,b,'Hybnost podél osy letu','middle');
       break;
     }
     default:{
-      const P=ElectronPhysics,field=10**S.zoom,resolution=P.hb*P.c/(10**S.q*P.e);
-      const r=Math.min(.65,resolution/field*.58);
-      if(r>.03)p.glow([0,0,0],r,amber);
-      for(const plane of ['xy','xz','yz'])ring([0,0,0],Math.max(.013,r),'#bc925a',plane,null,'4 3');
-      p.glow([0,0,0],.097,blue);dot([0,0,0],.028,blue,true);
+      const target=[-.18,0,0],source=[-.83,0,0],scattered=[.22,.37,0],recoil=[.07,-.37,0];
+      p.trace([source,target,scattered],aqua,1.7);
+      arrow(source,[target[0]-.08,0,0],aqua);
+      arrow(target,scattered,aqua,.031);
+      arrow(target,recoil,blue,.031);
+      p.glow(target,.10,blue);dot(target,.031,blue,true);
+      const [sx,sy]=proj([-.75,.14,0]);p.text(sx,sy,'Příchozí foton');
+      const [fx,fy]=proj([.29,.47,0]);p.text(fx,fy,'Rozptýlený foton','middle');
+      const [qx,qy]=proj([.30,-.41,0]);p.text(qx,qy,'Předaná hybnost','middle');
+      p.callout(target,[-.26,-.30,0],'Cílový elektron','end');
     }
   }
 }

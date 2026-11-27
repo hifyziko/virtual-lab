@@ -3,9 +3,16 @@
  --lesson-gap:5px;
  --lesson-header-gap:8px;
  --lesson-module-title-size:24px;
+ --lesson-module-number-font:13px/1 ui-monospace,monospace;
+ --lesson-module-number-color:#006c5e;
  --lesson-panel-title-size:16px;
+ --lesson-equation-size:20px;
  --lesson-control-size:14px;
+ --lesson-control-font:system-ui,"Segoe UI",sans-serif;
+ --lesson-control-label-weight:400;
+ --lesson-control-action-weight:500;
  --lesson-detail-size:12px;
+ --lesson-control-padding:4px 7px;
 }
 body[data-fusion-page]{
  --module-scene-scale:var(--fusion-fit,var(--compass-fit,var(--fit,1)));
@@ -14,7 +21,14 @@ body[data-fusion-page]{
  --lesson-ui-scale:max(.8,var(--module-scene-scale,1));
  --lesson-text:calc(var(--lesson-control-size) / var(--lesson-ui-scale));
  --lesson-heading:calc(var(--lesson-panel-title-size) / var(--lesson-ui-scale));
+ --lesson-equation:calc(var(--lesson-equation-size) / var(--lesson-ui-scale));
  --lesson-detail:calc(var(--lesson-detail-size) / var(--lesson-ui-scale));
+}
+
+/* Scene-scaled text grows on large screens. On smaller windows, compensate
+   for scene shrinkage while keeping logical text sizes within the layout budget. */
+.uniform-module-layout:is([data-lesson-text-scaling="scene"],[data-module="02-rozloha"]){
+ --lesson-ui-scale:clamp(.60,var(--module-scene-scale,1),1);
 }
 
 /* Machine interface typography, including embedded lessons. */
@@ -23,12 +37,57 @@ body[data-fusion-page]{
  font-size:var(--lesson-heading)!important;
  line-height:1.3;
 }
-.uniform-module-layout :is(.controls,.controlbox,.ctrlgrid,.fieldControls,.phaseControls,.controlRail,.experiment-controls,.toolbar,.tools,.current-controls,.guided-action,.story,.tabs,.schema-tabs) :is(label,output,button,select,input,summary):not(dialog *,svg *),
-.uniform-module-layout :is(article,.card,.panel,.plotcard,.scene) label:not(dialog *,svg *){
- font-family:system-ui,"Segoe UI",sans-serif;
+.uniform-module-layout :is(label,output,button,select,input,summary):not(dialog *,svg *,[data-guide-source] *){
+ font-family:var(--lesson-control-font)!important;
  font-size:var(--lesson-text)!important;
  line-height:1.25;
 }
-.uniform-module-layout > :is(.controls,.story,.toolbar,.tools,.current-controls,.guided-action){
+.uniform-module-layout :is(label,output):not(dialog *,svg *,[data-guide-source] *){
+ font-weight:var(--lesson-control-label-weight)!important;
+}
+.uniform-module-layout :is(button,select,summary):not(dialog *,svg *,[data-guide-source] *){
+ font-weight:var(--lesson-control-action-weight)!important;
+}
+.uniform-module-layout :is(.controls,.controlbox,.control-panel,.controlpanel,.toolbar,.timebar,.view-controls,.field-actions,.machine-controls,.traction-controls,.experiment-controls,.settings,.presets,.harmonics,.operating-controls,.sliders,.dc-controls,.dd-control-panel,.cm-controls,.bc-controls,.wc-controls,.compose-controls){
+ font-family:var(--lesson-control-font);
  font-size:var(--lesson-text);
+}
+.uniform-module-layout :is(.controls,.controlbox,.control-panel,.controlpanel,.toolbar,.timebar,.view-controls,.field-actions,.machine-controls,.traction-controls,.experiment-controls,.settings,.harmonics,.operating-controls,.sliders,.dc-controls,.dd-control-panel,.cm-controls,.bc-controls,.wc-controls,.compose-controls) :is(.control>span,[data-tex],[data-math],.check,.harm-label,.harm-label small):not(dialog *,svg *,canvas *){
+ font-size:var(--lesson-text)!important;
+}
+.uniform-module-layout :is(label,output,button,.controls,.controlbox,.control-panel,.controlpanel,.toolbar,.timebar,.view-controls,.field-actions,.machine-controls,.traction-controls,.experiment-controls,.harmonics,.operating-controls,.sliders,.dc-controls,.dd-control-panel,.cm-controls,.bc-controls,.wc-controls,.compose-controls) .katex:not(dialog *,svg *),
+body[data-fusion-page] :is(.controls,.controlbox,.toolbar,.experiment-controls) .katex:not(dialog *,svg *){
+ font-size:1em!important;
+}
+
+/* Labels and values in live readout panels use the same roles in every lesson. */
+.uniform-module-layout [data-lesson-readouts]{
+ font-family:var(--lesson-control-font);
+ font-size:var(--lesson-text);
+}
+.uniform-module-layout [data-lesson-readouts]>div{
+ min-width:0;
+ font-size:inherit;
+}
+.uniform-module-layout [data-lesson-readouts]>div>:is(b,strong){
+ font-size:var(--lesson-heading);
+ font-weight:var(--lesson-control-action-weight);
+}
+.uniform-module-layout :is(output,span)[data-lesson-readout]{
+ font-size:var(--lesson-heading)!important;
+}
+.uniform-module-layout [data-lesson-readouts] .katex{
+ font-size:1em;
+}
+.uniform-module-layout [data-lesson-plot] :is(.legend,.note,.cursor .control>span){
+ font-size:var(--lesson-text);
+}
+.uniform-module-layout [data-lesson-plot] .plot-math.axis{
+ font-size:var(--lesson-text);
+}
+.uniform-module-layout [data-lesson-plot] .plot-math:is(.tick,.start-tick){
+ font-size:var(--lesson-detail);
+}
+.uniform-module-layout [data-lesson-plot] :is(.legend,.note,.plot-math:is(.axis,.tick,.start-tick)) .katex{
+ font-size:1em;
 }

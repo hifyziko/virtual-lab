@@ -1,6 +1,14 @@
 # Pracovní projekt · verze 1.0
 
-## Převzetí aktuálního projektu — 20. listopadu 2026
+## Aktuální místní stav — 26. listopadu 2026
+
+Zdroje v aktivním pracovním stromu byly posunuty fast-forward na `098b406`.
+Používejte [aktuální místní rozcestník](versions/aktualni/web/index.html)
+nebo `SPUSTIT_VYUKU.cmd`. Instalace se sestavuje z tohoto pracovního stromu.
+Původní místní rozpracovanost je bezpečně uložená v místním Gitu pod `0c06b1f`
+(stash „Místní rozpracovanost před sjednocením s main 2026-11-26“).
+
+## Převzetí projektu — 20. listopadu 2026
 
 Na pokyn uživatele převzat soukromý archiv `virtual-lab-2026-11-20.zip`.
 Aktivní větev: `prace/predani-2026-11-20`, převzatý commit

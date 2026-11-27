@@ -18,6 +18,8 @@ Závazné zadání vycházející z odsouhlasených úprav projektu. Platí pro 
 - Pod hlavičkou všech modulů držet základní odstup 8 px před škálováním. Mezi hlavními panely a řadami ovládání používat 5 px. Odstup skládat jen jednou, ze společné mezery a případného doplnění v hlavičce.
 - Ovladače pokusu pohromadě tvoří viditelný kompaktní panel, i když jsou v jediné řadě. Horní panel má jemný rámeček, vodorovný vnitřní okraj 7 px, svislý 4 px a mezery mezi ovladači 6 px. Rychlé kroky a tlačítka v této řadě mají základní výšku 30 px. Při zalomení smí řada vyrůst podle obsahu.
 - Hlavičky používají společnou typografii s výchozím názvem 24 px. U strojů mají nadpisy panelů 16 px a ovládání 14 px. Fúzní lekce používají původní sazbu uvnitř pokusu. Popisky uvnitř grafů a technických výkresů se řídí čitelností daného grafu.
+- Písmo uživatelského rozhraní nastavovat podle role ve společném [module-ui.css](vyvoj/m_files/Web/module-ui.css). Modul určuje roli textu, například popisek, hodnotu, nadpis nebo doplněk. Velikost, řez a převod na měřítko okna přebírá ze společného stylu. Při úpravě odstranit místní přepisy pro stejnou roli, které společné pravidlo přebíjejí.
+- Místní výjimku používat jen při doložené potřebě čitelnosti nebo funkce. Uvést u ní důvod a rozsah a ověřit ji v malém i velkém okně. Schválený pilot škálování v Momentové charakteristice AM je omezený na tuto lekci. Pokud se čitelný text nevejde, nejdřív jej přirozeně zalomit. Zmenšení použít až při skutečném nedostatku místa.
 - Odstupy a rámec ovládání udržovat ve společných stylech. Při změně rozložení zkontrolovat hlavičku, ovládání a první graf v běžném okně i na celé obrazovce.
 - Nechat pouze informace potřebné k danému vysvětlení. Nevracet odstraněné duplicitní karty nebo ovladače bez důvodu.
 - Využívat volný prostor pro větší grafiku a čitelnost. Nezvětšovat samoúčelně výplně a prázdné mezery.
@@ -71,5 +73,5 @@ Závazné zadání vycházející z odsouhlasených úprav projektu. Platí pro 
 3. Pokud by změna ohrozila čitelnost, úplnost vysvětlení nebo konzistenci jiných modulů, oznámit konkrétní problém uživateli.
 4. Ověřit syntaxi, matematickou sazbu, zachování funkce ovladačů a stabilitu rozměrů při přepínání a opakovaném škálování. Přiměřeně ověřit různé velikosti okna.
 5. Pokud je dostupný prohlížeč, osobně zkontrolovat ořez, překryvy a popisky. Bez vizuální kontroly netvrdit, že vzhled byl ověřen.
-6. Aktualizovat zdroje i aktivní dodávky v `vyvoj/versions/aktualni` a `aktualni`; při změně dodávky udržet manifest. Nevytvářet další číslované verze bez zadání.
+6. Aktualizovat zdroje v `versions/vyvoj/m_files` a z kořene projektu sestavit výuku příkazem `node tools/build-release.cjs`. Jediný místní vstup je [aktuální rozcestník](aktualni/web/index.html). Starší vstupní adresy na něj mohou přesměrovat.
 7. Prohlížeč automaticky nespouštět. Stručně oznámit výsledek, provedené kontroly a případná omezení.

@@ -4,8 +4,7 @@ main.uniform-module-layout[data-transformer-lesson]{--module-flexible-height:1;h
 main[data-transformer-lesson]>*{flex-shrink:0;margin-top:0;margin-bottom:0;min-width:0}
 main[data-transformer-lesson] :is(.card,.panel){box-sizing:border-box;padding:12px;border:1px solid #d9e2e1!important;border-radius:12px!important;background:#fff;min-width:0}
 main[data-transformer-lesson] :is(.layout,.lab,.duo,.grid,.bottom,.footerrow){gap:5px!important}
-main[data-transformer-lesson] :is(h2,.paneltitle){font-size:16px!important;line-height:1.35;margin:0 0 6px}
-main[data-transformer-lesson] :is(button,select,input,label,.controlunit label){font-size:14px!important;line-height:1.35}
+main[data-transformer-lesson] :is(h2,.paneltitle){font-size:var(--lesson-heading,16px)!important;line-height:1.35;margin:0 0 6px}
 main[data-transformer-lesson] :is(.small,.foot,.lead,.intro,.note-line,.link-detail,.insight){font-size:13px!important;line-height:1.4}
 main[data-transformer-lesson] :is(.controlpanel,.control-panel){padding:10px 12px;gap:12px}
 main[data-transformer-lesson] :is(.duo,.lab){flex:1 1 0;min-height:0;align-items:stretch}
@@ -31,9 +30,9 @@ main[data-transformer-lesson] #modelReadouts{gap:6px 12px!important;margin-top:6
 /* TR04: drawings above, explanations and numerical results below. */
 html:has(main[data-transformer-lesson="tr04-pricna-vetev"]){scrollbar-gutter:auto}
 main[data-transformer-lesson="tr04-pricna-vetev"]>.controlpanel{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,.8fr) auto;gap:12px}
-main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
-main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time input{width:100%;min-width:0;flex:1 1 100%;order:2}
-main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time button{margin-left:auto;padding:6px 10px}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:30px auto;align-items:center;gap:3px 6px;min-width:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time input{grid-column:1/-1;grid-row:2;width:100%;min-width:0;margin:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time output{justify-self:end;white-space:nowrap}
 main[data-transformer-lesson="tr04-pricna-vetev"]>.duo{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1fr) 270px}
 main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-scene{grid-area:1/1;min-height:0}
 main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-circuit{grid-area:1/2;min-height:0}
@@ -46,8 +45,7 @@ main[data-transformer-lesson="tr04-pricna-vetev"] #modelReadouts{display:grid!im
 main[data-transformer-lesson="tr04-pricna-vetev"] #modelReadouts>div{min-width:0!important}
 main[data-transformer-lesson="tr04-pricna-vetev"] .paneltitle{flex-wrap:wrap;gap:3px 8px}
 main[data-transformer-lesson="tr04-pricna-vetev"] .controlunit label{align-items:center;min-height:32px;gap:12px}
-main[data-transformer-lesson="tr04-pricna-vetev"] #muValue{display:flex;align-items:center;justify-content:flex-end;min-width:110px;min-height:32px;font-size:18px!important;line-height:1.3;flex-shrink:0}
-main[data-transformer-lesson="tr04-pricna-vetev"] #muValue .katex{font-size:1em!important}
+main[data-transformer-lesson="tr04-pricna-vetev"] #muValue{display:flex;align-items:center;justify-content:flex-end;min-width:110px;min-height:32px;flex-shrink:0}
 main[data-transformer-lesson="tr04-pricna-vetev"] :is(#phaseValue,#sceneSub,#sceneI,#sceneI2) .katex{font-size:1.08em}
 /* Reserve the closed summary; expanded explanations are handled by a dialog. */
 main[data-transformer-lesson]>details{flex:none;margin:0;padding:0;min-height:36px}
@@ -108,8 +106,7 @@ main[data-transformer-lesson="tr06-hodinove-cislo"] :is(.formula,.result){margin
 
 
 main[data-transformer-lesson="tr05-rozptylova-reaktance"] .controlunit label{align-items:center;min-height:32px;gap:12px}
-main[data-transformer-lesson="tr05-rozptylova-reaktance"] :is(#muValue,#loadValue){display:flex;align-items:center;justify-content:flex-end;min-height:32px;font-size:18px!important;line-height:1.3;flex-shrink:0}
-main[data-transformer-lesson="tr05-rozptylova-reaktance"] :is(#muValue,#loadValue) .katex{font-size:1em!important}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] :is(#muValue,#loadValue){display:flex;align-items:center;justify-content:flex-end;min-height:32px;flex-shrink:0}
 
 /* TR05: full-height physical transformer, circuit and results on the right. */
 html:has(main[data-transformer-lesson="tr05-rozptylova-reaktance"]){scrollbar-gutter:auto}
@@ -144,12 +141,13 @@ main[data-transformer-lesson="tr05-rozptylova-reaktance"] #modelReadouts{grid-te
 main[data-transformer-lesson="tr05-rozptylova-reaktance"] #rmsOverview tr{height:28px}
 main[data-transformer-lesson="tr05-rozptylova-reaktance"] .paneltitle{flex-wrap:wrap;gap:3px 8px}
 
-/* Keep the content inside the iframe's actual content box, including its gutter. */
-main.uniform-module-layout[data-transformer-lesson]{width:calc(100% - 24px)!important;min-width:0!important;max-width:none!important;margin:0 12px!important;padding-top:0!important}
+/* The host already supplies the outer gutter and aligns the heading to the frame. */
+main.uniform-module-layout[data-transformer-lesson]{width:100%!important;min-width:0!important;max-width:none!important;margin:0!important;padding-inline:0!important;padding-top:0!important}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.lead{min-height:0;margin:0;line-height:1.4;font-size:13px}
-main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.controlpanel{height:112px;min-height:112px;padding:8px 12px;align-items:start}
-main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.duo{grid-template-rows:minmax(0,1fr) 240px}
-main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .duo>.panel>.figurebox{height:auto;min-height:210px;max-height:none;flex:1 1 0!important}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"])>.controlpanel{height:auto;min-height:0;padding:var(--lesson-control-padding);align-items:start}
+main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .controlunit input[type=range]{display:block;margin:3px 0 0}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"]>.duo{grid-template-rows:minmax(0,1fr) 240px}
+main[data-transformer-lesson="tr05-rozptylova-reaktance"] .duo>.panel>.figurebox{height:auto;min-height:210px;max-height:none;flex:1 1 0!important}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .duo>.panel>.circuit-links{height:90px;min-height:90px;gap:8px;margin:0!important}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .circuit-link{grid-template-rows:18px 32px minmax(0,1fr);padding:6px 8px!important;gap:2px}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .linked-equation{height:32px;margin:0!important}
@@ -163,6 +161,84 @@ main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .circuit-link{grid-template-rows:18px 44px minmax(0,1fr)}
 main[data-transformer-lesson]:is([data-transformer-lesson="tr04-pricna-vetev"],[data-transformer-lesson="tr05-rozptylova-reaktance"]) .linked-equation{height:44px;min-height:44px!important;overflow:visible;padding:0!important}
 main[data-transformer-lesson] .linked-equation .katex-display{margin:0;overflow:visible}
+
+/* TR04 uses common tracks for both drawings and their readout strips. */
+main.uniform-module-layout[data-transformer-lesson="tr04-pricna-vetev"]{
+ gap:var(--lesson-gap);
+}
+main[data-transformer-lesson="tr04-pricna-vetev"]>.controlpanel{
+ padding:var(--lesson-control-padding);
+ gap:6px;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] .controlunit label{min-height:30px}
+main[data-transformer-lesson="tr04-pricna-vetev"] #muValue{min-height:0}
+main[data-transformer-lesson="tr04-pricna-vetev"]>.controlpanel :is(.controlunit,.tr04-time) input[type=range]{
+ display:block;
+ height:18px;
+ margin:0;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-time{row-gap:0}
+main[data-transformer-lesson="tr04-pricna-vetev"]>.controlpanel button{
+ box-sizing:border-box;
+ height:30px;
+ padding:3px 9px;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"]>.duo{
+ grid-template-rows:auto minmax(0,1fr) auto auto;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] .duo>.panel:is(.tr04-scene,.tr04-circuit){
+ display:grid;
+ grid-row:1/span 3;
+ grid-template-rows:subgrid;
+ row-gap:normal;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] .duo>.panel>.figurebox{
+ height:auto;
+ min-height:0;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] .duo>.panel.tr04-circuit>.circuit-links{
+ height:auto;
+ min-height:0;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] .duo>:is(#magneticCause.tr04-cause,#rmsOverview.tr04-results){
+ grid-row:4;
+ padding:12px!important;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-readings{
+ display:grid;
+ gap:var(--lesson-gap);
+ align-content:start;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] :is(.tr04-readings,.tr04-results,.tr04-cause,.circuit-links){
+ font-family:var(--lesson-control-font);
+ font-size:var(--lesson-text);
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] :is(.tr04-readings #sceneInstantValues,.tr04-readings .mmf){
+ height:auto;
+ min-height:0;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] #sceneInstantValues{
+ padding:5px 6px!important;
+ row-gap:4px!important;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] #sceneSub{min-height:0}
+main[data-transformer-lesson="tr04-pricna-vetev"] :is(#sceneInstantValues>*,#mmfValue,.link-heading,.link-detail,.tr04-results td,.tr04-results th,#modelReadouts>div>div,.tr04-cause>div,.tr04-cause>p){
+ font-size:var(--lesson-text)!important;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] .tr04-cause :is(#causeVoltage,#causeFlux,#causeCurrent,#causeTotal){
+ font-size:var(--lesson-heading)!important;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] :is(.tr04-results h2,.tr04-cause h3){
+ margin:0 0 var(--lesson-gap)!important;
+ font-size:var(--lesson-heading)!important;
+ line-height:1.3;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] :is(.tr04-cause,.tr04-results,.tr04-readings,.circuit-links) .katex{
+ font-size:1em!important;
+}
+main[data-transformer-lesson="tr04-pricna-vetev"] :is(.tr04-cause .katex-display,.circuit-links .katex-display){
+ font-size:var(--lesson-heading);
+}
 
 main[data-transformer-lesson="tr05-rozptylova-reaktance"] #mmfValue{min-height:70px;font-size:18px;display:flex;align-items:center}
 main[data-transformer-lesson="tr05-rozptylova-reaktance"] #fluxSplit{height:150px}
@@ -250,8 +326,7 @@ main[data-transformer-lesson="tr08-zkratovy-proud"]>.layout{margin:0;min-height:
 main[data-transformer-lesson="tr08-zkratovy-proud"] .graph-card{display:grid;flex-direction:column;min-height:0;gap:6px;position:relative;grid-template-rows:32px 28px minmax(0,1.65fr) 20px minmax(0,1fr) 38px}
 main[data-transformer-lesson="tr08-zkratovy-proud"] #currentPlot{flex:1 1 0;height:0!important;min-height:0!important}
 main[data-transformer-lesson="tr08-zkratovy-proud"] #voltagePlot{height:90px;min-height:90px}
-main[data-transformer-lesson="tr08-zkratovy-proud"] .side{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-content:start;gap:8px}
-main[data-transformer-lesson="tr08-zkratovy-proud"] .side>:nth-child(n+4){grid-column:1/-1}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(min-content,1fr);gap:8px}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side .metric strong{font-size:19px!important}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .bottom{margin:0;min-height:0}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .bottom .equations{font-size:14px;gap:4px;padding:8px 12px}
@@ -263,19 +338,18 @@ main[data-transformer-lesson="tr08-zkratovy-proud"] #clipWarning{position:absolu
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side>.card{flex:initial;padding:8px 10px;grid-column:1/-1}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side .metric small{font-size:12px}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side .metric .detail{font-size:11px}
-main[data-transformer-lesson="tr08-zkratovy-proud"] .schema-body{grid-template-columns:minmax(0,1fr) 165px;gap:8px}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .schema-body{grid-template-columns:minmax(0,1fr) max-content;gap:8px}
 main[data-transformer-lesson="tr08-zkratovy-proud"] #sc-approved-schema{height:145px!important;min-width:0!important}
-main[data-transformer-lesson="tr08-zkratovy-proud"] .schema-parameters{font-size:13px}
-main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations{font-size:14px;line-height:1.3}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .schema-parameters{font-size:var(--lesson-text)}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations [data-tex]{margin:10px 0;padding:2px 0;overflow:visible;display:block;white-space:nowrap}
 main[data-transformer-lesson="tr08-zkratovy-proud"] #phaseSummary :is(td,th){padding:3px 2px!important}
-main[data-transformer-lesson="tr08-zkratovy-proud"] .side>.equations{grid-column:1/-1;padding:12px 14px;font-size:19px;line-height:1.35}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .side>.equations{display:flex;flex-direction:column;justify-content:space-between;padding:12px 8px;font-size:var(--lesson-equation);line-height:1.35}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations .katex{font-size:1em}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations [data-tex]:last-child{margin-bottom:4px}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side>.metric[hidden]{display:none!important}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .side .equations>[data-tex]{margin:7px 0}
 main[data-transformer-lesson="tr08-zkratovy-proud"] .equations>.envelope-results{margin-top:12px;padding:10px 0 0;border:0!important;border-top:1px solid #d9e2e1!important;border-radius:0!important}
-main[data-transformer-lesson="tr08-zkratovy-proud"] .envelope-results #phaseSummary table{font:14px/1.4 system-ui!important}
+main[data-transformer-lesson="tr08-zkratovy-proud"] .envelope-results #phaseSummary table{font:var(--lesson-detail)/1.4 var(--lesson-control-font)!important}
 
 /* Share additional host height between the equivalent circuit and equations. */
 main[data-transformer-lesson="tr03-schema"]>section.card:not(.controls){flex:1 1 0;height:auto;min-height:340px}

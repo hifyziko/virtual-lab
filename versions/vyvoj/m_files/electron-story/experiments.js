@@ -1,3 +1,9 @@
+function electronPacketProfile(S,T,cache){
+  const time=T*1.5;
+  if(cache.packetProfile?.time!==time)cache.packetProfile=ElectronPhysics.packetProfile(S.p,S.width,time);
+  return cache.packetProfile;
+}
+
 function drawElectronExperiment(env){
   const {p,P,S,T,cache,scale,chapter,read,plot}=env;
   const {line,dot,ring,tube,label,arrow}=p,{electron,path:teal,positive:gold,nucleus:red}=electronInk,blue='#356ac3',glass='#a7cee52e';
@@ -125,92 +131,186 @@ function drawElectronExperiment(env){
     const cursor={points:[[time*1e12,s.r*1e12]],color:teal,marker:true};
     plot('Poloměr při energetické ztrátě',[radiusCurve,cursor],0,end*1e12,0,r0*1e12*1.05,'t','ps','r','pm',{xLabel:'Čas',yLabel:'Poloměr dráhy'});
   }else if(chapter===4){
-    const Z=S.ion+1,energy=n=>P.energy(n,Z),ni=S.ni,nf=S.nf;
-    const view=P.bohrView(S,T),{wavelength,transition,progress}=view,active=progress>=0?view.final:ni;
+    const setup=cache.bohrTrial??S,{ni,nf,ion}=setup,Z=ion+1,energy=n=>P.energy(n,Z);
+    const view=P.bohrScene(S,cache,T),{wavelength,transfer}=view,active=transfer>=.5?view.final:ni;
     drawBohrAtom(p,view,true);
     if(wavelength&&Z===1&&Math.min(ni,nf)===2&&Math.max(ni,nf)>=3){const balmer=[656.28,486.13,434.05,410.17];value('\\lambda_{\\rm vzduch}',wavelength/1.00028,'nm',5);value('\\lambda_{\\rm NIST}',balmer[Math.max(ni,nf)-3],'nm',5);}
-    value('n',active);value('r_n',P.bohrLength(Z)*active**2*1e12,'pm');value('E_i',energy(ni),'eV');value('E_f',energy(nf),'eV');if(wavelength)value('\\lambda_{\\rm vak}',wavelength,'nm');
-    const status=ni===nf?'Stejná hladina':transition==='emission'?(progress<0?'Před emisí':'Foton emitován'):transition?(progress<0?'Foton přilétá':'Foton absorbován'):'Foton mimo rezonanci';
-    scale('\\text{'+status+'}');
-    const lines=[3,4,5,6].map((n,i)=>{
-      const selected=Math.min(ni,nf)===2&&Math.max(ni,nf)===n;
-      const position=P.h*P.c/((energy(n)-energy(2))*P.e)*1e9;
-      const color=Z===1?['#db4942','#258c99','#5959c1','#71449f'][i]:'#72758b';
-      return {...curve([[position,1]],color,true),width:selected?8:3};
-    });
-    plot(Z===1?'Balmerova série ve vakuu':'Přechody na druhou hladinu · ultrafialová oblast',lines,380/Z**2,700/Z**2,0,1.06,'\\lambda','nm','\\text{Poloha čáry}','',{showY:false,xLabel:'Vlnová délka'});
-  }else if(chapter===5){
-    const lambda=P.h/P.momentum(S.U)*1e9,r=S.r*.001,turns=P.tau*r/lambda,k=P.tau/lambda,v=P.momentum(S.U)/P.m*1e-6,time=T*.1;
-    const packet=x=>{const q=P.hb/P.m*1e3*time/(2*S.sigma**2),z=x-v*time;
-      const density=Math.exp(-z*z/(2*S.sigma**2*(1+q*q)))/(Math.sqrt(2*Math.PI)*S.sigma*Math.hypot(1,q));
-      return [density,Math.sqrt(density)*Math.cos(k*x-k*v*time/2+q*z*z/(4*S.sigma**2*(1+q*q))-.5*Math.atan(q))];};
-    if(!S.view){
-      const rView=.66,points=seq(420,f=>[rView*Math.cos(P.tau*f),.13*Math.cos(P.tau*(turns*f-S.U*P.e/P.h*time*1e-15)),rView*Math.sin(P.tau*f)]);
-      ring([0,0,0],rView,'#96b0bf','xz',null,'4 4');p.trace(points,teal);
-      line([points[0],points.at(-1)],gold,2);
-      dot(points[0],.015,gold,true);dot(points.at(-1),.015,gold,true);label([rView,.20,0],'Spoj');
-    }else{
-      const samples=seq(300,f=>{const x=(f-.5)*6+v*time;return [(f-.5)*1.7,...packet(x)];});
-      const envelope=samples.map(([x,density])=>[x,.32*Math.sqrt(density),0]);
-      p.waveEnvelope(envelope,envelope.map(([x,y,z])=>[x,-y,z]),teal);
-      line([[-.85,0,0],[.85,0,0]],'#8ca9ba',.9,null,'4 4');
-      p.trace(samples.map(([x,,amplitude])=>[x,.32*amplitude,0]),teal,2);
+    value('n',active);value('r_n',P.bohrLength(Z)*active**2*1e12,'pm');value('E_i',energy(ni),'eV');value('E_f',energy(nf),'eV');if(wavelength)value('\\lambda_{\\text{čára}}',wavelength,'nm');
+    scale('\\text{'+view.status+'}');
+    const spectrum=P.bohrSpectrum(S),graphZ=S.ion+1,lines=[];
+    if(spectrum.balmer||!spectrum.reference){
+      for(const [i,n] of [3,4,5,6].entries()){
+        const selected=spectrum.balmer&&Math.max(S.ni,S.nf)===n;
+        const position=P.h*P.c/((P.energy(n,graphZ)-P.energy(2,graphZ))*P.e)*1e9;
+        const color=graphZ===1?['#db4942','#258c99','#5959c1','#71449f'][i]:'#72758b';
+        lines.push({...curve([[position,1]],color,true),width:selected?7:3,label:selected?'Zvolený přechod':''});
+      }
+    }else lines.push({...curve([[spectrum.reference,1]],'#287f9e',true),width:7,label:'Zvolený přechod'});
+    const tune=P.bohrGap(S)>0;
+    if(tune){
+      const x=spectrum.incident;
+      lines.push({points:[[x,0],[x,1.16]],color:'#383d78',strokeWidth:2.25,dash:'5 4',label:'Laděný foton'});
     }
-    value('\\lambda',lambda,'nm');value('\\Delta\\varphi/(2\\pi)',turns);value('v_{\\rm g}',v*1e6,'m/s');value('v_{\\rm f}',v*5e5,'m/s');scale(S.view?'t='+env.fmt(time)+'\\,\\mathrm{fs}':'r='+S.r+'\\,\\mathrm{pm}');
-    plot('Volný balík • hustota v soustavě laboratoře',[{...curve(seq(160,f=>{const x=(f-.5)*6+v*time;return [x,packet(x)[0]];})),area:true}],v*time-3,v*time+3,0,1/(2.5066*S.sigma),'x','nm','w','nm^{-1}',{xLabel:'Poloha',yLabel:'Hustota pravděpodobnosti'});
+    const title=spectrum.reference&&!spectrum.balmer?'Okolí zvolené spektrální čáry':graphZ===1?'Balmerova série ve vakuu':'Přechody na druhou hladinu';
+    plot(title,lines,spectrum.min,spectrum.max,0,1.22,'\\lambda','nm','\\text{Poloha čáry}','',{showY:false,xLabel:'Vlnová délka',tune});
+  }else if(chapter===5){
+    const wave=P.hydrogenRing(S.r,S.lambda,T*.1),{turns,whole,required,closed,allowed,kineticEv,circularKineticEv}=wave;
+    const reference=S.reference+1;
+    const waveColor=closed?electronInk.match:teal,joinColor=closed?waveColor:gold;
+    const normalizeRadius=radius=>.78*radius/500;
+    const targetRadius=P.a*1e12*reference*reference;
+    drawHydrogenRing(p,normalizeRadius(S.r),wave,closed,{
+      radius:normalizeRadius(targetRadius),color:hydrogenLevelColors[reference-1]+'79'
+    });
+    value('\\lambda_{\\text{pro oběh}}',required,'nm',4);
+    value('E_{\\text{k, zkoušená}}',kineticEv,'eV',4);
+    value('E_{\\text{k, pro oběh}}',circularKineticEv,'eV',4);
+    if(reference>1)value('\\nu_{1\\to '+reference+'}',(P.energy(reference)-P.energy(1))*P.e/P.h/1e12,'THz',4);
+    value('2\\pi r/\\lambda',turns,'',4);
+    value('\\Delta\\varphi_{\\text{spoj}}',(closed?0:turns-whole)*360,'{}^\\circ');
+    const status=allowed?'Povolená dráha vodíku':closed?'Fáze navazuje, energie pro oběh nesedí':'Fáze ve spoji nenavazuje';
+    scale('\\text{'+status+'}'+(allowed?'\\quad n='+whole:''));
+    plot('Fázový posun podél obvodu',[
+      {...curve([[0,0],[1,turns]],waveColor),strokeWidth:3,label:'Zkoušená vlna'},
+      {points:[[0,0],[1,reference]],color:hydrogenLevelColors[reference-1],dash:'6 4',label:'Cílová hladina'},
+      {points:[[1,turns]],color:joinColor,marker:true}
+    ],0,1,0,Math.max(3.35,Math.ceil(turns)+.35),'s/(2\\pi r)','','\\Delta\\varphi/(2\\pi)','',{xLabel:'Část obvodu',yLabel:'Počet period fáze'});
   }else if(chapter===6){drawOrbital(env);}
   else if(chapter===7){
-    const wl=P.h/P.momentum(S.U)*1e9,toRad=Math.PI/180;
-    const source=[-.85*Math.sin(S.inc*toRad),.85*Math.cos(S.inc*toRad),0],det=[.83*Math.sin(S.det*toRad),.83*Math.cos(S.det*toRad),0];
-    drawNickelCrystal(p);
-    arrow(source,[0,0,0],teal);p.trace([[0,0,0],det],gold,2.3);p.glow(det,.10,gold);dot(det,.034,gold,true);label(det,'Detektor');
-    for(let j=0;j<5;j++){
-      const f=cycle(T*.32+j/5),[x,y]=source.map(v=>v*f);
-      const u=.115*Math.cos(S.inc*toRad),v=.115*Math.sin(S.inc*toRad);
-      line([[x-u,y-v,-.11],[x+u,y+v,-.11],[x+u,y+v,.11],[x-u,y-v,.11]],'#3a9c9c72',1,'#43c5bc29');
-    }
-    const I=electronCrystal.intensity(wl,S.inc,S.det);value('\\lambda',wl,'nm');value('I/N^2',I);scale('a_{\\rm Ni}=0{,}3524\\,\\mathrm{nm}');
-    const pts=cache.dif??=seq(180,f=>[f*85,electronCrystal.intensity(wl,S.inc,f*85)]);
-    plot('Úhlové rozdělení difraktované intenzity',[{...curve(pts),area:true},{points:[[S.det,I]],color:'#b57825',marker:true}],0,85,0,Math.max(...pts.map(v=>v[1]),I)*1.05,'\\theta','{}^\\circ','I/N^2','',{xLabel:'Úhel detektoru',yLabel:'Normalizovaná intenzita'});
+    const {lambda,peak,points,signal}=cache.dif??=electronCrystal.diffraction(S.U);
+    const intensity=signal(S.det),color=S.det===peak?electronInk.match:gold;
+    const origin=[-.39,-.40,0],at=(angle,r)=>{const a=angle*Math.PI/180;return [origin[0]+r*Math.sin(a),origin[1]+r*Math.cos(a),0];};
+    const det=at(S.det,.82),source=at(0,1.02),normal='#799aaa';
+    const block=[[-.66,-.56,0],[-.12,-.56,0],[-.12,-.40,0],[-.66,-.40,0]];
+    const metal=p.gradient('linearGradient','x2="0" y2="1"',[[0,'#c0dfed'],[1,'#517f9b']]);
+    line(block,'#547c93',1.3,metal);
+    for(let i=1;i<8;i++)dot([-.66+i*.0675,-.45,0],.014,'#397799',true);
+    line(seq(64,f=>at(f*85,.82)),normal,1.2,null,'4 4');
+    line([origin,at(0,1.08)],normal,1,null,'4 4');
+    if(S.det>0)line(seq(24,f=>at(f*S.det,.28)),color,1.8);
+    line([origin,at(0,.96)],teal,2.1);
+    arrow(at(0,.32),at(0,.04),teal);
+    for(let j=0;j<4;j++)dot(at(0,.07+.85*cycle(j/4-T*.42)),.011,electron,true);
+    p.trace([origin,det],color,1.25+2.6*intensity);
+    const head=(r,d)=>{const a=S.det*Math.PI/180,[x,y]=at(S.det,r);return [x+d*Math.cos(a),y-d*Math.sin(a),0];};
+    line([head(.82,-.047),head(.82,.047),head(.925,.047),head(.925,-.047)],color,1.4,'#fff9ed');
+    dot(det,.023,color,true);
+    const [sx,sy]=p.proj(source);
+    const sourceLabelOnLeft=sx>=123;
+    p.rect(sx-11,sy-8,22,16,'#deeff2',teal,4);
+    p.text(sx+(sourceLabelOnLeft?-16:16),sy+4,'Zdroj elektronů',sourceLabelOnLeft?'end':'start');
+    const [nx,ny]=p.proj(at(0,.48));
+    p.text(nx-10,ny+4,'Kolmice','end');
+    const [dx,dy]=p.proj(det);
+    const detectorLabelOnRight=dx+75<=p.w&&(sourceLabelOnLeft||dy-sy>=25||dx-sx>=105||dx<75);
+    p.text(dx+(detectorLabelOnRight?16:-16),dy-11,'Detektor',detectorLabelOnRight?'start':'end');
+    const [cx,cy]=p.proj([origin[0],-.63,0]);
+    p.text(cx,Math.min(cy+8,p.h-6),'Krystal niklu','middle');
+    value('\\lambda',lambda,'nm');value('I/I_{\\max}',intensity);
+    scale('\\theta=' + env.fmt(S.det,4) + '{}^\\circ');
+    const reference=S.U===54?[]:[{
+      points:(cache.difReference??=electronCrystal.diffraction(54)).points,
+      color:electronInk.level,dash:'5 4',label:'Výchozí napětí'
+    }];
+    plot('Změní napětí směr nejsilnějšího signálu?',[
+      {...curve(points),area:true,label:reference.length?'Zvolené napětí':''},
+      ...reference,
+      {points:[[peak,0],[peak,1]],color:electronInk.match,dash:'3 4',label:'Nejsilnější směr'},
+      {points:[[S.det,0],[S.det,intensity]],color,dash:'6 4',label:'Poloha detektoru'},
+      {points:[[S.det,intensity]],color,marker:true}
+    ],0,85,0,1.04,'\\theta','{}^\\circ','I/I_{\\max}','',{xLabel:'Úhel detektoru od kolmice',yLabel:'Relativní intenzita',tune:true,updateKey:S.U+'|'+S.det});
   }else if(chapter===8){
-    const r=P.dirac(S.p),xNow=.21*S.p;
-    line([[-.9,0,0],[.9,0,0]],'#8ea9b7',1,null,'4 4');line([[0,-.44,0],[0,.44,0]],'#b3c7d2');
-    line([[xNow,-.43,0],[xNow,.43,0]],'#9cb4c1',1,null,'3 4');
-    for(const sign of [-1,1]){
-      const color=sign===1?teal:electronInk.level;
-      const branch=seq(161,f=>{const x=(f-.5)*8;return [x*.21,sign*Math.hypot(1,x)*.1,0];});
-      p.waveEnvelope(branch,branch.map(([x,,z])=>[x,0,z]),color);p.trace(branch,color);
-      const point=[xNow,sign*Math.hypot(1,S.p)*.1,0];p.glow(point,.085,color);dot(point,.026,color,true);
+    const radius=.62*S.p,turn=radius?Math.min(1.12,1/radius):0;
+    const chamber=[[-.60,-.58,0],[.76,-.58,0],[.76,.58,0],[-.60,.58,0]];
+    line(chamber,'#8cb0c6',1.4,'#eaf3fbc7');
+    for(let i=0;i<7;i++)for(let j=0;j<5;j++){
+      const [x,y]=p.proj([-.49+.19*i,-.45+.225*j,0]);
+      p.disk(x,y,4,'#f7fbff','#a3bdd8',.7);
+      if(S.field)p.disk(x,y,1.45,blue);
+      else{
+        p.polyline([[x-1.5,y-1.5],[x+1.5,y+1.5]],blue,.9);
+        p.polyline([[x-1.5,y+1.5],[x+1.5,y-1.5]],blue,.9);
+      }
     }
-    label([-.84,.40,0],'Kladná energie');label([-.84,-.43,0],'Záporná energie');
-    value('E_+',r.total/1e6,'MeV');value('E_-',-r.total/1e6,'MeV');value('E_k',r.kinetic/1e6,'MeV');scale('p/(m_ec)\\in[-4,4]');
-    plot('Kinetická energie • zeleně relativistická, okrově klasická',[curve(seq(180,f=>[4*f,P.dirac(4*f).kinetic/1e6])),curve(seq(180,f=>[4*f,(4*f)**2*P.rest/2e6]),'#b57825')],0,4,0,8*P.rest/1e6,'p/(m_ec)','','E_k','MeV',{xLabel:'Relativní hybnost',yLabel:'Kinetická energie'});
+    if(turn)arrow([-.83,0,0],[-.59,0,0],electronInk.frame);
+    for(const [charge,color,name] of [[-1,electron,'Elektron'],[1,electronInk.level,'Pozitron']]){
+      const entry=turn?0:charge*.075,bend=S.field?-charge:charge;
+      const at=f=>[-.59+radius*Math.sin(turn*f),entry+bend*radius*(1-Math.cos(turn*f)),0];
+      if(turn)p.trace(seq(90,at),color,2.6);
+      const particle=at(.62);
+      p.glow(particle,.065,color);dot(particle,.023,color,true);
+      const side=turn?bend:charge;
+      const [x,y]=p.proj([.50,side*.49,0]);
+      p.disk(x-29,y,3.5,color,'#f7fbff',1);
+      p.text(x,y+5,name,'middle');
+    }
+    const relativistic=q=>P.dirac(q).kinetic/1e6,classic=q=>q*q*P.rest/2e6;
+    const actual=relativistic(S.p),estimate=classic(S.p),yMax=classic(4)*1.05;
+    const series=cache.diracCurves??=[
+      {...curve(seq(321,f=>[4*f,relativistic(4*f)])),label:'Relativistická'},
+      {...curve(seq(321,f=>[4*f,classic(4*f)]),gold),label:'Klasická'}
+    ];
+    value('v/c',S.p/Math.hypot(1,S.p));
+    value('E_{\\text{k, rel}}',actual,'MeV');
+    value('E_{\\text{k, klas}}',estimate,'MeV');
+    scale('r=\\frac{p}{eB}');
+    plot('Jak se s hybností mění kinetická energie?',[
+      ...series,{points:[[S.p,0],[S.p,yMax]],color:'#809eaf',dash:'4 4'},
+      {points:[[S.p,estimate]],color:gold,marker:true},{points:[[S.p,actual]],color:teal,marker:true}
+    ],0,4,0,yMax,'p/(m_ec)','','E_k','MeV',{xLabel:'Velikost hybnosti',yLabel:'Kinetická energie'});
   }else if(chapter===9){drawSlits(env);}
   else if(chapter===10){
-    const time=T*1.5,center=S.p/Math.hypot(1,S.p)*time,range=10/S.width;
-    const pts=seq(160,f=>{const x=center+(f-.5)*range;return [x,P.packet(S.p,S.width,x,time)];}),peak=S.width*Math.sqrt(2/Math.PI);
-    const profile=pts.map(([x,y])=>[(x-center)/range*1.78,y/peak*.61-.24,0]);
-    p.waveEnvelope(profile,profile.map(([x,,z])=>[x,-.24,z]),teal);p.trace(profile,teal);
-    value('t',time*P.hb/(P.m*P.c**2)*1e21,'zs');value('v(p_0)/c',S.p/Math.hypot(1,S.p));scale('\\bar\\lambda_C='+env.fmt(P.hb/(P.m*P.c)*1e15)+'\\,\\mathrm{fm}');
-    plot('Prostorová hustota jednočásticového stavu',[{...curve(pts),area:true}],center-range/2,center+range/2,0,peak,'x/\\bar\\lambda_C','','w\\bar\\lambda_C','',{xLabel:'Poloha',yLabel:'Hustota pravděpodobnosti'});
-  }else{
-    const field=10**S.zoom,dx=P.hb*P.c/(10**S.q*P.e),scales=[['Atom vodíku',P.a0],['Comptonova délka',P.hb/(P.m*P.c)],['Jádro • řád',5e-15],['Klasický poloměr',P.k/(P.m*P.c**2)],['Proton • řád',.84e-15]];
-    const orbitalScale=P.a0/field;
-    if(orbitalScale>.003&&orbitalScale<3){
-      // Exact radial law for hydrogen 1s: Gamma(shape=3, scale=a0/2).
-      const rng=P.random(100),points=[];
-      for(let i=0;i<6400;i++){
-        const r=-.5*orbitalScale*Math.log(Math.max(1e-30,rng()*rng()*rng())),u=2*rng()-1,phi=P.tau*rng(),s=Math.sqrt(1-u*u);
-        const [x,y]=p.proj([r*s*Math.cos(phi),r*u,r*s*Math.sin(phi)]);points.push([x,y,electron]);
+    const {time,min,max,points,mean,deviation}=electronPacketProfile(S,T,cache),shots=cache.packetShots??[];
+    const reference=!T&&S.width!==.25?(cache.packetReference??=P.packetProfile(S.p,.25,0)):null;
+    const baselineShots=reference?cache.packetBaseline?.shots:null;
+    const x=position=>-.86+(position-min)*1.72/(max-min);
+    const strip=(low,high)=>[[x(min),low,0],[x(max),low,0],[x(max),high,0],[x(min),high,0]];
+    function measureRow(samples,low,high,color,caption){
+      line(strip(low,high),'#c3d5df',1,'#f2f8fc');
+      const middle=(low+high)/2;
+      if(caption){
+        const [u,v]=p.proj([-.82,middle,0]);p.text(u,v+4,caption);
       }
-      p.marks(points,1.6,.37);
+      if(!samples.length){
+        const [u,v]=p.proj([.13,middle,0]);p.text(u,v+4,'Změř polohu elektronu','middle');
+      }
+      p.marks(samples.map(([position,jitter])=>{
+        const [u,v]=p.proj([x(position),low+(high-low)*(.12+.76*jitter),0]);
+        return [u,v,color];
+      }),4.2,.73,true);
     }
-    for(const [i,[name,len]] of scales.entries()){const r=len/field;if(r>.012&&r<1.25){ring([0,0,0],r,[teal,blue,gold,red,'#b7a0d3'][i]);label([r*.707,r*.707,0],name);}}
-    const probe=Math.min(1,dx/field),y=-.32;
-    p.trace([[-probe*.5,y,0],[probe*.5,y,0]],gold,2);
-    for(const side of [-1,1])line([[side*probe*.5,y-.035,0],[side*probe*.5,y+.035,0]],gold,1.6);
-    label([-.42,-.39,0],dx>field?'Rozlišení přesahuje zorné pole':'Rozlišení sondy');
+    const [markX,markY]=p.proj([0,.56,0]);p.text(markX,markY,'Výsledky měření polohy','middle');
+    if(baselineShots){
+      measureRow(baselineShots,.26,.45,electronInk.level,'Výchozí série');
+      measureRow(shots,.03,.22,electron,'Nová série');
+    }else{
+      measureRow(shots,.03,.45,electron,'');
+    }
+    const [bandX,bandY]=p.proj([0,-.09,0]);p.text(bandX,bandY,'Předpověď pravděpodobnosti','middle');
+    const density=p.gradient('linearGradient','x2="1" y2="0"',points.filter((_,i)=>i%5===0).map(([position,y])=>{
+      const opacity=Math.min(255,Math.round(255*y/.5));
+      return [(position-min)/(max-min),electron+opacity.toString(16).padStart(2,'0')];
+    }));
+    line(strip(-.32,-.17),'#a5c3d3',1,'#eaf3f7');
+    line(strip(-.32,-.17),'none',0,density);
+    function showInterval(center,width,y,color){
+      line([[x(center-width),y,0],[x(center+width),y,0]],color,2);
+      for(const edge of [center-width,center+width])line([[x(edge),y-.017,0],[x(edge),y+.017,0]],color,1.4);
+    }
+    showInterval(mean,deviation,-.37,teal);
+    if(reference)showInterval(reference.mean,reference.deviation,-.44,electronInk.level);
+    const [spreadX,spreadY]=p.proj([0,-.53,0]);p.text(spreadX,spreadY,'Nejistota polohy','middle');
+    value('t',time*P.hb/(P.m*P.c**2)*1e21,'zs');
+    value('\\Delta x/\\bar\\lambda_C',deviation);
+    value('N_{\\text{měření}}',shots.length,'',9);
+    scale('\\bar\\lambda_C='+env.fmt(P.hb/(P.m*P.c)*1e15)+'\\,\\mathrm{fm}');
+    const series=[{...curve(points),area:true,label:'Zvolené nastavení'}];
+    if(reference)series.push({points:reference.points,color:electronInk.level,dash:'5 4',label:'Výchozí nejistota hybnosti'});
+    plot('Jak přesně lze určit polohu elektronu?',series,min,max,0,.54,'x/\\bar\\lambda_C','','w\\bar\\lambda_C','',{xLabel:'Poloha podél osy letu',yLabel:'Hustota pravděpodobnosti'});
+  }else{
+    const field=10**S.zoom,dx=P.hb*P.c/(10**S.q*P.e);
+    drawResolutionScene(p,P,cache,field,dx);
     value('\\Delta x',dx,'m');value('qc',10**S.q,'eV');scale('L='+env.fmt(field)+'\\,\\mathrm m');
-    plot('Rozlišení při změně přenosu hybnosti • logaritmické osy',[curve(seq(100,f=>{const q=2+12*f;return [q,Math.log10(P.hb*P.c/P.e)-q];})),curve([[S.q,Math.log10(dx)]],gold,true)],2,14,-21,-8,'\\log_{10}(qc/\\mathrm{eV})','','\\log_{10}(\\Delta x/\\mathrm m)','',{xLabel:'Přenos hybnosti',yLabel:'Délkové rozlišení'});
+    plot('Rozlišení při změně přenosu hybnosti • logaritmické osy',[curve(seq(100,f=>{const q=2+12*f;return [q,Math.log10(P.hb*P.c/P.e)-q];})),{points:[[S.q,Math.log10(dx)]],color:gold,marker:true}],2,14,-21,-8,'\\log_{10}(qc/\\mathrm{eV})','','\\log_{10}(\\Delta x/\\mathrm m)','',{xLabel:'Přenesená hybnost',yLabel:'Délkové rozlišení',updateKey:S.q});
   }
 }

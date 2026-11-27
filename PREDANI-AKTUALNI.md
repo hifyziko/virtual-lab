@@ -1,5 +1,53 @@
 # Aktuální stav předání
 
+## Předání — 27. listopadu 2026
+
+Pohony a výkonová elektronika zahrnují třífázový střídač a osm dalších pokusů s měniči. Výklad vychází ze skript Václava Kůse. Soukromý výtisk je přibalen v `versions/vyvoj/m_files/reference/menice/`. PWM má rozsah 200 Hz až 100 kHz, detail spínací periody a zpomalení až 1 000×. U nepřímého měniče má brzdná větev více místa. Společná patička na široké obrazovce měří 26 px. Kresba cívek se přizpůsobuje panelu a ovladač mezery v proximity efektu má širší popisek.
+
+Na novém počítači obnovte projekt podle `ZACNETE-ZDE.txt` a použijte `versions/aktualni/web/index.html`. Kontroly viz `node tools/project/check.cjs`. Vzhled na cílovém monitoru ověřte otevřením pokusů z rozcestníku.
+
+## Místní vstup do výuky — 26. listopadu 2026
+
+Použijte [aktuální místní rozcestník](versions/aktualni/web/index.html) nebo
+`SPUSTIT_VYUKU.cmd`. Zdroje vycházejí z nasazeného commitu `098b406`.
+Předchozí místní rozpracovanost zůstává uložená v místním Gitu pod `0c06b1f`.
+Při dalších změnách sestavujte přímo z aktivního pracovního stromu.
+
+## Příběh elektronu — 26. listopadu 2026
+
+Modul `em07-elektron` je položka 13 ve skupině Elektřina a magnetismus.
+Výchozí pohled srovnává dobové modely atomu po dvojicích, od Thomsonova
+atomu po kvantový model vodíku. Obě scény lze otáčet společně a z každé
+dvojice přejít na související pokus. Obě sekce a grafy používají společnou
+světlou vektorovou kresbu SVG. U vodíku lze otáčet prostorovými vzorky
+orbitalů 1s, 2s a 2p a prohlížet tenký řez jádrem. Šipky rychlosti a sil
+vycházejí z obrysů příslušných částic. Pohled Pokusy s elektronem
+obsahuje dvanáct etap na časové ose, prostorové scény a grafy. Průvodce
+u každé etapy i u srovnání modelů uvádí motivaci, klíčový vztah a očekávaný
+výsledek. Posuvníky se přichytávají k referenčním hodnotám a k vybraným
+podmínkám vypočteným z aktuálního nastavení. Změna parametrů zachová čas
+a stav přehrávání. Dvojštěrbina při tažení posuvníku mění náhled clony.
+Po uvolnění přepočítá průběh a sbírá novou sadu zásahů. Modely i pokusy
+sdílejí kresbu prostorových objektů, vln a drah částic. Rozhodující pozorování, meze jednotlivých
+modelů a zdroje jsou v dialogu „Ovládání a výklad“.
+Difrakce na niklu používá kolmý dopad. Detektor lze otáčet posuvníkem
+i tažením v grafu, přichytává se k vrcholům a při změně napětí drží
+polohu. Po změně napětí graf ponechává výchozí křivku pro srovnání.
+Průvodce porovnává směry nejsilnějšího signálu při 54 V a 72 V.
+Diracova etapa ukazuje matematické větve rovnice vedle drah elektronu
+a pozitronu v magnetickém poli. Obrácení pole prohodí stopy při stejné
+hybnosti a energii. Dolní graf označuje obě vypočtené kinetické energie
+při zvolené hybnosti.
+Etapa Kvantové pole ukazuje přípravu hybnosti a simulovaná měření polohy.
+Pevné měřítko umožňuje porovnat rozptyl polohy při dvou různých přípravách.
+V Měřítkách vysvětluje schéma rozptylu fotonu, jak vzniká přenos
+hybnosti na elektron. Ovladač udává přenesenou hybnost v eV/c.
+Vektorový průlet přibližuje elektronový oblak vodíku a proton.
+Přiblížení sleduje zorné pole, mez rozlišení je vyznačena samostatně.
+Závěr ukazuje pozastavitelný názorný model valenčních kvarků a gluonového pole.
+Aktivní zdroje jsou v `versions/vyvoj/m_files/electron-story`. Rozcestník
+načítá celý modul až při otevření, stejně jako další vložené lekce.
+
 ## Sjednocení hlaviček modulů — 25. listopadu 2026
 
 Běžné moduly mají velikost názvu a ovládacích prvků podle fúzních.

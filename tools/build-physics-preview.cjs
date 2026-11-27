@@ -13,7 +13,7 @@ if(activate)js=js.replace(/footer\.innerHTML = '[^']*';/,"footer.innerHTML = 'Vi
 new vm.Script(js);
 const css=fs.readFileSync(path.join(__dirname,'physics-preview.css'),'utf8');
 html=html.replaceAll('Virtuální laboratoř elektrických strojů','Virtuální laboratoř fyziky');
-html=html.replace(/<meta name="description" content="[^"]*">/,'<meta name="description" content="Interaktivní principy a technické aplikace. Elektřina a magnetismus, elektrické stroje a návrh oblasti plazmatu a fúze.">');
+html=html.replace(/<meta name="description" content="[^"]*">/,'<meta name="description" content="Interaktivní principy a technické aplikace. Elektřina a magnetismus, elektrické stroje, pohony a výkonová elektronika, plazma a fúze.">');
 html=html.replace('</head>',()=>'<style id="physics-preview-style">'+css+'</style></head>');
 html=html.replace('</body>',()=>'<script id="physics-preview">'+js+'</script></body>');
 if(activate){

@@ -2,14 +2,21 @@
 function slitSolver({n=128,dt=.10,energy=.25,width=1.1,gap=4,mode='both',absorb=true,barrier=true,size=32,screenX=size-6}={}){
   const dx=size/n, kinetic=.05788382, hb=.65821196, wave=Math.sqrt(energy/(kinetic*hb));
   const re=new Float64Array(n*n), im=re.slice(), det=new Float64Array(n), atten=re.slice(), phase=re.slice(), fraction=re.slice();
+  const openings=[];
+  if(mode!=='upper')openings.push([(-gap-width)/2,(-gap+width)/2]);
+  if(mode!=='lower')openings.push([(gap-width)/2,(gap+width)/2]);
+  if(openings.length===2&&openings[0][1]>openings[1][0])openings.splice(0,2,[openings[0][0],openings[1][1]]);
+  const blocked=Float64Array.from({length:n},(_,y)=>{
+    const lo=y*dx-size/2,hi=lo+dx;
+    const openLength=openings.reduce((sum,[start,end])=>sum+Math.max(0,Math.min(hi,end)-Math.max(lo,start)),0);
+    return Math.max(0,1-openLength/dx);
+  });
   let norm=0, lost=0,time=0;
   for(let y=0;y<n;y++)for(let x=0;x<n;x++){
     const i=y*n+x,X=(x+.5)*dx,Y=(y+.5)*dx-size/2;
     const amp=Math.exp(-((X-6)**2/4+Y*Y/100)/2);
     re[i]=amp*Math.cos(wave*X);im[i]=amp*Math.sin(wave*X);norm+=amp*amp;
-    const upper=Math.abs(Y-gap/2)<width/2,lower=Math.abs(Y+gap/2)<width/2;
-    const hole=(mode!=='lower'&&upper)||(mode!=='upper'&&lower);
-    phase[i]=barrier&&Math.abs(X-12)<.5&&!hole?-5*dt/(2*hb):0;
+    phase[i]=barrier&&Math.abs(X-12)<.5?-5*blocked[y]*dt/(2*hb):0;
     const screen=Math.max(0,(X-screenX)/5)**2,edge=Math.max(0,(2-X)/2,(Math.abs(Y)-size/2+3)/3)**2;
     atten[i]=absorb?Math.exp(-(screen+edge)*dt/(2*hb)):1;fraction[i]=screen+edge?screen/(screen+edge):0;
   }

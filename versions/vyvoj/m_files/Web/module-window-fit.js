@@ -3,6 +3,15 @@
   const app=document.getElementById('app');
   const desktop=matchMedia('(min-width:851px)');
   const DESIGN_WIDTH=1600,DESIGN_HEIGHT=1000;
+  // The transformer section shares one outer width across native and embedded
+  // lessons. Reserve the same space for the heading, gutters and credit.
+  function transformerWidth(element){
+    const available=widthOf(element);
+    if(!Number.isFinite(window.innerWidth))return available;
+    const credit=document.getElementById('app-project-credit')?.getBoundingClientRect().height||0;
+    const height=innerHeight-credit-60;
+    return Math.max(1,Math.floor(Math.min(available,innerWidth-20,height*DESIGN_WIDTH/DESIGN_HEIGHT)));
+  }
   // Shared by native workspaces and iframe lessons; round down to stay in bounds.
   function setModuleTextScale(content,scale){
     const style=content?.style;
@@ -120,6 +129,19 @@
   }
   function prepareHeading(heading){
     if(!heading)return;
+    const title=heading.querySelector(':scope > h1');
+    const firstText=title?.firstChild;
+    const prefix=firstText?.nodeType===3?firstText.data.match(/^\s*(\d{1,2})\s*\/\s+/):null;
+    if(title&&!heading.querySelector(':scope > .num')){
+      const catalogNumber=window.Lab?.catalog?.find(entry=>entry.id===location.hash.slice(1))?.num;
+      const moduleNumber=catalogNumber||prefix?.[1];
+      if(moduleNumber){
+        const number=title.ownerDocument.createElement('span');
+        number.className='num';number.textContent=moduleNumber;
+        title.before(number);
+      }
+    }
+    if(prefix)firstText.deleteData(0,prefix[0].length);
     const candidates=Array.from(heading.querySelectorAll('button')).filter(el=>el.dataset.moduleFullscreen||/cel[áéou]+\s*(obrazovk|okn)|fullscreen|(?:^|\s)fs(?:\s|$)/i.test([el.textContent,el.title,el.getAttribute('aria-label'),el.id].join(' ').replace(/\s+/g,' ')));
     let button=candidates.find(el=>!el.dataset.windowFullscreenCreated)||candidates[0];
     for(const duplicate of candidates)if(duplicate!==button&&duplicate.dataset.windowFullscreenCreated)duplicate.remove();
@@ -172,8 +194,9 @@
     if(main?.classList?.contains('uniform-module-layout')&&!isStage(frame.parentElement)){
       window.prepareModuleFrame(frame);
     }
-    const available=Math.max(1,Math.floor(widthOf(frameHost(frame))));
     const standard=main?.classList?.contains('uniform-module-layout');
+    const host=frameHost(frame);
+    const available=Math.max(1,Math.floor(main?.dataset?.transformerLesson?transformerWidth(host):widthOf(host)));
     if(standard)setModuleTextScale(main,.8);
     const width=standard?1600:main?naturalWidth(main,available):available;
     frameWidths.set(frame,width);
@@ -362,7 +385,9 @@
   }
 
   window.fitImportedModule=(frame,content,naturalHeight)=>{
-    const width=widthOf(frameHost(frame));
+    const host=frameHost(frame);
+    const heading=host.querySelector(':scope > .modulehead');
+    const width=content.dataset?.transformerLesson?transformerWidth(host):widthOf(host);
     // Synchronous lessons can grow horizontally after KaTeX or a mode switch.
     // Measure on the logical viewport prepared above, never on the scaled frame.
     // Enlarge the CHILD viewport before shrinking the complete visible extent;
@@ -372,7 +397,6 @@
       const extent=Math.ceil(Math.max(logical,(content.scrollWidth||logical)+(content.offsetLeft||0)));
       frameWidths.set(frame,extent);
     }
-    const heading=frameHost(frame).querySelector(':scope > .modulehead');
     const height=Math.max(1,naturalHeight);
     const designWidth=frameWidths.get(frame)||naturalWidth(content,width);
     const {scale}=layoutScale(width,height,availableHeight(heading||frame),heading,designWidth);
@@ -421,7 +445,8 @@
     if(!native.style.getPropertyValue('--native-viewport-height')){
       native.style.setProperty('--native-viewport-height',viewportHeight);
     }
-    const width=widthOf(app);
+    const transformer=!!native.querySelector?.(':scope > .gridplots.transformer');
+    const width=transformer?transformerWidth(app):widthOf(app);
     const available=availableHeight(native);
     if(heading){
       // Native and embedded lessons use the same heading size and scene fitting.

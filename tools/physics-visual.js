@@ -4,14 +4,34 @@
   // The area sets the background; scientific colours remain unchanged.
   function applyAreaPalette(){
     const id=location.hash.slice(1),group=Lab.catalog.find(m=>m.id===id)?.group||(id.startsWith('group-')?id.slice(6):'');
-    const machines=['transformer','common','induction','sync','dc','drive'];
-    const area=id==='group-area-machines'||machines.includes(group)?'machines':id==='group-area-plasma'||group==='fusion'?'plasma':'electricity';
-    const palettes={electricity:['#176659','#e9f3ed','#f5f7f2','#173f3a','#cbded4'],machines:['#285da2','#eaf1fb','#f1f4fa','#203b60','#cdd9eb'],plasma:['#725198','#f1ebf8','#f7f3fa','#49355c','#ded2e8']};
+    const machines=['transformer','common','induction','sync','dc'];
+    const area=id==='group-area-drives'||group==='drive'||group==='converters'?'drives':id==='group-area-machines'||machines.includes(group)?'machines':id==='group-area-plasma'||group==='fusion'?'plasma':'electricity';
+    const palettes={drives:['#936024','#faf0df','#faf6ed','#563e25','#e8d7bd'],electricity:['#176659','#e9f3ed','#f5f7f2','#173f3a','#cbded4'],machines:['#285da2','#eaf1fb','#f1f4fa','#203b60','#cdd9eb'],plasma:['#725198','#f1ebf8','#f7f3fa','#49355c','#ded2e8']};
     const root=document.documentElement;if(id)root.dataset.tone='area';else delete root.dataset.tone;root.dataset.physicsArea=area;
     ['accent','wash','paper','ink','line'].forEach((key,i)=>root.style.setProperty('--tone-'+key,palettes[area][i]));
   }
   applyAreaPalette();window.addEventListener('hashchange',applyAreaPalette);
   const fieldArt = () => `<svg data-plain-svg viewBox="0 0 600 440" aria-hidden="true"><defs><radialGradient id="wow-field-glow"><stop stop-color="#b8f4dd"/><stop offset="1" stop-color="#b8f4dd" stop-opacity="0"/></radialGradient></defs><circle cx="300" cy="220" r="215" fill="url(#wow-field-glow)"/><g class="wow-orbits" fill="none" stroke="#138f86" stroke-width="1.4">${Array.from({length:11},(_,i)=>`<ellipse cx="300" cy="220" rx="${65+i*14}" ry="${30+i*8}" transform="rotate(${i*16} 300 220)" opacity="${.35+i*.05}"/>`).join('')}</g><g fill="#11786f"><circle cx="300" cy="220" r="20"/><circle cx="300" cy="220" r="32" fill="none" stroke="#11786f" opacity=".25"/><circle class="wow-particle" cx="465" cy="220" r="7"/></g><circle cx="300" cy="220" r="8" fill="#edfff6"/></svg>`;
+  function driveArt(){
+    const legs=[156,278,400].map((x,k)=>{
+      const valves=[0,1].map(j=>{
+        const y=j?157:85;
+        return `<g transform="translate(${x} ${y})">
+          <path d="M0 -24h21v15m0 16v17H0M15 -8h12m-12 15h12l-6 -14z" stroke="#78654c" stroke-width="2" fill="none"/>
+          <g class="drive-valve ${j?'lower':'upper'}" style="animation-delay:${[0,-4,-2][k]}s" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M0 -36v22l-9 6m0 -8v32m0 -9l9 7v22m-14 -45v18m-9 -9h9"/>
+            <path d="M0 14l-7 -1 3 -4z" fill="currentColor" stroke="none"/>
+          </g></g>`;
+      }).join('');
+      return `<rect x="${x-33}" y="56" width="72" height="130" rx="8" fill="#fffdf5" stroke="#bda783"/><g fill="#15384a"><circle cx="${x}" cy="49" r="3.4"/><circle cx="${x}" cy="193" r="3.4"/></g>${valves}
+        <path d="M${x} 121h46" stroke="#18394c" stroke-width="3.6"/><circle cx="${x}" cy="121" r="3.6" fill="#18394c"/><circle cx="${x+47}" cy="121" r="4" fill="white" stroke="#18394c" stroke-width="2"/>`;
+    }).join('');
+    return `<svg data-plain-svg class="drive-card-art" viewBox="39 29 434 261" aria-hidden="true">
+      <g fill="none" stroke="#15384a" stroke-width="4"><path d="M400 49H69v53m0 38v53h331"/><circle cx="69" cy="121" r="19" fill="#fff7e1"/><path d="M63 114h12m-6 -6v12m-6 10h12" stroke-width="2"/></g>
+      ${legs}<rect x="64" y="211" width="390" height="66" rx="8" fill="#142f40" stroke="#102736"/>
+      <path d="M76 244h366M137 215v58m61 -58v58m61 -58v58m61 -58v58m61 -58v58" stroke="#375262" fill="none"/><path d="M76 233h61v-11h61v11h61v22h61v11h61v-11h61" stroke="#73f1c9" stroke-width="4" fill="none" stroke-linejoin="round"/>
+      <g class="drive-sweep"><path d="M76 215v58" stroke="#ffc56b" stroke-dasharray="3 4"/><g class="drive-sample"><circle cx="76" cy="233" r="5.6" fill="#ffbd4e" stroke="#142f40" stroke-width="1.5"/></g></g></svg>`;
+  }
   const tokamakCardArt = () => `<div class="iter-card-scene" aria-hidden="true">
     <picture>
       <source media="(prefers-reduced-motion: reduce)" srcset="shared/fusion/iter-card-still.webp">
@@ -60,7 +80,7 @@
       }
       hero.querySelector('h1').parentElement.append(branding);
     }
-    const art = id => id === 'plasma' ? tokamakCardArt() : id === 'machines' ? machineArt() : fieldArt();
+    const art = id => id === 'plasma' ? tokamakCardArt() : id === 'drives' ? driveArt() : id === 'machines' ? machineArt() : fieldArt();
     const scene = document.createElement('div');
     scene.className = 'wow-scene';
     scene.innerHTML = art(area || 'electricity') + '<span class="wow-scene-caption">POZOROVAT · ZKOUMAT · POROZUMĚT</span>';
@@ -76,8 +96,8 @@
       label.innerHTML = '<span class="eyebrow">VYBERTE SI SVŮJ SVĚT</span><h2>Všechno spolu souvisí.</h2><p>Začněte principem. Pokračujte k jeho využití.</p>';
       root.querySelector('.physics-areas').before(label);
     }
-    for (const [i,card] of [...root.querySelectorAll('.physics-area-link')].entries()) {
-      const id = ['electricity','machines','plasma'][i];
+    for (const card of root.querySelectorAll('.physics-area-link')) {
+      const id = card.getAttribute('href').slice('#group-area-'.length);
       const visual = document.createElement('div');
       visual.className = 'wow-card-art';
       // Unique IDs prevent gradient collisions between the hero and cards.
@@ -112,8 +132,8 @@
  const toggle=document.createElement('button');toggle.className='lab-tree-toggle';toggle.textContent='☰ Moduly';toggle.type='button';toggle.setAttribute('aria-haspopup','dialog');
  const dialog=document.createElement('dialog');dialog.className='lab-tree-dialog';dialog.setAttribute('aria-label','Navigace mezi moduly');dialog.innerHTML='<header><h2>Moduly</h2><button type="button" aria-label="Zavřít navigaci">×</button></header><nav aria-label="Strom modulů"></nav>';document.body.append(toggle,dialog);
  const nav=dialog.querySelector('nav');let opened='';
- const areas=[['Elektřina a magnetismus',['electromagnetism','materials']],['Elektrické stroje',['transformer','common','induction','sync','dc','drive']],['Jaderná fúze a tokamaky',['fusion']]];
- const titles={electromagnetism:'Elektromagnetické principy',materials:'Materiály',transformer:'Transformátory',common:'Vinutí',induction:'Asynchronní stroje',sync:'Synchronní stroje',dc:'Stejnosměrné stroje',drive:'Elektrické pohony',fusion:'Jaderná fúze a tokamaky'};
+ const areas=[['Elektřina a magnetismus',['electromagnetism','materials']],['Elektrické stroje',['transformer','common','induction','sync','dc']],['Pohony a výkonová elektronika',['converters','drive']],['Jaderná fúze a tokamaky',['fusion']]];
+ const titles={electromagnetism:'Elektromagnetické principy',materials:'Materiály',transformer:'Transformátory',common:'Vinutí',induction:'Asynchronní stroje',sync:'Synchronní stroje',dc:'Stejnosměrné stroje',converters:'Výkonové měniče',drive:'Elektrické pohony',fusion:'Jaderná fúze a tokamaky'};
  function render(){nav.replaceChildren();const home=document.createElement('a');home.href='#';home.textContent='⌂ Hlavní rozcestník';home.className='lab-tree-home';home.title='Přejít na nejvyšší úroveň laboratoře';home.onclick=()=>dialog.close();nav.append(home);const id=location.hash.slice(1);let found=0;
   const available=(Lab.catalog||[]).filter(m=>Lab.modules.has(m.id));const selected=available.find(m=>m.id===id)?.group||opened;
   for(const [area,groups]of areas){const section=document.createElement('section'),heading=document.createElement('h3');heading.textContent=area;section.append(heading);let count=0;for(const group of groups){const items=available.filter(m=>m.group===group);if(!items.length)continue;const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent=titles[group]||group;details.append(summary);details.name='module-tree-topic';details.open=group===selected;details.addEventListener('toggle',()=>{if(details.open){for(const other of nav.querySelectorAll('details'))if(other!==details)other.open=false;opened=group;}else if(opened===group)opened='';});for(const m of items){const link=document.createElement('a');link.href='#'+m.id;link.textContent=m.title;if(m.id===id)link.setAttribute('aria-current','page');link.onclick=()=>dialog.close();details.append(link);}section.append(details);count+=items.length;}if(count){nav.append(section);found+=count;}}

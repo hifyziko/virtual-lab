@@ -1,4 +1,5 @@
-const electronInk={electron:'#2279b6',positive:'#ad6b33',nucleus:'#ba5146',path:'#197c77',level:'#77629a',frame:'#53788c',grid:'#becfd9'};
+const electronInk={electron:'#2279b6',positive:'#ad6b33',nucleus:'#ba5146',path:'#197c77',level:'#77629a',frame:'#53788c',grid:'#becfd9',match:'#087e50'};
+const hydrogenLevelColors=['#316b9c','#76529f','#9d4c72'];
 const atomGlyphRadius={nucleus:.042,electron:.023};
 const electronSvgNumber=value=>Math.round(value*100)/100;
 const electronSvgText=value=>String(value).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
@@ -227,20 +228,26 @@ function electronPainter(svg,camera,model=false){
   }
   return {...surface,proj,line,trace,glow,waveEnvelope,dot,ring,sphere,tube,label,callout,arrow,depthCloud,orientationAxes,scale};
 }
-function drawBohrAtom(p,{initial,final,shownFinal,highest,angle,transition,progress,photonColor},showPhoton=false){
+function drawBohrAtom(p,{initial,final,shownFinal,highest,angle,eventAngle,transfer=0,photon,photonColor,showAllLevels=false},showPhoton=false){
   const {line,dot,proj,polyline,gradient,rect,scale}=p;
   const {nucleus,electron}=electronInk;
-  const radius=n=>.67*(n/highest)**2;
+  const radius=n=>showAllLevels?.67*n/6:.67*(n/highest)**2;
   const orbit=(r,a)=>[r*Math.cos(a),0,r*Math.sin(a)];
-  const active=progress>=0?final:initial;
-  const levels=initial===shownFinal?[initial]:[initial,shownFinal];
+  const levels=showAllLevels?[1,2,3,4,5,6]:initial===shownFinal?[initial]:[initial,shownFinal];
   const drawRings=front=>{
     for(const n of levels){
-      const occupied=n===active;
+      const selected=n===initial||n===shownFinal;
+      const occupancy=initial===final?Number(n===initial):n===initial?1-transfer:n===final?transfer:0;
       let arc=[];
       const paintArc=()=>{
-        if(occupied&&front)line(arc,'#56acdd44',6);
-        line(arc,occupied?(front?'#3b8bb8':'#7cb7d2'):(front?'#9ea9c2':'#c3ccdb'),occupied?2.15:1.1);
+        if(showAllLevels&&selected)line(arc,front?'#6686a5':'#90a9be',1.6,null,'5 4');
+        else line(arc,showAllLevels?(front?'#c6d6e0':'#d2dfe7'):(front?'#9ea9c2':'#c3ccdb'),1.1);
+        if(occupancy>0){
+          p.layers.push('<g opacity="'+occupancy+'">');
+          if(front)line(arc,'#56acdd44',6);
+          line(arc,front?'#3b8bb8':'#7cb7d2',2.15);
+          p.layers.push('</g>');
+        }
       };
       for(let i=0;i<80;i++){
         const a=orbit(radius(n),i*Math.PI/40),b=orbit(radius(n),(i+1)*Math.PI/40);
@@ -258,27 +265,28 @@ function drawBohrAtom(p,{initial,final,shownFinal,highest,angle,transition,progr
   rect(cx-halo,cy-halo,2*halo,2*halo,glow);
   dot([0,0,0],atomGlyphRadius.nucleus*1.22*glyphScale,nucleus,true);
   drawRings(true);
-  const particle=orbit(radius(active),angle);
-  dot(particle,atomGlyphRadius.electron*1.22*glyphScale,electron,true);
-  if(!showPhoton||!transition)return;
-  const emission=transition==='emission';
-  const travel=emission?progress:-progress;
-  if(travel<0||travel>1)return;
-  const origin=orbit(radius(initial),-.48),direction=[.60,.69,.27];
+  const radiusGlyph=atomGlyphRadius.electron*1.22*glyphScale;
+  const from=orbit(radius(initial),angle),to=orbit(radius(final),angle);
+  if(transfer>0&&transfer<1){
+    const glowStrength=Math.sin(Math.PI*transfer);
+    p.layers.push('<g opacity="'+glowStrength+'">');
+    p.trace([from,to],photonColor,1.5);p.glow(from,.16,photonColor);p.glow(to,.13,photonColor);
+    p.layers.push('</g><g opacity="'+(1-transfer)+'">');dot(from,radiusGlyph,electron,true);
+    p.layers.push('</g><g opacity="'+transfer+'">');dot(to,radiusGlyph,electron,true);p.layers.push('</g>');
+  }else dot(transfer===1?to:from,radiusGlyph,electron,true);
+  if(!showPhoton||!photon)return;
+  const {travel,offset}=photon;
+  const origin=orbit(radius(initial),eventAngle),direction=[.52*Math.cos(eventAngle),.57,.52*Math.sin(eventAngle)];
+  origin[1]+=offset;
   const [ox,oy]=proj(origin),[dx,dy]=proj(origin.map((v,j)=>v+direction[j]));
   const length=Math.hypot(dx-ox,dy-oy)||1;
-  const width=Math.min(.32,travel*2),amplitude=scale*.038*Math.min(1,travel*6);
+  const extent=offset?1:Math.abs(travel),width=Math.min(.32,extent*2),amplitude=scale*.038*Math.min(1,extent*6);
   const points=Array.from({length:94},(_,i)=>{
     const q=i/93,along=travel+(q-.5)*width;
     const wave=amplitude*Math.sin(q*6*Math.PI)*Math.sin(q*Math.PI)**2;
     return [ox+(dx-ox)*along+(oy-dy)*wave/length,oy+(dy-oy)*along+(dx-ox)*wave/length];
   });
-  if(emission&&travel<.32){
-    const flash=Math.max(1,scale*.115*(1-travel/.32));
-    const light=gradient('radialGradient','',[[0,photonColor+'83'],[1,photonColor+'00']]);
-    rect(ox-flash,oy-flash,2*flash,2*flash,light);
-  }
-  if(travel>0){
+  if(extent>0){
     polyline(points,photonColor+'36',Math.max(5,scale*.04));
     polyline(points,photonColor,2.6);
   }
@@ -308,9 +316,79 @@ function drawClassicalOrbit(p,viewAt,T,r0,radiating,{radiation=false}={}){
   }
 }
 
+function hydrogenDiagramScale(height){
+  const P=ElectronPhysics,limit=-P.k/(2*25e-12*P.e),top=height*.14,bottom=height*.89;
+  return {top,bottom,y:energy=>top+(bottom-top)*energy/limit,
+    radiusAt:y=>25*(bottom-top)/Math.max(Number.EPSILON,y-top)};
+}
+
+function drawHydrogenLevels(p,reference,radius){
+  const P=ElectronPhysics,{w,h}=p;
+  const trial=-P.k/(2*radius*1e-12*P.e);
+  const {top,bottom,y}=hydrogenDiagramScale(h);
+  const left=w*.25,right=w*.74,xAxis=w*.93;
+  const target=P.energy(reference),targetY=y(target);
+  const match=Math.abs(target-trial)<1e-8;
+  const trialY=match?targetY:y(trial);
+  p.rect(left-6,targetY-9,right-left+12,18,hydrogenLevelColors[reference-1]+'20','none',5);
+  p.polyline([[xAxis,bottom],[xAxis,top]],'#96adbc',1.15);
+  p.text(xAxis,top-8,'Energie','middle');
+  p.polyline([[left,top],[right,top]],'#a9bcc9',1,'none','3 4');
+  p.text(left,top-8,'Mez vazby');
+  for(const [i,label] of ['První','Druhá','Třetí'].entries()){
+    const n=i+1,lineY=y(P.energy(n)),chosen=n===reference,color=hydrogenLevelColors[i];
+    p.polyline([[left,lineY],[right,lineY]],chosen?color:color+'80',chosen?3.3:1.45);
+    p.text(right+8,lineY+4,chosen?label+' · cíl':label);
+  }
+  const trialColor=match?electronInk.match:'#657581';
+  p.polyline([[match?left:left*.77,trialY],[match?right:right+4,trialY]],trialColor,2.2,'none','6 4');
+  p.disk(match?left:left*.77,trialY,3.5,trialColor,'#ffffff',1);
+  p.text(left*.68,trialY+4,match?'Přichyceno':'Zkouška','end');
+}
+
+function drawHydrogenRing(p,radius,{turns,phase},closed,target){
+  const {nucleus,path,positive}=electronInk,tau=ElectronPhysics.tau;
+  const circle=(r,count)=>Array.from({length:count+1},(_,i)=>[r*Math.cos(tau*i/count),0,r*Math.sin(tau*i/count)]);
+  const orbit=circle(radius,420);
+  const amplitude=Math.min(.11,.22*radius);
+  const wave=orbit.map(([x,,z],i)=>[x,amplitude*Math.cos(tau*turns*i/420+phase),z]);
+  const waveColor=closed?electronInk.match:path;
+  const join=[wave[0],wave.at(-1)],joinColor=closed?waveColor:positive;
+  const center=[0,0,0],centerDepth=p.proj(center)[2];
+  const depth=point=>p.proj(point)[2]-centerDepth;
+  function split(points){
+    const halves=[[],[]];
+    let previous=points[0],priorDepth=depth(previous),segment=[previous];
+    for(let i=1;i<points.length;i++){
+      const point=points[i],nextDepth=depth(point);
+      if((priorDepth>=0)!==(nextDepth>=0)){
+        const f=priorDepth/(priorDepth-nextDepth);
+        const edge=previous.map((v,j)=>v+f*(point[j]-v));
+        segment.push(edge);halves[Number(priorDepth>=0)].push(segment);segment=[edge];
+      }
+      segment.push(point);previous=point;priorDepth=nextDepth;
+    }
+    halves[Number(priorDepth>=0)].push(segment);
+    return halves;
+  }
+  const orbitHalves=split(orbit),waveHalves=split(wave),joinHalves=split(join);
+  const targetHalves=target?split(circle(target.radius,420)):null;
+  function drawHalf(front){
+    if(targetHalves)for(const points of targetHalves[front])p.line(points,target.color,1.8);
+    for(const points of orbitHalves[front])p.line(points,'#96b0bf',1.25,null,'4 4');
+    for(const points of waveHalves[front])p.trace(points,waveColor);
+    for(const points of joinHalves[front])p.line(points,joinColor,2);
+    for(const point of join)if(Number(depth(point)>=0)===front)p.dot(point,.019,joinColor,true);
+  }
+  drawHalf(0);
+  p.glow(center,.087,nucleus);p.dot(center,.026,nucleus,true);
+  drawHalf(1);
+  p.label([radius,amplitude+.08,0],'Spoj');
+}
+
 function drawNickelCrystal(p){
   const atoms=electronCrystal.atoms.map(atom=>{
-    const xyz=atom.map(value=>value*.255);
+    const xyz=atom.map(value=>value*.43);
     return {xyz,depth:p.proj(xyz)[2]};
   }).sort((a,b)=>a.depth-b.depth);
   const colors=['#8fb7cc','#6b9fb9','#4d8dad','#2c789f','#1f638d'];
@@ -319,15 +397,6 @@ function drawNickelCrystal(p){
     const band=Math.min(4,Math.floor(5*(depth-min)/range));
     p.dot(xyz,.014+.0025*band,colors[band],band>1);
   }
-}
-
-function drawPacketBody(p,points){
-  const color=electronInk.path;
-  for(const direction of [[0,1],[.55,.84],[.84,.55],[1,0],[-.55,.84],[-.84,.55]]){
-    const top=points.map(([x,r])=>[x,r*direction[0],r*direction[1]]);
-    p.waveEnvelope(top,top.map(([x,y,z])=>[x,-y,-z]),color);
-  }
-  p.line([[points[0][0],0,0],[points.at(-1)[0],0,0]],'#53869e',.9,null,'4 4');
 }
 
 function electronChart(svg,series,min,max,ymin,ymax){
@@ -370,9 +439,17 @@ const electronCrystal=(()=>{
     const x=i+u,y=j+v,z=k+w;
     atoms.push([a*(x-y)/Math.sqrt(2),a*(x+y+z)/Math.sqrt(3),a*(x+y-2*z)/Math.sqrt(6)]);
   }
-  function intensity(lambda,inc,det){
-    const rad=Math.PI/180,K=2*Math.PI/lambda,qx=K*(Math.sin(det*rad)-Math.sin(inc*rad)),qy=K*(Math.cos(det*rad)+Math.cos(inc*rad));
+  function intensity(lambda,det){
+    const rad=det*Math.PI/180,K=2*Math.PI/lambda,qx=K*Math.sin(rad),qy=K*(Math.cos(rad)+1);
     let re=0,im=0;for(const [x,y] of atoms){const phase=qx*x+qy*y;re+=Math.cos(phase);im+=Math.sin(phase);}return (re*re+im*im)/atoms.length**2;
   }
-  return {atoms,intensity};
+  function diffraction(voltage){
+    const lambda=ElectronPhysics.h/ElectronPhysics.momentum(voltage)*1e9;
+    const samples=Array.from({length:1701},(_,i)=>[i/20,intensity(lambda,i/20)]);
+    const [peak,maximum]=samples.reduce((best,point)=>point[1]>best[1]?point:best);
+    const points=samples.map(([angle,signal])=>[angle,signal/maximum]);
+    const targets=[peak,...points.filter(([,y],i)=>i>0&&i<points.length-1&&y>.08&&y>points[i-1][1]&&y>=points[i+1][1]).map(([angle])=>angle)];
+    return {lambda,peak,points,targets,signal:angle=>intensity(lambda,angle)/maximum};
+  }
+  return {atoms,diffraction};
 })();
