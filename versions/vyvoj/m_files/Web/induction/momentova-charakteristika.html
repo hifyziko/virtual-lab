@@ -51,9 +51,6 @@
 .harmonic-action{margin:4px 4px 0}
 .harmonics .harm-line{display:contents}
 .time-gain{margin-top:4px;max-width:310px}
-.curve-key{display:inline-flex;align-items:center;gap:5px;color:var(--curve-color)}
-.curve-key::before{content:"";width:16px;border-top:2px solid var(--curve-color)}
-.curve-key.dashed::before{border-top-style:dashed}
 .plot-math.start-tick{color:#865818}
 .cursor{padding-top:8px;margin-top:6px}
 .bar-pane #barPlot{display:block;height:auto;max-height:177px}
@@ -103,7 +100,6 @@ aside h2{font-size:14px;margin-bottom:5px}
 .bar-pane #barPlot{max-height:125px}
 .bar-pane .note,.bar-equations{font-size:11px}
 .equation-content{padding:0 12px 8px}
-#axisNote{margin:3px 0 0}
 @media(min-width:801px){
  .layout{align-items:stretch}
  .chart-card #torquePlot{flex:1;min-height:380px;height:380px}
@@ -141,9 +137,6 @@ aside h2{font-size:14px;margin-bottom:5px}
 .harmonics .space-gain{margin:0 0 0 8px}
 .harmonic-action{height:18px;line-height:18px;margin:3px 4px 0}
 .harmonic-action[hidden]{display:block!important;visibility:hidden}
-#gainNotice,#gainNotice:empty{display:block;height:19px;min-height:19px;line-height:19px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#componentsLegend,#componentsLegend[hidden]{display:flex!important;flex-wrap:nowrap;height:25px;min-height:25px;margin:0;overflow-x:auto;overflow-y:hidden;align-items:center;white-space:nowrap}
-#componentsLegend[hidden]{visibility:hidden}
 .schema-pane{height:326px;overflow:hidden}
 .schema-pane #schema,.schema-pane:has([data-schema="space"][aria-pressed="true"]) #schema{height:160px}
 .schema-pane #schemaInfo{height:88px;overflow:hidden;font-size:var(--lesson-heading,16px)}
@@ -245,7 +238,7 @@ aside h2{font-size:14px;margin-bottom:5px}
 .harmonics .card{height:auto;padding:7px 10px;overflow:visible}
 .harmonics .harm-row{height:auto;min-height:28px}
 .harmonics .time-gain,.harmonics .space-gain{position:static;width:100%;margin:4px 0 0}
-.harmonics .time-gain[hidden],#componentsLegend[hidden],#gainNotice:empty{display:none!important}
+.harmonics .time-gain[hidden],#gainNotice:empty{display:none!important}
 .operating-panel{display:flex;flex-direction:column;gap:8px}
 .bar-pane{display:flex;flex:1;min-height:0;flex-direction:column}
 .bar-pane #barPlot{width:100%;height:auto;aspect-ratio:255 / 165;max-height:none;margin:0}
@@ -265,17 +258,10 @@ aside h2{font-size:14px;margin-bottom:5px}
 
 .skin-preview{position:fixed;z-index:1000;width:min(290px,calc(100vw - 20px));box-sizing:border-box;padding:12px 16px 16px;background:#f4faf8;border:1px solid #8ebdb0;border-radius:14px;box-shadow:0 12px 32px #18394330;color:#19313b}.skin-preview[hidden]{display:none!important}.skin-preview svg{display:block;width:100%;height:125px}.skin-preview svg text{font:10px system-ui;fill:#60747b}.skin-preview h3{font:700 16px/1.35 system-ui;margin:3px 0 7px}.skin-preview p{font:13px/1.45 system-ui;color:#60747b;margin:0 0 10px}.skin-preview .skin-close{position:absolute;right:4px;top:1px;border:0;background:transparent;font:24px system-ui;padding:0 7px}.skin-preview .skin-link{display:block;padding:8px;background:#fff;border:1px solid #9dc7bb;border-radius:7px;color:#006958;text-decoration:none;font:600 13px/1.4 system-ui}#skin-hit{fill:transparent;stroke:transparent;stroke-width:1.5;cursor:pointer;pointer-events:all}#skin-hit:hover,#skin-hit:focus-visible,#skin-hit[aria-expanded=true]{fill:#007e6c0a;stroke:#007e6c;outline:none}
 
-.chart-summary{position:relative;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--lesson-gap,5px) 12px}
+.chart-summary{display:flex;justify-content:space-between;align-items:center;gap:var(--lesson-gap,5px) 12px}
 .chart-summary .legend{margin:0}
 .chart-summary .chart-total{align-items:baseline;gap:0 8px}
-#chartLegendToggle{padding:3px 7px;white-space:nowrap}
-.chart-legend-panel{
- position:absolute;z-index:2;inset-inline-end:0;top:calc(100% + var(--lesson-gap,5px));
- display:grid;gap:var(--lesson-gap,5px);width:min(100%,38em);padding:10px;
- border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:0 5px 16px #19313b26;
-}
-.chart-legend-panel #componentsLegend{height:auto;min-height:0;flex-wrap:wrap;overflow:visible;gap:2px 10px}
-.chart-legend-panel #gainNotice,.chart-legend-panel #axisNote{margin:0;min-height:0;height:auto;line-height:inherit;white-space:normal;overflow:visible}
+.chart-summary #gainNotice{margin:0;min-height:0;height:auto;line-height:inherit;white-space:nowrap;overflow:visible}
 .operating-panel{display:flex;flex-direction:column;gap:8px}
 .bar-pane{display:flex;flex:1;min-height:0;flex-direction:column}
 .bar-pane #barPlot{width:100%;height:auto;aspect-ratio:255 / 165;max-height:none;margin:0}
@@ -317,15 +303,10 @@ aside h2{font-size:14px;margin-bottom:5px}
 <div class="layout"><section class="card chart-card" data-lesson-plot><div class="chart-head"><h2>Moment v závislosti na skluzu</h2><label class="check"><input id="reference" type="checkbox" checked>Přirozená · 400 V</label></div>
 <div class="chart-summary">
 <div class="legend chart-total"><span class="total">Celkový moment</span><span class="note" id="normalization" data-lesson-readout></span></div>
-<button type="button" id="chartLegendToggle" aria-expanded="false" aria-controls="chartLegendPanel">Legenda a rozsah</button>
-<div class="chart-legend-panel" id="chartLegendPanel" hidden>
-<div id="componentsLegend" class="legend" hidden></div>
 <p class="note" id="gainNotice"></p>
-<p class="note" id="axisNote"></p>
-</div>
 </div>
 <svg id="torquePlot" role="img" aria-label="Momentová charakteristika"></svg><div class="cursor"><label class="control" for="speed"><span>Odečet skluzu<output id="speedOut" data-lesson-readout></output></span><input id="speed" type="range" min="-1" max="1" step="0.005" value="0.2"></label></div></section>
-<aside><section class="card schema-pane"><h2>T článek · základní harmonická</h2><div class="schema-tabs" role="group" aria-label="Typ náhradního schématu"><button data-schema="base" aria-pressed="true">Základní</button><button data-schema="time" aria-pressed="false">Časové μ</button><button data-schema="space" aria-pressed="false">Prostorové ν</button></div><div class="schema-scroll"><svg id="schema" role="img" aria-label="Náhradní schéma použité při výpočtu"></svg></div><p id="schemaInfo" class="note"></p></section><section class="card operating-panel" aria-label="Provozní hodnoty a rotor"><section class="readings" data-lesson-readouts><h2>Vybraný bod</h2><div><span>Moment</span><strong id="torqueRead"></strong></div><div><span>Skluz</span><b id="slipRead"></b></div><div><span>Frekvence rotoru · základní pole</span><b id="freqRead"></b></div><div><span data-tex="R'_2(s)"></span><b id="resRead"></b></div><div><span data-tex="X'_{2\sigma}"></span><b id="reactRead"></b></div><div><span class="marker-key">Záběr <span data-tex="M_{\mathrm{z}}"></span></span><b id="startRead"></b></div><div><span class="marker-key breakdown">Zvrat <span data-tex="M_{\mathrm{k}}"></span></span><b id="maxRead"></b></div></section>
+<aside><section class="card schema-pane"><h2>Náhradní schéma</h2><div class="schema-tabs" role="group" aria-label="Typ náhradního schématu"><button data-schema="base" aria-pressed="true">Základní</button><button data-schema="time" aria-pressed="false">Časové μ</button><button data-schema="space" aria-pressed="false">Prostorové ν</button></div><div class="schema-scroll"><svg id="schema" role="img" aria-label="Náhradní schéma použité při výpočtu"></svg></div><div id="schemaInfo" class="note"></div></section><section class="card operating-panel" aria-label="Provozní hodnoty a rotor"><section class="readings" data-lesson-readouts><h2>Vybraný bod</h2><div><span>Moment</span><strong id="torqueRead"></strong></div><div><span>Skluz</span><b id="slipRead"></b></div><div><span>Frekvence rotoru · základní pole</span><b id="freqRead"></b></div><div><span data-tex="R'_2(s)"></span><b id="resRead"></b></div><div><span data-tex="X'_{2\sigma}"></span><b id="reactRead"></b></div><div><span class="marker-key">Záběr <span data-tex="M_{\mathrm{z}}"></span></span><b id="startRead"></b></div><div><span class="marker-key breakdown">Zvrat <span data-tex="M_{\mathrm{k}}"></span></span><b id="maxRead"></b></div></section>
 <section class="cage bar-pane" hidden><h2>Proud v rotorové tyči</h2>
 <svg id="barPlot" role="img" aria-label="Průřez rotorové tyče a profil relativní proudové hustoty po hloubce"></svg>
 </section><section class="wound"><h2>Vnější rotorový odpor</h2><p>Vyšší odpor posouvá maximum momentu k většímu skluzu. Moment zvratu při stálém napětí zůstává přibližně stejný.</p></section></section></aside></div>
@@ -346,7 +327,8 @@ aside h2{font-size:14px;margin-bottom:5px}
 <li><b>Odečet skluzu:</b> posuvníkem vyberte pracovní bod. Vpravo se zobrazí jeho moment, skluz, frekvence a parametry rotoru. Nejde o přehrávání rozběhu.</li>
 <li><b>Harmonické:</b> zaškrtnutí zobrazí příspěvek; sousední tlačítko <b>+</b> jej zahrne do celkového momentu. Samotné zobrazení součet nemění.</li>
 <li><b>Zesílení zobrazení:</b> zvětšuje zobrazené harmonické příspěvky. Teprve volba <b>× i do součtu</b> použije zesílení také při jejich započtení.</li>
-<li><b>Náhradní schéma:</b> přepínejte základní, časové a prostorové harmonické. U klece sledujte i proudovou hustotu po hloubce tyče; její náhled nabízí přechod ke skin efektu.</li>
+<li><b>Náhradní schéma:</b> přepínejte základní, časové a prostorové harmonické. Rozptyl statoru závisí u klece na proudu a impedance klece na skluzu. Zkuste změnit skluz a sledujte proudovou hustotu ve vodiči. Náhled otevírá modul skinefektu.</li>
+<li>Časové harmonické mají vlastní obvody. Při změně skluzu se jejich rotorové parametry přepočítají podle příslušné frekvence. Prostorové harmonické sdílejí stator. Každý započtený řád přidá modální větev. U vyšších prostorových řádů model zanedbává ztráty v železe.</li>
 <li><b>Obnovit parametry:</b> kruhová šipka vrátí výchozí nastavení. Pokud je nabídnuta <b>Osa Y</b>, přizpůsobí rozsah momentu aktuálním křivkám.</li>
 </ul></section><section><h3>Co vyzkoušet</h3><ol><li>U vinuté kotvy zvětšujte přídavný odpor. Sledujte posun zvratu k většímu skluzu a porovnejte jeho výšku.</li><li>Přepněte na klec a porovnejte proud v tyči při malém skluzu a při záběru. Všímejte si změny účinného odporu.</li><li>Zobrazte jednu harmonickou a potom ji přidejte do součtu. Odlište její názorné zesílení od změny celkového momentu.</li></ol></section></template>
 </main><script>(()=>{const kd=(q,n)=>Array.from({length:q},(_,k)=>Math.cos(n*(k-(q-1)/2)*Math.PI/(3*q))).reduce((a,b)=>a+b,0)/q;
@@ -559,34 +541,28 @@ function graph(){if(!data.length)return;const el=$('torquePlot'),w=Math.max(270,
  if($('reference').checked)curves.unshift({values:baseline,color:C.grey,width:1.7,dash:'6 4'});
  const components=[];
  const math=tex=>katex.renderToString(tex,{throwOnError:true});
- const add=(kind,label,key,color,get,dash='',width=1.8)=>components.push({
-  kind,label,key,color,dash,width,values:data.map(v=>({n:v.n,total:get(v)}))
+ const add=(kind,label,color,get,dash='',width=1.8)=>components.push({
+  kind,label,color,dash,width,values:data.map(v=>({n:v.n,total:get(v)}))
  });
  if(p.includedSpaceOrders.length){
-  add('main-field','Základní pole po přepočtu','Základní pole','#287b91',v=>v.main,'8 3',1.9);
+  add('main-field','Základní pole po přepočtu','#287b91',v=>v.main,'8 3',1.9);
  }
  {
   for(const nu of spaceOrders){
    const included=p.includedSpaceOrders.includes(nu);
-   add('space-'+nu,`${nu}. prostorová${spaceGainLabel}${included?'':' · náhled'}`,math(String.raw`\nu=${nu}`),spaceColors[nu],v=>(v.displaySpaceBranches.find(b=>b.nu===nu)?.torque??0)*spaceGain,included?'':'4 3');
+   add('space-'+nu,`${nu}. prostorová${spaceGainLabel}${included?'':' · náhled'}`,spaceColors[nu],v=>(v.displaySpaceBranches.find(b=>b.nu===nu)?.torque??0)*spaceGain,included?'':'4 3');
   }
   for(const h of p.timeOrders){
    const color=timeColors[[5,7,11,13].indexOf(h)];
    const included=p.includedTimeOrders.includes(h);
-   add('time-'+h,`${h}. časová ${gainLabel}${included?'':' · náhled'}`,math(String.raw`\mu=${h}`),color,v=>(v.displayTimeCircuits.find(c=>c.h===h)?.torque??0)*gain,included?'':'4 3');
+   add('time-'+h,`${h}. časová ${gainLabel}${included?'':' · náhled'}`,color,v=>(v.displayTimeCircuits.find(c=>c.h===h)?.torque??0)*gain,included?'':'4 3');
   }
  }
  curves.push(...components);
- const legend=$('componentsLegend');
- legend.hidden=components.length===0;
- legend.innerHTML=components.map(c=>`<span class="curve-key${c.dash?' dashed':''}" style="--curve-color:${c.color}" title="${c.label}">${c.key}</span>`).join('');
  const gainNotes=[];
- if(spaceOrders.length&&spaceGain>1)gainNotes.push(math(String.raw`\nu\;\times ${spaceGain}`));
  if(p.timeOrders.length&&gain>1)gainNotes.push(math(String.raw`\mu\;\times ${gain}`));
- const notices=[];
- if(gainNotes.length)notices.push('Zesílení '+gainNotes.join(' · ')+(enhanced?' · platí i v součtu':' · součet bez zesílení'));
- if(components.some(c=>c.dash==='4 3'))notices.push('Přerušovaně · náhled');
- $('gainNotice').innerHTML=notices.join('. ');
+ if(spaceOrders.length&&spaceGain>1)gainNotes.push(math(String.raw`\nu\;\times ${spaceGain}`));
+ $('gainNotice').innerHTML=gainNotes.length?'Zesílení '+gainNotes.join(' · '):'';
  renderReadout('normalization',String.raw`100\,\%= ${readoutNumber(normalizer,1)}\,\mathrm{N{\cdot}m}`);
  $('normalization').title='Maximum přirozené motorické charakteristiky při 400 V, bez přídavného odporu.';
  const expanded=p.timeOrders.length>0||spaceOrders.length>0&&spaceGain>1;
@@ -678,7 +654,7 @@ function graph(){if(!data.length)return;const el=$('torquePlot'),w=Math.max(270,
  svg+=`<path data-start-slip d="M${xStart} ${T}V${bottom}" fill="none" stroke="#865818" stroke-width="1.4" stroke-dasharray="5 4"/>`;
  svg+=plotMath('s=1',Math.max(L+32,Math.min(right-32,xStart)),bottom-16,64,28,'start-tick');
  for(const c of curves){
-  svg+=`<path data-component="${c.kind||''}" clip-path="url(#plotClip)" d="${curvePath(c.values)}" fill="none" stroke="${c.color}" stroke-width="${c.width}" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="${c.dash||''}"/>`;
+  svg+=`<path data-component="${c.kind||''}" clip-path="url(#plotClip)" d="${curvePath(c.values)}" fill="none" stroke="${c.color}" stroke-width="${c.width}" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="${c.dash||''}">${c.label?`<title>${c.label}</title>`:''}</path>`;
  }
  const value=M.point(p,p.speed),cursorX=x(p.speed),cursorY=y(shownMoment(value)*100/normalizer);
  if(Math.abs(cursorX-xStart)>1)svg+=line(cursorX,T,cursorX,bottom,'#627e83','3 4');
@@ -796,9 +772,7 @@ const schemaPane=schemaInfo.closest('.schema-pane');
 const harmonicBar=document.querySelector('main[data-machine-viewport="am02-momentova-charakteristika"]>.harmonics');
 function fitHarmonics(){
  if(!harmonicBar?.clientWidth)return;
- const spatial=harmonicBar.querySelector('.spatial-harmonics');
  harmonicBar.style.removeProperty('--harmonics-fit');
- spatial.classList.remove('stacked');
  const fits=()=>harmonicBar.scrollWidth<=harmonicBar.clientWidth+1;
  const fitsSideBySide=()=>fits()&&[...harmonicBar.children].every(card=>card.scrollWidth<=card.clientWidth+1);
  harmonicBar.classList.remove('compact-labels');
@@ -807,8 +781,6 @@ function fitHarmonics(){
  harmonicBar.classList.add('compact-labels');
  if(fitsSideBySide())return;
  harmonicBar.classList.remove('side-by-side','compact-labels');
- if(fits())return;
- spatial.classList.add('stacked');
  if(fits())return;
  let lower=.45,upper=1;
  // Keep the largest size that fits the complete strip, including active controls.
@@ -823,12 +795,10 @@ function fitHarmonics(){
 function fitSchemaInfo(){
  schemaInfo.style.removeProperty('font-size');
  if(!schemaPane.clientHeight)return;
- const paneStyle=getComputedStyle(schemaPane);
- const contentBottom=schemaPane.getBoundingClientRect().bottom-parseFloat(paneStyle.paddingBottom)-parseFloat(paneStyle.borderBottomWidth);
- const fits=()=>schemaInfo.scrollWidth<=schemaInfo.clientWidth+1&&schemaInfo.getBoundingClientRect().bottom<=contentBottom+1;
+ const fits=()=>schemaInfo.scrollWidth<=schemaInfo.clientWidth+1;
  if(fits())return;
  const start=parseFloat(getComputedStyle(schemaInfo).fontSize);
- const minimum=parseFloat(paneStyle.getPropertyValue('--lesson-detail-size'))||12;
+ const minimum=parseFloat(getComputedStyle(schemaPane).getPropertyValue('--lesson-detail-size'))||12;
  for(let size=Math.floor(start)-1;size>=minimum;size--){
   schemaInfo.style.fontSize=size+'px';
   if(fits())return;
@@ -842,7 +812,6 @@ document.querySelectorAll('[data-schema]').forEach(button=>button.onclick=()=>{
 });
 function schema(){
  baseSchema();
- $('schema').closest('.schema-pane').querySelector('h2').textContent=schemaMode==='space'?'Rozšířený obvod · prostorové harmonické':schemaMode==='time'?'T článek · časová harmonická':'T článek · základní harmonická';
  const emphasize=t=>t.replace(/\\mu/g,String.raw`{\textcolor{#b45c16}{\boldsymbol{\mu}}}`).replace(/\\nu/g,String.raw`{\textcolor{#0039a6}{\boldsymbol{\nu}}}`);
  const math=t=>katex.renderToString(emphasize(t),{throwOnError:true});
  $('schema').closest('.schema-pane').dataset.mode=schemaMode;
@@ -877,7 +846,7 @@ function schema(){
  const formulas=schemaMode==='time'
   ?[String.raw`U_\mu=U_1/\mu,\quad n_{s\mu}=\pm\mu n_s`,String.raw`s_\mu=1-n/n_{s\mu},\quad f_{2\mu}=|s_\mu|\mu f_1`]
   :[String.raw`n_{s\nu}=\pm n_s/\nu,\quad s_\nu=1-n/n_{s\nu}`,String.raw`q_\nu=|k_{w\nu}/k_{w1}|,\quad X_{m\nu}=q_\nu^2X_m/\nu^2`];
- $('schemaInfo').innerHTML=formulas.map(t=>'<div>'+math(t)+'</div>').join('')+'<div class="schema-caption">'+(schemaMode==='time'?'Samostatný obvod pro každý řád. R₂′ a X₂σ′ se přepočítají při f₂μ.':'Společný stator; další blok pro každý započtený řád. R₂ν′ a X₂σν′ obsahují qν². Vyšší řády bez ztrát v železe.')+'</div>';
+ schemaInfo.innerHTML=formulas.map(t=>'<div>'+math(t)+'</div>').join('');
  fitSchemaInfo();
 }
 function baseSchema(){
@@ -901,14 +870,9 @@ function baseSchema(){
   String.raw`L_{\mathrm m}=81\,\mathrm{mH}`,
   String.raw`R_{\mathrm{Fe}}=370\,\Omega`
  ];
- const rotorInfo=p.rotor==='cage'
-  ? 'Rozptyl statoru závisí na proudu, impedance klece na skluzu.'
-  : math(String.raw`L_{1\sigma}=3{,}2\,\mathrm{mH}`)+'.';
- const spaceInfo=p.includedSpaceOrders.length?' Prostorové harmonické přidávají modální obvody.':'';
- const timeInfo=p.includedTimeOrders.length
-  ? ' Časové obvody: '+p.includedTimeOrders.map(order=>math(String.raw`${order}f_1`)).join(', ')+'.'
-  : '';
- $('schemaInfo').innerHTML=parameters.map(math).join(' · ')+'. '+rotorInfo+spaceInfo+timeInfo;
+ if(p.rotor==='wound')parameters.push(String.raw`L_{1\sigma}=3{,}2\,\mathrm{mH}`);
+ const row=values=>'<div>'+values.map(math).join(' · ')+'</div>';
+ schemaInfo.innerHTML=row(parameters.slice(0,2))+row(parameters.slice(2));
 
 }
 function update(){read();document.querySelectorAll('.cage').forEach(e=>e.hidden=p.rotor!=='cage');document.querySelectorAll('.wound').forEach(e=>e.hidden=p.rotor!=='wound');
@@ -930,10 +894,6 @@ function update(){read();document.querySelectorAll('.cage').forEach(e=>e.hidden=
  const cursor=$('speed');
  cursor.min=slipMin;cursor.max=slipMax;cursor.step=.005;
  p.speed=1500*(1-+cursor.value);
- const axisMath=tex=>katex.renderToString(tex,{throwOnError:true});
- const upperSlip=Number(slipMax.toFixed(2)).toLocaleString('cs-CZ').replace(',', '{,}');
- $('axisNote').innerHTML=p.timeOrders.length?'Rozsah skluzu zahrnuje vybrané časové harmonické.'
-  :`Skluz ${axisMath(readoutNumber(slipMin,0))} až ${axisMath(upperSlip)} · moment ${axisMath(String.raw`-${fundamentalBottom}\,\%`)} až ${axisMath(String.raw`+${fundamentalTop}\,\%`)}.`;
  const natural={...p,voltage:400,rscale:1,rext:0,timeOrders:[],spaceOrders:[],includedTimeOrders:[],includedSpaceOrders:[]};normalizer=Math.max(...M.curve(natural).map(v=>v.total));
  data=M.slipCurve(p,1000,range,[slipMin,slipMax]);baseline=M.slipCurve(natural,1000,range,[slipMin,slipMax]);
  const runup=M.curve(p,600);
@@ -944,21 +904,6 @@ function update(){read();document.querySelectorAll('.cage').forEach(e=>e.hidden=
 }
 for(const k of controlKeys){const el=$(k);el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{if(k==='shape'){if(el.value==='siemens'){$('width').value=5.63;$('depth').value=26.22;}else{$('width').value=8;$('depth').value=30;}}if(k==='speed'){p.speed=1500*(1-+el.value);graph();return;}if(!queued){queued=true;requestAnimationFrame(()=>{queued=false;update();});}});}
 for(const k of ['reference'])$(k).addEventListener('change',()=>{fit=true;graph();});
-const legendToggle=$('chartLegendToggle'),legendPanel=$('chartLegendPanel');
-function setChartLegend(open){
- legendPanel.hidden=!open;
- legendToggle.setAttribute('aria-expanded',String(open));
-}
-legendToggle.addEventListener('click',()=>setChartLegend(legendPanel.hidden));
-document.addEventListener('click',event=>{
- if(!legendPanel.hidden&&!legendPanel.contains(event.target)&&!legendToggle.contains(event.target))setChartLegend(false);
-});
-document.addEventListener('keydown',event=>{
- if(event.key==='Escape'&&!legendPanel.hidden){
-  setChartLegend(false);
-  legendToggle.focus();
- }
-});
 for(const id of ['timeGain','spaceGain'])$(id).addEventListener('input',graph);
 for(const kind of ['time','space'])$(kind+'SumGain').onclick=()=>{
  const button=$(kind+'SumGain');
