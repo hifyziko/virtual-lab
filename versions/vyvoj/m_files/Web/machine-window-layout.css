@@ -119,7 +119,7 @@ main[data-machine-viewport="am04-trakcni"] .fitted .warning-slot .warning{font-s
 main[data-machine-viewport="am04-trakcni"] .fitted aside>.card:last-child{min-height:0;flex:1 1 0}
 
 /* AM torque: use the common host canvas instead of an independent 880px chart row. */
-main.uniform-module-layout[data-machine-viewport="am02-momentova-charakteristika"]{--module-flexible-height:1;height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:8px}
+main.uniform-module-layout[data-machine-viewport="am02-momentova-charakteristika"]{--module-flexible-height:1;height:var(--module-host-height,1000px)!important;display:flex;flex-direction:column;gap:5px}
 main[data-machine-viewport="am02-momentova-charakteristika"]>*{flex-shrink:0;margin-top:0;margin-bottom:0}
 main[data-machine-viewport="am02-momentova-charakteristika"]>.layout{flex:1 1 0;min-height:0;height:0;grid-template-columns:minmax(0,1fr) 560px}
 main[data-machine-viewport="am02-momentova-charakteristika"] .layout>aside,main[data-machine-viewport="am02-momentova-charakteristika"] .layout>aside:has(>.wound:not([hidden])){height:100%;min-height:0;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:300px minmax(0,1fr)}
@@ -130,21 +130,71 @@ main[data-machine-viewport="am02-momentova-charakteristika"] .layout>aside>:is(.
 main[data-machine-viewport="am02-momentova-charakteristika"] .chart-card #torquePlot{flex:1 1 0;height:0;min-height:220px}
 main[data-machine-viewport="am02-momentova-charakteristika"] .bar-pane #barPlot{height:110px}
 
-/* Compact torque controls; keep a stable gain row when harmonics are enabled. */
-main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls{padding:8px 10px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls .controls,main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls .rotor-controls{grid-template-columns:minmax(180px,260px) minmax(200px,300px) minmax(200px,300px) auto;gap:6px 14px;justify-content:start}
-main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls select{padding:4px 7px;margin-top:2px}
+/* AM torque controls size to the visible rows and release the rest to the plot. */
+main.uniform-module-layout[data-machine-viewport="am02-momentova-charakteristika"] :is(.controls,.controlbox,.toolbar,.machine-controls,.traction-controls)
+ :is(.harm-label,.harm-label small){
+ font-size:var(--lesson-text)!important;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"]>.machine-controls{padding:4px 7px}
+main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls .controls{display:flex;flex-wrap:wrap;gap:6px;padding:0}
+main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls .controls>:not(.buttons){flex:1 1 220px}
+main[data-machine-viewport="am02-momentova-charakteristika"] > :is(.machine-controls,.harmonics)
+ :is(.control>span,.check,[data-tex],.harm-label,.harm-label small,label,output,button){font-size:var(--lesson-text)!important}
+main[data-machine-viewport="am02-momentova-charakteristika"] > :is(.machine-controls,.harmonics) .katex{font-size:1em!important}
 main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls input[type=range]{margin-top:4px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls .rotor-controls{margin-top:5px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .card{height:104px;padding:7px 10px;overflow:visible}
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics h2{margin-bottom:2px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .harm-row{height:25px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .time-gain,main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .space-gain{left:10px;bottom:5px;width:calc(100% - 20px)}
+main[data-machine-viewport="am02-momentova-charakteristika"] .machine-controls .buttons button{min-height:30px}
+main[data-machine-viewport="am02-momentova-charakteristika"] :is(.machine-controls,.harmonics) [hidden]{display:none!important}
+main[data-machine-viewport="am02-momentova-charakteristika"]>.harmonics{
+ --lesson-text:calc(var(--lesson-control-size) / var(--lesson-ui-scale) * var(--harmonics-fit,1));
+ --lesson-heading:calc(var(--lesson-panel-title-size) / var(--lesson-ui-scale) * var(--harmonics-fit,1));
+ display:grid;grid-template-columns:minmax(0,1fr);justify-items:start;gap:var(--lesson-gap);
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics>.card{
+ display:flex;flex:0 0 auto;align-items:center;flex-wrap:nowrap;white-space:nowrap;
+ gap:calc(6px * var(--harmonics-fit,1));height:auto;min-height:0;padding:4px 7px;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics h2{margin:0}
+main[data-machine-viewport="am02-momentova-charakteristika"]>.harmonics.side-by-side{
+ grid-template-columns:minmax(0,36fr) minmax(0,64fr);justify-items:stretch;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"]>.harmonics.side-by-side.compact-labels{
+ grid-template-columns:minmax(0,39fr) minmax(0,61fr);
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics.compact-labels [data-harmonic-group="belt"] small{display:none}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics.side-by-side>.card{
+ display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr;align-items:center;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics.side-by-side .harm-line{
+ display:flex;align-items:center;gap:8px;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics.side-by-side .card>.harm-line:first-child{
+ grid-column:1;grid-row:1;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics.side-by-side .card>.time-gain{
+ grid-column:1;grid-row:2;width:100%;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics.side-by-side .space-gain{flex:1 0 auto}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics.side-by-side .harm-row{flex:none}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics>.spatial-harmonics.stacked{
+ display:grid;grid-template-columns:auto auto auto;justify-items:start;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .spatial-harmonics.stacked [data-harmonic-group="belt"]{grid-column:2/-1}
+main[data-machine-viewport="am02-momentova-charakteristika"] .spatial-harmonics.stacked [data-harmonic-group="slot"]{grid-column:2}
+main[data-machine-viewport="am02-momentova-charakteristika"] .spatial-harmonics.stacked .space-gain{grid-column:3;grid-row:2}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .harm-row{
+ height:auto;min-height:0;margin:0;gap:calc(6px * var(--harmonics-fit,1));flex-wrap:nowrap;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .harm-picks{
+ flex-wrap:nowrap;gap:calc(6px * var(--harmonics-fit,1));padding:0;overflow:visible;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .harm-order{
+ gap:calc(4px * var(--harmonics-fit,1));padding-inline:calc(5px * var(--harmonics-fit,1));
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .time-gain{
+ position:static;width:calc(310px * var(--harmonics-fit,1));min-width:max-content;max-width:none;margin:0;
+}
+main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .time-gain .control{flex:1;min-width:max-content}
 
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .card:nth-child(2) .harm-row{margin-right:280px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .space-gain{left:auto;right:10px;top:30px;bottom:auto;width:260px}
-
-main[data-machine-viewport="am02-momentova-charakteristika"] #componentsLegend{flex-wrap:wrap;height:auto;min-height:25px;overflow:visible;white-space:normal;gap:3px 10px;flex-shrink:0}
 
 /* AM torque: plot and equivalent circuit consume the remaining host height;
    the merged operating information keeps only its natural content height. */
@@ -153,11 +203,11 @@ main[data-machine-viewport="am02-momentova-charakteristika"] .layout>.chart-card
 main[data-machine-viewport="am02-momentova-charakteristika"] .chart-card>:not(#torquePlot){flex-shrink:0}
 main[data-machine-viewport="am02-momentova-charakteristika"] .chart-card #torquePlot{display:block;flex:1 1 0;width:100%;height:0;min-height:220px;max-height:none}
 main[data-machine-viewport="am02-momentova-charakteristika"] .layout>aside,main[data-machine-viewport="am02-momentova-charakteristika"] .layout>aside:has(.wound:not([hidden])){grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:8px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .layout>aside>.schema-pane{display:flex;flex-direction:column;gap:4px;grid-column:1;grid-row:1;min-height:0!important;height:100%!important}
+main[data-machine-viewport="am02-momentova-charakteristika"] .layout>aside>.schema-pane{display:flex;flex-direction:column;gap:var(--lesson-gap);grid-column:1;grid-row:1;min-height:0!important;height:100%!important}
 main[data-machine-viewport="am02-momentova-charakteristika"] .schema-pane>:not(.schema-scroll){flex-shrink:0;margin-top:0;margin-bottom:0}
 main[data-machine-viewport="am02-momentova-charakteristika"] .schema-pane>.schema-scroll{flex:1 1 0;min-height:140px;display:flex;overflow:visible}
 main[data-machine-viewport="am02-momentova-charakteristika"] .schema-pane #schema{width:100%;height:100%;min-width:0;max-height:none;align-self:stretch}
-main[data-machine-viewport="am02-momentova-charakteristika"] .schema-pane #schemaInfo{height:auto;min-height:0;font-size:12px;line-height:1.35}
+main[data-machine-viewport="am02-momentova-charakteristika"] .schema-pane #schemaInfo{height:auto;min-height:0;line-height:1.35}
 main[data-machine-viewport="am02-momentova-charakteristika"] .layout>aside>.operating-panel{grid-column:1;grid-row:2;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;height:auto;min-height:0;padding:9px 11px;overflow:visible}
 main[data-machine-viewport="am02-momentova-charakteristika"] .operating-panel>section{height:auto;min-height:0;margin:0;padding:0;align-content:start;overflow:visible}
 main[data-machine-viewport="am02-momentova-charakteristika"] .operating-panel>.readings{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
@@ -165,12 +215,6 @@ main[data-machine-viewport="am02-momentova-charakteristika"] .operating-panel>:i
 main[data-machine-viewport="am02-momentova-charakteristika"] .operating-panel h2{font-size:14px;margin:0 0 5px}
 main[data-machine-viewport="am02-momentova-charakteristika"] .operating-panel .bar-pane p{font-size:12px;line-height:1.35;margin:4px 0}
 main[data-machine-viewport="am02-momentova-charakteristika"] .operating-panel .bar-equations{font-size:12px;padding:2px 0;gap:4px 8px}
-
-/* Harmonic chips determine their row height; never squeeze them into 25px. */
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .card{height:auto;min-height:124px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .harm-row{height:auto;min-height:34px;align-items:center}
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .harm-row+.harm-row{margin-top:5px}
-main[data-machine-viewport="am02-momentova-charakteristika"] .harmonics .harm-picks{padding:0;overflow:visible}
 
 /* Equivalent circuits grow with the logical host viewport, preserving viewBox. */
 main[data-machine-viewport="am02-momentova-charakteristika"]>.layout{grid-template-columns:minmax(0,1fr) clamp(560px,calc(var(--module-host-height,1000px) * .56),760px)}
